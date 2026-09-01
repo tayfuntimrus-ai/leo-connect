@@ -401,7 +401,7 @@ app.get(
         ok: true,
 
         version:
-          '3.4-admin-analytics'
+          '3.5-qr-center'
 
       });
 
@@ -2772,8 +2772,137 @@ app.get(
         );
 
 
+      const rows =
+        result.rows;
+
+
+      const stats = {
+
+        total_events:
+          rows.reduce(
+            (
+              total,
+              item
+            ) =>
+              total +
+              Number(
+                item.count || 0
+              ),
+            0
+          ),
+
+        profile_views:
+          0,
+
+        qr_scans:
+          0,
+
+        nfc_scans:
+          0,
+
+        whatsapp_clicks:
+          0,
+
+        phone_clicks:
+          0
+
+      };
+
+
+      rows.forEach(
+        item => {
+
+          const count =
+            Number(
+              item.count || 0
+            );
+
+
+          if (
+            item.type ===
+            'profile_view'
+          ) {
+
+            stats.profile_views =
+              count;
+
+          }
+
+
+          if (
+            item.type ===
+            'qr_scan'
+          ) {
+
+            stats.qr_scans +=
+              count;
+
+          }
+
+
+          if (
+            item.type ===
+            'qr'
+          ) {
+
+            stats.qr_scans +=
+              count;
+
+          }
+
+
+          if (
+            item.type ===
+            'nfc'
+          ) {
+
+            stats.nfc_scans =
+              count;
+
+          }
+
+
+          if (
+            item.type ===
+            'whatsapp'
+          ) {
+
+            stats.whatsapp_clicks =
+              count;
+
+          }
+
+
+          if (
+            item.type ===
+            'phone'
+          ) {
+
+            stats.phone_clicks =
+              count;
+
+          }
+
+        }
+      );
+
+
+      /* Keep individual event data available too */
+
+      rows.forEach(
+        item => {
+
+          stats[item.type] =
+            Number(
+              item.count || 0
+            );
+
+        }
+      );
+
+
       res.json(
-        result.rows
+        stats
       );
 
 
@@ -3237,6 +3366,33 @@ app.get(
 
 
 /* =========================
+   QR CENTER
+========================= */
+
+app.get(
+  '/qr-center',
+  (
+    req,
+    res
+  ) => {
+
+    res.sendFile(
+
+      path.join(
+
+        __dirname,
+        'public',
+        'qr-center.html'
+
+      )
+
+    );
+
+  }
+);
+
+
+/* =========================
    ADMIN PAGE
 ========================= */
 
@@ -3362,7 +3518,7 @@ initDatabase()
 
           console.log(
 
-            `LEO CONNECT 3.4 çalışıyor: ${PORT}`
+            `LEO CONNECT 3.5 çalışıyor: ${PORT}`
 
           );
 
