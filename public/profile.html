@@ -806,11 +806,15 @@ body{
 
 .iban-holder{
 
-  margin-top:6px;
+  margin-top:8px;
 
-  color:#888;
+  color:#fff;
 
-  font-size:10px;
+  font-size:13px;
+
+  font-weight:800;
+
+  word-break:break-word;
 
 }
 
@@ -821,7 +825,7 @@ body{
 
   gap:8px;
 
-  margin-top:13px;
+  margin-top:12px;
 
 }
 
@@ -867,7 +871,7 @@ body{
 }
 
 
-#ibanMessage{
+.iban-message{
 
   min-height:14px;
 
@@ -1500,7 +1504,7 @@ body{
       </strong>
 
       <span>
-        IBAN bilgilerini görüntüle
+        IBAN ve hesap sahibi bilgilerini görüntüle
       </span>
 
     </div>
@@ -1511,6 +1515,8 @@ body{
   <div class="iban-card">
 
 
+    <!-- IBAN -->
+
     <div class="iban-label">
       IBAN
     </div>
@@ -1519,14 +1525,6 @@ body{
     <div
       id="iban"
       class="iban-number"
-    >
-      -
-    </div>
-
-
-    <div
-      id="ibanHolder"
-      class="iban-holder"
     >
       -
     </div>
@@ -1546,6 +1544,44 @@ body{
 
     <div
       id="ibanMessage"
+      class="iban-message"
+    ></div>
+
+
+
+    <!-- HESAP SAHİBİ -->
+
+    <div
+      class="iban-label"
+      style="margin-top:18px;"
+    >
+      HESAP SAHİBİ
+    </div>
+
+
+    <div
+      id="ibanHolder"
+      class="iban-holder"
+    >
+      -
+    </div>
+
+
+    <div class="iban-buttons">
+
+      <button
+        class="iban-button"
+        onclick="copyIBANHolder()"
+      >
+        ADI KOPYALA
+      </button>
+
+    </div>
+
+
+    <div
+      id="ibanHolderMessage"
+      class="iban-message"
     ></div>
 
 
@@ -2354,13 +2390,80 @@ async function copyIBAN(){
     );
 
 
+    setTimeout(
+      function(){
+
+        document.getElementById(
+          "ibanMessage"
+        ).textContent =
+          "";
+
+      },
+      2500
+    );
+
+
   }catch(error){
 
     document.getElementById(
       "ibanMessage"
     ).textContent =
-      "IBAN: " +
       business.iban;
+
+  }
+
+}
+
+
+/* ==================================================
+   COPY IBAN HOLDER
+================================================== */
+
+async function copyIBANHolder(){
+
+  if(
+    !business?.iban_holder
+  )
+    return;
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      business.iban_holder
+    );
+
+
+    document.getElementById(
+      "ibanHolderMessage"
+    ).textContent =
+      "✓ Hesap sahibi adı kopyalandı.";
+
+
+    track(
+      "iban"
+    );
+
+
+    setTimeout(
+      function(){
+
+        document.getElementById(
+          "ibanHolderMessage"
+        ).textContent =
+          "";
+
+      },
+      2500
+    );
+
+
+  }catch(error){
+
+    document.getElementById(
+      "ibanHolderMessage"
+    ).textContent =
+      business.iban_holder;
 
   }
 
