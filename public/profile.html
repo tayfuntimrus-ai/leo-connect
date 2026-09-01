@@ -2393,33 +2393,83 @@ let source =
 
 async function getBusiness(){
 
-  const slug =
+  const pathParts =
     window.location.pathname
       .split("/")
-      .filter(Boolean)
-      .pop();
+      .filter(Boolean);
 
+  /*
+   * NFC:
+   * /p/nfc/ETIKET-KODU
+   */
+  if(
+    pathParts[0] === "p" &&
+    pathParts[1] === "nfc"
+  ){
 
-
-  if(!slug){
-
-    showError();
-
-    return;
+    source = "nfc";
 
   }
 
+  let endpoint = "";
 
+  /*
+   * NFC PROFILE
+   */
+  if(
+    pathParts.length >= 3 &&
+    pathParts[0] === "p" &&
+    pathParts[1] === "nfc"
+  ){
+
+    const code =
+      pathParts[2];
+
+    if(!code){
+
+      showError();
+
+      return;
+
+    }
+
+    endpoint =
+      "/api/profile-by-nfc/" +
+      encodeURIComponent(code);
+
+  }
+
+  /*
+   * NORMAL PROFILE / QR
+   *
+   * /p/slug
+   * /p/slug?source=qr
+   */
+  else{
+
+    const slug =
+      pathParts[1] ||
+      pathParts[0] ||
+      "";
+
+    if(!slug){
+
+      showError();
+
+      return;
+
+    }
+
+    endpoint =
+      "/api/profile/" +
+      encodeURIComponent(slug);
+
+  }
 
   try{
 
     const response =
-      await fetch(
-        "/api/profile/" +
-        encodeURIComponent(slug)
-      );
-
-
+      await fetch(endpoint);
 
     if(!response.ok){
 
@@ -2429,22 +2479,17 @@ async function getBusiness(){
 
     }
 
-
-
     business =
       await response.json();
 
-
-
     render();
-
-
 
     hideLoading();
 
   }catch(error){
 
     console.error(
+      "Profile loading error:",
       error
     );
 
@@ -3224,30 +3269,6 @@ function render(){
     );
 
   }
-
-
-
-  /* SOURCE TRACKING */
-
-  if(source === "qr"){
-
-    track(
-      "qr"
-    );
-
-  }
-
-
-
-  if(source === "nfc"){
-
-    track(
-      "nfc"
-    );
-
-  }
-
-}
 
 
 
