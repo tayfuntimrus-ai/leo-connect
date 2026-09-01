@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>LEO CONNECT</title>
+
+  <link rel="stylesheet" href="/style.css">
+
+  <style>
+    .profile-wrap{
+      width:min(520px,92%);
+      margin:auto;
+    }
+
+    .profile-box{
+      background:#fff;
+      border-radius:22px;
+      padding:32px 24px;
+      text-align:center;
+      box-shadow:0 25px 80px #0005;
+    }
+
+    .profile-logo{
+      width:78px;
+      height:78px;
+      margin:0 auto 15px;
+      border-radius:50%;
+      background:#171717;
+      display:grid;
+      place-items:center;
+      font-size:42px;
+    }
+
+    .profile-name{
+      font-size:32px;
+      margin:10px 0 5px;
+    }
+
+    .profile-category{
+      color:#a17a3e;
+      font-weight:700;
+    }
+
+    .profile-description{
+      color:#777;
+      line-height:1.7;
+      margin:18px 0 25px;
+    }
+
+    .profile-link{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:16px;
+      margin:10px 0;
+      border:1px solid #e2ded5;
+      border-radius:10px;
+      background:#fff;
+      transition:.2s;
+    }
+
+    .profile-link:hover{
+      transform:translateY(-2px);
+      box-shadow:0 8px 25px #0001;
+    }
+
+    .profile-icon{
+      width:38px;
+      height:38px;
+      border-radius:8px;
+      background:#f3efe7;
+      display:grid;
+      place-items:center;
+      font-size:19px;
+    }
+
+    .profile-link-text{
+      text-align:left;
+      font-weight:800;
+    }
+
+    .profile-footer{
+      margin-top:25px;
+      font-size:10px;
+      letter-spacing:.18em;
+      color:#a17a3e;
+    }
+
+    .copy-iban{
+      border:0;
+      background:#171717;
+      color:#fff;
+      padding:6px 9px;
+      border-radius:5px;
+      font-size:10px;
+      margin-left:auto;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<main class="profile">
+
+  <div class="profile-wrap">
+
+    <div class="profile-box" id="profileBox">
+
+      <div class="profile-logo">
+        🦁
+      </div>
+
+      <small>LEO CONNECT</small>
+
+      <h1 class="profile-name" id="businessName">
+        Yükleniyor...
+      </h1>
+
+      <div class="profile-category" id="category"></div>
+
+      <p class="profile-description" id="description"></p>
+
+      <div id="links"></div>
+
+      <div class="profile-footer">
+        DOKUN • BAĞLAN • KEŞFET • BÜYÜT
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<script>
+
+const slug =
+  window.location.pathname
+    .split("/")
+    .filter(Boolean)
+    .pop();
+
+
+async function loadProfile(){
+
+  try{
+
+    const response =
+      await fetch("/api/profile/" + slug);
+
+    const business =
+      await response.json();
+
+
+    if(!response.ok){
+
+      document.getElementById("profileBox").innerHTML =
+        "<h2>Profil bulunamadı</h2>";
+
+      return;
+
+    }
+
+
+    document.getElementById("businessName").textContent =
+      business.name || "İşletme";
+
+
+    document.getElementById("category").textContent =
+      business.category || "";
+
+
+    document.getElementById("description").textContent =
+      business.description || "";
+
+
+    const links =
+      document.getElementById("links");
+
+
+    function addLink(icon,title,url){
+
+      if(!url || url === "#") return;
+
+
+      const a =
+        document.createElement("a");
+
+      a.className="profile-link";
+
+      a.href=url;
+
+
+      a.innerHTML =
+        '<div class="profile-icon">'+icon+'</div>' +
+        '<div class="profile-link-text">'+title+'</div>';
+
+
+      links.appendChild(a);
+
+    }
+
+
+    if(business.phone){
+
+      addLink(
+        "📞",
+        "Telefon",
+        "tel:" + business.phone
+      );
+
+    }
+
+
+    if(business.address){
+
+      addLink(
+        "📍",
+        "Konum / Yol Tarifi",
+        business.address
+      );
+
+    }
+
+
+    if(business.instagram){
+
+      addLink(
+        "◎",
+        "Instagram",
+        business.instagram
+      );
+
+    }
+
+
+    if(business.tiktok){
+
+      addLink(
+        "♪",
+        "TikTok",
+        business.tiktok
+      );
+
+    }
+
+
+    if(business.menu){
+
+      addLink(
+        "🍽️",
+        "Menüyü Gör",
+        business.menu
+      );
+
+    }
+
+
+    if(business.iban){
+
+      const row =
+        document.createElement("div");
+
+      row.className="profile-link";
+
+      row.innerHTML =
+        '<div class="profile-icon">▣</div>' +
+        '<div class="profile-link-text">IBAN</div>' +
+        '<button class="copy-iban">Kopyala</button>';
+
+      row.querySelector("button").onclick =
+        async function(){
+
+          try{
+
+            await navigator.clipboard.writeText(
+              business.iban
+            );
+
+            this.textContent="Kopyalandı ✓";
+
+          }catch(e){
+
+            alert("IBAN: " + business.iban);
+
+          }
+
+        };
+
+      links.appendChild(row);
+
+    }
+
+  }catch(error){
+
+    document.getElementById("profileBox").innerHTML =
+      "<h2>Bir hata oluştu</h2>" +
+      "<p>Lütfen daha sonra tekrar deneyin.</p>";
+
+  }
+
+}
+
+
+loadProfile();
+
+</script>
+
+</body>
+</html>
