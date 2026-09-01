@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080808">
+  <title>QR Center — LEO CONNECT</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #070707;
+      --card: #101010;
+      --card2: #151515;
+      --gold: #d4af37;
+      --gold2: #f1d77a;
+      --text: #f7f4ea;
+      --muted: #9d9a91;
+      --border: rgba(212,175,55,.18);
+      --green: #54d98c;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(212,175,55,.14), transparent 35%),
+        linear-gradient(180deg, #080808 0%, #050505 100%);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    /* HEADER */
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: white;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(145deg, #f2d879, #b38a20);
+      color: #080808;
+      font-size: 25px;
+      font-weight: 900;
+      box-shadow: 0 8px 30px rgba(212,175,55,.2);
+    }
+
+    .brand-text strong {
+      display: block;
+      font-size: 16px;
+      letter-spacing: .16em;
+    }
+
+    .brand-text span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 3px;
+      letter-spacing: .12em;
+    }
+
+    .back-btn {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      text-decoration: none;
+      padding: 11px 15px;
+      border-radius: 12px;
+      font-size: 13px;
+      transition: .2s;
+    }
+
+    .back-btn:hover {
+      border-color: rgba(212,175,55,.45);
+      transform: translateY(-1px);
+    }
+
+    /* HERO */
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 30px;
+      background:
+        radial-gradient(circle at 90% 0%, rgba(212,175,55,.12), transparent 35%),
+        linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
+      box-shadow: 0 25px 80px rgba(0,0,0,.35);
+      margin-bottom: 20px;
+    }
+
+    .hero::after {
+      content: "♛";
+      position: absolute;
+      right: 30px;
+      bottom: -35px;
+      font-size: 180px;
+      color: rgba(212,175,55,.035);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      color: var(--gold2);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1;
+      letter-spacing: -.04em;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 650px;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    /* GRID */
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+
+    /* QR CARD */
+
+    .qr-card {
+      padding: 28px;
+      text-align: center;
+    }
+
+    .business-head {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .business-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 1px solid rgba(212,175,55,.3);
+      background: #111;
+    }
+
+    .business-name {
+      text-align: left;
+    }
+
+    .business-name strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .business-name span {
+      display: block;
+      color: var(--gold2);
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .qr-wrap {
+      width: min(390px, 100%);
+      aspect-ratio: 1;
+      margin: 0 auto 22px;
+      padding: 18px;
+      border-radius: 26px;
+      background: #fff;
+      box-shadow:
+        0 0 0 1px rgba(212,175,55,.25),
+        0 25px 80px rgba(0,0,0,.5);
+    }
+
+    .qr-wrap img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .qr-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(84,217,140,.2);
+      background: rgba(84,217,140,.07);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 12px currentColor;
+    }
+
+    /* URL */
+
+    .url-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      background: rgba(0,0,0,.25);
+      margin-bottom: 15px;
+    }
+
+    .url-text {
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      text-align: left;
+      color: #d8d4ca;
+      font-size: 12px;
+      padding-left: 8px;
+    }
+
+    .copy-mini {
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      background: rgba(212,175,55,.08);
+      color: var(--gold2);
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    /* ACTIONS */
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .action {
+      min-height: 48px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.025);
+      color: var(--text);
+      border-radius: 13px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      transition: .2s;
+    }
+
+    .action:hover {
+      transform: translateY(-2px);
+      border-color: rgba(212,175,55,.4);
+      background: rgba(212,175,55,.07);
+    }
+
+    .action.primary {
+      border-color: rgba(212,175,55,.35);
+      background: linear-gradient(135deg, rgba(212,175,55,.2), rgba(212,175,55,.06));
+      color: var(--gold2);
+    }
+
+    /* RIGHT */
+
+    .right-column {
+      display: grid;
+      gap: 20px;
+    }
+
+    .stats-card {
+      padding: 24px;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .card-title h2 {
+      font-size: 17px;
+      letter-spacing: -.02em;
+    }
+
+    .card-title span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .big-stat {
+      padding: 22px;
+      border-radius: 18px;
+      border: 1px solid rgba(212,175,55,.18);
+      background:
+        radial-gradient(circle at 90% 0%, rgba(212,175,55,.12), transparent 45%),
+        rgba(0,0,0,.18);
+      margin-bottom: 12px;
+    }
+
+    .big-stat small {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .big-stat strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 38px;
+      line-height: 1;
+      color: var(--gold2);
+      letter-spacing: -.04em;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .small-stat {
+      padding: 17px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .small-stat small {
+      color: var(--muted);
+      font-size: 10px;
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .small-stat strong {
+      font-size: 21px;
+    }
+
+    /* INFO */
+
+    .info-card {
+      padding: 24px;
+    }
+
+    .info-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .info-icon {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: rgba(212,175,55,.08);
+      color: var(--gold2);
+      font-size: 16px;
+      flex: 0 0 auto;
+    }
+
+    .info-item strong {
+      display: block;
+      font-size: 12px;
+    }
+
+    .info-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+
+    /* USAGE */
+
+    .usage-card {
+      padding: 24px;
+      margin-top: 20px;
+    }
+
+    .usage-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .usage-item {
+      min-height: 90px;
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,.02);
+      text-align: center;
+    }
+
+    .usage-item .icon {
+      font-size: 21px;
+      margin-bottom: 8px;
+    }
+
+    .usage-item strong {
+      display: block;
+      font-size: 11px;
+    }
+
+    .usage-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 9px;
+      margin-top: 4px;
+    }
+
+    .notice {
+      margin-top: 15px;
+      padding: 13px 15px;
+      border-radius: 13px;
+      border: 1px solid rgba(212,175,55,.14);
+      background: rgba(212,175,55,.045);
+      color: #c9c5bb;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    /* FOOTER */
+
+    footer {
+      text-align: center;
+      color: #68655e;
+      font-size: 10px;
+      padding: 30px 0 10px;
+      letter-spacing: .08em;
+    }
+
+    /* TOAST */
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 25px;
+      transform: translate(-50%, 30px);
+      opacity: 0;
+      pointer-events: none;
+      padding: 13px 18px;
+      border-radius: 13px;
+      background: #171717;
+      border: 1px solid rgba(212,175,55,.3);
+      color: var(--text);
+      box-shadow: 0 15px 40px rgba(0,0,0,.45);
+      font-size: 12px;
+      z-index: 100;
+      transition: .25s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    /* LOADING */
+
+    .loading {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: #070707;
+      z-index: 999;
+      transition: .3s;
+    }
+
+    .loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 3px solid rgba(212,175,55,.15);
+      border-top-color: var(--gold);
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 850px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .usage-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        padding: 14px;
+      }
+
+      .topbar {
+        margin-bottom: 18px;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+      }
+
+      .brand-text strong {
+        font-size: 13px;
+      }
+
+      .back-btn {
+        padding: 9px 11px;
+        font-size: 11px;
+      }
+
+      .hero {
+        padding: 23px 20px;
+        border-radius: 22px;
+      }
+
+      h1 {
+        font-size: 31px;
+      }
+
+      .qr-card,
+      .stats-card,
+      .info-card,
+      .usage-card {
+        padding: 19px;
+      }
+
+      .qr-wrap {
+        padding: 13px;
+        border-radius: 21px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .usage-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="loading" id="loading">
+    <div class="loader"></div>
+  </div>
+
+  <main class="page">
+
+    <header class="topbar">
+      <a href="/dashboard" class="brand">
+        <div class="brand-mark">♛</div>
+        <div class="brand-text">
+          <strong>LEO CONNECT</strong>
+          <span>QR CENTER</span>
+        </div>
+      </a>
+
+      <a href="/dashboard" class="back-btn">
+        ← Business Center
+      </a>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">Digital Identity System</div>
+      <h1>QR Center</h1>
+      <p>
+        İşletmenizin dijital profilini tek bir QR kod üzerinden müşterilerinize
+        ulaştırın. QR kodunuzu paylaşın, yazdırın veya işletmenizin farklı
+        noktalarında kullanın.
+      </p>
+    </section>
+
+    <section class="main-grid">
+
+      <!-- QR -->
+
+      <div class="card qr-card">
+
+        <div class="business-head">
+          <img
+            id="businessLogo"
+            class="business-logo"
+            src=""
+            alt="Logo"
+            style="display:none;"
+          >
+
+          <div class="business-name">
+            <strong id="businessName">İşletmeniz</strong>
+            <span id="businessCategory">LEO CONNECT</span>
+          </div>
+        </div>
+
+        <div class="qr-wrap">
+          <img id="qrImage" src="" alt="QR Code">
+        </div>
+
+        <div class="qr-status">
+          <span class="status-dot"></span>
+          QR Kod Aktif
+        </div>
+
+        <div class="url-box">
+          <div class="url-text" id="qrUrl">
+            QR bağlantısı hazırlanıyor...
+          </div>
+
+          <button class="copy-mini" onclick="copyUrl()">
+            Kopyala
+          </button>
+        </div>
+
+        <div class="actions">
+
+          <button class="action primary" onclick="downloadQR()">
+            ↓ QR İndir
+          </button>
+
+          <button class="action" onclick="printQR()">
+            🖨 Yazdır
+          </button>
+
+          <button class="action" onclick="openProfile()">
+            ↗ Profili Aç
+          </button>
+
+          <button class="action" onclick="shareProfile()">
+            ↗ Paylaş
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- RIGHT -->
+
+      <div class="right-column">
+
+        <div class="card stats-card">
+
+          <div class="card-title">
+            <h2>QR Performansı</h2>
+            <span>Toplam</span>
+          </div>
+
+          <div class="big-stat">
+            <small>Toplam QR Taraması</small>
+            <strong id="qrScans">0</strong>
+          </div>
+
+          <div class="stat-grid">
+
+            <div class="small-stat">
+              <small>Profil Görüntülenmesi</small>
+              <strong id="profileViews">0</strong>
+            </div>
+
+            <div class="small-stat">
+              <small>Toplam Etkileşim</small>
+              <strong id="totalEvents">0</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="card info-card">
+
+          <div class="card-title">
+            <h2>QR Nasıl Kullanılır?</h2>
+          </div>
+
+          <div class="info-list">
+
+            <div class="info-item">
+              <div class="info-icon">📱</div>
+              <div>
+                <strong>Müşteri Kamerasını Açar</strong>
+                <span>Telefon kamerasından QR kodu tarar.</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-icon">🌐</div>
+              <div>
+                <strong>Profil Açılır</strong>
+                <span>İşletmenizin LEO CONNECT profiline ulaşır.</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-icon">⚡</div>
+              <div>
+                <strong>Etkileşim Gerçekleşir</strong>
+                <span>Telefon, WhatsApp, konum, sosyal medya ve diğer aksiyonlara ulaşır.</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- USAGE -->
+
+    <section class="card usage-card">
+
+      <div class="card-title">
+        <div>
+          <h2>QR Kullanım Alanları</h2>
+        </div>
+        <span>LEO önerileri</span>
+      </div>
+
+      <div class="usage-grid">
+
+        <div class="usage-item">
+          <div class="icon">🍽</div>
+          <strong>Masa</strong>
+          <span>Müşteri masaları</span>
+        </div>
+
+        <div class="usage-item">
+          <div class="icon">📋</div>
+          <strong>Menü</strong>
+          <span>Basılı menüler</span>
+        </div>
+
+        <div class="usage-item">
+          <div class="icon">🏪</div>
+          <strong>Vitrin</strong>
+          <span>İşletme vitrini</span>
+        </div>
+
+        <div class="usage-item">
+          <div class="icon">💳</div>
+          <strong>Kasa</strong>
+          <span>Ödeme noktası</span>
+        </div>
+
+        <div class="usage-item">
+          <div class="icon">🪪</div>
+          <strong>Kartvizit</strong>
+          <span>Dijital kartvizit</span>
+        </div>
+
+        <div class="usage-item">
+          <div class="icon">🎪</div>
+          <strong>Stand</strong>
+          <span>Promosyon standı</span>
+        </div>
+
+        <div class="usage-item">
+          <div class="icon">📦</div>
+          <strong>Paket</strong>
+          <span>Ürün paketleri</span>
+        </div>
+
+        <div class="usage-item">
+          <div class="icon">✨</div>
+          <strong>Diğer</strong>
+          <span>Özel kullanım</span>
+        </div>
+
+      </div>
+
+      <div class="notice">
+        <strong>LEO önerisi:</strong>
+        QR kodu yalnızca tek bir noktada değil; masa, kasa, vitrin,
+        kartvizit ve paket gibi farklı temas noktalarında kullanarak
+        müşterilerin işletme profilinize ulaşmasını kolaylaştırabilirsiniz.
+      </div>
+
+    </section>
+
+    <footer>
+      LEO CONNECT · DIGITAL BUSINESS IDENTITY
+    </footer>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const token = localStorage.getItem("token");
+
+    let business = null;
+    let qrData = null;
+    let stats = null;
+
+    if (!token) {
+      window.location.href = "/login";
+    }
+
+    function headers() {
+      return {
+        "Authorization": "Bearer " + token,
+        "Content-Type": "application/json"
+      };
+    }
+
+    async function api(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          ...headers(),
+          ...(options.headers || {})
+        }
+      });
+
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        throw new Error("Oturum sona erdi.");
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Bir hata oluştu.");
+      }
+
+      return data;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      clearTimeout(window.toastTimer);
+
+      window.toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    async function loadBusiness() {
+      const data = await api("/api/me");
+
+      business = data.business || data;
+
+      document.getElementById("businessName").textContent =
+        business.name || "İşletmeniz";
+
+      document.getElementById("businessCategory").textContent =
+        business.category || "LEO CONNECT";
+
+      if (business.logo_url) {
+        const logo = document.getElementById("businessLogo");
+
+        logo.src = business.logo_url;
+        logo.style.display = "block";
+      }
+    }
+
+    async function loadQR() {
+      qrData = await api("/api/qr");
+
+      document.getElementById("qrImage").src = qrData.dataUrl;
+      document.getElementById("qrUrl").textContent = qrData.url;
+    }
+
+    async function loadStats() {
+      stats = await api("/api/stats");
+
+      const qrScans =
+        stats.qr_scans ??
+        stats.qr ??
+        stats.sources?.qr ??
+        0;
+
+      const profileViews =
+        stats.profile_views ??
+        stats.profileView ??
+        0;
+
+      const totalEvents =
+        stats.total_events ??
+        stats.total ??
+        0;
+
+      document.getElementById("qrScans").textContent =
+        Number(qrScans).toLocaleString("tr-TR");
+
+      document.getElementById("profileViews").textContent =
+        Number(profileViews).toLocaleString("tr-TR");
+
+      document.getElementById("totalEvents").textContent =
+        Number(totalEvents).toLocaleString("tr-TR");
+    }
+
+    async function copyUrl() {
+      if (!qrData?.url) return;
+
+      try {
+        await navigator.clipboard.writeText(qrData.url);
+        showToast("QR bağlantısı kopyalandı");
+      } catch {
+        showToast("Bağlantı kopyalanamadı");
+      }
+    }
+
+    function openProfile() {
+      if (!qrData?.url) return;
+
+      window.open(qrData.url, "_blank");
+    }
+
+    async function shareProfile() {
+      if (!qrData?.url) return;
+
+      const shareData = {
+        title: business?.name || "LEO CONNECT",
+        text: "İşletme profilimizi görüntüleyin.",
+        url: qrData.url
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (error) {
+          if (error.name !== "AbortError") {
+            showToast("Paylaşım başlatılamadı");
+          }
+        }
+      } else {
+        await copyUrl();
+        showToast("Bağlantı kopyalandı");
+      }
+    }
+
+    async function downloadQR() {
+      if (!qrData?.dataUrl) return;
+
+      try {
+        const link = document.createElement("a");
+
+        link.href = qrData.dataUrl;
+        link.download =
+          (business?.name || "leo-connect") + "-qr.png";
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        showToast("QR kod indiriliyor");
+      } catch {
+        showToast("QR indirilemedi");
+      }
+    }
+
+    function printQR() {
+      if (!qrData?.dataUrl) return;
+
+      const name = business?.name || "LEO CONNECT";
+
+      const printWindow = window.open("", "_blank");
+
+      if (!printWindow) {
+        showToast("Yazdırma penceresi açılamadı");
+        return;
+      }
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="tr">
+        <head>
+          <meta charset="UTF-8">
+          <title>${escapeHtml(name)} — QR</title>
+
+          <style>
+            * {
+              box-sizing: border-box;
+            }
+
+            body {
+              margin: 0;
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-family: Arial, sans-serif;
+              background: white;
+              color: #111;
+            }
+
+            .sheet {
+              width: 90%;
+              max-width: 600px;
+              text-align: center;
+              padding: 40px;
+            }
+
+            h1 {
+              margin: 0 0 10px;
+              font-size: 30px;
+            }
+
+            p {
+              color: #666;
+              margin-bottom: 25px;
+            }
+
+            img {
+              width: min(420px, 85vw);
+              height: auto;
+              display: block;
+              margin: auto;
+            }
+
+            .url {
+              margin-top: 22px;
+              font-size: 12px;
+              color: #555;
+              word-break: break-all;
+            }
+
+            .brand {
+              margin-top: 30px;
+              font-size: 11px;
+              letter-spacing: .2em;
+              color: #777;
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="sheet">
+            <h1>${escapeHtml(name)}</h1>
+            <p>Profilimizi görüntülemek için QR kodu tarayın.</p>
+
+            <img src="${qrData.dataUrl}" alt="QR Code">
+
+            <div class="url">
+              ${escapeHtml(qrData.url)}
+            </div>
+
+            <div class="brand">
+              LEO CONNECT
+            </div>
+          </div>
+
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 300);
+            };
+          <\/script>
+        </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function init() {
+      try {
+        await loadBusiness();
+        await loadQR();
+        await loadStats();
+      } catch (error) {
+        console.error(error);
+        showToast(error.message || "Veriler yüklenemedi");
+      } finally {
+        setTimeout(() => {
+          document.getElementById("loading").classList.add("hidden");
+        }, 350);
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
