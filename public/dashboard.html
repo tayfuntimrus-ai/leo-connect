@@ -4,161 +4,774 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>LEO CONNECT — Panel</title>
+  <title>LEO CONNECT — Premium Panel</title>
 
   <link rel="stylesheet" href="/style.css">
+
+  <style>
+
+    :root{
+      --gold:#b8893f;
+      --gold-light:#d8b16a;
+      --black:#111;
+      --soft:#f6f3ed;
+      --border:#e5dfd4;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      background:
+        radial-gradient(
+          circle at top right,
+          #d7b36b18,
+          transparent 35%
+        ),
+        #f7f4ee;
+      color:#171717;
+      font-family:Arial,sans-serif;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:18px 24px;
+      background:#111;
+      color:#fff;
+      border-bottom:1px solid #b8893f55;
+    }
+
+    header b{
+      letter-spacing:.08em;
+    }
+
+    header b span{
+      color:#d5a957;
+    }
+
+    header a{
+      color:#fff;
+      text-decoration:none;
+      font-size:13px;
+    }
+
+    .dashboard{
+      width:min(980px,94%);
+      margin:35px auto 80px;
+    }
+
+    .eyebrow{
+      color:var(--gold);
+      font-size:11px;
+      letter-spacing:.18em;
+      font-weight:700;
+    }
+
+    .dashboard-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:20px;
+      margin-bottom:28px;
+    }
+
+    .dashboard-title h1{
+      margin:8px 0 0;
+      font-size:34px;
+    }
+
+    .dashboard-title p{
+      margin:5px 0 0;
+      color:#777;
+    }
+
+    .premium-badge{
+      background:#111;
+      color:#d5a957;
+      padding:9px 14px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.08em;
+      white-space:nowrap;
+    }
+
+    .box{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:28px;
+      margin:22px 0;
+      box-shadow:0 15px 45px #0000000a;
+    }
+
+    .box h2{
+      margin:0 0 8px;
+      font-size:22px;
+    }
+
+    .box-description{
+      color:#777;
+      font-size:14px;
+      line-height:1.6;
+      margin:0 0 22px;
+    }
+
+    .field-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    input,
+    textarea{
+      width:100%;
+      border:1px solid #ddd7cc;
+      background:#fff;
+      border-radius:12px;
+      padding:14px;
+      font-size:14px;
+      outline:none;
+    }
+
+    input:focus,
+    textarea:focus{
+      border-color:var(--gold);
+      box-shadow:0 0 0 3px #b8893f18;
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+
+    .full{
+      grid-column:1/-1;
+    }
+
+    .hint{
+      color:#888;
+      font-size:12px;
+      line-height:1.5;
+      margin:4px 0 0;
+    }
+
+    .save-row{
+      display:flex;
+      align-items:center;
+      gap:15px;
+      margin-top:20px;
+    }
+
+    button,
+    .action{
+      border:0;
+      border-radius:11px;
+      padding:13px 18px;
+      cursor:pointer;
+      font-weight:700;
+      text-decoration:none;
+      display:inline-block;
+      font-size:13px;
+    }
+
+    .primary{
+      background:#b8893f;
+      color:#fff;
+    }
+
+    .dark{
+      background:#111;
+      color:#fff;
+    }
+
+    .light{
+      background:#f1ede5;
+      color:#222;
+    }
+
+    #message{
+      color:#9b712f;
+      font-size:13px;
+      margin:0;
+    }
+
+    /* QR + NFC */
+
+    .digital-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+    }
+
+    .digital-card{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:22px;
+      background:#fcfbf8;
+    }
+
+    .digital-card h3{
+      margin:0 0 8px;
+    }
+
+    .digital-card p{
+      color:#777;
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .qr-image{
+      width:230px;
+      max-width:100%;
+      display:block;
+      margin:20px auto;
+    }
+
+    .link-box{
+      background:#f3f0ea;
+      border-radius:10px;
+      padding:12px;
+      font-size:11px;
+      word-break:break-all;
+      line-height:1.5;
+      margin:15px 0;
+    }
+
+    .actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    /* NFC */
+
+    .nfc-symbol{
+      width:70px;
+      height:70px;
+      border-radius:18px;
+      background:#111;
+      color:#d5a957;
+      display:grid;
+      place-items:center;
+      font-size:32px;
+      margin-bottom:18px;
+    }
+
+    .nfc-url{
+      background:#111;
+      color:#fff;
+      padding:15px;
+      border-radius:11px;
+      font-size:11px;
+      line-height:1.5;
+      word-break:break-all;
+      margin:18px 0;
+    }
+
+    .nfc-status{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      color:#777;
+      margin-top:14px;
+    }
+
+    .status-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#3c9b61;
+    }
+
+    /* STATS */
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:12px;
+      margin-top:20px;
+    }
+
+    .stat{
+      background:#faf8f4;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+    }
+
+    .stat small{
+      display:block;
+      color:#9b712f;
+      font-size:11px;
+      margin-bottom:8px;
+    }
+
+    .stat strong{
+      font-size:30px;
+    }
+
+    .stat-label{
+      color:#888;
+      font-size:11px;
+      margin-top:5px;
+    }
+
+    /* QUICK */
+
+    .quick-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .quick{
+      padding:18px;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:#fff;
+      text-decoration:none;
+      color:#171717;
+    }
+
+    .quick-icon{
+      font-size:25px;
+      margin-bottom:10px;
+    }
+
+    .quick strong{
+      display:block;
+      margin-bottom:4px;
+    }
+
+    .quick span{
+      color:#888;
+      font-size:11px;
+    }
+
+    @media(max-width:700px){
+
+      .dashboard{
+        width:92%;
+        margin-top:25px;
+      }
+
+      .dashboard-title{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .dashboard-title h1{
+        font-size:29px;
+      }
+
+      .field-grid{
+        grid-template-columns:1fr;
+      }
+
+      .full{
+        grid-column:auto;
+      }
+
+      .digital-grid{
+        grid-template-columns:1fr;
+      }
+
+      .stats{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .stat strong{
+        font-size:26px;
+      }
+
+      .quick-grid{
+        grid-template-columns:1fr;
+      }
+
+      .box{
+        padding:20px;
+        border-radius:18px;
+      }
+
+    }
+
+  </style>
 </head>
+
 
 <body>
 
 <header>
-  <b>🦁 LEO <span>CONNECT</span></b>
-  <a href="/">Siteyi Gör</a>
+
+  <b>
+    🦁 LEO <span>CONNECT</span>
+  </b>
+
+  <a href="/">
+    Siteyi Gör →
+  </a>
+
 </header>
+
 
 <main class="dashboard">
 
-  <small>İŞLETME PANELİ</small>
 
-  <h1 id="title">Panel</h1>
+  <!-- BAŞLIK -->
+
+  <div class="dashboard-title">
+
+    <div>
+
+      <div class="eyebrow">
+        LEO CONNECT • BUSINESS
+      </div>
+
+      <h1 id="title">
+        İşletme Paneli
+      </h1>
+
+      <p>
+        Dijital profilini ve bağlantılarını yönet.
+      </p>
+
+    </div>
+
+    <div class="premium-badge">
+      PREMIUM PANEL
+    </div>
+
+  </div>
+
+
+  <!-- HIZLI İŞLEMLER -->
+
+  <div class="box">
+
+    <div class="eyebrow">
+      HIZLI İŞLEMLER
+    </div>
+
+    <h2>
+      Her şey tek panelde.
+    </h2>
+
+    <div class="quick-grid">
+
+      <a
+        class="quick"
+        id="quickProfile"
+        target="_blank"
+      >
+
+        <div class="quick-icon">
+          👤
+        </div>
+
+        <strong>
+          Profilimi Gör
+        </strong>
+
+        <span>
+          Müşterinin gördüğü sayfa
+        </span>
+
+      </a>
+
+
+      <a
+        class="quick"
+        id="quickQR"
+      >
+
+        <div class="quick-icon">
+          ▣
+        </div>
+
+        <strong>
+          QR Kodum
+        </strong>
+
+        <span>
+          QR kodunu aç
+        </span>
+
+      </a>
+
+
+      <a
+        class="quick"
+        href="#nfc"
+      >
+
+        <div class="quick-icon">
+          📡
+        </div>
+
+        <strong>
+          NFC
+        </strong>
+
+        <span>
+          NFC bağlantısını yönet
+        </span>
+
+      </a>
+
+    </div>
+
+  </div>
 
 
   <!-- İŞLETME BİLGİLERİ -->
 
   <div class="box">
 
-    <h2>İşletme Bilgileri</h2>
+    <div class="eyebrow">
+      PROFİL
+    </div>
 
-    <input
-      id="name"
-      placeholder="İşletme adı"
-    >
+    <h2>
+      İşletme Bilgileri
+    </h2>
 
-    <input
-      id="category"
-      placeholder="Kategori"
-    >
-
-    <textarea
-      id="description"
-      placeholder="İşletme açıklaması"
-    ></textarea>
-
-    <input
-      id="phone"
-      placeholder="Telefon"
-    >
-
-    <input
-      id="whatsapp"
-      placeholder="WhatsApp numarası veya bağlantısı"
-    >
-
-    <p class="hint">
-      Numara girersen otomatik olarak WhatsApp bağlantısına çevrilir.
-      Örn: 905401300626
+    <p class="box-description">
+      Müşterilerinin göreceği işletme bilgilerini buradan yönet.
     </p>
 
-    <input
-      id="address"
-      placeholder="Google Maps / Konum bağlantısı"
-    >
 
-    <input
-      id="instagram"
-      placeholder="Instagram bağlantısı"
-    >
+    <div class="field-grid">
 
-    <input
-      id="tiktok"
-      placeholder="TikTok bağlantısı"
-    >
+      <input
+        id="name"
+        placeholder="İşletme adı"
+      >
 
-    <input
-      id="google_review"
-      placeholder="Google yorum bağlantısı"
-    >
+      <input
+        id="category"
+        placeholder="Kategori"
+      >
 
-    <input
-      id="website"
-      placeholder="Web sitesi bağlantısı"
-    >
+      <textarea
+        id="description"
+        class="full"
+        placeholder="İşletme açıklaması"
+      ></textarea>
 
-    <input
-      id="menu"
-      placeholder="Menü bağlantısı"
-    >
+      <input
+        id="phone"
+        placeholder="Telefon"
+      >
 
-    <input
-      id="iban"
-      placeholder="IBAN"
-    >
+      <input
+        id="whatsapp"
+        placeholder="WhatsApp numarası veya bağlantısı"
+      >
 
-    <input
-      id="iban_holder"
-      placeholder="IBAN sahibi ad soyad"
-    >
+      <input
+        id="address"
+        placeholder="Google Maps / Konum bağlantısı"
+      >
 
-    <input
-      id="hours"
-      placeholder="Çalışma saatleri"
-    >
+      <input
+        id="instagram"
+        placeholder="Instagram bağlantısı"
+      >
 
-    <input
-      id="logo_url"
-      placeholder="Logo görsel URL'si"
-    >
+      <input
+        id="tiktok"
+        placeholder="TikTok bağlantısı"
+      >
+
+      <input
+        id="google_review"
+        placeholder="Google yorum bağlantısı"
+      >
+
+      <input
+        id="website"
+        placeholder="Web sitesi bağlantısı"
+      >
+
+      <input
+        id="menu"
+        placeholder="Menü bağlantısı"
+      >
+
+      <input
+        id="iban"
+        placeholder="IBAN"
+      >
+
+      <input
+        id="iban_holder"
+        placeholder="IBAN sahibi ad soyad"
+      >
+
+      <input
+        id="hours"
+        placeholder="Çalışma saatleri"
+      >
+
+      <input
+        id="logo_url"
+        class="full"
+        placeholder="Logo görsel URL'si"
+      >
+
+    </div>
+
 
     <p class="hint">
-      Logo URL'si ekleyebilirsin.
-      Kalıcı dosya yükleme sistemi sonraki aşamada bağlanacak.
+      WhatsApp alanına sadece telefon numarası yazarsan sistem otomatik olarak WhatsApp bağlantısı oluşturur.
     </p>
 
-    <button onclick="save()">
-      Bilgileri Kaydet
-    </button>
 
-    <p id="message"></p>
+    <div class="save-row">
+
+      <button
+        class="primary"
+        onclick="save()"
+      >
+        Bilgileri Kaydet
+      </button>
+
+      <p id="message"></p>
+
+    </div>
 
   </div>
 
 
-  <!-- QR -->
+  <!-- QR + NFC -->
 
   <div class="box">
 
-    <h2>QR Kodun</h2>
+    <div class="eyebrow">
+      DİJİTAL BAĞLANTI
+    </div>
 
-    <p>
-      Bu QR kod müşterilerini işletme profilinize yönlendirir.
+    <h2>
+      QR + NFC
+    </h2>
+
+    <p class="box-description">
+      İşletmeni tek dokunuşla veya tek taramayla müşterilerine ulaştır.
     </p>
 
-    <img
-      id="qr"
-      class="stand-qr"
-      alt="LEO CONNECT QR Kodu"
-    >
 
-    <p
-      id="url"
-      style="word-break:break-all;text-align:center"
-    ></p>
+    <div class="digital-grid">
 
-    <div class="qr-actions">
 
-      <a
-        id="open"
-        target="_blank"
+      <!-- QR -->
+
+      <div class="digital-card">
+
+        <h3>
+          ▣ QR Kodun
+        </h3>
+
+        <p>
+          QR kodunu masa, stand, menü, vitrin veya kartvizit üzerinde kullanabilirsin.
+        </p>
+
+        <img
+          id="qr"
+          class="qr-image"
+          alt="LEO CONNECT QR Kodu"
+        >
+
+        <div
+          id="url"
+          class="link-box"
+        >
+          QR bağlantısı hazırlanıyor...
+        </div>
+
+        <div class="actions">
+
+          <a
+            id="open"
+            class="action dark"
+            target="_blank"
+          >
+            Profili Aç
+          </a>
+
+          <a
+            id="download"
+            class="action primary"
+            download="leo-connect-qr.png"
+          >
+            QR'ı İndir
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <!-- NFC -->
+
+      <div
+        class="digital-card"
+        id="nfc"
       >
-        Profili Aç
-      </a>
 
-      <a
-        id="download"
-        download="leo-connect-qr.png"
-      >
-        QR'ı İndir
-      </a>
+        <div class="nfc-symbol">
+          📡
+        </div>
+
+        <h3>
+          NFC Bağlantın
+        </h3>
+
+        <p>
+          Aşağıdaki bağlantıyı NFC etiketine yazdır.
+          Müşteri telefonunu NFC etiketine dokundurduğunda doğrudan işletme profilin açılır.
+        </p>
+
+        <div
+          id="nfcUrl"
+          class="nfc-url"
+        >
+          NFC bağlantısı hazırlanıyor...
+        </div>
+
+        <div class="actions">
+
+          <button
+            class="dark"
+            onclick="copyNFC()"
+          >
+            NFC Bağlantısını Kopyala
+          </button>
+
+        </div>
+
+        <div class="nfc-status">
+
+          <span class="status-dot"></span>
+
+          NFC sistemi hazır
+
+        </div>
+
+        <p
+          id="nfcMessage"
+          class="hint"
+        ></p>
+
+      </div>
 
     </div>
 
@@ -169,238 +782,503 @@
 
   <div class="box">
 
-    <h2>İstatistikler</h2>
+    <div class="eyebrow">
+      ANALİTİK
+    </div>
+
+    <h2>
+      İstatistikler
+    </h2>
+
+    <p class="box-description">
+      Müşterilerinin işletmenle nasıl etkileşime geçtiğini takip et.
+    </p>
+
 
     <div class="stats">
 
       <div class="stat">
-        <small>Profil</small>
-        <strong id="profileViews">0</strong>
+
+        <small>
+          PROFİL
+        </small>
+
+        <strong id="profileViews">
+          0
+        </strong>
+
+        <div class="stat-label">
+          Görüntüleme
+        </div>
+
       </div>
 
-      <div class="stat">
-        <small>WhatsApp</small>
-        <strong id="whatsappViews">0</strong>
-      </div>
 
       <div class="stat">
-        <small>Telefon</small>
-        <strong id="phoneViews">0</strong>
+
+        <small>
+          WHATSAPP
+        </small>
+
+        <strong id="whatsappViews">
+          0
+        </strong>
+
+        <div class="stat-label">
+          Etkileşim
+        </div>
+
       </div>
 
-      <div class="stat">
-        <small>QR</small>
-        <strong id="qrViews">0</strong>
-      </div>
 
       <div class="stat">
-        <small>NFC</small>
-        <strong id="nfcViews">0</strong>
+
+        <small>
+          TELEFON
+        </small>
+
+        <strong id="phoneViews">
+          0
+        </strong>
+
+        <div class="stat-label">
+          Tıklama
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <small>
+          QR
+        </small>
+
+        <strong id="qrViews">
+          0
+        </strong>
+
+        <div class="stat-label">
+          Tarama
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <small>
+          NFC
+        </small>
+
+        <strong id="nfcViews">
+          0
+        </strong>
+
+        <div class="stat-label">
+          Dokunma
+        </div>
+
       </div>
 
     </div>
 
   </div>
 
+
 </main>
 
 
 <script>
 
-const token = localStorage.getItem("token");
 
-if (!token) {
-  window.location.href = "/login";
+/* =========================
+   AUTH
+========================= */
+
+const token =
+  localStorage.getItem("token");
+
+
+if(!token){
+
+  window.location.href =
+    "/login";
+
 }
 
 
+/* =========================
+   FIELDS
+========================= */
+
 const fields = [
+
   "name",
   "category",
   "description",
+
   "phone",
   "whatsapp",
+
   "address",
+
   "instagram",
   "tiktok",
+
   "google_review",
   "website",
   "menu",
+
   "iban",
   "iban_holder",
+
   "hours",
+
   "logo_url"
+
 ];
 
 
-async function api(url, options = {}) {
+/* =========================
+   API
+========================= */
+
+async function api(
+  url,
+  options={}
+){
 
   options.headers = {
+
     ...(options.headers || {}),
-    "Authorization": "Bearer " + token,
-    "Content-Type": "application/json"
+
+    "Authorization":
+      "Bearer " + token,
+
+    "Content-Type":
+      "application/json"
+
   };
 
+
   const response =
-    await fetch(url, options);
+    await fetch(
+      url,
+      options
+    );
 
-  if (response.status === 401) {
 
-    localStorage.removeItem("token");
+  if(
+    response.status === 401
+  ){
 
-    window.location.href = "/login";
+    localStorage.removeItem(
+      "token"
+    );
+
+    window.location.href =
+      "/login";
 
     return null;
+
   }
+
 
   return response.json();
 
 }
 
 
-async function load() {
+/* =========================
+   NFC
+========================= */
 
-  const business =
-    await api("/api/me");
-
-  if (!business) return;
-
-
-  document.getElementById("title").textContent =
-    business.name || "İşletme Paneli";
+let nfcUrl = "";
 
 
-  fields.forEach(function(field) {
+function createNFCUrl(business){
 
-    const element =
-      document.getElementById(field);
+  return (
+    window.location.origin +
+    "/p/" +
+    business.slug +
+    "?source=nfc"
+  );
 
-    if (element) {
-
-      element.value =
-        business[field] || "";
-
-    }
-
-  });
+}
 
 
-  const qr =
-    await api("/api/qr");
+async function copyNFC(){
+
+  if(!nfcUrl) return;
 
 
-  if (qr) {
+  try{
 
-    document.getElementById("qr").src =
-      qr.dataUrl;
-
-    document.getElementById("url").innerHTML =
-      '<a href="' +
-      qr.url +
-      '" target="_blank">' +
-      qr.url +
-      '</a>';
-
-    document.getElementById("open").href =
-      qr.url;
-
-    document.getElementById("download").href =
-      qr.dataUrl;
-
-  }
+    await navigator.clipboard.writeText(
+      nfcUrl
+    );
 
 
-  const stats =
-    await api("/api/stats");
+    document.getElementById(
+      "nfcMessage"
+    ).textContent =
+      "✓ NFC bağlantısı kopyalandı.";
 
+  }catch(error){
 
-  if (Array.isArray(stats)) {
-
-    stats.forEach(function(item) {
-
-      if (item.type === "profile_view") {
-
-        document.getElementById(
-          "profileViews"
-        ).textContent = item.count;
-
-      }
-
-
-      if (item.type === "whatsapp") {
-
-        document.getElementById(
-          "whatsappViews"
-        ).textContent = item.count;
-
-      }
-
-
-      if (item.type === "phone") {
-
-        document.getElementById(
-          "phoneViews"
-        ).textContent = item.count;
-
-      }
-
-
-      if (
-        item.type === "qr" ||
-        item.type === "qr_scan"
-      ) {
-
-        document.getElementById(
-          "qrViews"
-        ).textContent = item.count;
-
-      }
-
-
-      if (item.type === "nfc") {
-
-        document.getElementById(
-          "nfcViews"
-        ).textContent = item.count;
-
-      }
-
-    });
+    document.getElementById(
+      "nfcMessage"
+    ).textContent =
+      "Bağlantı: " + nfcUrl;
 
   }
 
 }
 
 
-async function save() {
+/* =========================
+   LOAD
+========================= */
+
+async function load(){
+
+  const business =
+    await api(
+      "/api/me"
+    );
+
+
+  if(!business) return;
+
+
+  document.getElementById(
+    "title"
+  ).textContent =
+    business.name ||
+    "İşletme Paneli";
+
+
+  fields.forEach(
+    function(field){
+
+      const element =
+        document.getElementById(
+          field
+        );
+
+
+      if(element){
+
+        element.value =
+          business[field] || "";
+
+      }
+
+    }
+  );
+
+
+  /* PROFİL */
+
+  const profileUrl =
+    window.location.origin +
+    "/p/" +
+    business.slug;
+
+
+  document.getElementById(
+    "quickProfile"
+  ).href =
+    profileUrl;
+
+
+  /* NFC */
+
+  nfcUrl =
+    createNFCUrl(
+      business
+    );
+
+
+  document.getElementById(
+    "nfcUrl"
+  ).textContent =
+    nfcUrl;
+
+
+  /* QR */
+
+  const qr =
+    await api(
+      "/api/qr"
+    );
+
+
+  if(qr){
+
+    document.getElementById(
+      "qr"
+    ).src =
+      qr.dataUrl;
+
+
+    document.getElementById(
+      "url"
+    ).textContent =
+      qr.url;
+
+
+    document.getElementById(
+      "open"
+    ).href =
+      qr.url;
+
+
+    document.getElementById(
+      "download"
+    ).href =
+      qr.dataUrl;
+
+
+    document.getElementById(
+      "quickQR"
+    ).href =
+      qr.url;
+
+  }
+
+
+  /* STATS */
+
+  const stats =
+    await api(
+      "/api/stats"
+    );
+
+
+  if(
+    Array.isArray(stats)
+  ){
+
+    stats.forEach(
+      function(item){
+
+        if(
+          item.type ===
+          "profile_view"
+        ){
+
+          document.getElementById(
+            "profileViews"
+          ).textContent =
+            item.count;
+
+        }
+
+
+        if(
+          item.type ===
+          "whatsapp"
+        ){
+
+          document.getElementById(
+            "whatsappViews"
+          ).textContent =
+            item.count;
+
+        }
+
+
+        if(
+          item.type ===
+          "phone"
+        ){
+
+          document.getElementById(
+            "phoneViews"
+          ).textContent =
+            item.count;
+
+        }
+
+
+        if(
+          item.type === "qr" ||
+          item.type === "qr_scan"
+        ){
+
+          document.getElementById(
+            "qrViews"
+          ).textContent =
+            item.count;
+
+        }
+
+
+        if(
+          item.type ===
+          "nfc"
+        ){
+
+          document.getElementById(
+            "nfcViews"
+          ).textContent =
+            item.count;
+
+        }
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =========================
+   SAVE
+========================= */
+
+async function save(){
 
   const data = {};
 
 
-  fields.forEach(function(field) {
+  fields.forEach(
+    function(field){
 
-    const element =
-      document.getElementById(field);
-
-    data[field] =
-      element ? element.value : "";
-
-  });
+      const element =
+        document.getElementById(
+          field
+        );
 
 
-  /*
-    WhatsApp numarası girildiyse
-    otomatik wa.me bağlantısına çevir.
-  */
+      data[field] =
+        element
+          ? element.value
+          : "";
+
+    }
+  );
+
+
+  /* WHATSAPP */
 
   const whatsapp =
-    data.whatsapp.replace(/\D/g, "");
+    data.whatsapp.replace(
+      /\D/g,
+      ""
+    );
 
 
-  if (
+  if(
     whatsapp &&
-    !data.whatsapp.includes("http")
-  ) {
+    !data.whatsapp.includes(
+      "http"
+    )
+  ){
 
     data.whatsapp =
       "https://wa.me/" +
@@ -414,25 +1292,31 @@ async function save() {
 
 
   const result =
-    await api("/api/me", {
+    await api(
+      "/api/me",
+      {
 
-      method: "PUT",
+        method:"PUT",
 
-      body:
-        JSON.stringify(data)
+        body:
+          JSON.stringify(
+            data
+          )
 
-    });
+      }
+    );
 
 
-  if (
+  if(
     result &&
     !result.error
-  ) {
+  ){
 
     document.getElementById(
       "message"
     ).textContent =
       "✓ Bilgiler başarıyla kaydedildi.";
+
 
     document.getElementById(
       "title"
@@ -440,31 +1324,76 @@ async function save() {
       result.name;
 
 
+    /* PROFİL */
+
+    const profileUrl =
+      window.location.origin +
+      "/p/" +
+      result.slug;
+
+
+    document.getElementById(
+      "quickProfile"
+    ).href =
+      profileUrl;
+
+
+    /* NFC */
+
+    nfcUrl =
+      createNFCUrl(
+        result
+      );
+
+
+    document.getElementById(
+      "nfcUrl"
+    ).textContent =
+      nfcUrl;
+
+
+    /* QR */
+
     const qr =
-      await api("/api/qr");
+      await api(
+        "/api/qr"
+      );
 
 
-    if (qr) {
+    if(qr){
 
-      document.getElementById("qr").src =
+      document.getElementById(
+        "qr"
+      ).src =
         qr.dataUrl;
 
-      document.getElementById("url").innerHTML =
-        '<a href="' +
-        qr.url +
-        '" target="_blank">' +
-        qr.url +
-        '</a>';
 
-      document.getElementById("open").href =
+      document.getElementById(
+        "url"
+      ).textContent =
         qr.url;
 
-      document.getElementById("download").href =
+
+      document.getElementById(
+        "open"
+      ).href =
+        qr.url;
+
+
+      document.getElementById(
+        "download"
+      ).href =
         qr.dataUrl;
+
+
+      document.getElementById(
+        "quickQR"
+      ).href =
+        qr.url;
 
     }
 
-  } else {
+  }else{
 
     document.getElementById(
       "message"
@@ -476,6 +1405,10 @@ async function save() {
 
 }
 
+
+/* =========================
+   START
+========================= */
 
 load();
 
