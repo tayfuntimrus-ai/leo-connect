@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LEO CONNECT — İşletme Oluştur</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<header>
+  <b>🦁 LEO <span>CONNECT</span></b>
+  <a href="/">Ana Sayfa</a>
+</header>
+
+<div class="box">
+
+  <small>LEO CONNECT</small>
+
+  <h1>İşletmeni oluştur</h1>
+
+  <p>
+    İşletmeni dijitale taşı ve müşterilerin için
+    tek bir bağlantı noktası oluştur.
+  </p>
+
+  <form id="registerForm">
+
+    <input
+      id="name"
+      type="text"
+      placeholder="İşletme adı"
+      required
+    >
+
+    <input
+      id="category"
+      type="text"
+      placeholder="İşletme kategorisi"
+    >
+
+    <input
+      id="email"
+      type="email"
+      placeholder="E-posta adresi"
+      required
+    >
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Şifre (en az 8 karakter)"
+      minlength="8"
+      required
+    >
+
+    <button type="submit">
+      Ücretsiz Başla →
+    </button>
+
+  </form>
+
+  <p id="message"></p>
+
+  <p>
+    Zaten hesabın var mı?
+    <a href="/login" class="gold">Giriş Yap</a>
+  </p>
+
+</div>
+
+<script>
+
+const form = document.getElementById("registerForm");
+const message = document.getElementById("message");
+
+form.addEventListener("submit", async function(e) {
+
+  e.preventDefault();
+
+  message.textContent = "Hesabın oluşturuluyor...";
+
+  try {
+
+    const response = await fetch("/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: document.getElementById("name").value,
+        category: document.getElementById("category").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      message.textContent = data.error || "Kayıt oluşturulamadı.";
+      return;
+    }
+
+    localStorage.setItem("token", data.token);
+
+    window.location.href = "/dashboard";
+
+  } catch (error) {
+
+    message.textContent =
+      "Sunucuya bağlanırken bir hata oluştu.";
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
