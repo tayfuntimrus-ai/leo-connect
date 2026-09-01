@@ -3,1307 +3,955 @@
 
 <head>
 
-  <meta charset="utf-8">
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1"
+>
+
+<title>LEO CONNECT — Yönetim Merkezi</title>
+
+<style>
+
+:root{
+  --gold:#c59a52;
+  --gold-light:#e0bd7b;
+  --black:#080808;
+  --dark:#101010;
+  --dark-2:#151515;
+  --border:#292929;
+  --green:#45c27a;
+  --red:#d95c5c;
+  --white:#fff;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#080808;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+button,
+input,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+#loginScreen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      #c59a5218,
+      transparent 35%
+    ),
+    #080808;
+}
+
+.login-card{
+  width:min(430px,100%);
+  padding:38px;
+  border-radius:28px;
+  border:1px solid #c59a5238;
+
+  background:
+    linear-gradient(
+      145deg,
+      #151515,
+      #0d0d0d
+    );
+
+  box-shadow:
+    0 30px 100px #000;
+}
+
+.lion{
+  width:74px;
+  height:74px;
+  margin:0 auto 22px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:22px;
+  background:#000;
+  border:1px solid #c59a5266;
+
+  font-size:38px;
+}
+
+.brand{
+  text-align:center;
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:.12em;
+}
+
+.brand span{
+  color:var(--gold-light);
+}
+
+.login-subtitle{
+  text-align:center;
+  color:#777;
+  font-size:11px;
+  letter-spacing:.14em;
+  margin:9px 0 30px;
+}
+
+.login-card label{
+  display:block;
+  color:#999;
+  font-size:11px;
+  margin-bottom:7px;
+}
+
+.login-card input{
+  width:100%;
+  padding:15px;
+  margin-bottom:16px;
+
+  border-radius:12px;
+  border:1px solid var(--border);
+
+  background:#111;
+  color:#fff;
+  outline:none;
+}
+
+.login-card input:focus{
+  border-color:var(--gold);
+}
+
+.login-button{
+  width:100%;
+  padding:15px;
+
+  border:0;
+  border-radius:12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
+    );
+
+  color:#fff;
+  font-weight:800;
+}
+
+#loginMessage{
+  min-height:18px;
+  margin-top:15px;
+
+  text-align:center;
+  color:#df6969;
+  font-size:12px;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+#adminApp{
+  display:none;
+}
+
+header{
+  height:72px;
+
+  position:sticky;
+  top:0;
+  z-index:100;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:0 28px;
+
+  background:#0c0c0ced;
+  backdrop-filter:blur(18px);
+
+  border-bottom:1px solid var(--border);
+}
+
+.header-brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.header-logo{
+  width:40px;
+  height:40px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:12px;
+  background:#000;
+
+  border:1px solid #c59a5255;
+
+  font-size:21px;
+}
+
+.header-brand strong{
+  font-size:15px;
+  letter-spacing:.1em;
+}
+
+.header-brand strong span{
+  color:var(--gold-light);
+}
+
+.admin-label{
+  margin-top:3px;
+  color:#666;
+  font-size:9px;
+  letter-spacing:.16em;
+}
+
+.header-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.new-business{
+  padding:10px 15px;
+
+  border:1px solid #c59a5266;
+  border-radius:10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
+    );
+
+  color:#fff;
+  font-size:12px;
+  font-weight:800;
+}
+
+.logout{
+  padding:10px 14px;
+
+  border-radius:10px;
+  border:1px solid #333;
+
+  background:#151515;
+  color:#ddd;
+
+  font-size:12px;
+  font-weight:700;
+}
+
+main{
+  width:min(1250px,94%);
+  margin:38px auto 80px;
+}
+
+.page-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+
+  margin-bottom:30px;
+}
+
+.eyebrow{
+  color:var(--gold-light);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.2em;
+}
+
+h1{
+  margin:8px 0 0;
+  font-size:36px;
+}
+
+.page-head p{
+  margin:7px 0 0;
+  color:#777;
+  font-size:13px;
+}
+
+.live{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#aaa;
+  font-size:11px;
+}
+
+.live-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 12px #45c27a88;
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:12px;
+  margin-bottom:22px;
+}
+
+.stat{
+  min-height:145px;
+  padding:20px;
+
+  border-radius:18px;
+  border:1px solid var(--border);
+
+  background:
+    linear-gradient(
+      145deg,
+      #151515,
+      #0f0f0f
+    );
+
+  position:relative;
+  overflow:hidden;
+}
+
+.stat-icon{
+  font-size:21px;
+  margin-bottom:15px;
+}
+
+.stat small{
+  display:block;
+  color:#777;
+  font-size:9px;
+  letter-spacing:.14em;
+  margin-bottom:7px;
+}
+
+.stat strong{
+  font-size:30px;
+  color:var(--gold-light);
+}
+
+
+/* =========================
+   PANEL
+========================= */
+
+.panel{
+  margin-top:22px;
+  overflow:hidden;
+
+  border-radius:22px;
+  border:1px solid var(--border);
+
+  background:
+    linear-gradient(
+      145deg,
+      #131313,
+      #0e0e0e
+    );
+}
+
+.panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+
+  padding:23px 25px;
+
+  border-bottom:1px solid var(--border);
+}
+
+.panel-head h2{
+  margin:0;
+  font-size:19px;
+}
+
+.panel-head p{
+  margin:5px 0 0;
+  color:#777;
+  font-size:11px;
+}
+
+.refresh{
+  padding:10px 14px;
+
+  border-radius:10px;
+  border:1px solid #333;
+
+  background:#181818;
+  color:#ddd;
+
+  font-size:11px;
+  font-weight:700;
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  min-width:900px;
+  border-collapse:collapse;
+}
+
+th{
+  padding:15px 18px;
+  text-align:left;
+
+  color:#666;
+  font-size:9px;
+  letter-spacing:.13em;
+
+  border-bottom:1px solid var(--border);
+}
+
+td{
+  padding:17px 18px;
+
+  border-bottom:1px solid #1d1d1d;
+
+  color:#ccc;
+  font-size:12px;
+}
+
+tbody tr{
+  cursor:pointer;
+}
+
+tbody tr:hover{
+  background:#c59a5208;
+}
+
+.business-name{
+  color:#fff;
+  font-weight:800;
+  margin-bottom:4px;
+}
+
+.business-email{
+  color:#666;
+  font-size:10px;
+}
+
+.category{
+  display:inline-block;
+
+  padding:6px 9px;
+
+  border-radius:999px;
+  border:1px solid #c59a5222;
+
+  background:#c59a5212;
+
+  color:var(--gold-light);
+  font-size:9px;
+}
+
+.number{
+  color:#ddd;
+  font-weight:700;
+}
+
+.number.gold{
+  color:var(--gold-light);
+}
+
+.empty{
+  padding:55px 20px;
+  text-align:center;
+  color:#666;
+}
+
+
+/* =========================
+   OVERLAY
+========================= */
+
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:500;
+
+  display:none;
+
+  overflow-y:auto;
+
+  padding:20px;
+
+  background:#000000dd;
+
+  backdrop-filter:blur(10px);
+}
+
+.modal{
+  width:min(1050px,100%);
+  margin:20px auto 60px;
+
+  border-radius:25px;
+
+  border:1px solid #c59a5235;
+
+  background:
+    linear-gradient(
+      145deg,
+      #151515,
+      #0b0b0b
+    );
+
+  box-shadow:
+    0 40px 120px #000;
+}
+
+.modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+
+  padding:25px;
+
+  border-bottom:1px solid var(--border);
+}
+
+.modal-header h2{
+  margin:6px 0 0;
+  font-size:27px;
+}
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
+.modal-header p{
+  margin:5px 0 0;
+  color:#777;
+  font-size:11px;
+}
 
-  <title>LEO CONNECT — Yönetim Merkezi</title>
+.close{
+  width:42px;
+  height:42px;
 
-  <style>
+  border-radius:12px;
+  border:1px solid #333;
 
-    :root{
-      --gold:#c59a52;
-      --gold-light:#e0bd7b;
-      --black:#080808;
-      --dark:#101010;
-      --dark-2:#151515;
-      --dark-3:#1d1d1d;
-      --white:#fff;
-      --muted:#888;
-      --border:#292929;
-      --green:#45c27a;
-      --red:#d95c5c;
-    }
+  background:#181818;
+  color:#fff;
 
+  font-size:20px;
+}
+
+.modal-body{
+  padding:25px;
+}
+
 
-    *{
-      box-sizing:border-box;
-    }
+/* =========================
+   FORM
+========================= */
 
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
 
-    body{
-      margin:0;
-      background:#080808;
-      color:#fff;
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-    }
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
 
+.field.full{
+  grid-column:1/-1;
+}
 
-    button,
-    input,
-    textarea{
-      font:inherit;
-    }
+.field label{
+  color:#777;
+  font-size:10px;
+  letter-spacing:.1em;
+}
 
+.field input,
+.field textarea{
+  width:100%;
 
-    button{
-      cursor:pointer;
-    }
+  padding:13px;
 
+  border-radius:11px;
 
-    /* =========================
-       LOGIN
-    ========================= */
+  border:1px solid #292929;
 
-    #loginScreen{
+  background:#0d0d0d;
+  color:#fff;
 
-      min-height:100vh;
+  outline:none;
+}
 
-      display:flex;
+.field textarea{
+  min-height:90px;
+  resize:vertical;
+}
 
-      align-items:center;
+.field input:focus,
+.field textarea:focus{
+  border-color:var(--gold);
+}
 
-      justify-content:center;
 
-      padding:24px;
+/* =========================
+   MODAL ACTIONS
+========================= */
 
-      background:
+.modal-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
 
-        radial-gradient(
-          circle at 50% 20%,
-          #c59a5218,
-          transparent 35%
-        ),
+  margin-top:22px;
+  padding-top:22px;
 
-        #080808;
+  border-top:1px solid var(--border);
+}
 
-    }
+.action{
+  padding:12px 15px;
 
+  border-radius:10px;
 
-    .login-card{
+  border:1px solid #333;
 
-      width:min(430px,100%);
+  background:#181818;
+  color:#fff;
 
-      padding:38px;
+  text-decoration:none;
 
-      border-radius:28px;
+  font-size:11px;
+  font-weight:700;
+}
 
-      border:1px solid #c59a5238;
+.action.gold{
+  background:#b8893f;
+  border-color:#b8893f;
+}
 
-      background:
-        linear-gradient(
-          145deg,
-          #151515,
-          #0d0d0d
-        );
+.action.danger{
+  background:#351818;
+  border-color:#6b2c2c;
+  color:#ff9b9b;
+}
 
-      box-shadow:
-        0 30px 100px #000;
+.message{
+  min-height:18px;
+  margin-top:13px;
 
-    }
+  color:var(--gold-light);
+  font-size:12px;
+}
 
 
-    .lion{
+/* =========================
+   STATS DETAIL
+========================= */
 
-      width:74px;
-      height:74px;
+.detail-stats{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:10px;
 
-      margin:0 auto 22px;
+  margin-bottom:22px;
+}
 
-      display:grid;
-      place-items:center;
+.detail-stat{
+  padding:16px;
 
-      border-radius:22px;
+  border-radius:15px;
 
-      background:#000;
+  background:#111;
+  border:1px solid var(--border);
+}
 
-      border:1px solid #c59a5266;
+.detail-stat small{
+  display:block;
+  color:#777;
+  font-size:9px;
+  margin-bottom:8px;
+}
 
-      font-size:38px;
+.detail-stat strong{
+  font-size:23px;
+  color:var(--gold-light);
+}
 
-    }
 
+/* =========================
+   DIGITAL BOX
+========================= */
 
-    .brand{
+.digital-box{
+  display:none;
 
-      text-align:center;
+  margin-top:20px;
+  padding:22px;
 
-      font-size:22px;
+  border-radius:18px;
 
-      font-weight:800;
+  background:#0d0d0d;
+  border:1px solid var(--border);
+}
 
-      letter-spacing:.12em;
+.qr-image{
+  width:260px;
+  max-width:100%;
+  display:block;
+  margin:15px auto;
+}
 
-    }
+.digital-url{
+  padding:12px;
 
+  border-radius:10px;
 
-    .brand span{
-      color:var(--gold-light);
-    }
+  background:#171717;
 
+  color:#aaa;
 
-    .login-subtitle{
+  font-size:10px;
 
-      text-align:center;
+  word-break:break-all;
+}
 
-      color:#777;
+.nfc-url{
+  padding:14px;
 
-      font-size:11px;
+  border-radius:10px;
 
-      letter-spacing:.14em;
+  background:#171717;
 
-      margin:9px 0 30px;
+  color:#fff;
 
-    }
+  font-size:10px;
 
+  word-break:break-all;
+}
 
-    .login-card label{
 
-      display:block;
+/* =========================
+   NEW BUSINESS
+========================= */
 
-      color:#999;
+.new-modal{
+  width:min(600px,100%);
+}
 
-      font-size:11px;
+.new-intro{
+  color:#888;
+  font-size:13px;
+  line-height:1.6;
+  margin:0 0 22px;
+}
 
-      margin-bottom:7px;
+.new-note{
+  margin-top:15px;
+  padding:14px;
 
-    }
+  border-radius:12px;
 
+  background:#c59a5210;
+  border:1px solid #c59a5225;
 
-    .login-card input{
+  color:#aaa;
 
-      width:100%;
+  font-size:11px;
+  line-height:1.5;
+}
 
-      padding:15px;
+.created-box{
+  display:none;
 
-      margin-bottom:16px;
+  margin-top:20px;
+  padding:20px;
 
-      border-radius:12px;
+  border-radius:16px;
 
-      border:1px solid var(--border);
+  background:#0b170f;
 
-      background:#111;
+  border:1px solid #2b6841;
+}
 
-      color:#fff;
+.created-box h3{
+  margin:0 0 12px;
+  color:#72d99a;
+}
 
-      outline:none;
+.created-row{
+  margin:9px 0;
+  padding:11px;
 
-    }
+  border-radius:9px;
 
+  background:#101b14;
 
-    .login-card input:focus{
+  color:#ddd;
 
-      border-color:var(--gold);
+  font-size:12px;
 
-      box-shadow:
-        0 0 0 3px #c59a5215;
+  word-break:break-all;
+}
 
-    }
+.created-row b{
+  color:#888;
+}
 
 
-    .login-button{
+/* =========================
+   FOOTER
+========================= */
 
-      width:100%;
+.footer{
+  text-align:center;
+  margin-top:35px;
 
-      padding:15px;
+  color:#444;
 
-      border:0;
+  font-size:10px;
+  letter-spacing:.12em;
+}
 
-      border-radius:12px;
 
-      background:
-        linear-gradient(
-          135deg,
-          #c59a52,
-          #9e7738
-        );
+/* =========================
+   MOBILE
+========================= */
 
-      color:#fff;
+@media(max-width:1000px){
 
-      font-weight:800;
+  .stats{
+    grid-template-columns:repeat(3,1fr);
+  }
 
-    }
+  .detail-stats{
+    grid-template-columns:repeat(3,1fr);
+  }
 
+}
 
-    #loginMessage{
+@media(max-width:650px){
 
-      min-height:18px;
+  header{
+    height:auto;
+    min-height:72px;
+    padding:14px 16px;
+  }
 
-      margin-top:15px;
+  .header-actions{
+    flex-direction:column;
+    align-items:stretch;
+  }
 
-      text-align:center;
+  .new-business,
+  .logout{
+    font-size:10px;
+    padding:9px 10px;
+  }
 
-      color:#df6969;
+  main{
+    width:92%;
+    margin-top:25px;
+  }
 
-      font-size:12px;
+  .page-head{
+    align-items:flex-start;
+    flex-direction:column;
+  }
 
-    }
+  h1{
+    font-size:29px;
+  }
 
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
 
-    /* =========================
-       APP
-    ========================= */
+  .detail-stats{
+    grid-template-columns:1fr 1fr;
+  }
 
-    #adminApp{
-      display:none;
-    }
+  .form-grid{
+    grid-template-columns:1fr;
+  }
 
+  .field.full{
+    grid-column:auto;
+  }
 
-    header{
+  .overlay{
+    padding:10px;
+  }
 
-      height:72px;
+  .modal{
+    margin:10px auto 40px;
+  }
 
-      position:sticky;
+  .modal-header{
+    padding:18px;
+  }
 
-      top:0;
+  .modal-body{
+    padding:18px;
+  }
 
-      z-index:100;
+}
 
-      display:flex;
 
-      align-items:center;
+/* =========================
+   UTIL
+========================= */
 
-      justify-content:space-between;
+.hidden{
+  display:none !important;
+}
 
-      padding:0 28px;
-
-      background:#0c0c0ced;
-
-      backdrop-filter:blur(18px);
-
-      border-bottom:1px solid var(--border);
-
-    }
-
-
-    .header-brand{
-
-      display:flex;
-
-      align-items:center;
-
-      gap:12px;
-
-    }
-
-
-    .header-logo{
-
-      width:40px;
-      height:40px;
-
-      display:grid;
-      place-items:center;
-
-      border-radius:12px;
-
-      background:#000;
-
-      border:1px solid #c59a5255;
-
-      font-size:21px;
-
-    }
-
-
-    .header-brand strong{
-
-      font-size:15px;
-
-      letter-spacing:.1em;
-
-    }
-
-
-    .header-brand strong span{
-      color:var(--gold-light);
-    }
-
-
-    .admin-label{
-
-      margin-top:3px;
-
-      color:#666;
-
-      font-size:9px;
-
-      letter-spacing:.16em;
-
-    }
-
-
-    .logout{
-
-      padding:10px 14px;
-
-      border-radius:10px;
-
-      border:1px solid #333;
-
-      background:#151515;
-
-      color:#ddd;
-
-      font-size:12px;
-
-      font-weight:700;
-
-    }
-
-
-    main{
-
-      width:min(1250px,94%);
-
-      margin:38px auto 80px;
-
-    }
-
-
-    .page-head{
-
-      display:flex;
-
-      align-items:flex-end;
-
-      justify-content:space-between;
-
-      gap:20px;
-
-      margin-bottom:30px;
-
-    }
-
-
-    .eyebrow{
-
-      color:var(--gold-light);
-
-      font-size:10px;
-
-      font-weight:800;
-
-      letter-spacing:.2em;
-
-    }
-
-
-    h1{
-
-      margin:8px 0 0;
-
-      font-size:36px;
-
-    }
-
-
-    .page-head p{
-
-      margin:7px 0 0;
-
-      color:#777;
-
-      font-size:13px;
-
-    }
-
-
-    .live{
-
-      display:flex;
-
-      align-items:center;
-
-      gap:8px;
-
-      color:#aaa;
-
-      font-size:11px;
-
-    }
-
-
-    .live-dot{
-
-      width:8px;
-      height:8px;
-
-      border-radius:50%;
-
-      background:var(--green);
-
-      box-shadow:
-        0 0 12px #45c27a88;
-
-    }
-
-
-    /* =========================
-       STATS
-    ========================= */
-
-    .stats{
-
-      display:grid;
-
-      grid-template-columns:
-        repeat(6,1fr);
-
-      gap:12px;
-
-      margin-bottom:22px;
-
-    }
-
-
-    .stat{
-
-      min-height:145px;
-
-      padding:20px;
-
-      border-radius:18px;
-
-      border:1px solid var(--border);
-
-      background:
-        linear-gradient(
-          145deg,
-          #151515,
-          #0f0f0f
-        );
-
-      position:relative;
-
-      overflow:hidden;
-
-    }
-
-
-    .stat::after{
-
-      content:"";
-
-      position:absolute;
-
-      width:100px;
-      height:100px;
-
-      right:-45px;
-      bottom:-45px;
-
-      border-radius:50%;
-
-      background:#c59a5210;
-
-    }
-
-
-    .stat-icon{
-
-      font-size:21px;
-
-      margin-bottom:15px;
-
-    }
-
-
-    .stat small{
-
-      display:block;
-
-      color:#777;
-
-      font-size:9px;
-
-      letter-spacing:.14em;
-
-      margin-bottom:7px;
-
-    }
-
-
-    .stat strong{
-
-      font-size:30px;
-
-    }
-
-
-    .gold-number{
-      color:var(--gold-light);
-    }
-
-
-    /* =========================
-       PANEL
-    ========================= */
-
-    .panel{
-
-      margin-top:22px;
-
-      overflow:hidden;
-
-      border-radius:22px;
-
-      border:1px solid var(--border);
-
-      background:
-        linear-gradient(
-          145deg,
-          #131313,
-          #0e0e0e
-        );
-
-    }
-
-
-    .panel-head{
-
-      display:flex;
-
-      align-items:center;
-
-      justify-content:space-between;
-
-      gap:15px;
-
-      padding:23px 25px;
-
-      border-bottom:1px solid var(--border);
-
-    }
-
-
-    .panel-head h2{
-
-      margin:0;
-
-      font-size:19px;
-
-    }
-
-
-    .panel-head p{
-
-      margin:5px 0 0;
-
-      color:#777;
-
-      font-size:11px;
-
-    }
-
-
-    .refresh{
-
-      padding:10px 14px;
-
-      border-radius:10px;
-
-      border:1px solid #333;
-
-      background:#181818;
-
-      color:#ddd;
-
-      font-size:11px;
-
-      font-weight:700;
-
-    }
-
-
-    /* =========================
-       TABLE
-    ========================= */
-
-    .table-wrap{
-      overflow-x:auto;
-    }
-
-
-    table{
-
-      width:100%;
-
-      min-width:900px;
-
-      border-collapse:collapse;
-
-    }
-
-
-    th{
-
-      padding:15px 18px;
-
-      text-align:left;
-
-      color:#666;
-
-      font-size:9px;
-
-      letter-spacing:.13em;
-
-      border-bottom:1px solid var(--border);
-
-    }
-
-
-    td{
-
-      padding:17px 18px;
-
-      border-bottom:1px solid #1d1d1d;
-
-      color:#ccc;
-
-      font-size:12px;
-
-    }
-
-
-    tbody tr{
-
-      cursor:pointer;
-
-      transition:
-        background .2s,
-        transform .2s;
-
-    }
-
-
-    tbody tr:hover{
-
-      background:#c59a5208;
-
-    }
-
-
-    tbody tr:last-child td{
-      border-bottom:0;
-    }
-
-
-    .business-name{
-
-      color:#fff;
-
-      font-weight:800;
-
-      margin-bottom:4px;
-
-    }
-
-
-    .business-email{
-
-      color:#666;
-
-      font-size:10px;
-
-    }
-
-
-    .category{
-
-      display:inline-block;
-
-      padding:6px 9px;
-
-      border-radius:999px;
-
-      border:1px solid #c59a5222;
-
-      background:#c59a5212;
-
-      color:var(--gold-light);
-
-      font-size:9px;
-
-    }
-
-
-    .number{
-
-      color:#ddd;
-
-      font-weight:700;
-
-    }
-
-
-    .number.gold{
-      color:var(--gold-light);
-    }
-
-
-    .empty{
-
-      padding:55px 20px;
-
-      text-align:center;
-
-      color:#666;
-
-    }
-
-
-    /* =========================
-       DETAIL OVERLAY
-    ========================= */
-
-    #detailOverlay{
-
-      position:fixed;
-
-      inset:0;
-
-      z-index:500;
-
-      display:none;
-
-      overflow-y:auto;
-
-      padding:25px;
-
-      background:#000000dd;
-
-      backdrop-filter:blur(10px);
-
-    }
-
-
-    .detail{
-
-      width:min(1100px,100%);
-
-      margin:30px auto 70px;
-
-      border-radius:25px;
-
-      border:1px solid #c59a5235;
-
-      background:
-        linear-gradient(
-          145deg,
-          #151515,
-          #0b0b0b
-        );
-
-      box-shadow:
-        0 40px 120px #000;
-
-    }
-
-
-    .detail-header{
-
-      display:flex;
-
-      align-items:center;
-
-      justify-content:space-between;
-
-      gap:20px;
-
-      padding:25px;
-
-      border-bottom:1px solid var(--border);
-
-    }
-
-
-    .detail-header h2{
-
-      margin:6px 0 0;
-
-      font-size:28px;
-
-    }
-
-
-    .detail-header p{
-
-      margin:5px 0 0;
-
-      color:#777;
-
-      font-size:11px;
-
-    }
-
-
-    .close{
-
-      width:42px;
-      height:42px;
-
-      border-radius:12px;
-
-      border:1px solid #333;
-
-      background:#181818;
-
-      color:#fff;
-
-      font-size:20px;
-
-    }
-
-
-    .detail-body{
-
-      padding:25px;
-
-    }
-
-
-    /* =========================
-       DETAIL STATS
-    ========================= */
-
-    .detail-stats{
-
-      display:grid;
-
-      grid-template-columns:
-        repeat(6,1fr);
-
-      gap:10px;
-
-      margin-bottom:22px;
-
-    }
-
-
-    .detail-stat{
-
-      padding:16px;
-
-      border-radius:15px;
-
-      background:#111;
-
-      border:1px solid var(--border);
-
-    }
-
-
-    .detail-stat small{
-
-      display:block;
-
-      color:#777;
-
-      font-size:9px;
-
-      margin-bottom:8px;
-
-    }
-
-
-    .detail-stat strong{
-
-      font-size:23px;
-
-      color:var(--gold-light);
-
-    }
-
-
-    /* =========================
-       DETAIL GRID
-    ========================= */
-
-    .detail-grid{
-
-      display:grid;
-
-      grid-template-columns:
-        1fr 1fr;
-
-      gap:14px;
-
-    }
-
-
-    .field{
-
-      display:flex;
-
-      flex-direction:column;
-
-      gap:6px;
-
-    }
-
-
-    .field.full{
-      grid-column:1/-1;
-    }
-
-
-    .field label{
-
-      color:#777;
-
-      font-size:10px;
-
-      letter-spacing:.1em;
-
-    }
-
-
-    .field input,
-    .field textarea{
-
-      width:100%;
-
-      padding:13px;
-
-      border-radius:11px;
-
-      border:1px solid #292929;
-
-      background:#0d0d0d;
-
-      color:#fff;
-
-      outline:none;
-
-    }
-
-
-    .field textarea{
-
-      min-height:90px;
-
-      resize:vertical;
-
-    }
-
-
-    .field input:focus,
-    .field textarea:focus{
-
-      border-color:var(--gold);
-
-      box-shadow:
-        0 0 0 3px #c59a5212;
-
-    }
-
-
-    /* =========================
-       DETAIL ACTIONS
-    ========================= */
-
-    .detail-actions{
-
-      display:flex;
-
-      flex-wrap:wrap;
-
-      gap:9px;
-
-      margin-top:22px;
-
-      padding-top:22px;
-
-      border-top:1px solid var(--border);
-
-    }
-
-
-    .action{
-
-      padding:12px 15px;
-
-      border-radius:10px;
-
-      border:1px solid #333;
-
-      background:#181818;
-
-      color:#fff;
-
-      text-decoration:none;
-
-      font-size:11px;
-
-      font-weight:700;
-
-    }
-
-
-    .action.gold{
-
-      background:#b8893f;
-
-      border-color:#b8893f;
-
-    }
-
-
-    .action.danger{
-
-      background:#351818;
-
-      border-color:#6b2c2c;
-
-      color:#ff9b9b;
-
-    }
-
-
-    .save-message{
-
-      margin-top:13px;
-
-      min-height:17px;
-
-      color:var(--gold-light);
-
-      font-size:12px;
-
-    }
-
-
-    /* =========================
-       QR
-    ========================= */
-
-    .qr-box{
-
-      display:none;
-
-      margin-top:20px;
-
-      padding:22px;
-
-      border-radius:18px;
-
-      background:#0d0d0d;
-
-      border:1px solid var(--border);
-
-      text-align:center;
-
-    }
-
-
-    .qr-box img{
-
-      width:260px;
-
-      max-width:100%;
-
-      display:block;
-
-      margin:10px auto 18px;
-
-    }
-
-
-    .qr-url{
-
-      padding:12px;
-
-      border-radius:10px;
-
-      background:#171717;
-
-      color:#aaa;
-
-      font-size:10px;
-
-      word-break:break-all;
-
-    }
-
-
-    /* =========================
-       NFC
-    ========================= */
-
-    .nfc-box{
-
-      display:none;
-
-      margin-top:20px;
-
-      padding:22px;
-
-      border-radius:18px;
-
-      background:#0d0d0d;
-
-      border:1px solid var(--border);
-
-    }
-
-
-    .nfc-url{
-
-      margin-top:12px;
-
-      padding:14px;
-
-      border-radius:10px;
-
-      background:#171717;
-
-      color:#fff;
-
-      font-size:10px;
-
-      word-break:break-all;
-
-    }
-
-
-    /* =========================
-       FOOTER
-    ========================= */
-
-    .footer{
-
-      text-align:center;
-
-      margin-top:35px;
-
-      color:#444;
-
-      font-size:10px;
-
-      letter-spacing:.12em;
-
-    }
-
-
-    /* =========================
-       RESPONSIVE
-    ========================= */
-
-    @media(max-width:1000px){
-
-      .stats{
-
-        grid-template-columns:
-          repeat(3,1fr);
-
-      }
-
-
-      .detail-stats{
-
-        grid-template-columns:
-          repeat(3,1fr);
-
-      }
-
-    }
-
-
-    @media(max-width:650px){
-
-      header{
-
-        padding:0 17px;
-
-      }
-
-
-      main{
-
-        width:92%;
-
-        margin-top:25px;
-
-      }
-
-
-      .page-head{
-
-        align-items:flex-start;
-
-        flex-direction:column;
-
-      }
-
-
-      h1{
-        font-size:29px;
-      }
-
-
-      .stats{
-
-        grid-template-columns:
-          1fr 1fr;
-
-      }
-
-
-      .detail-stats{
-
-        grid-template-columns:
-          1fr 1fr;
-
-      }
-
-
-      .detail-grid{
-
-        grid-template-columns:
-          1fr;
-
-      }
-
-
-      .field.full{
-        grid-column:auto;
-      }
-
-
-      .detail-header h2{
-        font-size:23px;
-      }
-
-
-      #detailOverlay{
-        padding:10px;
-      }
-
-
-      .detail{
-        margin:10px auto 40px;
-      }
-
-
-      .detail-body{
-        padding:18px;
-      }
-
-
-      .detail-header{
-        padding:18px;
-      }
-
-    }
-
-  </style>
+</style>
 
 </head>
 
@@ -1331,7 +979,6 @@
       PRIVATE ADMINISTRATION
     </div>
 
-
     <label>
       ADMIN E-POSTA
     </label>
@@ -1340,9 +987,8 @@
       id="adminEmail"
       type="email"
       autocomplete="username"
-      placeholder="Admin e-posta"
+      placeholder="Admin e-posta adresi"
     >
-
 
     <label>
       ADMIN ŞİFRE
@@ -1352,9 +998,8 @@
       id="adminPassword"
       type="password"
       autocomplete="current-password"
-      placeholder="Admin şifre"
+      placeholder="Admin şifresi"
     >
-
 
     <button
       class="login-button"
@@ -1362,7 +1007,6 @@
     >
       YÖNETİM MERKEZİNE GİR
     </button>
-
 
     <div id="loginMessage"></div>
 
@@ -1402,12 +1046,23 @@
   </div>
 
 
-  <button
-    class="logout"
-    onclick="logout()"
-  >
-    Çıkış Yap
-  </button>
+  <div class="header-actions">
+
+    <button
+      class="new-business"
+      onclick="openNewBusiness()"
+    >
+      ＋ Yeni İşletme
+    </button>
+
+    <button
+      class="logout"
+      onclick="logout()"
+    >
+      Çıkış Yap
+    </button>
+
+  </div>
 
 </header>
 
@@ -1416,252 +1071,252 @@
 <main>
 
 
-  <!-- PAGE HEADER -->
+<div class="page-head">
 
-  <div class="page-head">
+  <div>
+
+    <div class="eyebrow">
+      LEO CONNECT • CONTROL CENTER
+    </div>
+
+    <h1>
+      Yönetim Merkezi
+    </h1>
+
+    <p>
+      Tüm işletmeleri, bağlantıları ve etkileşimleri tek merkezden yönet.
+    </p>
+
+  </div>
+
+
+  <div class="live">
+
+    <span class="live-dot"></span>
+
+    Sistem aktif
+
+  </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     STATS
+================================================== -->
+
+<div class="stats">
+
+
+  <div class="stat">
+
+    <div class="stat-icon">
+      🏢
+    </div>
+
+    <small>
+      İŞLETMELER
+    </small>
+
+    <strong id="businessCount">
+      0
+    </strong>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-icon">
+      👁️
+    </div>
+
+    <small>
+      PROFİL GÖRÜNTÜLEME
+    </small>
+
+    <strong id="profileCount">
+      0
+    </strong>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-icon">
+      ▣
+    </div>
+
+    <small>
+      QR TARAMA
+    </small>
+
+    <strong id="qrCount">
+      0
+    </strong>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-icon">
+      📡
+    </div>
+
+    <small>
+      NFC DOKUNMA
+    </small>
+
+    <strong id="nfcCount">
+      0
+    </strong>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-icon">
+      💬
+    </div>
+
+    <small>
+      WHATSAPP
+    </small>
+
+    <strong id="whatsappCount">
+      0
+    </strong>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-icon">
+      📞
+    </div>
+
+    <small>
+      TELEFON
+    </small>
+
+    <strong id="phoneCount">
+      0
+    </strong>
+
+  </div>
+
+
+</div>
+
+
+
+<!-- ==================================================
+     BUSINESS LIST
+================================================== -->
+
+<section class="panel">
+
+  <div class="panel-head">
 
     <div>
 
-      <div class="eyebrow">
-        LEO CONNECT • CONTROL CENTER
-      </div>
-
-      <h1>
-        Yönetim Merkezi
-      </h1>
+      <h2>
+        İşletmeler
+      </h2>
 
       <p>
-        Tüm işletmeleri, bağlantıları ve etkileşimleri tek merkezden yönet.
+        İşletmeye dokunarak detaylı yönetim ekranını aç.
       </p>
 
     </div>
 
 
-    <div class="live">
-
-      <span class="live-dot"></span>
-
-      Sistem aktif
-
-    </div>
-
-  </div>
-
-
-
-  <!-- GLOBAL STATS -->
-
-  <div class="stats">
-
-
-    <div class="stat">
-
-      <div class="stat-icon">
-        🏢
-      </div>
-
-      <small>
-        İŞLETMELER
-      </small>
-
-      <strong
-        id="businessCount"
-        class="gold-number"
-      >
-        0
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="stat-icon">
-        👁️
-      </div>
-
-      <small>
-        PROFİL GÖRÜNTÜLEME
-      </small>
-
-      <strong id="profileCount">
-        0
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="stat-icon">
-        ▣
-      </div>
-
-      <small>
-        QR TARAMA
-      </small>
-
-      <strong id="qrCount">
-        0
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="stat-icon">
-        📡
-      </div>
-
-      <small>
-        NFC DOKUNMA
-      </small>
-
-      <strong id="nfcCount">
-        0
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="stat-icon">
-        💬
-      </div>
-
-      <small>
-        WHATSAPP
-      </small>
-
-      <strong id="whatsappCount">
-        0
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="stat-icon">
-        📞
-      </div>
-
-      <small>
-        TELEFON
-      </small>
-
-      <strong id="phoneCount">
-        0
-      </strong>
-
-    </div>
+    <button
+      class="refresh"
+      onclick="loadAdmin()"
+    >
+      ↻ Yenile
+    </button>
 
   </div>
 
 
+  <div class="table-wrap">
 
-  <!-- BUSINESS LIST -->
+    <table>
 
-  <section class="panel">
+      <thead>
 
-    <div class="panel-head">
+        <tr>
 
-      <div>
+          <th>
+            İŞLETME
+          </th>
 
-        <h2>
-          İşletmeler
-        </h2>
+          <th>
+            KATEGORİ
+          </th>
 
-        <p>
-          İşletmeye dokunarak detaylı yönetim ekranını aç.
-        </p>
+          <th>
+            PROFİL
+          </th>
 
-      </div>
+          <th>
+            QR
+          </th>
 
+          <th>
+            NFC
+          </th>
 
-      <button
-        class="refresh"
-        onclick="loadAdmin()"
-      >
-        ↻ Yenile
-      </button>
+          <th>
+            WHATSAPP
+          </th>
 
-    </div>
+          <th>
+            TELEFON
+          </th>
 
+          <th>
+            KAYIT
+          </th>
 
-    <div class="table-wrap">
+        </tr>
 
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>
-              İŞLETME
-            </th>
-
-            <th>
-              KATEGORİ
-            </th>
-
-            <th>
-              PROFİL
-            </th>
-
-            <th>
-              QR
-            </th>
-
-            <th>
-              NFC
-            </th>
-
-            <th>
-              WHATSAPP
-            </th>
-
-            <th>
-              TELEFON
-            </th>
-
-            <th>
-              KAYIT
-            </th>
-
-          </tr>
-
-        </thead>
+      </thead>
 
 
-        <tbody id="businessTable">
+      <tbody id="businessTable">
 
-          <tr>
+        <tr>
 
-            <td
-              colspan="8"
-              class="empty"
-            >
-              İşletmeler yükleniyor...
-            </td>
+          <td
+            colspan="8"
+            class="empty"
+          >
+            İşletmeler yükleniyor...
+          </td>
 
-          </tr>
+        </tr>
 
-        </tbody>
+      </tbody>
 
-      </table>
+    </table>
 
-    </div>
-
-  </section>
-
-
-
-  <div class="footer">
-    LEO CONNECT • PREMIUM DIGITAL BUSINESS SYSTEM
   </div>
+
+</section>
+
+
+
+<div class="footer">
+  LEO CONNECT • PREMIUM DIGITAL BUSINESS SYSTEM
+</div>
 
 
 </main>
@@ -1671,15 +1326,18 @@
 
 
 <!-- ==================================================
-     DETAIL OVERLAY
+     BUSINESS DETAIL MODAL
 ================================================== -->
 
-<div id="detailOverlay">
+<div
+  id="detailOverlay"
+  class="overlay"
+>
 
-  <div class="detail">
+  <div class="modal">
 
 
-    <div class="detail-header">
+    <div class="modal-header">
 
       <div>
 
@@ -1709,98 +1367,53 @@
 
 
 
-    <div class="detail-body">
+    <div class="modal-body">
 
-
-      <!-- DETAIL STATS -->
 
       <div class="detail-stats">
 
 
         <div class="detail-stat">
-
-          <small>
-            PROFİL
-          </small>
-
-          <strong id="detailProfile">
-            0
-          </strong>
-
+          <small>PROFİL</small>
+          <strong id="detailProfile">0</strong>
         </div>
 
 
         <div class="detail-stat">
-
-          <small>
-            QR
-          </small>
-
-          <strong id="detailQR">
-            0
-          </strong>
-
+          <small>QR</small>
+          <strong id="detailQR">0</strong>
         </div>
 
 
         <div class="detail-stat">
-
-          <small>
-            NFC
-          </small>
-
-          <strong id="detailNFC">
-            0
-          </strong>
-
+          <small>NFC</small>
+          <strong id="detailNFC">0</strong>
         </div>
 
 
         <div class="detail-stat">
-
-          <small>
-            WHATSAPP
-          </small>
-
-          <strong id="detailWhatsapp">
-            0
-          </strong>
-
+          <small>WHATSAPP</small>
+          <strong id="detailWhatsapp">0</strong>
         </div>
 
 
         <div class="detail-stat">
-
-          <small>
-            TELEFON
-          </small>
-
-          <strong id="detailPhone">
-            0
-          </strong>
-
+          <small>TELEFON</small>
+          <strong id="detailPhone">0</strong>
         </div>
 
 
         <div class="detail-stat">
-
-          <small>
-            TOPLAM ETKİLEŞİM
-          </small>
-
-          <strong id="detailTotal">
-            0
-          </strong>
-
+          <small>TOPLAM</small>
+          <strong id="detailTotal">0</strong>
         </div>
+
 
       </div>
 
 
 
-      <!-- BUSINESS FIELDS -->
-
-      <div class="detail-grid">
+      <div class="form-grid">
 
 
         <div class="field">
@@ -1967,13 +1580,12 @@
 
         </div>
 
+
       </div>
 
 
 
-      <!-- ACTIONS -->
-
-      <div class="detail-actions">
+      <div class="modal-actions">
 
 
         <button
@@ -2016,21 +1628,20 @@
           🗑 İşletmeyi Sil
         </button>
 
+
       </div>
 
 
       <div
         id="saveMessage"
-        class="save-message"
+        class="message"
       ></div>
 
 
 
-      <!-- QR BOX -->
-
       <div
         id="qrBox"
-        class="qr-box"
+        class="digital-box"
       >
 
         <div class="eyebrow">
@@ -2043,12 +1654,13 @@
 
         <img
           id="detailQRImage"
+          class="qr-image"
           alt="QR Kod"
         >
 
         <div
           id="detailQRUrl"
-          class="qr-url"
+          class="digital-url"
         ></div>
 
         <br>
@@ -2065,11 +1677,9 @@
 
 
 
-      <!-- NFC BOX -->
-
       <div
         id="nfcBox"
-        class="nfc-box"
+        class="digital-box"
       >
 
         <div class="eyebrow">
@@ -2109,62 +1719,239 @@
 
 
 
+<!-- ==================================================
+     NEW BUSINESS MODAL
+================================================== -->
+
+<div
+  id="newBusinessOverlay"
+  class="overlay"
+>
+
+  <div class="modal new-modal">
+
+
+    <div class="modal-header">
+
+      <div>
+
+        <div class="eyebrow">
+          LEO CONNECT • BUSINESS
+        </div>
+
+        <h2>
+          Yeni İşletme
+        </h2>
+
+        <p>
+          Yeni müşteri hesabını oluştur.
+        </p>
+
+      </div>
+
+
+      <button
+        class="close"
+        onclick="closeNewBusiness()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+      <p class="new-intro">
+
+        Buradan yeni işletmenin giriş hesabını oluşturabilirsin.
+        İşletme daha sonra kendi panelinden profil bilgilerini güncelleyebilir.
+
+      </p>
+
+
+      <div class="form-grid">
+
+
+        <div class="field full">
+
+          <label>
+            İŞLETME ADI *
+          </label>
+
+          <input
+            id="new_name"
+            placeholder="Örn. Zelo Bowl"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            E-POSTA *
+          </label>
+
+          <input
+            id="new_email"
+            type="email"
+            placeholder="musteri@email.com"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            ŞİFRE *
+          </label>
+
+          <input
+            id="new_password"
+            type="text"
+            placeholder="En az 8 karakter"
+          >
+
+        </div>
+
+
+        <div class="field full">
+
+          <label>
+            KATEGORİ
+          </label>
+
+          <input
+            id="new_category"
+            placeholder="Örn. Restoran"
+          >
+
+        </div>
+
+
+      </div>
+
+
+      <div class="new-note">
+
+        🔐 E-posta ve şifre müşterinin işletme paneline
+        giriş yapması için kullanılacaktır.
+
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button
+          class="action gold"
+          onclick="createBusiness()"
+        >
+          ＋ İşletmeyi Oluştur
+        </button>
+
+        <button
+          class="action"
+          onclick="closeNewBusiness()"
+        >
+          Vazgeç
+        </button>
+
+      </div>
+
+
+      <div
+        id="newBusinessMessage"
+        class="message"
+      ></div>
+
+
+      <div
+        id="createdBox"
+        class="created-box"
+      >
+
+        <h3>
+          ✓ İşletme Başarıyla Oluşturuldu
+        </h3>
+
+        <div
+          id="createdBusinessName"
+          class="created-row"
+        ></div>
+
+        <div
+          id="createdBusinessEmail"
+          class="created-row"
+        ></div>
+
+        <div
+          id="createdBusinessPassword"
+          class="created-row"
+        ></div>
+
+        <div
+          id="createdBusinessUrl"
+          class="created-row"
+        ></div>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
 <script>
 
 
 /* ==================================================
-   CONFIG
+   GLOBAL
 ================================================== */
 
 const ADMIN_TOKEN_KEY =
   "leo_admin_token";
 
-
 let currentBusinessId =
   null;
-
 
 let currentBusiness =
   null;
 
 
 /* ==================================================
-   LOGIN
+   ADMIN LOGIN
 ================================================== */
 
 async function adminLogin(){
 
   const email =
     document
-      .getElementById(
-        "adminEmail"
-      )
+      .getElementById("adminEmail")
       .value
       .trim();
 
-
   const password =
     document
-      .getElementById(
-        "adminPassword"
-      )
+      .getElementById("adminPassword")
       .value;
-
 
   const message =
     document.getElementById(
       "loginMessage"
     );
 
-
-  message.textContent =
-    "";
+  message.textContent = "";
 
 
-  if(
-    !email ||
-    !password
-  ){
+  if(!email || !password){
 
     message.textContent =
       "E-posta ve şifre gerekli.";
@@ -2180,7 +1967,6 @@ async function adminLogin(){
       await fetch(
         "/api/admin/login",
         {
-
           method:"POST",
 
           headers:{
@@ -2190,13 +1976,9 @@ async function adminLogin(){
 
           body:
             JSON.stringify({
-
               email,
-
               password
-
             })
-
         }
       );
 
@@ -2205,13 +1987,10 @@ async function adminLogin(){
       await response.json();
 
 
-    if(
-      !response.ok
-    ){
+    if(!response.ok){
 
       message.textContent =
-        data.error
-        ||
+        data.error ||
         "Admin girişi başarısız.";
 
       return;
@@ -2230,10 +2009,7 @@ async function adminLogin(){
 
   }catch(error){
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     message.textContent =
       "Sunucuya bağlanılamadı.";
@@ -2250,17 +2026,13 @@ async function adminLogin(){
 function showAdmin(){
 
   document
-    .getElementById(
-      "loginScreen"
-    )
+    .getElementById("loginScreen")
     .style.display =
       "none";
 
 
   document
-    .getElementById(
-      "adminApp"
-    )
+    .getElementById("adminApp")
     .style.display =
       "block";
 
@@ -2282,27 +2054,20 @@ function logout(){
 
 
   document
-    .getElementById(
-      "adminApp"
-    )
+    .getElementById("adminApp")
     .style.display =
       "none";
 
 
   document
-    .getElementById(
-      "loginScreen"
-    )
+    .getElementById("loginScreen")
     .style.display =
       "flex";
 
 
   document
-    .getElementById(
-      "adminPassword"
-    )
-    .value =
-      "";
+    .getElementById("adminPassword")
+    .value = "";
 
 }
 
@@ -2351,9 +2116,7 @@ async function adminApi(
     );
 
 
-  if(
-    response.status === 401
-  ){
+  if(response.status === 401){
 
     logout();
 
@@ -2383,58 +2146,40 @@ async function loadAdmin(){
     return;
 
 
-  document
-    .getElementById(
-      "businessCount"
-    )
-    .textContent =
-      overview.businesses
-      ?? 0;
+  document.getElementById(
+    "businessCount"
+  ).textContent =
+    overview.businesses ?? 0;
 
 
-  document
-    .getElementById(
-      "profileCount"
-    )
-    .textContent =
-      overview.profile_views
-      ?? 0;
+  document.getElementById(
+    "profileCount"
+  ).textContent =
+    overview.profile_views ?? 0;
 
 
-  document
-    .getElementById(
-      "qrCount"
-    )
-    .textContent =
-      overview.qr_scans
-      ?? 0;
+  document.getElementById(
+    "qrCount"
+  ).textContent =
+    overview.qr_scans ?? 0;
 
 
-  document
-    .getElementById(
-      "nfcCount"
-    )
-    .textContent =
-      overview.nfc_scans
-      ?? 0;
+  document.getElementById(
+    "nfcCount"
+  ).textContent =
+    overview.nfc_scans ?? 0;
 
 
-  document
-    .getElementById(
-      "whatsappCount"
-    )
-    .textContent =
-      overview.whatsapp_clicks
-      ?? 0;
+  document.getElementById(
+    "whatsappCount"
+  ).textContent =
+    overview.whatsapp_clicks ?? 0;
 
 
-  document
-    .getElementById(
-      "phoneCount"
-    )
-    .textContent =
-      overview.phone_clicks
-      ?? 0;
+  document.getElementById(
+    "phoneCount"
+  ).textContent =
+    overview.phone_clicks ?? 0;
 
 
   const businesses =
@@ -2455,7 +2200,7 @@ async function loadAdmin(){
 
 
 /* ==================================================
-   RENDER BUSINESS LIST
+   RENDER BUSINESSES
 ================================================== */
 
 function renderBusinesses(
@@ -2469,9 +2214,7 @@ function renderBusinesses(
 
 
   if(
-    !Array.isArray(
-      businesses
-    )
+    !Array.isArray(businesses)
     ||
     businesses.length === 0
   ){
@@ -2520,21 +2263,15 @@ function renderBusinesses(
               <td>
 
                 <div class="business-name">
-
                   ${escapeHtml(
-                    business.name
-                    || "-"
+                    business.name || "-"
                   )}
-
                 </div>
 
                 <div class="business-email">
-
                   ${escapeHtml(
-                    business.email
-                    || "-"
+                    business.email || "-"
                   )}
-
                 </div>
 
               </td>
@@ -2543,56 +2280,41 @@ function renderBusinesses(
               <td>
 
                 <span class="category">
-
                   ${escapeHtml(
-                    business.category
-                    || "Genel"
+                    business.category || "Genel"
                   )}
-
                 </span>
 
               </td>
 
 
               <td class="number gold">
-
                 ${business.profile_views ?? 0}
-
               </td>
 
 
               <td class="number">
-
                 ${business.qr_scans ?? 0}
-
               </td>
 
 
               <td class="number">
-
                 ${business.nfc_scans ?? 0}
-
               </td>
 
 
               <td class="number">
-
                 ${business.whatsapp_clicks ?? 0}
-
               </td>
 
 
               <td class="number">
-
                 ${business.phone_clicks ?? 0}
-
               </td>
 
 
               <td>
-
                 ${date}
-
               </td>
 
             </tr>
@@ -2610,18 +2332,14 @@ function renderBusinesses(
    OPEN BUSINESS
 ================================================== */
 
-async function openBusiness(
-  id
-){
+async function openBusiness(id){
 
   currentBusinessId =
     id;
 
 
   document
-    .getElementById(
-      "detailOverlay"
-    )
+    .getElementById("detailOverlay")
     .style.display =
       "block";
 
@@ -2631,17 +2349,13 @@ async function openBusiness(
 
 
   document
-    .getElementById(
-      "detailTitle"
-    )
+    .getElementById("detailTitle")
     .textContent =
       "Yükleniyor...";
 
 
   document
-    .getElementById(
-      "saveMessage"
-    )
+    .getElementById("saveMessage")
     .textContent =
       "";
 
@@ -2670,8 +2384,7 @@ async function openBusiness(
 
 
   const stats =
-    data.stats
-    || {};
+    data.stats || {};
 
 
   fillBusiness(
@@ -2679,67 +2392,46 @@ async function openBusiness(
   );
 
 
-  document
-    .getElementById(
-      "detailProfile"
+  document.getElementById(
+    "detailProfile"
+  ).textContent =
+    stats.profile_view ?? 0;
+
+
+  document.getElementById(
+    "detailQR"
+  ).textContent =
+    (
+      stats.qr_scan ?? 0
     )
-    .textContent =
-      stats.profile_view
-      ?? 0;
+    +
+    (
+      stats.qr ?? 0
+    );
 
 
-  document
-    .getElementById(
-      "detailQR"
-    )
-    .textContent =
-      (
-        stats.qr_scan
-        ??
-        0
-      )
-      +
-      (
-        stats.qr
-        ??
-        0
-      );
+  document.getElementById(
+    "detailNFC"
+  ).textContent =
+    stats.nfc ?? 0;
 
 
-  document
-    .getElementById(
-      "detailNFC"
-    )
-    .textContent =
-      stats.nfc
-      ?? 0;
+  document.getElementById(
+    "detailWhatsapp"
+  ).textContent =
+    stats.whatsapp ?? 0;
 
 
-  document
-    .getElementById(
-      "detailWhatsapp"
-    )
-    .textContent =
-      stats.whatsapp
-      ?? 0;
+  document.getElementById(
+    "detailPhone"
+  ).textContent =
+    stats.phone ?? 0;
 
 
-  document
-    .getElementById(
-      "detailPhone"
-    )
-    .textContent =
-      stats.phone
-      ?? 0;
-
-
-  document
-    .getElementById(
-      "detailTotal"
-    )
-    .textContent =
-      data.total_events
-      ?? 0;
+  document.getElementById(
+    "detailTotal"
+  ).textContent =
+    data.total_events ?? 0;
 
 }
 
@@ -2752,56 +2444,34 @@ function fillBusiness(
   business
 ){
 
-  document
-    .getElementById(
-      "detailTitle"
-    )
-    .textContent =
-      business.name
-      ||
-      "İşletme";
+  document.getElementById(
+    "detailTitle"
+  ).textContent =
+    business.name || "İşletme";
 
 
-  document
-    .getElementById(
-      "detailEmail"
-    )
-    .textContent =
-      business.email
-      ||
-      "-";
+  document.getElementById(
+    "detailEmail"
+  ).textContent =
+    business.email || "-";
 
 
   const fields = [
 
     "name",
-
     "category",
-
     "description",
-
     "phone",
-
     "whatsapp",
-
     "address",
-
     "instagram",
-
     "tiktok",
-
     "google_review",
-
     "website",
-
     "menu",
-
     "iban",
-
     "iban_holder",
-
     "hours",
-
     "logo_url"
 
   ];
@@ -2819,9 +2489,7 @@ function fillBusiness(
       if(element){
 
         element.value =
-          business[field]
-          ||
-          "";
+          business[field] || "";
 
       }
 
@@ -2829,13 +2497,11 @@ function fillBusiness(
   );
 
 
-  document
-    .getElementById(
-      "detailProfileLink"
-    )
-    .href =
-      "/p/" +
-      business.slug;
+  document.getElementById(
+    "detailProfileLink"
+  ).href =
+    "/p/" +
+    business.slug;
 
 }
 
@@ -2853,33 +2519,19 @@ async function saveBusiness(){
   const fields = [
 
     "name",
-
     "category",
-
     "description",
-
     "phone",
-
     "whatsapp",
-
     "address",
-
     "instagram",
-
     "tiktok",
-
     "google_review",
-
     "website",
-
     "menu",
-
     "iban",
-
     "iban_holder",
-
     "hours",
-
     "logo_url"
 
   ];
@@ -2961,8 +2613,7 @@ async function saveBusiness(){
   }else{
 
     message.textContent =
-      result?.error
-      ||
+      result?.error ||
       "İşletme güncellenemedi.";
 
   }
@@ -2971,7 +2622,7 @@ async function saveBusiness(){
 
 
 /* ==================================================
-   SHOW QR
+   QR
 ================================================== */
 
 async function showQR(){
@@ -2980,23 +2631,15 @@ async function showQR(){
     return;
 
 
-  const qrBox =
-    document.getElementById(
-      "qrBox"
-    );
-
-
-  const nfcBox =
-    document.getElementById(
-      "nfcBox"
-    );
-
-
-  nfcBox.style.display =
+  document.getElementById(
+    "nfcBox"
+  ).style.display =
     "none";
 
 
-  qrBox.style.display =
+  document.getElementById(
+    "qrBox"
+  ).style.display =
     "block";
 
 
@@ -3016,61 +2659,45 @@ async function showQR(){
     return;
 
 
-  document
-    .getElementById(
-      "detailQRImage"
-    )
-    .src =
-      result.dataUrl;
+  document.getElementById(
+    "detailQRImage"
+  ).src =
+    result.dataUrl;
 
 
-  document
-    .getElementById(
-      "detailQRUrl"
-    )
-    .textContent =
-      result.url;
+  document.getElementById(
+    "detailQRUrl"
+  ).textContent =
+    result.url;
 
 
-  document
-    .getElementById(
-      "detailQRDownload"
-    )
-    .href =
-      result.dataUrl;
+  document.getElementById(
+    "detailQRDownload"
+  ).href =
+    result.dataUrl;
 
 }
 
 
 /* ==================================================
-   SHOW NFC
+   NFC
 ================================================== */
 
 function showNFC(){
 
-  if(
-    !currentBusiness
-  )
+  if(!currentBusiness)
     return;
 
 
-  const nfcBox =
-    document.getElementById(
-      "nfcBox"
-    );
-
-
-  const qrBox =
-    document.getElementById(
-      "qrBox"
-    );
-
-
-  qrBox.style.display =
+  document.getElementById(
+    "qrBox"
+  ).style.display =
     "none";
 
 
-  nfcBox.style.display =
+  document.getElementById(
+    "nfcBox"
+  ).style.display =
     "block";
 
 
@@ -3081,12 +2708,10 @@ function showNFC(){
     "?source=nfc";
 
 
-  document
-    .getElementById(
-      "detailNFCUrl"
-    )
-    .textContent =
-      url;
+  document.getElementById(
+    "detailNFCUrl"
+  ).textContent =
+    url;
 
 }
 
@@ -3097,9 +2722,7 @@ function showNFC(){
 
 async function copyNFC(){
 
-  if(
-    !currentBusiness
-  )
+  if(!currentBusiness)
     return;
 
 
@@ -3117,21 +2740,17 @@ async function copyNFC(){
     );
 
 
-    document
-      .getElementById(
-        "saveMessage"
-      )
-      .textContent =
-        "✓ NFC bağlantısı kopyalandı.";
+    document.getElementById(
+      "saveMessage"
+    ).textContent =
+      "✓ NFC bağlantısı kopyalandı.";
 
   }catch(error){
 
-    document
-      .getElementById(
-        "saveMessage"
-      )
-      .textContent =
-        url;
+    document.getElementById(
+      "saveMessage"
+    ).textContent =
+      url;
 
   }
 
@@ -3139,25 +2758,21 @@ async function copyNFC(){
 
 
 /* ==================================================
-   HIDE DIGITAL BOXES
+   HIDE BOXES
 ================================================== */
 
 function hideDigitalBoxes(){
 
-  document
-    .getElementById(
-      "qrBox"
-    )
-    .style.display =
-      "none";
+  document.getElementById(
+    "qrBox"
+  ).style.display =
+    "none";
 
 
-  document
-    .getElementById(
-      "nfcBox"
-    )
-    .style.display =
-      "none";
+  document.getElementById(
+    "nfcBox"
+  ).style.display =
+    "none";
 
 }
 
@@ -3168,12 +2783,10 @@ function hideDigitalBoxes(){
 
 function closeDetail(){
 
-  document
-    .getElementById(
-      "detailOverlay"
-    )
-    .style.display =
-      "none";
+  document.getElementById(
+    "detailOverlay"
+  ).style.display =
+    "none";
 
 
   document.body.style.overflow =
@@ -3201,8 +2814,7 @@ async function deleteBusiness(){
 
 
   const name =
-    currentBusiness?.name
-    ||
+    currentBusiness?.name ||
     "bu işletme";
 
 
@@ -3229,9 +2841,7 @@ async function deleteBusiness(){
       ),
 
       {
-
         method:"DELETE"
-
       }
 
     );
@@ -3253,10 +2863,233 @@ async function deleteBusiness(){
   }else{
 
     alert(
-      result?.error
-      ||
+      result?.error ||
       "İşletme silinemedi."
     );
+
+  }
+
+}
+
+
+/* ==================================================
+   NEW BUSINESS
+================================================== */
+
+function openNewBusiness(){
+
+  document.getElementById(
+    "newBusinessOverlay"
+  ).style.display =
+    "block";
+
+
+  document.body.style.overflow =
+    "hidden";
+
+
+  document.getElementById(
+    "newBusinessMessage"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "createdBox"
+  ).style.display =
+    "none";
+
+}
+
+
+function closeNewBusiness(){
+
+  document.getElementById(
+    "newBusinessOverlay"
+  ).style.display =
+    "none";
+
+
+  document.body.style.overflow =
+    "";
+
+}
+
+
+async function createBusiness(){
+
+  const name =
+    document.getElementById(
+      "new_name"
+    ).value.trim();
+
+
+  const email =
+    document.getElementById(
+      "new_email"
+    ).value.trim();
+
+
+  const password =
+    document.getElementById(
+      "new_password"
+    ).value;
+
+
+  const category =
+    document.getElementById(
+      "new_category"
+    ).value.trim();
+
+
+  const message =
+    document.getElementById(
+      "newBusinessMessage"
+    );
+
+
+  message.textContent =
+    "";
+
+
+  if(
+    !name ||
+    !email ||
+    !password
+  ){
+
+    message.textContent =
+      "İşletme adı, e-posta ve şifre gerekli.";
+
+    return;
+
+  }
+
+
+  if(
+    password.length < 8
+  ){
+
+    message.textContent =
+      "Şifre en az 8 karakter olmalı.";
+
+    return;
+
+  }
+
+
+  message.textContent =
+    "İşletme oluşturuluyor...";
+
+
+  const result =
+    await adminApi(
+
+      "/api/admin/business",
+
+      {
+
+        method:"POST",
+
+        body:
+          JSON.stringify({
+
+            name,
+
+            email,
+
+            password,
+
+            category
+
+          })
+
+      }
+
+    );
+
+
+  if(
+    result &&
+    result.ok
+  ){
+
+    message.textContent =
+      "✓ İşletme oluşturuldu.";
+
+
+    const business =
+      result.business;
+
+
+    document.getElementById(
+      "createdBusinessName"
+    ).innerHTML =
+      "<b>İŞLETME:</b> " +
+      escapeHtml(
+        business.name
+      );
+
+
+    document.getElementById(
+      "createdBusinessEmail"
+    ).innerHTML =
+      "<b>E-POSTA:</b> " +
+      escapeHtml(
+        email
+      );
+
+
+    document.getElementById(
+      "createdBusinessPassword"
+    ).innerHTML =
+      "<b>ŞİFRE:</b> " +
+      escapeHtml(
+        password
+      );
+
+
+    document.getElementById(
+      "createdBusinessUrl"
+    ).innerHTML =
+      "<b>PANEL:</b> " +
+      window.location.origin +
+      "/login";
+
+
+    document.getElementById(
+      "createdBox"
+    ).style.display =
+      "block";
+
+
+    document.getElementById(
+      "new_name"
+    ).value = "";
+
+
+    document.getElementById(
+      "new_email"
+    ).value = "";
+
+
+    document.getElementById(
+      "new_password"
+    ).value = "";
+
+
+    document.getElementById(
+      "new_category"
+    ).value = "";
+
+
+    await loadAdmin();
+
+  }else{
+
+    message.textContent =
+      result?.error ||
+      "İşletme oluşturulamadı.";
 
   }
 
@@ -3271,9 +3104,7 @@ function escapeHtml(
   value
 ){
 
-  return String(
-    value
-  )
+  return String(value)
 
     .replace(
       /&/g,
@@ -3304,7 +3135,7 @@ function escapeHtml(
 
 
 /* ==================================================
-   ENTER KEY
+   ENTER LOGIN
 ================================================== */
 
 document
@@ -3328,7 +3159,7 @@ document
 
 
 /* ==================================================
-   ESC KEY
+   ESC
 ================================================== */
 
 document.addEventListener(
@@ -3340,6 +3171,7 @@ document.addEventListener(
     ){
 
       closeDetail();
+      closeNewBusiness();
 
     }
 
@@ -3348,7 +3180,7 @@ document.addEventListener(
 
 
 /* ==================================================
-   EXISTING TOKEN
+   EXISTING ADMIN TOKEN
 ================================================== */
 
 const existingToken =
@@ -3365,7 +3197,5 @@ if(existingToken){
 
 </script>
 
-
 </body>
-
 </html>
