@@ -1,903 +1,2239 @@
 <!doctype html>
 <html lang="tr">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>LEO CONNECT — Premium Panel</title>
-
-  <link rel="stylesheet" href="/style.css">
-
-  <style>
-
-    :root{
-      --gold:#b8893f;
-      --gold-light:#d8b16a;
-      --black:#111;
-      --soft:#f6f3ed;
-      --border:#e5dfd4;
-    }
-
-    *{
-      box-sizing:border-box;
-    }
-
-    body{
-      margin:0;
-      background:
-        radial-gradient(
-          circle at top right,
-          #d7b36b18,
-          transparent 35%
-        ),
-        #f7f4ee;
-      color:#171717;
-      font-family:Arial,sans-serif;
-    }
-
-    header{
-      position:sticky;
-      top:0;
-      z-index:50;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:18px 24px;
-      background:#111;
-      color:#fff;
-      border-bottom:1px solid #b8893f55;
-    }
-
-    header b{
-      letter-spacing:.08em;
-    }
-
-    header b span{
-      color:#d5a957;
-    }
-
-    header a{
-      color:#fff;
-      text-decoration:none;
-      font-size:13px;
-    }
-
-    .dashboard{
-      width:min(980px,94%);
-      margin:35px auto 80px;
-    }
-
-    .eyebrow{
-      color:var(--gold);
-      font-size:11px;
-      letter-spacing:.18em;
-      font-weight:700;
-    }
-
-    .dashboard-title{
-      display:flex;
-      justify-content:space-between;
-      align-items:end;
-      gap:20px;
-      margin-bottom:28px;
-    }
-
-    .dashboard-title h1{
-      margin:8px 0 0;
-      font-size:34px;
-    }
-
-    .dashboard-title p{
-      margin:5px 0 0;
-      color:#777;
-    }
-
-    .premium-badge{
-      background:#111;
-      color:#d5a957;
-      padding:9px 14px;
-      border-radius:999px;
-      font-size:11px;
-      font-weight:700;
-      letter-spacing:.08em;
-      white-space:nowrap;
-    }
-
-    .box{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:22px;
-      padding:28px;
-      margin:22px 0;
-      box-shadow:0 15px 45px #0000000a;
-    }
-
-    .box h2{
-      margin:0 0 8px;
-      font-size:22px;
-    }
-
-    .box-description{
-      color:#777;
-      font-size:14px;
-      line-height:1.6;
-      margin:0 0 22px;
-    }
-
-    .field-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-
-    input,
-    textarea{
-      width:100%;
-      border:1px solid #ddd7cc;
-      background:#fff;
-      border-radius:12px;
-      padding:14px;
-      font-size:14px;
-      outline:none;
-    }
-
-    input:focus,
-    textarea:focus{
-      border-color:var(--gold);
-      box-shadow:0 0 0 3px #b8893f18;
-    }
-
-    textarea{
-      min-height:110px;
-      resize:vertical;
-    }
-
-    .full{
-      grid-column:1/-1;
-    }
-
-    .hint{
-      color:#888;
-      font-size:12px;
-      line-height:1.5;
-      margin:4px 0 0;
-    }
-
-    .save-row{
-      display:flex;
-      align-items:center;
-      gap:15px;
-      margin-top:20px;
-    }
-
-    button,
-    .action{
-      border:0;
-      border-radius:11px;
-      padding:13px 18px;
-      cursor:pointer;
-      font-weight:700;
-      text-decoration:none;
-      display:inline-block;
-      font-size:13px;
-    }
-
-    .primary{
-      background:#b8893f;
-      color:#fff;
-    }
-
-    .dark{
-      background:#111;
-      color:#fff;
-    }
-
-    .light{
-      background:#f1ede5;
-      color:#222;
-    }
-
-    #message{
-      color:#9b712f;
-      font-size:13px;
-      margin:0;
-    }
-
-    /* QR + NFC */
-
-    .digital-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:20px;
-    }
-
-    .digital-card{
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:22px;
-      background:#fcfbf8;
-    }
-
-    .digital-card h3{
-      margin:0 0 8px;
-    }
-
-    .digital-card p{
-      color:#777;
-      font-size:13px;
-      line-height:1.5;
-    }
-
-    .qr-image{
-      width:230px;
-      max-width:100%;
-      display:block;
-      margin:20px auto;
-    }
-
-    .link-box{
-      background:#f3f0ea;
-      border-radius:10px;
-      padding:12px;
-      font-size:11px;
-      word-break:break-all;
-      line-height:1.5;
-      margin:15px 0;
-    }
-
-    .actions{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    /* NFC */
-
-    .nfc-symbol{
-      width:70px;
-      height:70px;
-      border-radius:18px;
-      background:#111;
-      color:#d5a957;
-      display:grid;
-      place-items:center;
-      font-size:32px;
-      margin-bottom:18px;
-    }
-
-    .nfc-url{
-      background:#111;
-      color:#fff;
-      padding:15px;
-      border-radius:11px;
-      font-size:11px;
-      line-height:1.5;
-      word-break:break-all;
-      margin:18px 0;
-    }
-
-    .nfc-status{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
-      color:#777;
-      margin-top:14px;
-    }
-
-    .status-dot{
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:#3c9b61;
-    }
-
-    /* STATS */
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:12px;
-      margin-top:20px;
-    }
-
-    .stat{
-      background:#faf8f4;
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:18px;
-    }
-
-    .stat small{
-      display:block;
-      color:#9b712f;
-      font-size:11px;
-      margin-bottom:8px;
-    }
-
-    .stat strong{
-      font-size:30px;
-    }
-
-    .stat-label{
-      color:#888;
-      font-size:11px;
-      margin-top:5px;
-    }
-
-    /* QUICK */
-
-    .quick-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-    }
-
-    .quick{
-      padding:18px;
-      border:1px solid var(--border);
-      border-radius:16px;
-      background:#fff;
-      text-decoration:none;
-      color:#171717;
-    }
-
-    .quick-icon{
-      font-size:25px;
-      margin-bottom:10px;
-    }
-
-    .quick strong{
-      display:block;
-      margin-bottom:4px;
-    }
-
-    .quick span{
-      color:#888;
-      font-size:11px;
-    }
-
-    @media(max-width:700px){
-
-      .dashboard{
-        width:92%;
-        margin-top:25px;
-      }
-
-      .dashboard-title{
-        align-items:flex-start;
-        flex-direction:column;
-      }
-
-      .dashboard-title h1{
-        font-size:29px;
-      }
-
-      .field-grid{
-        grid-template-columns:1fr;
-      }
-
-      .full{
-        grid-column:auto;
-      }
-
-      .digital-grid{
-        grid-template-columns:1fr;
-      }
-
-      .stats{
-        grid-template-columns:1fr 1fr;
-      }
-
-      .stat strong{
-        font-size:26px;
-      }
-
-      .quick-grid{
-        grid-template-columns:1fr;
-      }
-
-      .box{
-        padding:20px;
-        border-radius:18px;
-      }
-
-    }
-
-  </style>
+
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1"
+>
+
+<meta
+  name="theme-color"
+  content="#080808"
+>
+
+<title>LEO CONNECT — Business Center</title>
+
+<style>
+
+:root{
+
+  --gold:#c59a52;
+  --gold-light:#e0bd7b;
+
+  --black:#080808;
+  --dark:#101010;
+  --dark-2:#151515;
+  --dark-3:#1c1c1c;
+
+  --white:#fff;
+  --muted:#888;
+
+  --border:#292929;
+
+  --green:#45c27a;
+}
+
+
+*{
+  box-sizing:border-box;
+}
+
+
+html{
+  scroll-behavior:smooth;
+}
+
+
+body{
+
+  margin:0;
+
+  background:
+
+    radial-gradient(
+      circle at 80% 0%,
+      #c59a5215,
+      transparent 30%
+    ),
+
+    #080808;
+
+  color:#fff;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+}
+
+
+/* ==================================================
+   HEADER
+================================================== */
+
+header{
+
+  position:sticky;
+
+  top:0;
+
+  z-index:100;
+
+  height:72px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  padding:0 28px;
+
+  background:#0a0a0aed;
+
+  backdrop-filter:blur(20px);
+
+  border-bottom:
+    1px solid var(--border);
+
+}
+
+
+.brand{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+}
+
+
+.brand-icon{
+
+  width:42px;
+
+  height:42px;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:13px;
+
+  background:#000;
+
+  border:
+    1px solid #c59a5260;
+
+  font-size:22px;
+
+}
+
+
+.brand-text strong{
+
+  display:block;
+
+  font-size:15px;
+
+  letter-spacing:.12em;
+
+}
+
+
+.brand-text strong span{
+
+  color:
+    var(--gold-light);
+
+}
+
+
+.brand-text small{
+
+  display:block;
+
+  margin-top:3px;
+
+  color:#666;
+
+  font-size:9px;
+
+  letter-spacing:.15em;
+
+}
+
+
+.header-actions{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+}
+
+
+.header-button{
+
+  padding:
+    10px 14px;
+
+  border-radius:10px;
+
+  border:
+    1px solid #333;
+
+  background:#151515;
+
+  color:#ddd;
+
+  text-decoration:none;
+
+  font-size:11px;
+
+  font-weight:700;
+
+}
+
+
+.header-button.gold{
+
+  background:
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
+    );
+
+  border-color:
+    #c59a52;
+
+  color:#fff;
+
+}
+
+
+/* ==================================================
+   MAIN
+================================================== */
+
+main{
+
+  width:min(
+    1100px,
+    94%
+  );
+
+  margin:
+    35px auto 80px;
+
+}
+
+
+.page-head{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-end;
+
+  gap:20px;
+
+  margin-bottom:25px;
+
+}
+
+
+.eyebrow{
+
+  color:
+    var(--gold-light);
+
+  font-size:10px;
+
+  font-weight:800;
+
+  letter-spacing:.2em;
+
+}
+
+
+.page-head h1{
+
+  margin:
+    8px 0 0;
+
+  font-size:36px;
+
+}
+
+
+.page-head p{
+
+  margin:
+    7px 0 0;
+
+  color:#777;
+
+  font-size:13px;
+
+}
+
+
+.live{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  color:#aaa;
+
+  font-size:11px;
+
+}
+
+
+.live-dot{
+
+  width:8px;
+
+  height:8px;
+
+  border-radius:50%;
+
+  background:
+    var(--green);
+
+  box-shadow:
+    0 0 12px #45c27a88;
+
+}
+
+
+/* ==================================================
+   PROFILE HERO
+================================================== */
+
+.profile-hero{
+
+  position:relative;
+
+  overflow:hidden;
+
+  margin-bottom:20px;
+
+  padding:28px;
+
+  border-radius:24px;
+
+  border:
+    1px solid #c59a5235;
+
+  background:
+
+    radial-gradient(
+      circle at 90% 20%,
+      #c59a5218,
+      transparent 35%
+    ),
+
+    linear-gradient(
+      145deg,
+      #171717,
+      #0d0d0d
+    );
+
+}
+
+
+.profile-hero::after{
+
+  content:"";
+
+  position:absolute;
+
+  width:180px;
+
+  height:180px;
+
+  right:-80px;
+
+  bottom:-100px;
+
+  border-radius:50%;
+
+  border:
+    1px solid #c59a5218;
+
+}
+
+
+.profile-hero-inner{
+
+  position:relative;
+
+  z-index:2;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:22px;
+
+}
+
+
+.logo-wrap{
+
+  width:92px;
+
+  height:92px;
+
+  flex:none;
+
+  display:grid;
+
+  place-items:center;
+
+  overflow:hidden;
+
+  border-radius:24px;
+
+  background:#050505;
+
+  border:
+    1px solid #c59a5260;
+
+  box-shadow:
+    0 15px 40px #000;
+
+}
+
+
+.logo-wrap img{
+
+  width:100%;
+
+  height:100%;
+
+  object-fit:cover;
+
+}
+
+
+.logo-placeholder{
+
+  font-size:36px;
+
+}
+
+
+.profile-info{
+
+  min-width:0;
+
+}
+
+
+.profile-info h2{
+
+  margin:0;
+
+  font-size:27px;
+
+  word-break:break-word;
+
+}
+
+
+.profile-category{
+
+  display:inline-block;
+
+  margin-top:8px;
+
+  padding:
+    6px 10px;
+
+  border-radius:999px;
+
+  background:#c59a5212;
+
+  border:
+    1px solid #c59a5230;
+
+  color:
+    var(--gold-light);
+
+  font-size:10px;
+
+}
+
+
+.profile-description{
+
+  margin:
+    12px 0 0;
+
+  color:#888;
+
+  font-size:12px;
+
+  line-height:1.6;
+
+}
+
+
+.profile-actions{
+
+  margin-left:auto;
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  justify-content:flex-end;
+
+  gap:8px;
+
+}
+
+
+.action{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:
+    11px 15px;
+
+  border-radius:10px;
+
+  border:
+    1px solid #333;
+
+  background:#171717;
+
+  color:#fff;
+
+  text-decoration:none;
+
+  font-size:11px;
+
+  font-weight:700;
+
+  cursor:pointer;
+
+}
+
+
+.action.gold{
+
+  background:
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
+    );
+
+  border-color:
+    #c59a52;
+
+}
+
+
+/* ==================================================
+   STATS
+================================================== */
+
+.stats{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(5,1fr);
+
+  gap:10px;
+
+  margin-bottom:20px;
+
+}
+
+
+.stat{
+
+  padding:18px;
+
+  border-radius:17px;
+
+  border:
+    1px solid var(--border);
+
+  background:
+    linear-gradient(
+      145deg,
+      #151515,
+      #0f0f0f
+    );
+
+}
+
+
+.stat small{
+
+  display:block;
+
+  color:#777;
+
+  font-size:9px;
+
+  letter-spacing:.14em;
+
+  margin-bottom:9px;
+
+}
+
+
+.stat strong{
+
+  display:block;
+
+  color:
+    var(--gold-light);
+
+  font-size:27px;
+
+}
+
+
+.stat span{
+
+  display:block;
+
+  margin-top:5px;
+
+  color:#555;
+
+  font-size:10px;
+
+}
+
+
+/* ==================================================
+   BOX
+================================================== */
+
+.box{
+
+  margin-top:20px;
+
+  padding:26px;
+
+  border-radius:22px;
+
+  border:
+    1px solid var(--border);
+
+  background:
+    linear-gradient(
+      145deg,
+      #141414,
+      #0d0d0d
+    );
+
+}
+
+
+.box-head{
+
+  display:flex;
+
+  align-items:flex-start;
+
+  justify-content:space-between;
+
+  gap:15px;
+
+  margin-bottom:22px;
+
+}
+
+
+.box-head h2{
+
+  margin:
+    7px 0 0;
+
+  font-size:20px;
+
+}
+
+
+.box-head p{
+
+  margin:
+    5px 0 0;
+
+  color:#777;
+
+  font-size:11px;
+
+  line-height:1.5;
+
+}
+
+
+/* ==================================================
+   FORM
+================================================== */
+
+.form-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:14px;
+
+}
+
+
+.field{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:7px;
+
+}
+
+
+.field.full{
+
+  grid-column:
+    1 / -1;
+
+}
+
+
+.field label{
+
+  color:#777;
+
+  font-size:9px;
+
+  font-weight:700;
+
+  letter-spacing:.12em;
+
+}
+
+
+.field input,
+.field textarea{
+
+  width:100%;
+
+  padding:14px;
+
+  border-radius:11px;
+
+  border:
+    1px solid #292929;
+
+  background:#0b0b0b;
+
+  color:#fff;
+
+  outline:none;
+
+  font-size:13px;
+
+}
+
+
+.field textarea{
+
+  min-height:105px;
+
+  resize:vertical;
+
+  line-height:1.5;
+
+}
+
+
+.field input:focus,
+.field textarea:focus{
+
+  border-color:
+    var(--gold);
+
+  box-shadow:
+    0 0 0 3px #c59a5212;
+
+}
+
+
+.field input::placeholder,
+.field textarea::placeholder{
+
+  color:#555;
+
+}
+
+
+.field-hint{
+
+  color:#555;
+
+  font-size:10px;
+
+  line-height:1.4;
+
+}
+
+
+/* ==================================================
+   SAVE
+================================================== */
+
+.save-area{
+
+  display:flex;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  gap:12px;
+
+  margin-top:22px;
+
+  padding-top:20px;
+
+  border-top:
+    1px solid var(--border);
+
+}
+
+
+.save-button{
+
+  padding:
+    13px 20px;
+
+  border:0;
+
+  border-radius:11px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
+    );
+
+  color:#fff;
+
+  font-size:12px;
+
+  font-weight:800;
+
+  cursor:pointer;
+
+}
+
+
+#message{
+
+  min-height:17px;
+
+  color:
+    var(--gold-light);
+
+  font-size:11px;
+
+}
+
+
+/* ==================================================
+   DIGITAL GRID
+================================================== */
+
+.digital-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:15px;
+
+}
+
+
+.digital-card{
+
+  padding:22px;
+
+  border-radius:18px;
+
+  background:#101010;
+
+  border:
+    1px solid var(--border);
+
+}
+
+
+.digital-icon{
+
+  width:52px;
+
+  height:52px;
+
+  display:grid;
+
+  place-items:center;
+
+  margin-bottom:15px;
+
+  border-radius:15px;
+
+  background:#000;
+
+  border:
+    1px solid #c59a5235;
+
+  font-size:25px;
+
+}
+
+
+.digital-card h3{
+
+  margin:0;
+
+  font-size:17px;
+
+}
+
+
+.digital-card p{
+
+  margin:
+    8px 0 0;
+
+  color:#777;
+
+  font-size:11px;
+
+  line-height:1.6;
+
+}
+
+
+.qr-image{
+
+  width:230px;
+
+  max-width:100%;
+
+  display:block;
+
+  margin:
+    20px auto;
+
+  border-radius:8px;
+
+}
+
+
+.digital-url{
+
+  padding:12px;
+
+  border-radius:10px;
+
+  background:#080808;
+
+  color:#888;
+
+  font-size:9px;
+
+  line-height:1.5;
+
+  word-break:break-all;
+
+  border:
+    1px solid #222;
+
+}
+
+
+.digital-actions{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:8px;
+
+  margin-top:12px;
+
+}
+
+
+.nfc-symbol{
+
+  width:64px;
+
+  height:64px;
+
+  display:grid;
+
+  place-items:center;
+
+  margin-bottom:15px;
+
+  border-radius:18px;
+
+  background:#000;
+
+  border:
+    1px solid #c59a5235;
+
+  color:
+    var(--gold-light);
+
+  font-size:30px;
+
+}
+
+
+.nfc-url{
+
+  margin-top:18px;
+
+  padding:15px;
+
+  border-radius:11px;
+
+  background:#000;
+
+  color:#fff;
+
+  border:
+    1px solid #292929;
+
+  font-size:9px;
+
+  line-height:1.5;
+
+  word-break:break-all;
+
+}
+
+
+.nfc-status{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:7px;
+
+  margin-top:12px;
+
+  color:#666;
+
+  font-size:10px;
+
+}
+
+
+.status-dot{
+
+  width:7px;
+
+  height:7px;
+
+  border-radius:50%;
+
+  background:
+    var(--green);
+
+}
+
+
+/* ==================================================
+   QUICK INFO
+================================================== */
+
+.info-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:10px;
+
+}
+
+
+.info-card{
+
+  padding:17px;
+
+  border-radius:15px;
+
+  background:#101010;
+
+  border:
+    1px solid var(--border);
+
+}
+
+
+.info-card-icon{
+
+  font-size:19px;
+
+  margin-bottom:9px;
+
+}
+
+
+.info-card strong{
+
+  display:block;
+
+  font-size:12px;
+
+}
+
+
+.info-card span{
+
+  display:block;
+
+  margin-top:5px;
+
+  color:#666;
+
+  font-size:10px;
+
+  line-height:1.5;
+
+  word-break:break-word;
+
+}
+
+
+/* ==================================================
+   FOOTER
+================================================== */
+
+.footer{
+
+  margin-top:35px;
+
+  text-align:center;
+
+  color:#3f3f3f;
+
+  font-size:9px;
+
+  letter-spacing:.15em;
+
+}
+
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media(max-width:900px){
+
+  .stats{
+
+    grid-template-columns:
+      repeat(3,1fr);
+
+  }
+
+  .profile-hero-inner{
+
+    align-items:flex-start;
+
+    flex-wrap:wrap;
+
+  }
+
+  .profile-actions{
+
+    width:100%;
+
+    margin-left:0;
+
+    justify-content:flex-start;
+
+  }
+
+}
+
+
+@media(max-width:700px){
+
+  header{
+
+    height:auto;
+
+    min-height:70px;
+
+    padding:
+      12px 16px;
+
+  }
+
+
+  .header-actions{
+
+    flex-direction:column;
+
+    align-items:stretch;
+
+  }
+
+
+  .header-button{
+
+    padding:
+      8px 10px;
+
+    font-size:9px;
+
+  }
+
+
+  main{
+
+    width:92%;
+
+    margin-top:24px;
+
+  }
+
+
+  .page-head{
+
+    align-items:flex-start;
+
+    flex-direction:column;
+
+  }
+
+
+  .page-head h1{
+
+    font-size:29px;
+
+  }
+
+
+  .profile-hero{
+
+    padding:20px;
+
+  }
+
+
+  .profile-hero-inner{
+
+    display:block;
+
+  }
+
+
+  .logo-wrap{
+
+    width:78px;
+
+    height:78px;
+
+    margin-bottom:15px;
+
+  }
+
+
+  .profile-info h2{
+
+    font-size:23px;
+
+  }
+
+
+  .profile-actions{
+
+    margin-top:18px;
+
+  }
+
+
+  .stats{
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
+
+
+  .stat strong{
+
+    font-size:24px;
+
+  }
+
+
+  .box{
+
+    padding:20px;
+
+    border-radius:18px;
+
+  }
+
+
+  .box-head{
+
+    display:block;
+
+  }
+
+
+  .form-grid{
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  .field.full{
+
+    grid-column:auto;
+
+  }
+
+
+  .digital-grid{
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  .info-grid{
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
+
+}
+
+
+@media(max-width:430px){
+
+  .info-grid{
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+}
+
+</style>
+
 </head>
 
 
 <body>
 
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
 <header>
 
-  <b>
-    🦁 LEO <span>CONNECT</span>
-  </b>
 
-  <a href="/">
-    Siteyi Gör →
-  </a>
+  <div class="brand">
+
+    <div class="brand-icon">
+      🦁
+    </div>
+
+    <div class="brand-text">
+
+      <strong>
+        LEO <span>CONNECT</span>
+      </strong>
+
+      <small>
+        BUSINESS CENTER
+      </small>
+
+    </div>
+
+  </div>
+
+
+  <div class="header-actions">
+
+    <a
+      id="headerProfile"
+      class="header-button gold"
+      target="_blank"
+    >
+      👤 Profilim
+    </a>
+
+    <a
+      href="/"
+      class="header-button"
+    >
+      Site
+    </a>
+
+  </div>
+
 
 </header>
 
 
-<main class="dashboard">
+
+<main>
 
 
-  <!-- BAŞLIK -->
+<!-- ==================================================
+     PAGE HEAD
+================================================== -->
 
-  <div class="dashboard-title">
+<div class="page-head">
 
-    <div>
+  <div>
 
-      <div class="eyebrow">
-        LEO CONNECT • BUSINESS
-      </div>
+    <div class="eyebrow">
+      LEO CONNECT • BUSINESS
+    </div>
 
-      <h1 id="title">
-        İşletme Paneli
-      </h1>
+    <h1 id="title">
+      İşletme Paneli
+    </h1>
 
-      <p>
-        Dijital profilini ve bağlantılarını yönet.
+    <p>
+      Dijital işletme profilini ve bağlantılarını yönet.
+    </p>
+
+  </div>
+
+
+  <div class="live">
+
+    <span class="live-dot"></span>
+
+    Sistem aktif
+
+  </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     PROFILE HERO
+================================================== -->
+
+<section class="profile-hero">
+
+
+  <div class="profile-hero-inner">
+
+
+    <div class="logo-wrap">
+
+      <span
+        id="logoPlaceholder"
+        class="logo-placeholder"
+      >
+        🦁
+      </span>
+
+      <img
+        id="logoPreview"
+        style="display:none"
+        alt="İşletme logosu"
+      >
+
+    </div>
+
+
+    <div class="profile-info">
+
+      <h2 id="heroName">
+        İşletme
+      </h2>
+
+      <span
+        id="heroCategory"
+        class="profile-category"
+      >
+        İşletme
+      </span>
+
+      <p
+        id="heroDescription"
+        class="profile-description"
+      >
+        Dijital profilini yönet.
       </p>
 
     </div>
 
-    <div class="premium-badge">
-      PREMIUM PANEL
-    </div>
 
-  </div>
-
-
-  <!-- HIZLI İŞLEMLER -->
-
-  <div class="box">
-
-    <div class="eyebrow">
-      HIZLI İŞLEMLER
-    </div>
-
-    <h2>
-      Her şey tek panelde.
-    </h2>
-
-    <div class="quick-grid">
+    <div class="profile-actions">
 
       <a
-        class="quick"
-        id="quickProfile"
+        id="heroProfile"
+        class="action"
         target="_blank"
       >
-
-        <div class="quick-icon">
-          👤
-        </div>
-
-        <strong>
-          Profilimi Gör
-        </strong>
-
-        <span>
-          Müşterinin gördüğü sayfa
-        </span>
-
+        👤 Müşteri Profilini Gör
       </a>
-
 
       <a
-        class="quick"
-        id="quickQR"
+        href="#profile"
+        class="action gold"
       >
-
-        <div class="quick-icon">
-          ▣
-        </div>
-
-        <strong>
-          QR Kodum
-        </strong>
-
-        <span>
-          QR kodunu aç
-        </span>
-
+        ✏️ Profili Düzenle
       </a>
 
+    </div>
 
-      <a
-        class="quick"
-        href="#nfc"
-      >
 
-        <div class="quick-icon">
-          📡
-        </div>
+  </div>
 
-        <strong>
-          NFC
-        </strong>
+</section>
 
-        <span>
-          NFC bağlantısını yönet
-        </span>
 
-      </a>
+
+<!-- ==================================================
+     STATS
+================================================== -->
+
+<section class="stats">
+
+
+  <div class="stat">
+
+    <small>
+      PROFİL
+    </small>
+
+    <strong id="profileViews">
+      0
+    </strong>
+
+    <span>
+      Görüntüleme
+    </span>
+
+  </div>
+
+
+  <div class="stat">
+
+    <small>
+      WHATSAPP
+    </small>
+
+    <strong id="whatsappViews">
+      0
+    </strong>
+
+    <span>
+      Etkileşim
+    </span>
+
+  </div>
+
+
+  <div class="stat">
+
+    <small>
+      TELEFON
+    </small>
+
+    <strong id="phoneViews">
+      0
+    </strong>
+
+    <span>
+      Tıklama
+    </span>
+
+  </div>
+
+
+  <div class="stat">
+
+    <small>
+      QR
+    </small>
+
+    <strong id="qrViews">
+      0
+    </strong>
+
+    <span>
+      Tarama
+    </span>
+
+  </div>
+
+
+  <div class="stat">
+
+    <small>
+      NFC
+    </small>
+
+    <strong id="nfcViews">
+      0
+    </strong>
+
+    <span>
+      Dokunma
+    </span>
+
+  </div>
+
+
+</section>
+
+
+
+<!-- ==================================================
+     PROFILE
+================================================== -->
+
+<section
+  id="profile"
+  class="box"
+>
+
+
+  <div class="box-head">
+
+    <div>
+
+      <div class="eyebrow">
+        PROFİL
+      </div>
+
+      <h2>
+        İşletme Bilgileri
+      </h2>
+
+      <p>
+        Müşterilerinin göreceği bilgileri buradan yönet.
+      </p>
 
     </div>
 
   </div>
 
 
-  <!-- İŞLETME BİLGİLERİ -->
 
-  <div class="box">
-
-    <div class="eyebrow">
-      PROFİL
-    </div>
-
-    <h2>
-      İşletme Bilgileri
-    </h2>
-
-    <p class="box-description">
-      Müşterilerinin göreceği işletme bilgilerini buradan yönet.
-    </p>
+  <div class="form-grid">
 
 
-    <div class="field-grid">
+    <div class="field">
+
+      <label>
+        İŞLETME ADI
+      </label>
 
       <input
         id="name"
         placeholder="İşletme adı"
       >
 
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        KATEGORİ
+      </label>
+
       <input
         id="category"
-        placeholder="Kategori"
+        placeholder="Restoran, Klinik, Kuaför..."
       >
+
+    </div>
+
+
+    <div class="field full">
+
+      <label>
+        İŞLETME AÇIKLAMASI
+      </label>
 
       <textarea
         id="description"
-        class="full"
-        placeholder="İşletme açıklaması"
+        placeholder="İşletmen hakkında kısa açıklama..."
       ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        TELEFON
+      </label>
 
       <input
         id="phone"
-        placeholder="Telefon"
+        placeholder="05XXXXXXXXX"
       >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        WHATSAPP
+      </label>
 
       <input
         id="whatsapp"
-        placeholder="WhatsApp numarası veya bağlantısı"
+        placeholder="05XXXXXXXXX veya bağlantı"
       >
+
+      <span class="field-hint">
+        Numara yazarsan WhatsApp bağlantısı otomatik oluşturulur.
+      </span>
+
+    </div>
+
+
+    <div class="field full">
+
+      <label>
+        KONUM / GOOGLE MAPS
+      </label>
 
       <input
         id="address"
-        placeholder="Google Maps / Konum bağlantısı"
+        placeholder="Google Maps bağlantısı"
       >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        INSTAGRAM
+      </label>
 
       <input
         id="instagram"
         placeholder="Instagram bağlantısı"
       >
 
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        TIKTOK
+      </label>
+
       <input
         id="tiktok"
         placeholder="TikTok bağlantısı"
       >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        GOOGLE YORUM
+      </label>
 
       <input
         id="google_review"
         placeholder="Google yorum bağlantısı"
       >
 
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        WEB SİTESİ
+      </label>
+
       <input
         id="website"
-        placeholder="Web sitesi bağlantısı"
+        placeholder="https://..."
       >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        MENÜ
+      </label>
 
       <input
         id="menu"
         placeholder="Menü bağlantısı"
       >
 
-      <input
-        id="iban"
-        placeholder="IBAN"
-      >
+    </div>
 
-      <input
-        id="iban_holder"
-        placeholder="IBAN sahibi ad soyad"
-      >
+
+    <div class="field">
+
+      <label>
+        ÇALIŞMA SAATLERİ
+      </label>
 
       <input
         id="hours"
-        placeholder="Çalışma saatleri"
+        placeholder="11:00 - 23:59"
       >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        IBAN
+      </label>
+
+      <input
+        id="iban"
+        placeholder="TR..."
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        IBAN SAHİBİ
+      </label>
+
+      <input
+        id="iban_holder"
+        placeholder="Ad Soyad"
+      >
+
+    </div>
+
+
+    <div class="field full">
+
+      <label>
+        LOGO GÖRSEL URL
+      </label>
 
       <input
         id="logo_url"
-        class="full"
-        placeholder="Logo görsel URL'si"
+        placeholder="https://..."
+        oninput="previewLogo()"
       >
+
+      <span class="field-hint">
+        Logo bağlantısını buraya eklediğinde üstteki önizleme otomatik güncellenir.
+      </span>
 
     </div>
 
 
-    <p class="hint">
-      WhatsApp alanına sadece telefon numarası yazarsan sistem otomatik olarak WhatsApp bağlantısı oluşturur.
-    </p>
+  </div>
 
 
-    <div class="save-row">
 
-      <button
-        class="primary"
-        onclick="save()"
-      >
-        Bilgileri Kaydet
-      </button>
+  <div class="save-area">
 
-      <p id="message"></p>
+    <button
+      class="save-button"
+      onclick="save()"
+    >
+      ✓ Bilgileri Kaydet
+    </button>
+
+    <div id="message"></div>
+
+  </div>
+
+
+</section>
+
+
+
+<!-- ==================================================
+     DIGITAL CONNECTION
+================================================== -->
+
+<section class="box">
+
+
+  <div class="box-head">
+
+    <div>
+
+      <div class="eyebrow">
+        DIGITAL CONNECTION
+      </div>
+
+      <h2>
+        QR + NFC
+      </h2>
+
+      <p>
+        İşletmeni müşterilerine tek tarama veya tek dokunuşla ulaştır.
+      </p>
 
     </div>
 
   </div>
 
 
-  <!-- QR + NFC -->
 
-  <div class="box">
-
-    <div class="eyebrow">
-      DİJİTAL BAĞLANTI
-    </div>
-
-    <h2>
-      QR + NFC
-    </h2>
-
-    <p class="box-description">
-      İşletmeni tek dokunuşla veya tek taramayla müşterilerine ulaştır.
-    </p>
+  <div class="digital-grid">
 
 
-    <div class="digital-grid">
+    <!-- QR -->
 
+    <div class="digital-card">
 
-      <!-- QR -->
-
-      <div class="digital-card">
-
-        <h3>
-          ▣ QR Kodun
-        </h3>
-
-        <p>
-          QR kodunu masa, stand, menü, vitrin veya kartvizit üzerinde kullanabilirsin.
-        </p>
-
-        <img
-          id="qr"
-          class="qr-image"
-          alt="LEO CONNECT QR Kodu"
-        >
-
-        <div
-          id="url"
-          class="link-box"
-        >
-          QR bağlantısı hazırlanıyor...
-        </div>
-
-        <div class="actions">
-
-          <a
-            id="open"
-            class="action dark"
-            target="_blank"
-          >
-            Profili Aç
-          </a>
-
-          <a
-            id="download"
-            class="action primary"
-            download="leo-connect-qr.png"
-          >
-            QR'ı İndir
-          </a>
-
-        </div>
-
+      <div class="digital-icon">
+        ▣
       </div>
 
+      <h3>
+        QR Kodun
+      </h3>
 
-      <!-- NFC -->
+      <p>
+        Masa, stand, vitrin, menü veya kartvizitte kullanabileceğin QR bağlantın.
+      </p>
+
+
+      <img
+        id="qr"
+        class="qr-image"
+        alt="LEO CONNECT QR"
+      >
+
 
       <div
-        class="digital-card"
-        id="nfc"
+        id="url"
+        class="digital-url"
       >
+        QR bağlantısı hazırlanıyor...
+      </div>
 
-        <div class="nfc-symbol">
-          📡
-        </div>
 
-        <h3>
-          NFC Bağlantın
-        </h3>
+      <div class="digital-actions">
 
-        <p>
-          Aşağıdaki bağlantıyı NFC etiketine yazdır.
-          Müşteri telefonunu NFC etiketine dokundurduğunda doğrudan işletme profilin açılır.
-        </p>
-
-        <div
-          id="nfcUrl"
-          class="nfc-url"
+        <a
+          id="open"
+          class="action"
+          target="_blank"
         >
-          NFC bağlantısı hazırlanıyor...
-        </div>
+          Profili Aç
+        </a>
 
-        <div class="actions">
-
-          <button
-            class="dark"
-            onclick="copyNFC()"
-          >
-            NFC Bağlantısını Kopyala
-          </button>
-
-        </div>
-
-        <div class="nfc-status">
-
-          <span class="status-dot"></span>
-
-          NFC sistemi hazır
-
-        </div>
-
-        <p
-          id="nfcMessage"
-          class="hint"
-        ></p>
+        <a
+          id="download"
+          class="action gold"
+          download="leo-connect-qr.png"
+        >
+          QR'ı İndir
+        </a>
 
       </div>
+
+    </div>
+
+
+
+    <!-- NFC -->
+
+    <div class="digital-card">
+
+      <div class="nfc-symbol">
+        📡
+      </div>
+
+      <h3>
+        NFC Bağlantın
+      </h3>
+
+      <p>
+        Bu bağlantıyı NFC etiketine yazdır. Müşteri telefonunu etikete dokundurduğunda profilin açılır.
+      </p>
+
+
+      <div
+        id="nfcUrl"
+        class="nfc-url"
+      >
+        NFC bağlantısı hazırlanıyor...
+      </div>
+
+
+      <div class="digital-actions">
+
+        <button
+          class="action gold"
+          onclick="copyNFC()"
+        >
+          NFC Bağlantısını Kopyala
+        </button>
+
+      </div>
+
+
+      <div class="nfc-status">
+
+        <span class="status-dot"></span>
+
+        NFC sistemi hazır
+
+      </div>
+
+
+      <div
+        id="nfcMessage"
+        class="field-hint"
+        style="margin-top:8px"
+      ></div>
+
+    </div>
+
+
+  </div>
+
+
+</section>
+
+
+
+<!-- ==================================================
+     QUICK INFO
+================================================== -->
+
+<section class="box">
+
+
+  <div class="box-head">
+
+    <div>
+
+      <div class="eyebrow">
+        BUSINESS PROFILE
+      </div>
+
+      <h2>
+        Profil Özeti
+      </h2>
+
+      <p>
+        Müşterilerinin işletmenle hangi kanallardan iletişim kurabileceğini kontrol et.
+      </p>
 
     </div>
 
   </div>
 
 
-  <!-- İSTATİSTİKLER -->
 
-  <div class="box">
+  <div class="info-grid">
 
-    <div class="eyebrow">
-      ANALİTİK
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        📞
+      </div>
+
+      <strong>
+        Telefon
+      </strong>
+
+      <span id="infoPhone">
+        Eklenmedi
+      </span>
+
     </div>
 
-    <h2>
-      İstatistikler
-    </h2>
 
-    <p class="box-description">
-      Müşterilerinin işletmenle nasıl etkileşime geçtiğini takip et.
-    </p>
+    <div class="info-card">
 
-
-    <div class="stats">
-
-      <div class="stat">
-
-        <small>
-          PROFİL
-        </small>
-
-        <strong id="profileViews">
-          0
-        </strong>
-
-        <div class="stat-label">
-          Görüntüleme
-        </div>
-
+      <div class="info-card-icon">
+        💬
       </div>
 
+      <strong>
+        WhatsApp
+      </strong>
 
-      <div class="stat">
-
-        <small>
-          WHATSAPP
-        </small>
-
-        <strong id="whatsappViews">
-          0
-        </strong>
-
-        <div class="stat-label">
-          Etkileşim
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <small>
-          TELEFON
-        </small>
-
-        <strong id="phoneViews">
-          0
-        </strong>
-
-        <div class="stat-label">
-          Tıklama
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <small>
-          QR
-        </small>
-
-        <strong id="qrViews">
-          0
-        </strong>
-
-        <div class="stat-label">
-          Tarama
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <small>
-          NFC
-        </small>
-
-        <strong id="nfcViews">
-          0
-        </strong>
-
-        <div class="stat-label">
-          Dokunma
-        </div>
-
-      </div>
+      <span id="infoWhatsapp">
+        Eklenmedi
+      </span>
 
     </div>
+
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        📍
+      </div>
+
+      <strong>
+        Konum
+      </strong>
+
+      <span id="infoAddress">
+        Eklenmedi
+      </span>
+
+    </div>
+
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        📸
+      </div>
+
+      <strong>
+        Instagram
+      </strong>
+
+      <span id="infoInstagram">
+        Eklenmedi
+      </span>
+
+    </div>
+
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        ⭐
+      </div>
+
+      <strong>
+        Google
+      </strong>
+
+      <span id="infoGoogle">
+        Eklenmedi
+      </span>
+
+    </div>
+
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        🕐
+      </div>
+
+      <strong>
+        Çalışma Saatleri
+      </strong>
+
+      <span id="infoHours">
+        Eklenmedi
+      </span>
+
+    </div>
+
 
   </div>
+
+
+</section>
+
+
+
+<div class="footer">
+
+  LEO CONNECT • PREMIUM DIGITAL BUSINESS SYSTEM
+
+</div>
 
 
 </main>
 
 
+
 <script>
 
 
-/* =========================
+/* ==================================================
    AUTH
-========================= */
+================================================== */
 
 const token =
-  localStorage.getItem("token");
+  localStorage.getItem(
+    "token"
+  );
 
 
 if(!token){
@@ -908,9 +2244,9 @@ if(!token){
 }
 
 
-/* =========================
+/* ==================================================
    FIELDS
-========================= */
+================================================== */
 
 const fields = [
 
@@ -940,9 +2276,9 @@ const fields = [
 ];
 
 
-/* =========================
+/* ==================================================
    API
-========================= */
+================================================== */
 
 async function api(
   url,
@@ -990,20 +2326,27 @@ async function api(
 }
 
 
-/* =========================
+/* ==================================================
    NFC
-========================= */
+================================================== */
 
 let nfcUrl = "";
 
 
-function createNFCUrl(business){
+function createNFCUrl(
+  business
+){
 
   return (
+
     window.location.origin +
+
     "/p/" +
+
     business.slug +
+
     "?source=nfc"
+
   );
 
 }
@@ -1011,7 +2354,8 @@ function createNFCUrl(business){
 
 async function copyNFC(){
 
-  if(!nfcUrl) return;
+  if(!nfcUrl)
+    return;
 
 
   try{
@@ -1026,21 +2370,89 @@ async function copyNFC(){
     ).textContent =
       "✓ NFC bağlantısı kopyalandı.";
 
+
   }catch(error){
 
     document.getElementById(
       "nfcMessage"
     ).textContent =
-      "Bağlantı: " + nfcUrl;
+      nfcUrl;
 
   }
 
 }
 
 
-/* =========================
+/* ==================================================
+   LOGO PREVIEW
+================================================== */
+
+function previewLogo(){
+
+  const url =
+    document.getElementById(
+      "logo_url"
+    ).value.trim();
+
+
+  const img =
+    document.getElementById(
+      "logoPreview"
+    );
+
+
+  const placeholder =
+    document.getElementById(
+      "logoPlaceholder"
+    );
+
+
+  if(!url){
+
+    img.style.display =
+      "none";
+
+    placeholder.style.display =
+      "block";
+
+    return;
+
+  }
+
+
+  img.onload =
+    function(){
+
+      img.style.display =
+        "block";
+
+      placeholder.style.display =
+        "none";
+
+    };
+
+
+  img.onerror =
+    function(){
+
+      img.style.display =
+        "none";
+
+      placeholder.style.display =
+        "block";
+
+    };
+
+
+  img.src =
+    url;
+
+}
+
+
+/* ==================================================
    LOAD
-========================= */
+================================================== */
 
 async function load(){
 
@@ -1050,8 +2462,11 @@ async function load(){
     );
 
 
-  if(!business) return;
+  if(!business)
+    return;
 
+
+  /* TITLE */
 
   document.getElementById(
     "title"
@@ -1060,8 +2475,31 @@ async function load(){
     "İşletme Paneli";
 
 
+  document.getElementById(
+    "heroName"
+  ).textContent =
+    business.name ||
+    "İşletme";
+
+
+  document.getElementById(
+    "heroCategory"
+  ).textContent =
+    business.category ||
+    "İşletme";
+
+
+  document.getElementById(
+    "heroDescription"
+  ).textContent =
+    business.description ||
+    "Dijital işletme profilini yönet.";
+
+
+  /* FIELDS */
+
   fields.forEach(
-    function(field){
+    field => {
 
       const element =
         document.getElementById(
@@ -1072,7 +2510,8 @@ async function load(){
       if(element){
 
         element.value =
-          business[field] || "";
+          business[field] ||
+          "";
 
       }
 
@@ -1080,7 +2519,10 @@ async function load(){
   );
 
 
-  /* PROFİL */
+  previewLogo();
+
+
+  /* PROFILE URL */
 
   const profileUrl =
     window.location.origin +
@@ -1089,7 +2531,13 @@ async function load(){
 
 
   document.getElementById(
-    "quickProfile"
+    "headerProfile"
+  ).href =
+    profileUrl;
+
+
+  document.getElementById(
+    "heroProfile"
   ).href =
     profileUrl;
 
@@ -1141,12 +2589,6 @@ async function load(){
     ).href =
       qr.dataUrl;
 
-
-    document.getElementById(
-      "quickQR"
-    ).href =
-      qr.url;
-
   }
 
 
@@ -1163,7 +2605,7 @@ async function load(){
   ){
 
     stats.forEach(
-      function(item){
+      item => {
 
         if(
           item.type ===
@@ -1218,8 +2660,7 @@ async function load(){
 
 
         if(
-          item.type ===
-          "nfc"
+          item.type === "nfc"
         ){
 
           document.getElementById(
@@ -1234,12 +2675,76 @@ async function load(){
 
   }
 
+
+  /* INFO */
+
+  setInfo(
+    "infoPhone",
+    business.phone
+  );
+
+
+  setInfo(
+    "infoWhatsapp",
+    business.whatsapp
+  );
+
+
+  setInfo(
+    "infoAddress",
+    business.address
+  );
+
+
+  setInfo(
+    "infoInstagram",
+    business.instagram
+  );
+
+
+  setInfo(
+    "infoGoogle",
+    business.google_review
+  );
+
+
+  setInfo(
+    "infoHours",
+    business.hours
+  );
+
 }
 
 
-/* =========================
+/* ==================================================
+   INFO HELPER
+================================================== */
+
+function setInfo(
+  id,
+  value
+){
+
+  const element =
+    document.getElementById(
+      id
+    );
+
+
+  if(!element)
+    return;
+
+
+  element.textContent =
+    value ||
+    "Eklenmedi";
+
+}
+
+
+/* ==================================================
    SAVE
-========================= */
+================================================== */
 
 async function save(){
 
@@ -1247,7 +2752,7 @@ async function save(){
 
 
   fields.forEach(
-    function(field){
+    field => {
 
       const element =
         document.getElementById(
@@ -1257,7 +2762,7 @@ async function save(){
 
       data[field] =
         element
-          ? element.value
+          ? element.value.trim()
           : "";
 
     }
@@ -1282,18 +2787,35 @@ async function save(){
 
     data.whatsapp =
       "https://wa.me/" +
+
       (
+
         whatsapp.startsWith("90")
+
           ? whatsapp
+
           : "90" + whatsapp
+
       );
 
   }
 
 
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+  message.textContent =
+    "Kaydediliyor...";
+
+
   const result =
     await api(
+
       "/api/me",
+
       {
 
         method:"PUT",
@@ -1304,6 +2826,7 @@ async function save(){
           )
 
       }
+
     );
 
 
@@ -1312,19 +2835,39 @@ async function save(){
     !result.error
   ){
 
-    document.getElementById(
-      "message"
-    ).textContent =
+    message.textContent =
       "✓ Bilgiler başarıyla kaydedildi.";
 
 
     document.getElementById(
       "title"
     ).textContent =
-      result.name;
+      result.name ||
+      "İşletme Paneli";
 
 
-    /* PROFİL */
+    document.getElementById(
+      "heroName"
+    ).textContent =
+      result.name ||
+      "İşletme";
+
+
+    document.getElementById(
+      "heroCategory"
+    ).textContent =
+      result.category ||
+      "İşletme";
+
+
+    document.getElementById(
+      "heroDescription"
+    ).textContent =
+      result.description ||
+      "Dijital işletme profilini yönet.";
+
+
+    /* PROFILE */
 
     const profileUrl =
       window.location.origin +
@@ -1333,7 +2876,13 @@ async function save(){
 
 
     document.getElementById(
-      "quickProfile"
+      "headerProfile"
+    ).href =
+      profileUrl;
+
+
+    document.getElementById(
+      "heroProfile"
     ).href =
       profileUrl;
 
@@ -1350,6 +2899,49 @@ async function save(){
       "nfcUrl"
     ).textContent =
       nfcUrl;
+
+
+    /* LOGO */
+
+    previewLogo();
+
+
+    /* INFO */
+
+    setInfo(
+      "infoPhone",
+      result.phone
+    );
+
+
+    setInfo(
+      "infoWhatsapp",
+      result.whatsapp
+    );
+
+
+    setInfo(
+      "infoAddress",
+      result.address
+    );
+
+
+    setInfo(
+      "infoInstagram",
+      result.instagram
+    );
+
+
+    setInfo(
+      "infoGoogle",
+      result.google_review
+    );
+
+
+    setInfo(
+      "infoHours",
+      result.hours
+    );
 
 
     /* QR */
@@ -1385,19 +2977,12 @@ async function save(){
       ).href =
         qr.dataUrl;
 
-
-      document.getElementById(
-        "quickQR"
-      ).href =
-        qr.url;
-
     }
+
 
   }else{
 
-    document.getElementById(
-      "message"
-    ).textContent =
+    message.textContent =
       result?.error ||
       "Bir hata oluştu.";
 
@@ -1406,13 +2991,15 @@ async function save(){
 }
 
 
-/* =========================
+/* ==================================================
    START
-========================= */
+================================================== */
 
 load();
 
 </script>
 
+
 </body>
+
 </html>
