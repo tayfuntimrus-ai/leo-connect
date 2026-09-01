@@ -7,12 +7,17 @@
 
 <meta
   name="viewport"
-  content="width=device-width, initial-scale=1"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
 >
 
 <meta
   name="theme-color"
   content="#080808"
+>
+
+<meta
+  name="description"
+  content="LEO CONNECT dijital işletme profili"
 >
 
 <title>LEO CONNECT</title>
@@ -21,17 +26,34 @@
 
 :root{
   --gold:#c59a52;
-  --gold-light:#e0bd7b;
+  --gold-light:#e5c584;
+  --gold-soft:#c59a5220;
+
   --black:#080808;
   --dark:#101010;
   --dark-2:#151515;
+  --dark-3:#1b1b1b;
+
   --border:#292929;
-  --muted:#858585;
+  --border-light:#363636;
+
+  --muted:#777;
+  --muted-2:#4d4d4d;
+
   --green:#45c27a;
+
+  --shadow:
+    0 30px 90px rgba(0,0,0,.65);
+
+  --radius-xl:30px;
+  --radius-lg:22px;
+  --radius-md:15px;
+  --radius-sm:11px;
 }
 
 *{
   box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
 
 html{
@@ -47,15 +69,21 @@ body{
   background:
 
     radial-gradient(
-      circle at 50% -10%,
-      #c59a5222,
+      circle at 50% -12%,
+      rgba(197,154,82,.16),
       transparent 35%
     ),
 
     radial-gradient(
-      circle at 100% 50%,
-      #c59a5210,
+      circle at 100% 35%,
+      rgba(197,154,82,.07),
       transparent 30%
+    ),
+
+    radial-gradient(
+      circle at 0% 75%,
+      rgba(197,154,82,.045),
+      transparent 28%
     ),
 
     #080808;
@@ -67,7 +95,19 @@ body{
     Helvetica,
     sans-serif;
 
+  overflow-x:hidden;
 }
+
+button,
+a{
+  -webkit-user-select:none;
+  user-select:none;
+}
+
+button{
+  font-family:inherit;
+}
+
 
 
 /* ==================================================
@@ -76,19 +116,18 @@ body{
 
 .page{
 
-  width:min(
-    520px,
-    100%
-  );
+  width:min(520px,100%);
 
   min-height:100vh;
 
   margin:auto;
 
   padding:
-    22px 18px 45px;
+    18px 16px
+    calc(48px + env(safe-area-inset-bottom));
 
 }
+
 
 
 /* ==================================================
@@ -101,13 +140,27 @@ body{
 
   align-items:center;
 
-  justify-content:center;
+  justify-content:space-between;
+
+  margin-bottom:16px;
+
+  padding:
+    0 4px;
+
+}
+
+
+
+.brand-left{
+
+  display:flex;
+
+  align-items:center;
 
   gap:9px;
 
-  margin-bottom:22px;
-
 }
+
 
 
 .brand-lion{
@@ -120,35 +173,81 @@ body{
 
   place-items:center;
 
-  border-radius:12px;
+  border-radius:13px;
 
-  background:#050505;
+  background:
+
+    radial-gradient(
+      circle at 50% 35%,
+      #242424,
+      #050505
+    );
 
   border:
-    1px solid #c59a5260;
+    1px solid rgba(197,154,82,.42);
 
-  font-size:21px;
+  box-shadow:
+    0 8px 25px rgba(0,0,0,.4);
+
+  font-size:20px;
 
 }
+
 
 
 .brand-name{
 
-  font-size:13px;
+  font-size:12px;
 
-  font-weight:800;
+  font-weight:900;
 
-  letter-spacing:.15em;
+  letter-spacing:.16em;
 
 }
+
 
 
 .brand-name span{
 
-  color:
-    var(--gold-light);
+  color:var(--gold-light);
 
 }
+
+
+
+.brand-status{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+  color:#555;
+
+  font-size:8px;
+
+  letter-spacing:.09em;
+
+}
+
+
+
+.status-dot{
+
+  width:6px;
+
+  height:6px;
+
+  border-radius:50%;
+
+  background:var(--green);
+
+  box-shadow:
+    0 0 12px rgba(69,194,122,.7);
+
+}
+
 
 
 /* ==================================================
@@ -164,31 +263,31 @@ body{
   text-align:center;
 
   padding:
-    30px 22px 27px;
+    31px 20px 20px;
 
-  border-radius:28px;
+  border-radius:var(--radius-xl);
 
   border:
-    1px solid #c59a5245;
+    1px solid rgba(197,154,82,.34);
 
   background:
 
     radial-gradient(
       circle at 50% 0%,
-      #c59a5218,
-      transparent 45%
+      rgba(197,154,82,.16),
+      transparent 42%
     ),
 
     linear-gradient(
       145deg,
-      #171717,
-      #0c0c0c
+      #191919,
+      #0b0b0b 72%
     );
 
-  box-shadow:
-    0 30px 90px #00000080;
+  box-shadow:var(--shadow);
 
 }
+
 
 
 .hero::before{
@@ -197,11 +296,11 @@ body{
 
   position:absolute;
 
-  width:220px;
+  width:280px;
 
-  height:220px;
+  height:280px;
 
-  top:-150px;
+  top:-205px;
 
   left:50%;
 
@@ -211,9 +310,38 @@ body{
   border-radius:50%;
 
   border:
-    1px solid #c59a5215;
+    1px solid rgba(197,154,82,.12);
+
+  box-shadow:
+    0 0 70px rgba(197,154,82,.06);
 
 }
+
+
+
+.hero::after{
+
+  content:"";
+
+  position:absolute;
+
+  width:180px;
+
+  height:180px;
+
+  right:-100px;
+
+  bottom:-100px;
+
+  border-radius:50%;
+
+  background:
+    rgba(197,154,82,.035);
+
+  filter:blur(5px);
+
+}
+
 
 
 .logo{
@@ -222,12 +350,12 @@ body{
 
   z-index:2;
 
-  width:120px;
+  width:122px;
 
-  height:120px;
+  height:122px;
 
   margin:
-    0 auto 18px;
+    0 auto 17px;
 
   display:grid;
 
@@ -235,17 +363,21 @@ body{
 
   overflow:hidden;
 
-  border-radius:30px;
+  border-radius:31px;
 
   background:#050505;
 
   border:
-    1px solid #c59a5270;
+    1px solid rgba(197,154,82,.58);
 
   box-shadow:
-    0 18px 45px #000;
+
+    0 20px 50px rgba(0,0,0,.72),
+
+    0 0 0 7px rgba(197,154,82,.025);
 
 }
+
 
 
 .logo img{
@@ -259,11 +391,18 @@ body{
 }
 
 
+
 .logo-placeholder{
 
-  font-size:48px;
+  font-size:47px;
+
+  filter:
+    drop-shadow(
+      0 5px 12px rgba(197,154,82,.25)
+    );
 
 }
+
 
 
 .business-name{
@@ -276,43 +415,51 @@ body{
 
   font-size:30px;
 
-  line-height:1.15;
+  line-height:1.13;
 
-  font-weight:800;
+  font-weight:900;
 
-  letter-spacing:-.02em;
+  letter-spacing:-.025em;
 
   word-break:break-word;
 
 }
 
 
+
 .category{
 
-  display:inline-block;
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
 
   margin-top:10px;
 
   padding:
-    7px 12px;
+    7px 13px;
 
   border-radius:999px;
 
-  background:#c59a5212;
+  background:
+    rgba(197,154,82,.075);
 
   border:
-    1px solid #c59a5235;
+    1px solid rgba(197,154,82,.22);
 
-  color:
-    var(--gold-light);
+  color:var(--gold-light);
 
-  font-size:10px;
+  font-size:9px;
 
-  font-weight:700;
+  font-weight:800;
 
-  letter-spacing:.06em;
+  letter-spacing:.08em;
+
+  text-transform:uppercase;
 
 }
+
 
 
 .description{
@@ -322,26 +469,69 @@ body{
   z-index:2;
 
   margin:
-    15px auto 0;
+    14px auto 0;
 
-  max-width:410px;
+  max-width:420px;
 
   color:#929292;
 
-  font-size:13px;
+  font-size:12px;
 
-  line-height:1.65;
+  line-height:1.7;
 
 }
 
 
+
+.profile-badge{
+
+  position:relative;
+
+  z-index:2;
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:7px;
+
+  margin-top:14px;
+
+  padding:
+    7px 10px;
+
+  border-radius:999px;
+
+  background:#090909;
+
+  border:
+    1px solid #242424;
+
+  color:#696969;
+
+  font-size:8px;
+
+  letter-spacing:.08em;
+
+}
+
+
+
+.profile-badge span{
+
+  color:var(--gold-light);
+
+}
+
+
+
 /* ==================================================
-   CONNECTION STATUS
+   SOURCE BADGE
 ================================================== */
 
-.status{
+.source-badge{
 
-  display:flex;
+  display:none;
 
   align-items:center;
 
@@ -349,32 +539,40 @@ body{
 
   gap:7px;
 
-  margin-top:16px;
+  margin:
+    12px auto 0;
 
-  color:#626262;
+  width:max-content;
 
-  font-size:9px;
+  padding:
+    7px 11px;
 
-  letter-spacing:.12em;
-
-}
-
-
-.status-dot{
-
-  width:6px;
-
-  height:6px;
-
-  border-radius:50%;
+  border-radius:999px;
 
   background:
-    var(--green);
+    rgba(197,154,82,.08);
 
-  box-shadow:
-    0 0 10px #45c27a88;
+  border:
+    1px solid rgba(197,154,82,.22);
+
+  color:var(--gold-light);
+
+  font-size:8px;
+
+  font-weight:800;
+
+  letter-spacing:.08em;
 
 }
+
+
+
+.source-badge.show{
+
+  display:flex;
+
+}
+
 
 
 /* ==================================================
@@ -383,21 +581,26 @@ body{
 
 .actions{
 
+  position:relative;
+
+  z-index:3;
+
   display:grid;
 
   grid-template-columns:
     1fr 1fr;
 
-  gap:10px;
+  gap:9px;
 
   margin-top:18px;
 
 }
 
 
+
 .action{
 
-  min-height:52px;
+  min-height:53px;
 
   display:flex;
 
@@ -410,49 +613,157 @@ body{
   padding:
     13px 10px;
 
-  border-radius:13px;
+  border-radius:14px;
 
   border:
     1px solid #303030;
 
-  background:#151515;
+  background:
+
+    linear-gradient(
+      145deg,
+      #181818,
+      #111111
+    );
 
   color:#fff;
 
   text-decoration:none;
 
-  font-size:12px;
+  font-size:11px;
 
-  font-weight:800;
+  font-weight:900;
 
   transition:
-    transform .15s,
-    border-color .15s;
+    transform .15s ease,
+    border-color .15s ease,
+    box-shadow .15s ease;
 
 }
+
 
 
 .action:active{
 
   transform:
-    scale(.98);
+    scale(.97);
 
 }
+
 
 
 .action.gold{
 
   background:
+
     linear-gradient(
       135deg,
-      #c59a52,
-      #9e7738
+      #d0a45a,
+      #a77d3b
     );
 
   border-color:
-    #c59a52;
+    #d0a45a;
+
+  color:#fff;
+
+  box-shadow:
+    0 9px 25px rgba(197,154,82,.14);
 
 }
+
+
+
+.action.secondary{
+
+  background:
+    #111;
+
+}
+
+
+
+.action.hidden{
+
+  display:none;
+
+}
+
+
+
+/* ==================================================
+   SHARE ACTIONS
+================================================== */
+
+.share-actions{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:9px;
+
+  margin-top:10px;
+
+}
+
+
+
+.small-action{
+
+  min-height:44px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:7px;
+
+  padding:10px;
+
+  border-radius:12px;
+
+  border:
+    1px solid #262626;
+
+  background:#0f0f0f;
+
+  color:#a0a0a0;
+
+  font-size:9px;
+
+  font-weight:800;
+
+  cursor:pointer;
+
+  transition:
+    transform .15s,
+    border-color .15s,
+    color .15s;
+
+}
+
+
+
+.small-action:active{
+
+  transform:scale(.97);
+
+}
+
+
+
+.small-action:hover{
+
+  border-color:#4b4b4b;
+
+  color:var(--gold-light);
+
+}
+
 
 
 /* ==================================================
@@ -461,23 +772,47 @@ body{
 
 .section{
 
-  margin-top:15px;
+  margin-top:14px;
 
-  padding:19px;
+  padding:18px;
 
-  border-radius:21px;
+  border-radius:var(--radius-lg);
 
   border:
     1px solid var(--border);
 
   background:
+
     linear-gradient(
       145deg,
-      #141414,
+      #151515,
       #0d0d0d
     );
 
+  box-shadow:
+    0 15px 45px rgba(0,0,0,.18);
+
+  animation:
+    sectionIn .45s ease both;
+
 }
+
+
+
+@keyframes sectionIn{
+
+  from{
+    opacity:0;
+    transform:translateY(8px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+}
+
 
 
 .section-title{
@@ -493,33 +828,40 @@ body{
 }
 
 
+
 .section-icon{
 
-  width:34px;
+  width:35px;
 
-  height:34px;
+  height:35px;
 
   display:grid;
 
   place-items:center;
+
+  flex:none;
 
   border-radius:10px;
 
   background:#080808;
 
   border:
-    1px solid #c59a5230;
+    1px solid rgba(197,154,82,.22);
 
-  font-size:16px;
+  font-size:15px;
 
 }
+
 
 
 .section-title strong{
 
-  font-size:13px;
+  display:block;
+
+  font-size:12px;
 
 }
+
 
 
 .section-title span{
@@ -530,9 +872,10 @@ body{
 
   color:#555;
 
-  font-size:9px;
+  font-size:8px;
 
 }
+
 
 
 /* ==================================================
@@ -551,9 +894,10 @@ body{
 }
 
 
+
 .link{
 
-  min-height:50px;
+  min-height:52px;
 
   display:flex;
 
@@ -561,8 +905,7 @@ body{
 
   gap:9px;
 
-  padding:
-    11px;
+  padding:11px;
 
   border-radius:12px;
 
@@ -575,14 +918,38 @@ body{
 
   text-decoration:none;
 
+  transition:
+    transform .15s,
+    border-color .15s,
+    background .15s;
+
 }
+
+
+
+.link:active{
+
+  transform:scale(.98);
+
+}
+
+
+
+.link:hover{
+
+  border-color:#3b3b3b;
+
+  background:#141414;
+
+}
+
 
 
 .link-icon{
 
-  width:30px;
+  width:31px;
 
-  height:30px;
+  height:31px;
 
   flex:none;
 
@@ -599,6 +966,7 @@ body{
 }
 
 
+
 .link-text{
 
   min-width:0;
@@ -606,13 +974,15 @@ body{
 }
 
 
+
 .link-text strong{
 
   display:block;
 
-  font-size:10px;
+  font-size:9px;
 
 }
+
 
 
 .link-text span{
@@ -634,6 +1004,7 @@ body{
 }
 
 
+
 /* ==================================================
    INFO LIST
 ================================================== */
@@ -647,6 +1018,7 @@ body{
   gap:8px;
 
 }
+
 
 
 .info-row{
@@ -667,6 +1039,7 @@ body{
   background:#101010;
 
 }
+
 
 
 .info-icon{
@@ -690,6 +1063,7 @@ body{
 }
 
 
+
 .info-content{
 
   min-width:0;
@@ -699,17 +1073,19 @@ body{
 }
 
 
+
 .info-label{
 
   display:block;
 
   color:#555;
 
-  font-size:8px;
+  font-size:7px;
 
   letter-spacing:.1em;
 
 }
+
 
 
 .info-value{
@@ -720,11 +1096,12 @@ body{
 
   color:#ddd;
 
-  font-size:11px;
+  font-size:10px;
 
   word-break:break-word;
 
 }
+
 
 
 .info-action{
@@ -752,138 +1129,6 @@ body{
 }
 
 
-/* ==================================================
-   IBAN
-================================================== */
-
-.iban-card{
-
-  padding:16px;
-
-  border-radius:15px;
-
-  background:
-
-    linear-gradient(
-      135deg,
-      #171717,
-      #0d0d0d
-    );
-
-  border:
-    1px solid #c59a5230;
-
-}
-
-
-.iban-label{
-
-  color:#666;
-
-  font-size:8px;
-
-  letter-spacing:.12em;
-
-}
-
-
-.iban-number{
-
-  margin-top:9px;
-
-  color:#fff;
-
-  font-size:13px;
-
-  font-weight:800;
-
-  letter-spacing:.04em;
-
-  word-break:break-all;
-
-}
-
-
-.iban-holder{
-
-  margin-top:8px;
-
-  color:#fff;
-
-  font-size:13px;
-
-  font-weight:800;
-
-  word-break:break-word;
-
-}
-
-
-.iban-buttons{
-
-  display:flex;
-
-  gap:8px;
-
-  margin-top:12px;
-
-}
-
-
-.iban-button{
-
-  flex:1;
-
-  padding:10px;
-
-  border-radius:9px;
-
-  border:
-    1px solid #333;
-
-  background:#171717;
-
-  color:#ddd;
-
-  font-size:9px;
-
-  font-weight:800;
-
-  cursor:pointer;
-
-}
-
-
-.iban-button.gold{
-
-  background:
-    linear-gradient(
-      135deg,
-      #c59a52,
-      #9e7738
-    );
-
-  border-color:
-    #c59a52;
-
-  color:#fff;
-
-}
-
-
-.iban-message{
-
-  min-height:14px;
-
-  margin-top:8px;
-
-  color:
-    var(--gold-light);
-
-  font-size:9px;
-
-}
-
 
 /* ==================================================
    HOURS
@@ -909,11 +1154,12 @@ body{
 }
 
 
+
 .hours-icon{
 
-  width:38px;
+  width:39px;
 
-  height:38px;
+  height:39px;
 
   display:grid;
 
@@ -923,18 +1169,30 @@ body{
 
   background:#080808;
 
-  font-size:18px;
+  font-size:17px;
 
 }
+
+
+
+.hours-content{
+
+  min-width:0;
+
+}
+
 
 
 .hours-content strong{
 
   display:block;
 
-  font-size:10px;
+  font-size:9px;
+
+  letter-spacing:.05em;
 
 }
+
 
 
 .hours-content span{
@@ -950,6 +1208,348 @@ body{
 }
 
 
+
+/* ==================================================
+   IBAN
+================================================== */
+
+.iban-card{
+
+  padding:16px;
+
+  border-radius:15px;
+
+  background:
+
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(197,154,82,.08),
+      transparent 45%
+    ),
+
+    linear-gradient(
+      135deg,
+      #171717,
+      #0d0d0d
+    );
+
+  border:
+    1px solid rgba(197,154,82,.22);
+
+}
+
+
+
+.iban-label{
+
+  color:#666;
+
+  font-size:7px;
+
+  font-weight:700;
+
+  letter-spacing:.12em;
+
+}
+
+
+
+.iban-number{
+
+  margin-top:9px;
+
+  color:#fff;
+
+  font-size:13px;
+
+  font-weight:900;
+
+  letter-spacing:.035em;
+
+  word-break:break-all;
+
+}
+
+
+
+.iban-holder{
+
+  margin-top:8px;
+
+  color:#fff;
+
+  font-size:13px;
+
+  font-weight:900;
+
+  word-break:break-word;
+
+}
+
+
+
+.iban-buttons{
+
+  display:flex;
+
+  gap:8px;
+
+  margin-top:12px;
+
+}
+
+
+
+.iban-button{
+
+  flex:1;
+
+  padding:10px;
+
+  border-radius:9px;
+
+  border:
+    1px solid #333;
+
+  background:#171717;
+
+  color:#ddd;
+
+  font-size:8px;
+
+  font-weight:900;
+
+  cursor:pointer;
+
+  transition:
+    transform .15s,
+    border-color .15s;
+
+}
+
+
+
+.iban-button:active{
+
+  transform:scale(.98);
+
+}
+
+
+
+.iban-button.gold{
+
+  background:
+
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
+    );
+
+  border-color:
+    #c59a52;
+
+  color:#fff;
+
+}
+
+
+
+.iban-message{
+
+  min-height:13px;
+
+  margin-top:7px;
+
+  color:var(--gold-light);
+
+  font-size:8px;
+
+}
+
+
+
+/* ==================================================
+   SHARE TOAST
+================================================== */
+
+.toast{
+
+  position:fixed;
+
+  z-index:9999;
+
+  left:50%;
+
+  bottom:
+    calc(22px + env(safe-area-inset-bottom));
+
+  transform:
+    translate(-50%,20px);
+
+  width:max-content;
+
+  max-width:
+    calc(100% - 30px);
+
+  padding:
+    11px 15px;
+
+  border-radius:999px;
+
+  background:
+
+    linear-gradient(
+      135deg,
+      #1b1b1b,
+      #101010
+    );
+
+  border:
+    1px solid rgba(197,154,82,.35);
+
+  box-shadow:
+    0 15px 45px rgba(0,0,0,.55);
+
+  color:#ddd;
+
+  font-size:9px;
+
+  font-weight:800;
+
+  opacity:0;
+
+  pointer-events:none;
+
+  transition:
+    opacity .22s,
+    transform .22s;
+
+}
+
+
+
+.toast.show{
+
+  opacity:1;
+
+  transform:
+    translate(-50%,0);
+
+}
+
+
+
+/* ==================================================
+   LOADING
+================================================== */
+
+.loading-screen{
+
+  position:fixed;
+
+  inset:0;
+
+  z-index:10000;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:#080808;
+
+  transition:
+    opacity .35s,
+    visibility .35s;
+
+}
+
+
+
+.loading-screen.hide{
+
+  opacity:0;
+
+  visibility:hidden;
+
+}
+
+
+
+.loading-box{
+
+  text-align:center;
+
+}
+
+
+
+.loading-lion{
+
+  width:65px;
+
+  height:65px;
+
+  margin:auto;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:20px;
+
+  background:#050505;
+
+  border:
+    1px solid rgba(197,154,82,.35);
+
+  box-shadow:
+    0 0 45px rgba(197,154,82,.08);
+
+  font-size:30px;
+
+  animation:
+    pulseLion 1.4s ease-in-out infinite;
+
+}
+
+
+
+@keyframes pulseLion{
+
+  0%,100%{
+    transform:scale(1);
+    box-shadow:0 0 35px rgba(197,154,82,.05);
+  }
+
+  50%{
+    transform:scale(1.04);
+    box-shadow:0 0 55px rgba(197,154,82,.13);
+  }
+
+}
+
+
+
+.loading-text{
+
+  margin-top:14px;
+
+  color:#666;
+
+  font-size:8px;
+
+  font-weight:800;
+
+  letter-spacing:.16em;
+
+}
+
+
+
 /* ==================================================
    FOOTER
 ================================================== */
@@ -962,11 +1562,14 @@ body{
 
   color:#3d3d3d;
 
-  font-size:8px;
+  font-size:7px;
+
+  font-weight:700;
 
   letter-spacing:.16em;
 
 }
+
 
 
 .powered{
@@ -975,9 +1578,12 @@ body{
 
   color:#292929;
 
-  font-size:8px;
+  font-size:7px;
+
+  letter-spacing:.12em;
 
 }
+
 
 
 /* ==================================================
@@ -991,6 +1597,7 @@ body{
 }
 
 
+
 /* ==================================================
    MOBILE
 ================================================== */
@@ -999,34 +1606,41 @@ body{
 
   .page{
 
-    padding-left:12px;
+    padding-left:11px;
 
-    padding-right:12px;
+    padding-right:11px;
 
   }
-
 
   .hero{
 
-    padding-left:16px;
+    padding-left:15px;
 
-    padding-right:16px;
+    padding-right:15px;
 
   }
 
+  .business-name{
+
+    font-size:27px;
+
+  }
 
   .link-grid{
 
-    grid-template-columns:
-      1fr;
+    grid-template-columns:1fr;
 
   }
 
+}
 
-  .actions{
 
-    grid-template-columns:
-      1fr;
+
+@media(min-width:700px){
+
+  .page{
+
+    padding-top:35px;
 
   }
 
@@ -1037,10 +1651,38 @@ body{
 </head>
 
 
+
 <body>
 
 
+
+<!-- ==================================================
+     LOADING
+================================================== -->
+
+<div
+  id="loadingScreen"
+  class="loading-screen"
+>
+
+  <div class="loading-box">
+
+    <div class="loading-lion">
+      🦁
+    </div>
+
+    <div class="loading-text">
+      LEO CONNECT
+    </div>
+
+  </div>
+
+</div>
+
+
+
 <div class="page">
+
 
 
 <!-- ==================================================
@@ -1049,12 +1691,24 @@ body{
 
 <div class="top-brand">
 
-  <div class="brand-lion">
-    🦁
+  <div class="brand-left">
+
+    <div class="brand-lion">
+      🦁
+    </div>
+
+    <div class="brand-name">
+      LEO <span>CONNECT</span>
+    </div>
+
   </div>
 
-  <div class="brand-name">
-    LEO <span>CONNECT</span>
+  <div class="brand-status">
+
+    <span class="status-dot"></span>
+
+    AKTİF
+
   </div>
 
 </div>
@@ -1066,6 +1720,7 @@ body{
 ================================================== -->
 
 <section class="hero">
+
 
 
   <div class="logo">
@@ -1086,12 +1741,14 @@ body{
   </div>
 
 
+
   <h1
     id="name"
     class="business-name"
   >
     İşletme
   </h1>
+
 
 
   <div
@@ -1102,6 +1759,7 @@ body{
   </div>
 
 
+
   <p
     id="description"
     class="description"
@@ -1110,14 +1768,25 @@ body{
   </p>
 
 
-  <div class="status">
 
-    <span class="status-dot"></span>
+  <div class="profile-badge">
+
+    <span>✦</span>
 
     LEO CONNECT DİJİTAL PROFİL
 
   </div>
 
+
+
+  <div
+    id="sourceBadge"
+    class="source-badge"
+  ></div>
+
+
+
+  <!-- PRIMARY ACTIONS -->
 
   <div class="actions">
 
@@ -1130,9 +1799,10 @@ body{
     </a>
 
 
+
     <a
       id="whatsappButton"
-      class="action"
+      class="action secondary"
       href="#"
       target="_blank"
       rel="noopener"
@@ -1143,7 +1813,38 @@ body{
   </div>
 
 
+
+  <!-- SHARE ACTIONS -->
+
+  <div class="share-actions">
+
+    <button
+      id="shareButton"
+      class="small-action"
+      type="button"
+      onclick="shareProfile()"
+    >
+      ↗ Profili Paylaş
+    </button>
+
+
+
+    <button
+      id="copyLinkButton"
+      class="small-action"
+      type="button"
+      onclick="copyProfileLink()"
+    >
+      🔗 Linki Kopyala
+    </button>
+
+  </div>
+
+
+
 </section>
+
+
 
 
 
@@ -1155,6 +1856,7 @@ body{
   id="contactSection"
   class="section hidden"
 >
+
 
 
   <div class="section-title">
@@ -1170,7 +1872,7 @@ body{
       </strong>
 
       <span>
-        İşletmeye ulaş
+        İşletmeye hızlıca ulaş
       </span>
 
     </div>
@@ -1178,8 +1880,12 @@ body{
   </div>
 
 
+
   <div class="info-list">
 
+
+
+    <!-- LOCATION -->
 
     <div
       id="locationRow"
@@ -1215,6 +1921,9 @@ body{
     </div>
 
 
+
+    <!-- PHONE -->
+
     <div
       id="phoneRow"
       class="info-row hidden"
@@ -1247,10 +1956,14 @@ body{
     </div>
 
 
+
   </div>
 
 
+
 </section>
+
+
 
 
 
@@ -1262,6 +1975,7 @@ body{
   id="socialSection"
   class="section hidden"
 >
+
 
 
   <div class="section-title">
@@ -1285,7 +1999,9 @@ body{
   </div>
 
 
+
   <div class="link-grid">
+
 
 
     <a
@@ -1314,6 +2030,7 @@ body{
     </a>
 
 
+
     <a
       id="tiktokLink"
       class="link hidden"
@@ -1338,6 +2055,7 @@ body{
       </div>
 
     </a>
+
 
 
     <a
@@ -1366,6 +2084,7 @@ body{
     </a>
 
 
+
     <a
       id="websiteLink"
       class="link hidden"
@@ -1390,6 +2109,7 @@ body{
       </div>
 
     </a>
+
 
 
     <a
@@ -1418,10 +2138,14 @@ body{
     </a>
 
 
+
   </div>
 
 
+
 </section>
+
+
 
 
 
@@ -1433,6 +2157,7 @@ body{
   id="hoursSection"
   class="section hidden"
 >
+
 
 
   <div class="section-title">
@@ -1456,6 +2181,7 @@ body{
   </div>
 
 
+
   <div class="hours-card">
 
     <div class="hours-icon">
@@ -1465,7 +2191,7 @@ body{
     <div class="hours-content">
 
       <strong>
-        AÇIKLIK DURUMU
+        ÇALIŞMA SAATLERİ
       </strong>
 
       <span id="hours">
@@ -1477,7 +2203,10 @@ body{
   </div>
 
 
+
 </section>
+
+
 
 
 
@@ -1489,6 +2218,7 @@ body{
   id="ibanSection"
   class="section hidden"
 >
+
 
 
   <div class="section-title">
@@ -1504,7 +2234,7 @@ body{
       </strong>
 
       <span>
-        IBAN ve hesap sahibi bilgilerini görüntüle
+        IBAN ve hesap sahibi bilgileri
       </span>
 
     </div>
@@ -1512,7 +2242,9 @@ body{
   </div>
 
 
+
   <div class="iban-card">
+
 
 
     <!-- IBAN -->
@@ -1520,6 +2252,7 @@ body{
     <div class="iban-label">
       IBAN
     </div>
+
 
 
     <div
@@ -1530,11 +2263,13 @@ body{
     </div>
 
 
+
     <div class="iban-buttons">
 
       <button
         class="iban-button gold"
         onclick="copyIBAN()"
+        type="button"
       >
         IBAN'I KOPYALA
       </button>
@@ -1542,10 +2277,13 @@ body{
     </div>
 
 
+
     <div
       id="ibanMessage"
       class="iban-message"
     ></div>
+
+
 
 
 
@@ -1559,6 +2297,7 @@ body{
     </div>
 
 
+
     <div
       id="ibanHolder"
       class="iban-holder"
@@ -1567,16 +2306,19 @@ body{
     </div>
 
 
+
     <div class="iban-buttons">
 
       <button
         class="iban-button"
         onclick="copyIBANHolder()"
+        type="button"
       >
         ADI KOPYALA
       </button>
 
     </div>
+
 
 
     <div
@@ -1585,10 +2327,14 @@ body{
     ></div>
 
 
+
   </div>
 
 
+
 </section>
+
+
 
 
 
@@ -1607,11 +2353,24 @@ body{
 </div>
 
 
+
 </div>
 
 
 
+<!-- ==================================================
+     TOAST
+================================================== -->
+
+<div
+  id="toast"
+  class="toast"
+></div>
+
+
+
 <script>
+
 
 
 /* ==================================================
@@ -1627,6 +2386,7 @@ let source =
   || "";
 
 
+
 /* ==================================================
    API
 ================================================== */
@@ -1640,6 +2400,7 @@ async function getBusiness(){
       .pop();
 
 
+
   if(!slug){
 
     showError();
@@ -1649,15 +2410,15 @@ async function getBusiness(){
   }
 
 
+
   try{
 
     const response =
       await fetch(
         "/api/profile/" +
-        encodeURIComponent(
-          slug
-        )
+        encodeURIComponent(slug)
       );
+
 
 
     if(!response.ok){
@@ -1669,11 +2430,17 @@ async function getBusiness(){
     }
 
 
+
     business =
       await response.json();
 
 
+
     render();
+
+
+
+    hideLoading();
 
   }catch(error){
 
@@ -1688,16 +2455,16 @@ async function getBusiness(){
 }
 
 
+
 /* ==================================================
    TRACK
 ================================================== */
 
-async function track(
-  type
-){
+async function track(type){
 
   if(!business?.slug)
     return;
+
 
 
   try{
@@ -1739,26 +2506,26 @@ async function track(
 }
 
 
+
 /* ==================================================
    SAFE URL
 ================================================== */
 
-function safeUrl(
-  value
-){
+function safeUrl(value){
 
   if(!value)
     return "";
+
+
 
   const url =
     String(value)
       .trim();
 
 
+
   if(
-    /^https?:\/\//i.test(
-      url
-    )
+    /^https?:\/\//i.test(url)
   ){
 
     return url;
@@ -1766,9 +2533,11 @@ function safeUrl(
   }
 
 
+
   return "";
 
 }
+
 
 
 /* ==================================================
@@ -1783,16 +2552,19 @@ function renderLogo(){
     );
 
 
+
   const img =
     document.getElementById(
       "logo"
     );
 
 
+
   const placeholder =
     document.getElementById(
       "logoPlaceholder"
     );
+
 
 
   if(!url){
@@ -1808,6 +2580,7 @@ function renderLogo(){
   }
 
 
+
   img.onload =
     function(){
 
@@ -1818,6 +2591,7 @@ function renderLogo(){
         "none";
 
     };
+
 
 
   img.onerror =
@@ -1832,10 +2606,12 @@ function renderLogo(){
     };
 
 
+
   img.src =
     url;
 
 }
+
 
 
 /* ==================================================
@@ -1854,14 +2630,15 @@ function setupLink(
     );
 
 
+
   if(!element)
     return false;
 
 
+
   const url =
-    safeUrl(
-      value
-    );
+    safeUrl(value);
+
 
 
   if(!url){
@@ -1875,8 +2652,10 @@ function setupLink(
   }
 
 
+
   element.href =
     url;
+
 
 
   element.addEventListener(
@@ -1891,14 +2670,68 @@ function setupLink(
   );
 
 
+
   element.classList.remove(
     "hidden"
   );
 
 
+
   return true;
 
 }
+
+
+
+/* ==================================================
+   SOURCE BADGE
+================================================== */
+
+function renderSource(){
+
+  const badge =
+    document.getElementById(
+      "sourceBadge"
+    );
+
+
+
+  if(source === "qr"){
+
+    badge.textContent =
+      "▣ QR İLE GİRİŞ";
+
+    badge.classList.add(
+      "show"
+    );
+
+    return;
+
+  }
+
+
+
+  if(source === "nfc"){
+
+    badge.textContent =
+      "◉ NFC İLE GİRİŞ";
+
+    badge.classList.add(
+      "show"
+    );
+
+    return;
+
+  }
+
+
+
+  badge.classList.remove(
+    "show"
+  );
+
+}
+
 
 
 /* ==================================================
@@ -1910,9 +2743,11 @@ function render(){
   document.title =
     (
       business.name
-      || "LEO CONNECT"
+      ||
+      "LEO CONNECT"
     ) +
     " — LEO CONNECT";
+
 
 
   /* NAME */
@@ -1925,12 +2760,14 @@ function render(){
     "İşletme";
 
 
+
   /* CATEGORY */
 
   const category =
     document.getElementById(
       "category"
     );
+
 
 
   if(
@@ -1953,6 +2790,7 @@ function render(){
   }
 
 
+
   /* DESCRIPTION */
 
   document.getElementById(
@@ -1963,9 +2801,17 @@ function render(){
     "Dijital işletme profili";
 
 
+
   /* LOGO */
 
   renderLogo();
+
+
+
+  /* SOURCE */
+
+  renderSource();
+
 
 
   /* PHONE */
@@ -1975,6 +2821,7 @@ function render(){
       business.phone
       || ""
     ).trim();
+
 
 
   if(phone){
@@ -1987,10 +2834,23 @@ function render(){
       );
 
 
-    document.getElementById(
-      "phoneButton"
-    ).href =
+
+    const phoneButton =
+      document.getElementById(
+        "phoneButton"
+      );
+
+
+
+    phoneButton.href =
       phoneHref;
+
+
+
+    phoneButton.classList.remove(
+      "hidden"
+    );
+
 
 
     document.getElementById(
@@ -1999,10 +2859,12 @@ function render(){
       phoneHref;
 
 
+
     document.getElementById(
       "phone"
     ).textContent =
       phone;
+
 
 
     document.getElementById(
@@ -2012,9 +2874,8 @@ function render(){
     );
 
 
-    document.getElementById(
-      "phoneButton"
-    ).addEventListener(
+
+    phoneButton.addEventListener(
       "click",
       function(){
 
@@ -2024,6 +2885,7 @@ function render(){
 
       }
     );
+
 
 
     document.getElementById(
@@ -2050,6 +2912,7 @@ function render(){
   }
 
 
+
   /* WHATSAPP */
 
   let whatsapp =
@@ -2057,6 +2920,7 @@ function render(){
       business.whatsapp
       || ""
     ).trim();
+
 
 
   if(
@@ -2071,6 +2935,7 @@ function render(){
         /\D/g,
         ""
       );
+
 
 
     if(number){
@@ -2088,6 +2953,7 @@ function render(){
   }
 
 
+
   if(
     /^https?:\/\//i.test(
       whatsapp
@@ -2100,13 +2966,16 @@ function render(){
       );
 
 
+
     whatsappButton.href =
       whatsapp;
+
 
 
     whatsappButton.classList.remove(
       "hidden"
     );
+
 
 
     whatsappButton.addEventListener(
@@ -2131,6 +3000,7 @@ function render(){
   }
 
 
+
   /* LOCATION */
 
   if(
@@ -2143,10 +3013,12 @@ function render(){
       business.address;
 
 
+
     const location =
       safeUrl(
         business.address
       );
+
 
 
     if(location){
@@ -2155,6 +3027,7 @@ function render(){
         "locationLink"
       ).href =
         location;
+
 
 
       document.getElementById(
@@ -2180,6 +3053,7 @@ function render(){
     }
 
 
+
     document.getElementById(
       "locationRow"
     ).classList.remove(
@@ -2189,9 +3063,11 @@ function render(){
   }
 
 
+
   /* SOCIAL */
 
   let socialCount = 0;
+
 
 
   if(
@@ -2207,6 +3083,7 @@ function render(){
   }
 
 
+
   if(
     setupLink(
       "tiktokLink",
@@ -2218,6 +3095,7 @@ function render(){
     socialCount++;
 
   }
+
 
 
   if(
@@ -2233,6 +3111,7 @@ function render(){
   }
 
 
+
   if(
     setupLink(
       "websiteLink",
@@ -2244,6 +3123,7 @@ function render(){
     socialCount++;
 
   }
+
 
 
   if(
@@ -2259,6 +3139,7 @@ function render(){
   }
 
 
+
   if(socialCount){
 
     document.getElementById(
@@ -2270,11 +3151,13 @@ function render(){
   }
 
 
+
   /* CONTACT */
 
   const hasContact =
     !!business.phone ||
     !!business.address;
+
 
 
   if(hasContact){
@@ -2286,6 +3169,7 @@ function render(){
     );
 
   }
+
 
 
   /* HOURS */
@@ -2300,6 +3184,7 @@ function render(){
       business.hours;
 
 
+
     document.getElementById(
       "hoursSection"
     ).classList.remove(
@@ -2307,6 +3192,7 @@ function render(){
     );
 
   }
+
 
 
   /* IBAN */
@@ -2321,12 +3207,14 @@ function render(){
       business.iban;
 
 
+
     document.getElementById(
       "ibanHolder"
     ).textContent =
       business.iban_holder
       ||
       "IBAN sahibi";
+
 
 
     document.getElementById(
@@ -2338,7 +3226,8 @@ function render(){
   }
 
 
-  /* SOURCE */
+
+  /* SOURCE TRACKING */
 
   if(source === "qr"){
 
@@ -2347,6 +3236,7 @@ function render(){
     );
 
   }
+
 
 
   if(source === "nfc"){
@@ -2358,6 +3248,7 @@ function render(){
   }
 
 }
+
 
 
 /* ==================================================
@@ -2372,11 +3263,13 @@ async function copyIBAN(){
     return;
 
 
+
   try{
 
     await navigator.clipboard.writeText(
       business.iban
     );
+
 
 
     document.getElementById(
@@ -2385,9 +3278,17 @@ async function copyIBAN(){
       "✓ IBAN kopyalandı.";
 
 
+
     track(
       "iban"
     );
+
+
+
+    showToast(
+      "IBAN kopyalandı."
+    );
+
 
 
     setTimeout(
@@ -2403,6 +3304,7 @@ async function copyIBAN(){
     );
 
 
+
   }catch(error){
 
     document.getElementById(
@@ -2413,6 +3315,7 @@ async function copyIBAN(){
   }
 
 }
+
 
 
 /* ==================================================
@@ -2427,11 +3330,13 @@ async function copyIBANHolder(){
     return;
 
 
+
   try{
 
     await navigator.clipboard.writeText(
       business.iban_holder
     );
+
 
 
     document.getElementById(
@@ -2440,9 +3345,17 @@ async function copyIBANHolder(){
       "✓ Hesap sahibi adı kopyalandı.";
 
 
+
     track(
       "iban"
     );
+
+
+
+    showToast(
+      "Hesap sahibi adı kopyalandı."
+    );
+
 
 
     setTimeout(
@@ -2458,6 +3371,7 @@ async function copyIBANHolder(){
     );
 
 
+
   }catch(error){
 
     document.getElementById(
@@ -2470,11 +3384,205 @@ async function copyIBANHolder(){
 }
 
 
+
+/* ==================================================
+   COPY PROFILE LINK
+================================================== */
+
+async function copyProfileLink(){
+
+  const url =
+    window.location.href;
+
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      url
+    );
+
+    showToast(
+      "Profil bağlantısı kopyalandı."
+    );
+
+  }catch(error){
+
+    showToast(
+      "Bağlantı kopyalanamadı."
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   SHARE PROFILE
+================================================== */
+
+async function shareProfile(){
+
+  const shareData = {
+
+    title:
+      business?.name
+      || "LEO CONNECT",
+
+    text:
+      (
+        business?.name
+        || "İşletme"
+      ) +
+      " — LEO CONNECT dijital profil",
+
+    url:
+      window.location.href
+
+  };
+
+
+
+  if(
+    navigator.share
+  ){
+
+    try{
+
+      await navigator.share(
+        shareData
+      );
+
+      return;
+
+    }catch(error){
+
+      if(
+        error?.name ===
+        "AbortError"
+      ){
+
+        return;
+
+      }
+
+    }
+
+  }
+
+
+
+  await copyProfileLink();
+
+}
+
+
+
+/* ==================================================
+   TOAST
+================================================== */
+
+let toastTimer = null;
+
+
+
+function showToast(message){
+
+  const toast =
+    document.getElementById(
+      "toast"
+    );
+
+
+
+  toast.textContent =
+    message;
+
+
+
+  toast.classList.add(
+    "show"
+  );
+
+
+
+  clearTimeout(
+    toastTimer
+  );
+
+
+
+  toastTimer =
+    setTimeout(
+      function(){
+
+        toast.classList.remove(
+          "show"
+        );
+
+      },
+      2400
+    );
+
+}
+
+
+
+/* ==================================================
+   LOADING
+================================================== */
+
+function hideLoading(){
+
+  const loading =
+    document.getElementById(
+      "loadingScreen"
+    );
+
+
+
+  if(loading){
+
+    setTimeout(
+      function(){
+
+        loading.classList.add(
+          "hide"
+        );
+
+      },
+      180
+    );
+
+  }
+
+}
+
+
+
 /* ==================================================
    ERROR
 ================================================== */
 
 function showError(){
+
+  const loading =
+    document.getElementById(
+      "loadingScreen"
+    );
+
+
+
+  if(loading){
+
+    loading.classList.add(
+      "hide"
+    );
+
+  }
+
+
 
   document.body.innerHTML = `
 
@@ -2496,21 +3604,35 @@ function showError(){
 
         <div
           style="
-            font-size:50px;
-            margin-bottom:20px;
+            width:70px;
+            height:70px;
+            margin:0 auto 20px;
+            display:grid;
+            place-items:center;
+            border-radius:20px;
+            background:#050505;
+            border:1px solid #c59a5245;
+            font-size:34px;
           "
         >
           🦁
         </div>
 
-        <h2>
+        <h2
+          style="
+            margin:0;
+            font-size:22px;
+          "
+        >
           Profil bulunamadı
         </h2>
 
         <p
           style="
             color:#777;
-            font-size:13px;
+            font-size:12px;
+            line-height:1.7;
+            max-width:320px;
           "
         >
           Bu işletme profili mevcut değil veya bağlantı geçersiz.
@@ -2525,13 +3647,17 @@ function showError(){
 }
 
 
+
 /* ==================================================
    START
 ================================================== */
 
 getBusiness();
 
+
+
 </script>
+
 
 
 </body>
