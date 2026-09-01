@@ -401,7 +401,7 @@ app.get(
         ok: true,
 
         version:
-          '3.5-qr-center'
+          '3.6-nfc-center'
 
       });
 
@@ -1256,8 +1256,6 @@ app.get(
           : '30d';
 
 
-      /* BUSINESS */
-
       const businessResult =
         await pool.query(
           `
@@ -1295,8 +1293,6 @@ app.get(
 
       }
 
-
-      /* DATE CONDITION */
 
       let dateCondition =
         '';
@@ -1337,8 +1333,6 @@ app.get(
 
       }
 
-
-      /* TOTALS */
 
       const totalResult =
         await pool.query(
@@ -1384,8 +1378,6 @@ app.get(
         }
       );
 
-
-      /* DAILY */
 
       const dailyResult =
         await pool.query(
@@ -1562,8 +1554,6 @@ app.get(
         );
 
 
-      /* CHANNELS */
-
       const channels = [
 
         {
@@ -1679,8 +1669,6 @@ app.get(
       ];
 
 
-      /* QR / NFC */
-
       const sources = {
 
         qr:
@@ -1697,8 +1685,6 @@ app.get(
 
       };
 
-
-      /* TOTAL */
 
       const totalEvents =
         Object.values(
@@ -2240,6 +2226,7 @@ app.post(
             category || ''
 
           ]
+
         );
 
 
@@ -2887,8 +2874,6 @@ app.get(
       );
 
 
-      /* Keep individual event data available too */
-
       rows.forEach(
         item => {
 
@@ -3393,6 +3378,33 @@ app.get(
 
 
 /* =========================
+   NFC CENTER
+========================= */
+
+app.get(
+  '/nfc-center',
+  (
+    req,
+    res
+  ) => {
+
+    res.sendFile(
+
+      path.join(
+
+        __dirname,
+        'public',
+        'nfc-center.html'
+
+      )
+
+    );
+
+  }
+);
+
+
+/* =========================
    ADMIN PAGE
 ========================= */
 
@@ -3518,7 +3530,7 @@ initDatabase()
 
           console.log(
 
-            `LEO CONNECT 3.5 çalışıyor: ${PORT}`
+            `LEO CONNECT 3.6 çalışıyor: ${PORT}`
 
           );
 
