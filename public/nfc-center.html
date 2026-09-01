@@ -1,768 +1,1195 @@
 <!DOCTYPE html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#050505" />
 
-  <title>NFC Merkezi | LEO CONNECT</title>
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#050505"
+  >
+
+  <title>LEO CONNECT — NFC Center</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+
+    *{
+      box-sizing:border-box;
     }
 
-    :root {
-      --bg: #050505;
-      --panel: #0d0d0d;
-      --panel-2: #111111;
-      --gold: #d6ae55;
-      --gold-light: #f1d58a;
-      --gold-dark: #9d772c;
-      --text: #f5f5f5;
-      --muted: #8f8f8f;
-      --border: rgba(214,174,85,.18);
-      --green: #45d483;
-      --red: #ff6464;
+    html{
+      scroll-behavior:smooth;
     }
 
-    body {
+    body{
+      margin:0;
+      background:
+        radial-gradient(
+          circle at 50% -10%,
+          rgba(212,175,55,.12),
+          transparent 34%
+        ),
+        #050505;
+      color:#fff;
       font-family:
         Inter,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
-        Roboto,
         Arial,
         sans-serif;
-      background:
-        radial-gradient(circle at top right, rgba(214,174,85,.09), transparent 30%),
-        radial-gradient(circle at bottom left, rgba(214,174,85,.04), transparent 28%),
-        var(--bg);
-      color: var(--text);
-      min-height: 100vh;
+      min-height:100vh;
     }
 
     button,
-    a {
-      font: inherit;
+    input,
+    select{
+      font:inherit;
     }
 
-    button {
-      cursor: pointer;
+    button,
+    a{
+      -webkit-tap-highlight-color:transparent;
     }
 
-    .app {
-      min-height: 100vh;
-      max-width: 1280px;
-      margin: auto;
-      padding: 28px 22px 60px;
+    a{
+      color:inherit;
+      text-decoration:none;
     }
 
-    /* HEADER */
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 34px;
+    .page{
+      width:min(1380px,100%);
+      margin:auto;
+      padding:
+        22px
+        22px
+        70px;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
+    /* =====================================================
+       TOPBAR
+    ===================================================== */
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      margin-bottom:26px;
     }
 
-    .brand-mark {
-      width: 48px;
-      height: 48px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .brand-mark{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
       background:
-        linear-gradient(145deg, #171717, #090909);
+        linear-gradient(
+          145deg,
+          #f4d879,
+          #b98b19
+        );
+
+      color:#080808;
+      font-size:24px;
+      font-weight:900;
+
       box-shadow:
-        0 0 30px rgba(214,174,85,.07),
-        inset 0 0 20px rgba(214,174,85,.03);
-      font-size: 23px;
+        0 12px 30px
+        rgba(212,175,55,.18);
     }
 
-    .brand-text strong {
-      display: block;
-      letter-spacing: 2px;
-      font-size: 15px;
+    .brand-text strong{
+      display:block;
+      font-size:15px;
+      letter-spacing:2px;
     }
 
-    .brand-text span {
-      display: block;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+    .brand-text span{
+      display:block;
+      margin-top:3px;
+      color:#8d8d8d;
+      font-size:12px;
     }
 
-    .back-btn {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.025);
-      color: #ddd;
-      padding: 11px 16px;
-      border-radius: 12px;
-      text-decoration: none;
-      transition: .2s;
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
     }
 
-    .back-btn:hover {
-      border-color: rgba(214,174,85,.4);
-      color: var(--gold-light);
-      transform: translateY(-1px);
+    .top-btn{
+      border:1px solid rgba(255,255,255,.09);
+      background:#0d0d0d;
+      color:#ddd;
+
+      padding:11px 15px;
+      border-radius:13px;
+
+      cursor:pointer;
+      transition:.2s;
     }
 
-    /* HERO */
+    .top-btn:hover{
+      border-color:rgba(212,175,55,.35);
+      color:#fff;
+      transform:translateY(-1px);
+    }
 
-    .hero {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 34px;
+    /* =====================================================
+       HERO
+    ===================================================== */
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+
+      border:1px solid
+        rgba(212,175,55,.16);
+
       background:
-        linear-gradient(145deg, rgba(214,174,85,.07), rgba(255,255,255,.018) 40%, rgba(255,255,255,.008));
+        linear-gradient(
+          135deg,
+          rgba(212,175,55,.075),
+          rgba(255,255,255,.025)
+        );
+
+      border-radius:30px;
+
+      padding:
+        32px;
+
+      margin-bottom:20px;
+
       box-shadow:
-        0 30px 90px rgba(0,0,0,.35);
-      margin-bottom: 22px;
+        0 30px 80px
+        rgba(0,0,0,.32);
     }
 
-    .hero::after {
-      content: "";
-      position: absolute;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      right: -100px;
-      top: -120px;
-      background: rgba(214,174,85,.07);
-      filter: blur(15px);
-      pointer-events: none;
-    }
+    .hero::after{
+      content:"";
+      position:absolute;
 
-    .eyebrow {
-      color: var(--gold);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2.4px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
+      width:300px;
+      height:300px;
 
-    .hero h1 {
-      font-size: clamp(30px, 5vw, 48px);
-      line-height: 1.05;
-      letter-spacing: -1.5px;
-      margin-bottom: 12px;
-    }
+      right:-120px;
+      top:-150px;
 
-    .hero p {
-      max-width: 720px;
-      color: #a6a6a6;
-      line-height: 1.7;
-      font-size: 15px;
-    }
+      border-radius:50%;
 
-    .business-line {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 20px;
-      color: #ddd;
-      font-size: 14px;
-    }
-
-    .business-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 14px rgba(69,212,131,.45);
-    }
-
-    /* GRID */
-
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 22px;
-    }
-
-    .card {
-      border: 1px solid var(--border);
-      border-radius: 24px;
       background:
-        linear-gradient(145deg, rgba(255,255,255,.025), rgba(255,255,255,.008));
-      box-shadow: 0 25px 70px rgba(0,0,0,.25);
-      overflow: hidden;
+        radial-gradient(
+          circle,
+          rgba(212,175,55,.13),
+          transparent 68%
+        );
+
+      pointer-events:none;
     }
 
-    .card-head {
-      padding: 22px 24px 16px;
-      border-bottom: 1px solid rgba(255,255,255,.055);
+    .hero-content{
+      position:relative;
+      z-index:1;
     }
 
-    .card-head h2 {
-      font-size: 18px;
-      margin-bottom: 5px;
+    .eyebrow{
+      color:#caa83c;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:2.8px;
+      text-transform:uppercase;
+      margin-bottom:9px;
     }
 
-    .card-head p {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
+    .hero h1{
+      margin:0;
+      font-size:clamp(30px,5vw,52px);
+      line-height:1.03;
+      letter-spacing:-1.5px;
     }
 
-    .card-body {
-      padding: 24px;
+    .hero h1 span{
+      color:#d8b84b;
     }
 
-    /* NFC PREVIEW */
+    .hero p{
+      color:#999;
+      max-width:700px;
+      line-height:1.65;
+      margin:
+        14px
+        0
+        0;
+      font-size:15px;
+    }
 
-    .nfc-stage {
-      min-height: 420px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    /* =====================================================
+       STATS
+    ===================================================== */
+
+    .stats{
+      display:grid;
+      grid-template-columns:
+        repeat(4,minmax(0,1fr));
+
+      gap:14px;
+      margin-bottom:20px;
+    }
+
+    .stat{
+      border:1px solid
+        rgba(255,255,255,.075);
+
+      background:#0b0b0b;
+
+      border-radius:20px;
+
+      padding:20px;
+
+      min-height:128px;
+
+      position:relative;
+      overflow:hidden;
+    }
+
+    .stat::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      width:100%;
+      height:1px;
+
       background:
-        radial-gradient(circle, rgba(214,174,85,.075), transparent 38%);
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(212,175,55,.35),
+          transparent
+        );
     }
 
-    .nfc-card {
-      width: min(320px, 100%);
-      aspect-ratio: 1 / 1;
-      border-radius: 32px;
-      border: 1px solid rgba(214,174,85,.3);
+    .stat-label{
+      color:#777;
+      font-size:11px;
+      letter-spacing:1.4px;
+      text-transform:uppercase;
+      font-weight:700;
+    }
+
+    .stat-value{
+      margin-top:13px;
+      font-size:31px;
+      font-weight:800;
+      letter-spacing:-1px;
+    }
+
+    .stat-note{
+      margin-top:6px;
+      color:#666;
+      font-size:12px;
+    }
+
+    /* =====================================================
+       MAIN GRID
+    ===================================================== */
+
+    .main-grid{
+      display:grid;
+      grid-template-columns:
+        minmax(0,1fr)
+        360px;
+
+      gap:20px;
+      align-items:start;
+    }
+
+    .panel{
+      border:1px solid
+        rgba(255,255,255,.075);
+
       background:
-        linear-gradient(145deg, #1b1b1b, #080808);
+        linear-gradient(
+          180deg,
+          #0c0c0c,
+          #090909
+        );
+
+      border-radius:25px;
+
+      padding:24px;
+
       box-shadow:
-        0 35px 80px rgba(0,0,0,.5),
-        0 0 70px rgba(214,174,85,.08),
-        inset 0 1px 0 rgba(255,255,255,.06);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
+        0 20px 55px
+        rgba(0,0,0,.24);
     }
 
-    .nfc-card::before {
-      content: "";
-      position: absolute;
-      inset: 12px;
-      border-radius: 24px;
-      border: 1px solid rgba(214,174,85,.09);
-      pointer-events: none;
+    .panel-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:15px;
+      margin-bottom:20px;
     }
 
-    .lion {
-      font-size: 72px;
-      line-height: 1;
-      margin-bottom: 18px;
-      filter: drop-shadow(0 8px 20px rgba(214,174,85,.18));
+    .panel-head h2{
+      margin:0;
+      font-size:21px;
+      letter-spacing:-.4px;
     }
 
-    .tap-symbol {
-      width: 86px;
-      height: 86px;
-      border: 1px solid rgba(214,174,85,.35);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 39px;
-      margin-bottom: 20px;
-      background: rgba(214,174,85,.045);
+    .panel-head p{
+      margin:6px 0 0;
+      color:#777;
+      font-size:13px;
+      line-height:1.5;
     }
 
-    .nfc-card strong {
-      font-size: 17px;
-      letter-spacing: 2px;
+    /* =====================================================
+       TAG LIST
+    ===================================================== */
+
+    .tag-list{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
     }
 
-    .nfc-card span {
-      color: var(--muted);
-      font-size: 11px;
-      margin-top: 7px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+    .empty{
+      padding:48px 20px;
+      text-align:center;
+
+      border:1px dashed
+        rgba(255,255,255,.1);
+
+      border-radius:20px;
+
+      color:#777;
     }
 
-    /* URL */
-
-    .url-box {
-      border: 1px solid rgba(214,174,85,.16);
-      background: rgba(0,0,0,.22);
-      border-radius: 15px;
-      padding: 15px;
-      margin-bottom: 18px;
+    .empty-icon{
+      font-size:38px;
+      margin-bottom:12px;
     }
 
-    .url-label {
-      color: var(--muted);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1.4px;
-      margin-bottom: 8px;
+    .empty strong{
+      display:block;
+      color:#bbb;
+      font-size:16px;
+      margin-bottom:6px;
     }
 
-    .url {
-      color: var(--gold-light);
-      font-size: 13px;
-      line-height: 1.5;
-      word-break: break-all;
+    .tag-card{
+      border:1px solid
+        rgba(255,255,255,.075);
+
+      background:#101010;
+
+      border-radius:20px;
+
+      padding:17px;
+
+      transition:
+        transform .2s,
+        border-color .2s,
+        background .2s;
     }
 
-    /* BUTTONS */
+    .tag-card:hover{
+      transform:translateY(-2px);
 
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      border-color:
+        rgba(212,175,55,.23);
+
+      background:#121212;
     }
 
-    .btn {
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      padding: 13px 14px;
-      background: #111;
-      color: #eee;
-      transition: .2s;
+    .tag-main{
+      display:flex;
+      align-items:center;
+      gap:15px;
     }
 
-    .btn:hover {
-      transform: translateY(-1px);
-      border-color: rgba(214,174,85,.42);
-    }
+    .tag-icon{
+      flex:0 0 auto;
 
-    .btn.gold {
+      width:54px;
+      height:54px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      border-radius:17px;
+
       background:
-        linear-gradient(135deg, #e1bd68, #a77b2d);
-      border-color: transparent;
-      color: #080808;
-      font-weight: 800;
+        linear-gradient(
+          145deg,
+          rgba(212,175,55,.18),
+          rgba(212,175,55,.05)
+        );
+
+      border:1px solid
+        rgba(212,175,55,.18);
+
+      font-size:25px;
     }
 
-    .btn.full {
-      grid-column: 1 / -1;
+    .tag-info{
+      min-width:0;
+      flex:1;
     }
 
-    /* USAGE */
-
-    .usage-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 16px;
+    .tag-title-row{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      flex-wrap:wrap;
     }
 
-    .usage {
-      border: 1px solid rgba(255,255,255,.07);
-      border-radius: 14px;
-      padding: 15px 8px;
-      background: rgba(255,255,255,.015);
-      color: #cfcfcf;
-      text-align: center;
-      transition: .2s;
+    .tag-title{
+      font-weight:800;
+      font-size:16px;
     }
 
-    .usage:hover,
-    .usage.active {
-      border-color: rgba(214,174,85,.4);
-      background: rgba(214,174,85,.055);
-      color: var(--gold-light);
+    .status{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+
+      border-radius:999px;
+
+      padding:5px 9px;
+
+      font-size:10px;
+      font-weight:800;
+
+      text-transform:uppercase;
+      letter-spacing:.7px;
     }
 
-    .usage-icon {
-      display: block;
-      font-size: 22px;
-      margin-bottom: 8px;
+    .status-dot{
+      width:6px;
+      height:6px;
+      border-radius:50%;
     }
 
-    .usage span {
-      font-size: 11px;
+    .status.active{
+      color:#bce8c8;
+      background:rgba(54,170,82,.1);
+      border:1px solid rgba(54,170,82,.16);
     }
 
-    /* STATS */
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+    .status.active .status-dot{
+      background:#55d477;
+      box-shadow:0 0 8px #55d477;
     }
 
-    .stat {
-      padding: 18px;
-      border: 1px solid rgba(255,255,255,.07);
-      border-radius: 16px;
-      background: rgba(255,255,255,.015);
+    .status.passive{
+      color:#999;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.07);
     }
 
-    .stat span {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-      margin-bottom: 9px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    .status.passive .status-dot{
+      background:#666;
     }
 
-    .stat strong {
-      font-size: 27px;
-      letter-spacing: -1px;
+    .tag-meta{
+      margin-top:7px;
+
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+
+      color:#777;
+      font-size:12px;
     }
 
-    .stat small {
-      display: block;
-      color: #777;
-      font-size: 10px;
-      margin-top: 4px;
+    .tag-code{
+      margin-top:10px;
+
+      color:#555;
+      font-size:10px;
+
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
 
-    /* GUIDE */
+    .tag-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
 
-    .guide {
-      display: grid;
-      gap: 12px;
+      margin-top:14px;
     }
 
-    .guide-item {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      padding: 15px;
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: 15px;
-      background: rgba(255,255,255,.014);
+    .action{
+      border:1px solid
+        rgba(255,255,255,.08);
+
+      background:#151515;
+      color:#cfcfcf;
+
+      border-radius:11px;
+
+      padding:9px 11px;
+
+      cursor:pointer;
+
+      font-size:11px;
+      font-weight:700;
+
+      transition:.18s;
     }
 
-    .guide-number {
-      flex: 0 0 32px;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(214,174,85,.3);
-      color: var(--gold);
-      font-size: 12px;
-      font-weight: 800;
+    .action:hover{
+      color:#fff;
+      border-color:
+        rgba(212,175,55,.3);
+      transform:translateY(-1px);
     }
 
-    .guide-item strong {
-      display: block;
-      font-size: 13px;
-      margin-bottom: 5px;
+    .action.gold{
+      color:#090909;
+
+      border-color:transparent;
+
+      background:
+        linear-gradient(
+          135deg,
+          #f1d56c,
+          #b58a18
+        );
     }
 
-    .guide-item p {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.55;
+    .action.danger:hover{
+      color:#ffb0b0;
+      border-color:rgba(255,80,80,.25);
     }
 
-    /* STATUS */
+    /* =====================================================
+       CREATE FORM
+    ===================================================== */
 
-    .status {
-      margin-top: 18px;
-      padding: 14px 15px;
-      border-radius: 14px;
-      border: 1px solid rgba(69,212,131,.18);
-      background: rgba(69,212,131,.035);
-      color: #9de7ba;
-      font-size: 12px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
+    .form{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
     }
 
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 10px rgba(69,212,131,.5);
-      flex: 0 0 auto;
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
     }
 
-    /* TOAST */
-
-    .toast {
-      position: fixed;
-      right: 22px;
-      bottom: 22px;
-      z-index: 50;
-      max-width: 340px;
-      padding: 14px 17px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: #121212;
-      color: #eee;
-      box-shadow: 0 20px 60px rgba(0,0,0,.45);
-      transform: translateY(30px);
-      opacity: 0;
-      pointer-events: none;
-      transition: .25s;
-      font-size: 13px;
+    .field label{
+      color:#858585;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:1px;
+      text-transform:uppercase;
     }
 
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
+    .field input,
+    .field select{
+      width:100%;
+
+      border:1px solid
+        rgba(255,255,255,.09);
+
+      outline:none;
+
+      background:#111;
+      color:#fff;
+
+      border-radius:13px;
+
+      padding:13px 14px;
+
+      transition:.2s;
     }
 
-    /* LOADING */
+    .field input:focus,
+    .field select:focus{
+      border-color:
+        rgba(212,175,55,.45);
 
-    .loading {
-      opacity: .5;
-      pointer-events: none;
+      box-shadow:
+        0 0 0 3px
+        rgba(212,175,55,.06);
     }
 
-    /* MOBILE */
+    .field-hint{
+      color:#555;
+      font-size:11px;
+      line-height:1.5;
+    }
 
-    @media (max-width: 900px) {
-      .main-grid {
-        grid-template-columns: 1fr;
+    .create-btn{
+      width:100%;
+
+      border:0;
+
+      padding:14px;
+
+      border-radius:14px;
+
+      cursor:pointer;
+
+      color:#090909;
+
+      font-weight:900;
+      letter-spacing:.3px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #f1d56c,
+          #b58a18
+        );
+
+      box-shadow:
+        0 12px 30px
+        rgba(212,175,55,.12);
+
+      transition:.2s;
+    }
+
+    .create-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:
+        0 15px 35px
+        rgba(212,175,55,.2);
+    }
+
+    .create-btn:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    /* =====================================================
+       GUIDE
+    ===================================================== */
+
+    .guide{
+      margin-top:18px;
+
+      border:1px solid
+        rgba(212,175,55,.1);
+
+      background:
+        rgba(212,175,55,.035);
+
+      border-radius:18px;
+
+      padding:17px;
+    }
+
+    .guide-title{
+      font-size:13px;
+      font-weight:800;
+      margin-bottom:10px;
+    }
+
+    .guide-step{
+      display:flex;
+      gap:10px;
+      margin-top:10px;
+      color:#777;
+      font-size:11px;
+      line-height:1.5;
+    }
+
+    .guide-number{
+      flex:0 0 auto;
+
+      width:22px;
+      height:22px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      border-radius:8px;
+
+      background:#171717;
+
+      color:#c9a93d;
+
+      font-weight:800;
+    }
+
+    /* =====================================================
+       MODAL
+    ===================================================== */
+
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+
+      background:
+        rgba(0,0,0,.78);
+
+      backdrop-filter:blur(9px);
+
+      display:none;
+      align-items:center;
+      justify-content:center;
+
+      padding:20px;
+
+      z-index:1000;
+    }
+
+    .modal-backdrop.show{
+      display:flex;
+    }
+
+    .modal{
+      width:min(520px,100%);
+
+      background:#0c0c0c;
+
+      border:1px solid
+        rgba(212,175,55,.2);
+
+      border-radius:25px;
+
+      padding:24px;
+
+      box-shadow:
+        0 40px 100px
+        rgba(0,0,0,.6);
+    }
+
+    .modal-head{
+      display:flex;
+      justify-content:space-between;
+      gap:15px;
+      align-items:center;
+      margin-bottom:20px;
+    }
+
+    .modal-head h3{
+      margin:0;
+      font-size:20px;
+    }
+
+    .close{
+      width:36px;
+      height:36px;
+
+      border-radius:11px;
+
+      border:1px solid
+        rgba(255,255,255,.08);
+
+      background:#151515;
+      color:#aaa;
+
+      cursor:pointer;
+    }
+
+    .modal-actions{
+      display:flex;
+      gap:9px;
+      margin-top:18px;
+    }
+
+    .modal-actions button{
+      flex:1;
+    }
+
+    /* =====================================================
+       URL BOX
+    ===================================================== */
+
+    .url-box{
+      margin-top:16px;
+
+      padding:14px;
+
+      background:#090909;
+
+      border:1px solid
+        rgba(255,255,255,.07);
+
+      border-radius:15px;
+
+      color:#aaa;
+
+      font-size:11px;
+
+      word-break:break-all;
+
+      line-height:1.55;
+    }
+
+    /* =====================================================
+       TOAST
+    ===================================================== */
+
+    .toast{
+      position:fixed;
+
+      left:50%;
+      bottom:24px;
+
+      transform:
+        translate(-50%,20px);
+
+      opacity:0;
+
+      pointer-events:none;
+
+      z-index:2000;
+
+      padding:13px 17px;
+
+      border-radius:14px;
+
+      border:1px solid
+        rgba(212,175,55,.25);
+
+      background:#111;
+
+      color:#eee;
+
+      font-size:12px;
+      font-weight:700;
+
+      box-shadow:
+        0 20px 50px
+        rgba(0,0,0,.4);
+
+      transition:.25s;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:
+        translate(-50%,0);
+    }
+
+    /* =====================================================
+       LOADING
+    ===================================================== */
+
+    .loading{
+      padding:40px;
+      text-align:center;
+      color:#666;
+      font-size:13px;
+    }
+
+    .spinner{
+      width:24px;
+      height:24px;
+
+      border-radius:50%;
+
+      border:2px solid
+        rgba(255,255,255,.08);
+
+      border-top-color:#d3b248;
+
+      margin:
+        0
+        auto
+        12px;
+
+      animation:
+        spin .8s linear infinite;
+    }
+
+    @keyframes spin{
+      to{
+        transform:rotate(360deg);
       }
     }
 
-    @media (max-width: 620px) {
-      .app {
-        padding: 18px 13px 40px;
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media(max-width:1050px){
+
+      .main-grid{
+        grid-template-columns:1fr;
       }
 
-      .topbar {
-        margin-bottom: 22px;
-      }
-
-      .hero {
-        padding: 25px 20px;
-        border-radius: 22px;
-      }
-
-      .hero h1 {
-        font-size: 32px;
-      }
-
-      .card {
-        border-radius: 20px;
-      }
-
-      .card-body {
-        padding: 18px;
-      }
-
-      .nfc-stage {
-        min-height: 330px;
-      }
-
-      .nfc-card {
-        width: min(275px, 88vw);
-      }
-
-      .usage-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .stats {
-        grid-template-columns: 1fr;
-      }
-
-      .actions {
-        grid-template-columns: 1fr;
-      }
-
-      .btn.full {
-        grid-column: auto;
-      }
-
-      .brand-text span {
-        display: none;
-      }
-
-      .back-btn {
-        padding: 9px 11px;
-        font-size: 12px;
-      }
     }
+
+    @media(max-width:760px){
+
+      .page{
+        padding:
+          15px
+          15px
+          50px;
+      }
+
+      .topbar{
+        align-items:flex-start;
+      }
+
+      .top-actions{
+        width:100%;
+      }
+
+      .top-btn{
+        flex:1;
+      }
+
+      .stats{
+        grid-template-columns:
+          repeat(2,minmax(0,1fr));
+      }
+
+      .hero{
+        padding:24px;
+        border-radius:23px;
+      }
+
+      .panel{
+        padding:18px;
+        border-radius:20px;
+      }
+
+    }
+
+    @media(max-width:470px){
+
+      .topbar{
+        flex-direction:column;
+      }
+
+      .top-actions{
+        width:100%;
+      }
+
+      .stats{
+        gap:9px;
+      }
+
+      .stat{
+        min-height:112px;
+        padding:15px;
+      }
+
+      .stat-value{
+        font-size:25px;
+      }
+
+      .tag-main{
+        align-items:flex-start;
+      }
+
+      .tag-icon{
+        width:46px;
+        height:46px;
+        font-size:21px;
+      }
+
+      .tag-actions .action{
+        flex:1;
+        text-align:center;
+      }
+
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
-<div class="app">
-
-  <!-- HEADER -->
-
-  <header class="topbar">
-
-    <div class="brand">
-
-      <div class="brand-mark">
-        🦁
-      </div>
-
-      <div class="brand-text">
-        <strong>LEO CONNECT</strong>
-        <span>Premium Business Technology</span>
-      </div>
-
-    </div>
-
-    <a href="/dashboard" class="back-btn">
-      ← Dashboard
-    </a>
-
-  </header>
+  <div class="page">
 
 
-  <!-- HERO -->
+    <!-- ===================================================
+         TOPBAR
+    ==================================================== -->
 
-  <section class="hero">
+    <header class="topbar">
 
-    <div class="eyebrow">
-      NFC CENTER
-    </div>
+      <div class="brand">
 
-    <h1>
-      NFC Merkezi
-    </h1>
-
-    <p>
-      İşletmenizin dijital profilini NFC etiketiyle tek dokunuşta
-      müşterilerinizle buluşturun. Bağlantınızı yönetin, test edin ve
-      kullanım alanınızı belirleyin.
-    </p>
-
-    <div class="business-line">
-      <span class="business-dot"></span>
-      <span id="businessName">İşletme yükleniyor...</span>
-    </div>
-
-  </section>
-
-
-  <!-- MAIN -->
-
-  <div class="main-grid">
-
-    <!-- LEFT -->
-
-    <section class="card">
-
-      <div class="card-head">
-        <h2>🦁 NFC Etiketi</h2>
-        <p>
-          İşletmenizin NFC etiketi için kullanılacak dijital bağlantı.
-        </p>
-      </div>
-
-      <div class="card-body">
-
-        <div class="nfc-stage">
-
-          <div class="nfc-card">
-
-            <div class="lion">🦁</div>
-
-            <div class="tap-symbol">
-              📡
-            </div>
-
-            <strong>NFC</strong>
-
-            <span>
-              TAP TO CONNECT
-            </span>
-
-          </div>
-
+        <div class="brand-mark">
+          🦁
         </div>
 
-      </div>
+        <div class="brand-text">
 
-    </section>
-
-
-    <!-- RIGHT -->
-
-    <section class="card">
-
-      <div class="card-head">
-        <h2>Bağlantı Yönetimi</h2>
-        <p>
-          NFC etiketiniz bu bağlantıyı açacaktır.
-        </p>
-      </div>
-
-      <div class="card-body">
-
-        <div class="url-box">
-
-          <div class="url-label">
-            NFC bağlantısı
-          </div>
-
-          <div class="url" id="nfcUrl">
-            Yükleniyor...
-          </div>
-
-        </div>
-
-
-        <div class="actions">
-
-          <button
-            class="btn gold"
-            onclick="copyNfcUrl()"
-          >
-            📋 Bağlantıyı Kopyala
-          </button>
-
-          <button
-            class="btn"
-            onclick="testNfc()"
-          >
-            📱 NFC'yi Test Et
-          </button>
-
-          <button
-            class="btn"
-            onclick="openProfile()"
-          >
-            🔗 Profili Aç
-          </button>
-
-          <button
-            class="btn"
-            onclick="shareProfile()"
-          >
-            📤 Paylaş
-          </button>
-
-        </div>
-
-
-        <div class="status">
-          <span class="status-dot"></span>
+          <strong>
+            LEO CONNECT
+          </strong>
 
           <span>
-            NFC bağlantınız aktif ve kullanıma hazır.
+            NFC CENTER
           </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="top-actions">
+
+        <a
+          class="top-btn"
+          href="/dashboard"
+        >
+          ← Business Center
+        </a>
+
+        <button
+          class="top-btn"
+          type="button"
+          onclick="logout()"
+        >
+          Çıkış
+        </button>
+
+      </div>
+
+    </header>
+
+
+
+    <!-- ===================================================
+         HERO
+    ==================================================== -->
+
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <div class="eyebrow">
+          DIGITAL CONNECTION
+        </div>
+
+        <h1>
+          NFC <span>Center</span>
+        </h1>
+
+        <p>
+          İşletmene ait tüm NFC etiketlerini tek merkezden
+          oluştur, yönet, aktif veya pasif hale getir ve
+          her etiketin dokunuş performansını ayrı ayrı takip et.
+        </p>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         STATS
+    ==================================================== -->
+
+    <section class="stats">
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Toplam NFC
+        </div>
+
+        <div
+          class="stat-value"
+          id="statTags"
+        >
+          —
+        </div>
+
+        <div class="stat-note">
+          Oluşturulan etiket
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Toplam Dokunuş
+        </div>
+
+        <div
+          class="stat-value"
+          id="statTaps"
+        >
+          —
+        </div>
+
+        <div class="stat-note">
+          Tüm NFC etiketleri
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Aktif
+        </div>
+
+        <div
+          class="stat-value"
+          id="statActive"
+        >
+          —
+        </div>
+
+        <div class="stat-note">
+          Kullanıma açık
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Son Dokunuş
+        </div>
+
+        <div
+          class="stat-value"
+          id="statLast"
+          style="font-size:20px"
+        >
+          —
+        </div>
+
+        <div class="stat-note">
+          En son NFC etkileşimi
         </div>
 
       </div>
@@ -770,670 +1197,1776 @@
     </section>
 
 
-    <!-- USAGE -->
 
-    <section class="card">
+    <!-- ===================================================
+         MAIN
+    ==================================================== -->
 
-      <div class="card-head">
+    <main class="main-grid">
 
-        <h2>🏷️ NFC Kullanım Alanı</h2>
 
-        <p>
-          Bu NFC etiketinin nerede kullanılacağını seçin.
-        </p>
+      <!-- =================================================
+           TAGS
+      ================================================== -->
 
-      </div>
+      <section class="panel">
 
-      <div class="card-body">
+        <div class="panel-head">
 
-        <div class="usage-grid">
+          <div>
 
-          <button class="usage" data-place="Masa">
-            <span class="usage-icon">🍽️</span>
-            <span>Masa</span>
-          </button>
+            <h2>
+              NFC Etiketlerin
+            </h2>
 
-          <button class="usage" data-place="Menü">
-            <span class="usage-icon">📖</span>
-            <span>Menü</span>
-          </button>
+            <p>
+              Her etiket bağımsız bir bağlantıya ve
+              ayrı dokunuş istatistiğine sahiptir.
+            </p>
 
-          <button class="usage" data-place="Vitrin">
-            <span class="usage-icon">🪟</span>
-            <span>Vitrin</span>
-          </button>
+          </div>
 
-          <button class="usage" data-place="Kasa">
-            <span class="usage-icon">💳</span>
-            <span>Kasa</span>
-          </button>
-
-          <button class="usage" data-place="Kartvizit">
-            <span class="usage-icon">💼</span>
-            <span>Kartvizit</span>
-          </button>
-
-          <button class="usage" data-place="Stand">
-            <span class="usage-icon">🪧</span>
-            <span>Stand</span>
-          </button>
-
-          <button class="usage" data-place="Paket">
-            <span class="usage-icon">📦</span>
-            <span>Paket</span>
-          </button>
-
-          <button class="usage" data-place="Diğer">
-            <span class="usage-icon">＋</span>
-            <span>Diğer</span>
+          <button
+            class="action"
+            type="button"
+            onclick="loadTags()"
+          >
+            ↻ Yenile
           </button>
 
         </div>
 
-      </div>
 
-    </section>
+        <div
+          id="tagList"
+          class="tag-list"
+        >
 
+          <div class="loading">
 
-    <!-- STATS -->
+            <div class="spinner"></div>
 
-    <section class="card">
-
-      <div class="card-head">
-
-        <h2>📊 NFC Performansı</h2>
-
-        <p>
-          İşletme profiliniz üzerinden gerçekleşen NFC etkileşimleri.
-        </p>
-
-      </div>
-
-      <div class="card-body">
-
-        <div class="stats">
-
-          <div class="stat">
-
-            <span>NFC Dokunmaları</span>
-
-            <strong id="nfcScans">0</strong>
-
-            <small>Toplam NFC etkileşimi</small>
-
-          </div>
-
-          <div class="stat">
-
-            <span>Profil Görüntüleme</span>
-
-            <strong id="profileViews">0</strong>
-
-            <small>Toplam profil görüntüleme</small>
-
-          </div>
-
-          <div class="stat">
-
-            <span>Toplam Etkileşim</span>
-
-            <strong id="totalEvents">0</strong>
-
-            <small>Tüm dijital etkileşimler</small>
+            NFC etiketleri yükleniyor...
 
           </div>
 
         </div>
 
-      </div>
-
-    </section>
+      </section>
 
 
-    <!-- GUIDE -->
 
-    <section class="card">
+      <!-- =================================================
+           CREATE
+      ================================================== -->
 
-      <div class="card-head">
+      <aside class="panel">
 
-        <h2>📱 NFC Etiketi Nasıl Yazılır?</h2>
+        <div class="panel-head">
 
-        <p>
-          NFC etiketinizi birkaç adımda işletme profilinize bağlayabilirsiniz.
-        </p>
+          <div>
 
-      </div>
+            <h2>
+              Yeni NFC Etiketi
+            </h2>
 
-      <div class="card-body">
+            <p>
+              İşletmen için benzersiz bir NFC bağlantısı oluştur.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <form
+          class="form"
+          id="createForm"
+        >
+
+          <div class="field">
+
+            <label for="tagName">
+              Etiket Adı
+            </label>
+
+            <input
+              id="tagName"
+              type="text"
+              placeholder="Örn. NFC #001"
+              maxlength="80"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="tagPlacement">
+              Kullanım Alanı
+            </label>
+
+            <select id="tagPlacement">
+
+              <option value="">
+                Seçiniz
+              </option>
+
+              <option value="Masa">
+                Masa
+              </option>
+
+              <option value="Menü">
+                Menü
+              </option>
+
+              <option value="Vitrin">
+                Vitrin
+              </option>
+
+              <option value="Kasa">
+                Kasa
+              </option>
+
+              <option value="Kartvizit">
+                Kartvizit
+              </option>
+
+              <option value="Stand">
+                Stand
+              </option>
+
+              <option value="Paket">
+                Paket
+              </option>
+
+              <option value="Diğer">
+                Diğer
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field-hint">
+
+            Etiket oluşturulduğunda sistem sana özel
+            benzersiz bir NFC bağlantısı üretir.
+            Bu bağlantıyı fiziksel NFC etikete yazabilirsin.
+
+          </div>
+
+
+          <button
+            class="create-btn"
+            id="createBtn"
+            type="submit"
+          >
+            ＋ NFC Etiketini Oluştur
+          </button>
+
+        </form>
+
 
         <div class="guide">
 
-          <div class="guide-item">
+          <div class="guide-title">
+            📡 NFC Etiketi Nasıl Kullanılır?
+          </div>
 
-            <div class="guide-number">01</div>
+
+          <div class="guide-step">
+
+            <div class="guide-number">
+              1
+            </div>
 
             <div>
-              <strong>NFC etiketinizi hazırlayın</strong>
-
-              <p>
-                Yazılabilir bir NFC etiketi veya NFC kartı kullanın.
-              </p>
+              Yeni bir NFC etiketi oluştur.
             </div>
 
           </div>
 
 
-          <div class="guide-item">
+          <div class="guide-step">
 
-            <div class="guide-number">02</div>
+            <div class="guide-number">
+              2
+            </div>
 
             <div>
-              <strong>Bağlantıyı kopyalayın</strong>
-
-              <p>
-                Yukarıdaki “Bağlantıyı Kopyala” butonuna basarak
-                işletmenize özel NFC adresini kopyalayın.
-              </p>
+              Oluşan benzersiz bağlantıyı kopyala.
             </div>
 
           </div>
 
 
-          <div class="guide-item">
+          <div class="guide-step">
 
-            <div class="guide-number">03</div>
+            <div class="guide-number">
+              3
+            </div>
 
             <div>
-              <strong>NFC yazma uygulamasını açın</strong>
-
-              <p>
-                Telefonunuzdaki NFC yazma uygulamasıyla yeni bir URL
-                kaydı oluşturun ve kopyaladığınız bağlantıyı ekleyin.
-              </p>
+              Bağlantıyı NFC yazma uygulamasıyla
+              fiziksel etikete kaydet.
             </div>
 
           </div>
 
 
-          <div class="guide-item">
+          <div class="guide-step">
 
-            <div class="guide-number">04</div>
-
-            <div>
-              <strong>Etiketi telefona yaklaştırın</strong>
-
-              <p>
-                NFC etiketini telefonunuza yaklaştırarak bağlantıyı etikete yazın.
-              </p>
+            <div class="guide-number">
+              4
             </div>
 
-          </div>
-
-
-          <div class="guide-item">
-
-            <div class="guide-number">05</div>
-
             <div>
-              <strong>Test edin</strong>
-
-              <p>
-                Etiketi farklı bir telefonla okutun ve işletme profilinizin
-                doğru şekilde açıldığını kontrol edin.
-              </p>
+              Etiketi müşterinin dokunabileceği
+              noktaya yerleştir.
             </div>
 
           </div>
 
         </div>
 
-      </div>
+      </aside>
 
-    </section>
-
-
-    <!-- QUICK -->
-
-    <section class="card">
-
-      <div class="card-head">
-
-        <h2>⚡ Hızlı İşlemler</h2>
-
-        <p>
-          NFC bağlantınızla ilgili işlemler.
-        </p>
-
-      </div>
-
-      <div class="card-body">
-
-        <div class="actions">
-
-          <button
-            class="btn gold full"
-            onclick="copyNfcUrl()"
-          >
-            📋 NFC Bağlantısını Kopyala
-          </button>
-
-          <button
-            class="btn"
-            onclick="testNfc()"
-          >
-            🧪 Test Et
-          </button>
-
-          <button
-            class="btn"
-            onclick="openProfile()"
-          >
-            👁️ Profili Gör
-          </button>
-
-          <button
-            class="btn"
-            onclick="window.location.href='/dashboard'"
-          >
-            ⚙️ Dashboard
-          </button>
-
-          <button
-            class="btn"
-            onclick="window.location.href='/qr-center'"
-          >
-            🔲 QR Merkezi
-          </button>
-
-        </div>
-
-      </div>
-
-    </section>
+    </main>
 
   </div>
 
-</div>
 
 
-<div class="toast" id="toast"></div>
+  <!-- =====================================================
+       EDIT MODAL
+  ====================================================== -->
+
+  <div
+    class="modal-backdrop"
+    id="editModal"
+  >
+
+    <div class="modal">
+
+      <div class="modal-head">
+
+        <h3>
+          NFC Etiketini Düzenle
+        </h3>
+
+        <button
+          class="close"
+          type="button"
+          onclick="closeEdit()"
+        >
+          ×
+        </button>
+
+      </div>
 
 
-<script>
+      <form
+        class="form"
+        id="editForm"
+      >
 
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    window.location.href = "/login";
-  }
-
-
-  let nfcUrlValue = "";
-  let profileUrlValue = "";
-  let businessValue = null;
+        <input
+          type="hidden"
+          id="editId"
+        >
 
 
-  async function api(url, options = {}) {
+        <div class="field">
 
-    const headers = {
-      ...(options.headers || {}),
-      Authorization: "Bearer " + token
-    };
+          <label>
+            Etiket Adı
+          </label>
 
-    if (
-      options.body &&
-      typeof options.body === "object"
-    ) {
-      headers["Content-Type"] = "application/json";
-      options.body = JSON.stringify(options.body);
+          <input
+            id="editName"
+            type="text"
+            maxlength="80"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Kullanım Alanı
+          </label>
+
+          <select id="editPlacement">
+
+            <option value="">
+              Seçiniz
+            </option>
+
+            <option value="Masa">
+              Masa
+            </option>
+
+            <option value="Menü">
+              Menü
+            </option>
+
+            <option value="Vitrin">
+              Vitrin
+            </option>
+
+            <option value="Kasa">
+              Kasa
+            </option>
+
+            <option value="Kartvizit">
+              Kartvizit
+            </option>
+
+            <option value="Stand">
+              Stand
+            </option>
+
+            <option value="Paket">
+              Paket
+            </option>
+
+            <option value="Diğer">
+              Diğer
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Durum
+          </label>
+
+          <select id="editActive">
+
+            <option value="true">
+              Aktif
+            </option>
+
+            <option value="false">
+              Pasif
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            class="action"
+            type="button"
+            onclick="closeEdit()"
+          >
+            Vazgeç
+          </button>
+
+          <button
+            class="action gold"
+            type="submit"
+          >
+            Değişiklikleri Kaydet
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       URL MODAL
+  ====================================================== -->
+
+  <div
+    class="modal-backdrop"
+    id="urlModal"
+  >
+
+    <div class="modal">
+
+      <div class="modal-head">
+
+        <h3>
+          NFC Bağlantısı
+        </h3>
+
+        <button
+          class="close"
+          type="button"
+          onclick="closeUrl()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div
+        id="urlModalTitle"
+        style="
+          color:#aaa;
+          font-size:13px;
+        "
+      >
+      </div>
+
+
+      <div
+        id="urlModalValue"
+        class="url-box"
+      >
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button
+          class="action gold"
+          type="button"
+          onclick="copyModalUrl()"
+        >
+          🔗 Kopyala
+        </button>
+
+        <button
+          class="action"
+          type="button"
+          onclick="testModalUrl()"
+        >
+          ↗ Test Et
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       TOAST
+  ====================================================== -->
+
+  <div
+    id="toast"
+    class="toast"
+  >
+  </div>
+
+
+
+  <script>
+
+    /* =====================================================
+       AUTH
+    ===================================================== */
+
+    const token =
+      localStorage.getItem('token');
+
+
+    if (!token) {
+
+      window.location.href =
+        '/login';
+
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers
-    });
 
-    if (response.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-      return null;
+    /* =====================================================
+       STATE
+    ===================================================== */
+
+    let tags = [];
+
+    let currentModalTag = null;
+
+
+    /* =====================================================
+       API
+    ===================================================== */
+
+    async function api(
+      url,
+      options = {}
+    ){
+
+      const headers = {
+        ...(options.headers || {}),
+        'Authorization':
+          `Bearer ${token}`,
+        'Content-Type':
+          'application/json'
+      };
+
+
+      const response =
+        await fetch(
+          url,
+          {
+            ...options,
+            headers
+          }
+        );
+
+
+      let data = null;
+
+      try{
+
+        data =
+          await response.json();
+
+      }catch{
+
+        data = {};
+
+      }
+
+
+      if (
+        response.status === 401 ||
+        response.status === 403
+      ){
+
+        localStorage.removeItem('token');
+
+        window.location.href =
+          '/login';
+
+        return;
+
+      }
+
+
+      if (!response.ok){
+
+        throw new Error(
+          data.error ||
+          'Bir hata oluştu'
+        );
+
+      }
+
+
+      return data;
+
     }
 
-    const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(
-        data?.error || "Bir hata oluştu."
+    /* =====================================================
+       TOAST
+    ===================================================== */
+
+    let toastTimer;
+
+
+    function toast(message){
+
+      const el =
+        document.getElementById(
+          'toast'
+        );
+
+
+      el.textContent =
+        message;
+
+
+      el.classList.add(
+        'show'
       );
+
+
+      clearTimeout(
+        toastTimer
+      );
+
+
+      toastTimer =
+        setTimeout(
+          () => {
+
+            el.classList.remove(
+              'show'
+            );
+
+          },
+          2600
+        );
+
     }
 
-    return data;
-  }
+
+    /* =====================================================
+       FORMAT DATE
+    ===================================================== */
+
+    function formatDate(value){
+
+      if (!value){
+        return 'Henüz yok';
+      }
 
 
-  function showToast(message) {
-
-    const toast = document.getElementById("toast");
-
-    toast.textContent = message;
-    toast.classList.add("show");
-
-    clearTimeout(window.toastTimer);
-
-    window.toastTimer = setTimeout(() => {
-      toast.classList.remove("show");
-    }, 2600);
-  }
+      const date =
+        new Date(value);
 
 
-  async function loadBusiness() {
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ){
 
-    try {
+        return 'Henüz yok';
 
-      const me = await api("/api/me");
-
-      if (!me) return;
-
-      businessValue = me;
-
-      document.getElementById("businessName").textContent =
-        me.name || "İşletmeniz";
+      }
 
 
-      const slug = me.slug;
-
-      profileUrlValue =
-        window.location.origin +
-        "/p/" +
-        slug;
-
-
-      nfcUrlValue =
-        profileUrlValue +
-        "?source=nfc";
-
-
-      document.getElementById("nfcUrl").textContent =
-        nfcUrlValue;
-
-
-    } catch (error) {
-
-      console.error(error);
-
-      showToast(
-        error.message ||
-        "İşletme bilgileri alınamadı."
+      return date.toLocaleString(
+        'tr-TR',
+        {
+          day:'2-digit',
+          month:'2-digit',
+          year:'numeric',
+          hour:'2-digit',
+          minute:'2-digit'
+        }
       );
 
     }
 
-  }
+
+    function shortDate(value){
+
+      if (!value){
+        return 'Henüz yok';
+      }
 
 
-  async function loadStats() {
-
-    try {
-
-      const stats = await api("/api/stats");
-
-      if (!stats) return;
-
-      document.getElementById("nfcScans").textContent =
-        Number(stats.nfc_scans || 0).toLocaleString("tr-TR");
-
-      document.getElementById("profileViews").textContent =
-        Number(stats.profile_views || 0).toLocaleString("tr-TR");
-
-      document.getElementById("totalEvents").textContent =
-        Number(stats.total_events || 0).toLocaleString("tr-TR");
-
-    } catch (error) {
-
-      console.error(error);
-
-    }
-
-  }
+      const date =
+        new Date(value);
 
 
-  async function copyNfcUrl() {
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ){
 
-    if (!nfcUrlValue) {
+        return 'Henüz yok';
 
-      showToast("NFC bağlantısı henüz hazır değil.");
-
-      return;
-    }
+      }
 
 
-    try {
-
-      await navigator.clipboard.writeText(
-        nfcUrlValue
-      );
-
-      showToast(
-        "NFC bağlantısı panoya kopyalandı."
-      );
-
-    } catch {
-
-      const temp =
-        document.createElement("textarea");
-
-      temp.value = nfcUrlValue;
-
-      document.body.appendChild(temp);
-
-      temp.select();
-
-      document.execCommand("copy");
-
-      temp.remove();
-
-      showToast(
-        "NFC bağlantısı kopyalandı."
+      return date.toLocaleDateString(
+        'tr-TR',
+        {
+          day:'2-digit',
+          month:'short',
+          year:'numeric'
+        }
       );
 
     }
 
-  }
 
+    /* =====================================================
+       ESCAPE HTML
+    ===================================================== */
 
-  function openProfile() {
+    function escapeHtml(value){
 
-    if (!profileUrlValue) {
-
-      showToast(
-        "Profil bağlantısı henüz hazır değil."
+      return String(
+        value ?? ''
+      )
+      .replace(
+        /&/g,
+        '&amp;'
+      )
+      .replace(
+        /</g,
+        '&lt;'
+      )
+      .replace(
+        />/g,
+        '&gt;'
+      )
+      .replace(
+        /"/g,
+        '&quot;'
+      )
+      .replace(
+        /'/g,
+        '&#039;'
       );
 
-      return;
     }
 
 
-    window.open(
-      profileUrlValue,
-      "_blank"
+    /* =====================================================
+       LOAD TAGS
+    ===================================================== */
+
+    async function loadTags(){
+
+      const list =
+        document.getElementById(
+          'tagList'
+        );
+
+
+      list.innerHTML = `
+
+        <div class="loading">
+
+          <div class="spinner"></div>
+
+          NFC etiketleri yükleniyor...
+
+        </div>
+
+      `;
+
+
+      try{
+
+        const data =
+          await api(
+            '/api/nfc-tags'
+          );
+
+
+        tags =
+          Array.isArray(data)
+            ? data
+            : [];
+
+
+        renderTags();
+
+        updateStats();
+
+
+      }catch(error){
+
+        console.error(error);
+
+
+        list.innerHTML = `
+
+          <div class="empty">
+
+            <div class="empty-icon">
+              ⚠️
+            </div>
+
+            <strong>
+              Etiketler yüklenemedi
+            </strong>
+
+            <div>
+              ${escapeHtml(error.message)}
+            </div>
+
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       RENDER TAGS
+    ===================================================== */
+
+    function renderTags(){
+
+      const list =
+        document.getElementById(
+          'tagList'
+        );
+
+
+      if (!tags.length){
+
+        list.innerHTML = `
+
+          <div class="empty">
+
+            <div class="empty-icon">
+              📡
+            </div>
+
+            <strong>
+              Henüz NFC etiketi yok
+            </strong>
+
+            <div>
+              Sağ taraftaki formu kullanarak
+              ilk NFC etiketini oluşturabilirsin.
+            </div>
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      list.innerHTML =
+        tags
+          .map(
+            tagCard
+          )
+          .join('');
+
+    }
+
+
+    /* =====================================================
+       TAG CARD
+    ===================================================== */
+
+    function tagCard(tag){
+
+      const active =
+        !!tag.is_active;
+
+
+      const placement =
+        tag.placement ||
+        'Konum belirtilmedi';
+
+
+      const statusClass =
+        active
+          ? 'active'
+          : 'passive';
+
+
+      const statusText =
+        active
+          ? 'Aktif'
+          : 'Pasif';
+
+
+      const tapCount =
+        Number(
+          tag.tap_count || 0
+        );
+
+
+      return `
+
+        <article
+          class="tag-card"
+        >
+
+          <div class="tag-main">
+
+            <div class="tag-icon">
+              📡
+            </div>
+
+
+            <div class="tag-info">
+
+              <div class="tag-title-row">
+
+                <div class="tag-title">
+
+                  ${escapeHtml(
+                    tag.name
+                  )}
+
+                </div>
+
+
+                <span
+                  class="status ${statusClass}"
+                >
+
+                  <span
+                    class="status-dot"
+                  ></span>
+
+                  ${statusText}
+
+                </span>
+
+              </div>
+
+
+              <div class="tag-meta">
+
+                <span>
+                  📍 ${escapeHtml(
+                    placement
+                  )}
+                </span>
+
+                <span>
+                  👆 ${tapCount} dokunuş
+                </span>
+
+                <span>
+                  🕒 ${escapeHtml(
+                    shortDate(
+                      tag.last_tap
+                    )
+                  )}
+                </span>
+
+              </div>
+
+
+              <div class="tag-code">
+
+                ${escapeHtml(
+                  tag.url
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="tag-actions">
+
+            <button
+              class="action gold"
+              type="button"
+              onclick="showUrl(${tag.id})"
+            >
+              🔗 Bağlantı
+            </button>
+
+
+            <button
+              class="action"
+              type="button"
+              onclick="testTag(${tag.id})"
+            >
+              ↗ Test Et
+            </button>
+
+
+            <button
+              class="action"
+              type="button"
+              onclick="copyTagUrl(${tag.id})"
+            >
+              📋 Kopyala
+            </button>
+
+
+            <button
+              class="action"
+              type="button"
+              onclick="editTag(${tag.id})"
+            >
+              ✏️ Düzenle
+            </button>
+
+
+            <button
+              class="action danger"
+              type="button"
+              onclick="deleteTag(${tag.id})"
+            >
+              🗑 Sil
+            </button>
+
+          </div>
+
+        </article>
+
+      `;
+
+    }
+
+
+    /* =====================================================
+       STATS
+    ===================================================== */
+
+    function updateStats(){
+
+      const total =
+        tags.length;
+
+
+      const active =
+        tags.filter(
+          tag =>
+            !!tag.is_active
+        ).length;
+
+
+      const taps =
+        tags.reduce(
+          (
+            total,
+            tag
+          ) =>
+            total +
+            Number(
+              tag.tap_count || 0
+            ),
+          0
+        );
+
+
+      let latest = null;
+
+
+      tags.forEach(
+        tag => {
+
+          if (!tag.last_tap){
+            return;
+          }
+
+
+          if (
+            !latest ||
+            new Date(tag.last_tap)
+              >
+            new Date(latest)
+          ){
+
+            latest =
+              tag.last_tap;
+
+          }
+
+        }
+      );
+
+
+      document.getElementById(
+        'statTags'
+      ).textContent =
+        total;
+
+
+      document.getElementById(
+        'statActive'
+      ).textContent =
+        active;
+
+
+      document.getElementById(
+        'statTaps'
+      ).textContent =
+        taps.toLocaleString(
+          'tr-TR'
+        );
+
+
+      document.getElementById(
+        'statLast'
+      ).textContent =
+        latest
+          ? shortDate(latest)
+          : 'Henüz yok';
+
+    }
+
+
+    /* =====================================================
+       CREATE
+    ===================================================== */
+
+    document.getElementById(
+      'createForm'
+    ).addEventListener(
+      'submit',
+      async event => {
+
+        event.preventDefault();
+
+
+        const name =
+          document.getElementById(
+            'tagName'
+          ).value.trim();
+
+
+        const placement =
+          document.getElementById(
+            'tagPlacement'
+          ).value;
+
+
+        if (!name){
+
+          toast(
+            'Etiket adı gerekli'
+          );
+
+          return;
+
+        }
+
+
+        const button =
+          document.getElementById(
+            'createBtn'
+          );
+
+
+        button.disabled =
+          true;
+
+
+        button.textContent =
+          'Oluşturuluyor...';
+
+
+        try{
+
+          const data =
+            await api(
+              '/api/nfc-tags',
+              {
+                method:'POST',
+
+                body:
+                  JSON.stringify({
+                    name,
+                    placement
+                  })
+              }
+            );
+
+
+          document.getElementById(
+            'tagName'
+          ).value = '';
+
+
+          document.getElementById(
+            'tagPlacement'
+          ).value = '';
+
+
+          toast(
+            'NFC etiketi başarıyla oluşturuldu'
+          );
+
+
+          await loadTags();
+
+
+          if (
+            data &&
+            data.tag
+          ){
+
+            setTimeout(
+              () => {
+
+                showUrl(
+                  data.tag.id
+                );
+
+              },
+              250
+            );
+
+          }
+
+        }catch(error){
+
+          console.error(error);
+
+          toast(
+            error.message
+          );
+
+        }finally{
+
+          button.disabled =
+            false;
+
+          button.textContent =
+            '＋ NFC Etiketini Oluştur';
+
+        }
+
+      }
     );
 
-  }
+
+    /* =====================================================
+       COPY URL
+    ===================================================== */
+
+    async function copyText(text){
+
+      try{
+
+        await navigator.clipboard.writeText(
+          text
+        );
+
+        return true;
+
+      }catch{
+
+        const textarea =
+          document.createElement(
+            'textarea'
+          );
 
 
-  async function shareProfile() {
+        textarea.value =
+          text;
 
-    if (!profileUrlValue) {
 
-      showToast(
-        "Profil bağlantısı henüz hazır değil."
-      );
+        textarea.style.position =
+          'fixed';
 
-      return;
+        textarea.style.opacity =
+          '0';
+
+
+        document.body.appendChild(
+          textarea
+        );
+
+
+        textarea.select();
+
+
+        let success =
+          false;
+
+
+        try{
+
+          success =
+            document.execCommand(
+              'copy'
+            );
+
+        }catch{
+
+          success =
+            false;
+
+        }
+
+
+        textarea.remove();
+
+
+        return success;
+
+      }
+
     }
 
 
-    const shareData = {
-      title:
-        businessValue?.name ||
-        "İşletme Profili",
+    async function copyTagUrl(id){
 
-      text:
-        "İşletme profilimizi inceleyebilirsiniz.",
-
-      url:
-        profileUrlValue
-    };
+      const tag =
+        tags.find(
+          item =>
+            Number(item.id) ===
+            Number(id)
+        );
 
 
-    if (
-      navigator.share &&
-      window.isSecureContext
-    ) {
+      if (!tag){
+        return;
+      }
 
-      try {
 
-        await navigator.share(
-          shareData
+      const success =
+        await copyText(
+          tag.url
+        );
+
+
+      toast(
+        success
+          ? 'NFC bağlantısı kopyalandı'
+          : 'Bağlantı kopyalanamadı'
+      );
+
+    }
+
+
+    /* =====================================================
+       URL MODAL
+    ===================================================== */
+
+    function showUrl(id){
+
+      const tag =
+        tags.find(
+          item =>
+            Number(item.id) ===
+            Number(id)
+        );
+
+
+      if (!tag){
+        return;
+      }
+
+
+      currentModalTag =
+        tag;
+
+
+      document.getElementById(
+        'urlModalTitle'
+      ).textContent =
+        `${tag.name} • ${tag.placement || 'Konum belirtilmedi'}`;
+
+
+      document.getElementById(
+        'urlModalValue'
+      ).textContent =
+        tag.url;
+
+
+      document.getElementById(
+        'urlModal'
+      ).classList.add(
+        'show'
+      );
+
+    }
+
+
+    function closeUrl(){
+
+      document.getElementById(
+        'urlModal'
+      ).classList.remove(
+        'show'
+      );
+
+
+      currentModalTag =
+        null;
+
+    }
+
+
+    async function copyModalUrl(){
+
+      if (
+        !currentModalTag
+      ){
+        return;
+      }
+
+
+      const success =
+        await copyText(
+          currentModalTag.url
+        );
+
+
+      toast(
+        success
+          ? 'Bağlantı kopyalandı'
+          : 'Bağlantı kopyalanamadı'
+      );
+
+    }
+
+
+    function testModalUrl(){
+
+      if (
+        !currentModalTag
+      ){
+        return;
+      }
+
+
+      window.open(
+        currentModalTag.url,
+        '_blank',
+        'noopener'
+      );
+
+    }
+
+
+    /* =====================================================
+       TEST TAG
+    ===================================================== */
+
+    function testTag(id){
+
+      const tag =
+        tags.find(
+          item =>
+            Number(item.id) ===
+            Number(id)
+        );
+
+
+      if (!tag){
+        return;
+      }
+
+
+      if (!tag.is_active){
+
+        toast(
+          'Bu NFC etiketi pasif durumda'
         );
 
         return;
 
-      } catch (error) {
+      }
 
-        if (
-          error &&
-          error.name === "AbortError"
-        ) {
+
+      window.open(
+        tag.url,
+        '_blank',
+        'noopener'
+      );
+
+    }
+
+
+    /* =====================================================
+       EDIT
+    ===================================================== */
+
+    function editTag(id){
+
+      const tag =
+        tags.find(
+          item =>
+            Number(item.id) ===
+            Number(id)
+        );
+
+
+      if (!tag){
+        return;
+      }
+
+
+      document.getElementById(
+        'editId'
+      ).value =
+        tag.id;
+
+
+      document.getElementById(
+        'editName'
+      ).value =
+        tag.name || '';
+
+
+      document.getElementById(
+        'editPlacement'
+      ).value =
+        tag.placement || '';
+
+
+      document.getElementById(
+        'editActive'
+      ).value =
+        String(
+          !!tag.is_active
+        );
+
+
+      document.getElementById(
+        'editModal'
+      ).classList.add(
+        'show'
+      );
+
+    }
+
+
+    function closeEdit(){
+
+      document.getElementById(
+        'editModal'
+      ).classList.remove(
+        'show'
+      );
+
+    }
+
+
+    document.getElementById(
+      'editForm'
+    ).addEventListener(
+      'submit',
+      async event => {
+
+        event.preventDefault();
+
+
+        const id =
+          document.getElementById(
+            'editId'
+          ).value;
+
+
+        const name =
+          document.getElementById(
+            'editName'
+          ).value.trim();
+
+
+        const placement =
+          document.getElementById(
+            'editPlacement'
+          ).value;
+
+
+        const is_active =
+          document.getElementById(
+            'editActive'
+          ).value ===
+          'true';
+
+
+        if (!name){
+
+          toast(
+            'Etiket adı gerekli'
+          );
+
           return;
+
         }
+
+
+        try{
+
+          await api(
+            `/api/nfc-tags/${id}`,
+            {
+              method:'PUT',
+
+              body:
+                JSON.stringify({
+                  name,
+                  placement,
+                  is_active
+                })
+            }
+          );
+
+
+          closeEdit();
+
+
+          toast(
+            'NFC etiketi güncellendi'
+          );
+
+
+          await loadTags();
+
+        }catch(error){
+
+          console.error(error);
+
+          toast(
+            error.message
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       DELETE
+    ===================================================== */
+
+    async function deleteTag(id){
+
+      const tag =
+        tags.find(
+          item =>
+            Number(item.id) ===
+            Number(id)
+        );
+
+
+      if (!tag){
+        return;
+      }
+
+
+      const confirmed =
+        confirm(
+          `"${tag.name}" NFC etiketini silmek istediğine emin misin?\n\nBu işlem geri alınamaz.`
+        );
+
+
+      if (!confirmed){
+        return;
+      }
+
+
+      try{
+
+        await api(
+          `/api/nfc-tags/${id}`,
+          {
+            method:'DELETE'
+          }
+        );
+
+
+        toast(
+          'NFC etiketi silindi'
+        );
+
+
+        await loadTags();
+
+      }catch(error){
+
+        console.error(error);
+
+        toast(
+          error.message
+        );
 
       }
 
     }
 
 
-    await copyNfcUrl();
+    /* =====================================================
+       LOGOUT
+    ===================================================== */
 
-  }
+    function logout(){
 
-
-  function testNfc() {
-
-    if (!nfcUrlValue) {
-
-      showToast(
-        "NFC bağlantısı henüz hazır değil."
+      localStorage.removeItem(
+        'token'
       );
 
-      return;
+      window.location.href =
+        '/login';
+
     }
 
 
-    /*
-      Web NFC desteği olan cihazlarda
-      gelecekte doğrudan yazma özelliği
-      burada genişletilebilir.
+    /* =====================================================
+       MODAL BACKDROP
+    ===================================================== */
 
-      Şimdilik en güvenli test:
-      NFC bağlantısını açmak.
-    */
-
-    window.open(
-      nfcUrlValue,
-      "_blank"
-    );
-
-    showToast(
-      "NFC bağlantısı test için açıldı."
-    );
-
-  }
-
-
-  document
-    .querySelectorAll(".usage")
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          document
-            .querySelectorAll(".usage")
-            .forEach(item => {
-              item.classList.remove("active");
-            });
-
-          button.classList.add("active");
-
-          const place =
-            button.dataset.place;
-
-          localStorage.setItem(
-            "leo_nfc_usage",
-            place
-          );
-
-          showToast(
-            "NFC kullanım alanı: " +
-            place
-          );
-
-        }
-      );
-
-    });
-
-
-  function restoreUsage() {
-
-    const saved =
-      localStorage.getItem(
-        "leo_nfc_usage"
-      );
-
-    if (!saved) return;
-
-    document
-      .querySelectorAll(".usage")
-      .forEach(button => {
+    document.getElementById(
+      'editModal'
+    ).addEventListener(
+      'click',
+      event => {
 
         if (
-          button.dataset.place === saved
-        ) {
+          event.target.id ===
+          'editModal'
+        ){
 
-          button.classList.add("active");
+          closeEdit();
 
         }
 
-      });
-
-  }
-
-
-  async function init() {
-
-    try {
-
-      await loadBusiness();
-
-      await loadStats();
-
-      restoreUsage();
-
-    } catch (error) {
-
-      console.error(error);
-
-    }
-
-  }
+      }
+    );
 
 
-  init();
+    document.getElementById(
+      'urlModal'
+    ).addEventListener(
+      'click',
+      event => {
 
-</script>
+        if (
+          event.target.id ===
+          'urlModal'
+        ){
+
+          closeUrl();
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       ESC
+    ===================================================== */
+
+    document.addEventListener(
+      'keydown',
+      event => {
+
+        if (
+          event.key ===
+          'Escape'
+        ){
+
+          closeEdit();
+
+          closeUrl();
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       INIT
+    ===================================================== */
+
+    loadTags();
+
+  </script>
 
 </body>
+
 </html>
