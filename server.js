@@ -310,7 +310,7 @@ app.get('/api/health', async (req, res) => {
 
     res.json({
       ok: true,
-      version: '3.7-nfc-tags',
+      version: '3.8-stable-public-profile',
       database: 'postgresql',
       nfc_tags: true
     });
@@ -459,7 +459,7 @@ app.get('/api/admin/overview', adminAuth, async (req, res) => {
       events:
         events.rows[0].count,
 
-      profile_views:
+             profile_views:
         profiles.rows[0].count,
 
       qr_scans:
@@ -723,6 +723,7 @@ app.get(
 
   }
 );
+
 
 /* ==================================================
    ADMIN NFC MANAGEMENT
@@ -1347,6 +1348,7 @@ app.get(
   }
 );
 
+
 /* =========================================================
    ADMIN BUSINESS QR
 ========================================================= */
@@ -1358,230 +1360,76 @@ app.get(
 
     try {
 
-      const id = Number(req.params.id);
-
-      const result = await pool.query(
-        `
-        SELECT slug
-        FROM businesses
-        WHERE id=$1
-        `,
-        [id]
-      );
+      const result =
+        await pool.query(
+          `
+          SELECT
+            id,
+            name,
+            slug
+          FROM businesses
+          WHERE id=$1
+          `,
+          [
+            req.params.id
+          ]
+        );
 
       if (!result.rows.length) {
 
-        return res.status(404).json({
-          error: 'İşletme bulunamadı'
-        });
+        return res
+          .status(404)
+          .json({
+            error:
+              'İşletme bulunamadı'
+          });
 
       }
 
-      const baseUrl =
-        process.env.PUBLIC_URL ||
-        process.env.RENDER_EXTERNAL_URL ||
-        `${req.protocol}://${req.get('host')}`;
+      const business =
+        result.rows[0];
 
       const url =
-        `${baseUrl}/p/${result.rows[0].slug}?source=qr`;
+        `${req.protocol}://${req.get('host')}/p/${business.slug}?source=qr`;
 
-      const qr =
+      const dataUrl =
         await QRCode.toDataURL(url, {
-          width: 900,
+          width: 1200,
           margin: 2,
           errorCorrectionLevel: 'H'
         });
 
       res.json({
+
+        business_id:
+          business.id,
+
+        business_name:
+          business.name,
+
+        slug:
+          business.slug,
+
         url,
-        qr
+
+        dataUrl
+
       });
 
     } catch (error) {
 
-      console.error(error);
-
-      res.status(500).json({
-        error: 'QR oluşturulamadı'
-      });
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   ADMIN BUSINESS UPDATE
-========================================================= */
-
-app.put(
-  '/api/admin/business/:id',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const id = Number(req.params.id);
-
-      const {
-        name,
-        category,
-        description,
-        phone,
-        whatsapp,
-        address,
-        instagram,
-        tiktok,
-        google_review,
-        website,
-        menu,
-        iban,
-        iban_holder,
-        hours,
-        logo_url
-      } = req.body;
-
-      if (!name) {
-
-        return res.status(400).json({
-          error: 'İşletme adı gerekli'
-        });
-
-      }
-
-      const current =
-        await pool.query(
-          `
-          SELECT slug
-          FROM businesses
-          WHERE id=$1
-          `,
-          [id]
-        );
-
-      if (!current.rows.length) {
-
-        return res.status(404).json({
-          error: 'İşletme bulunamadı'
-        });
-
-      }
-
-      await pool.query(
-        `
-        UPDATE businesses
-
-        SET
-          name=$1,
-          category=$2,
-          description=$3,
-          phone=$4,
-          whatsapp=$5,
-          address=$6,
-          instagram=$7,
-          tiktok=$8,
-          google_review=$9,
-          website=$10,
-          menu=$11,
-          iban=$12,
-          iban_holder=$13,
-          hours=$14,
-          logo_url=$15
-
-        WHERE id=$16
-        `,
-        [
-          name,
-          category || '',
-          description || '',
-          phone || '',
-          whatsapp || '',
-          address || '',
-          instagram || '',
-          tiktok || '',
-          google_review || '',
-          website || '',
-          menu || '',
-          iban || '',
-          iban_holder || '',
-          hours || '',
-          logo_url || '',
-          id
-        ]
+      console.error(
+        'ADMIN QR ERROR:',
+        error
       );
 
-      const updated =
-        await pool.query(
-          `
-          SELECT *
-          FROM businesses
-          WHERE id=$1
-          `,
-          [id]
-        );
-
-      res.json({
-        business: publicBusiness(updated.rows[0])
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).json({
-        error: 'İşletme güncellenemedi'
-      });
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   ADMIN BUSINESS DELETE
-========================================================= */
-
-app.delete(
-  '/api/admin/business/:id',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const id = Number(req.params.id);
-
-      const result =
-        await pool.query(
-          `
-          DELETE FROM businesses
-          WHERE id=$1
-          RETURNING id
-          `,
-          [id]
-        );
-
-      if (!result.rows.length) {
-
-        return res.status(404).json({
-          error: 'İşletme bulunamadı'
+      res
+        .status(500)
+        .json({
+          error:
+            'QR oluşturulamadı'
         });
 
-      }
-
-      res.json({
-        success: true
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).json({
-        error: 'İşletme silinemedi'
-      });
-
     }
 
   }
@@ -1589,7 +1437,7 @@ app.delete(
 
 
 /* =========================================================
-   REGISTER
+   BUSINESS AUTH
 ========================================================= */
 
 app.post('/api/register', async (req, res) => {
@@ -1606,19 +1454,22 @@ app.post('/api/register', async (req, res) => {
     if (
       !name ||
       !email ||
-      !password ||
-      password.length < 8
+      !password
     ) {
 
-      return res.status(400).json({
-        error:
-          'İşletme adı, e-posta ve 8+ karakter şifre gerekli'
-      });
+      return res
+        .status(400)
+        .json({
+          error:
+            'İşletme adı, e-posta ve şifre zorunludur'
+        });
 
     }
 
     const normalizedEmail =
-      String(email).trim().toLowerCase();
+      String(email)
+        .trim()
+        .toLowerCase();
 
     const existing =
       await pool.query(
@@ -1627,50 +1478,68 @@ app.post('/api/register', async (req, res) => {
         FROM businesses
         WHERE email=$1
         `,
-        [normalizedEmail]
+        [
+          normalizedEmail
+        ]
       );
 
     if (existing.rows.length) {
 
-      return res.status(409).json({
-        error: 'E-posta zaten kayıtlı'
-      });
+      return res
+        .status(409)
+        .json({
+          error:
+            'Bu e-posta zaten kayıtlı'
+        });
 
     }
 
-    const base =
-      slugify(name) || 'business';
+    const passwordHash =
+      await bcrypt.hash(
+        String(password),
+        10
+      );
 
-    let sl = base;
-    let n = 1;
+    let slug =
+      slugify(name);
 
-    while (true) {
+    if (!slug) {
+      slug = 'isletme';
+    }
 
-      const check =
+    let slugExists =
+      await pool.query(
+        `
+        SELECT id
+        FROM businesses
+        WHERE slug=$1
+        `,
+        [
+          slug
+        ]
+      );
+
+    let suffix = 2;
+
+    while (slugExists.rows.length) {
+
+      slug =
+        `${slugify(name)}-${suffix}`;
+
+      slugExists =
         await pool.query(
           `
           SELECT id
           FROM businesses
           WHERE slug=$1
           `,
-          [sl]
+          [
+            slug
+          ]
         );
 
-      if (!check.rows.length) {
-        break;
-      }
-
-      n++;
-
-      sl =
-        `${base}-${n}`;
+      suffix++;
     }
-
-    const passwordHash =
-      await bcrypt.hash(
-        password,
-        12
-      );
 
     const result =
       await pool.query(
@@ -1691,14 +1560,20 @@ app.post('/api/register', async (req, res) => {
           $5
         )
 
-        RETURNING *
+        RETURNING
+          id,
+          name,
+          slug,
+          email,
+          category,
+          created_at
         `,
         [
-          name,
-          sl,
+          String(name).trim(),
+          slug,
           normalizedEmail,
           passwordHash,
-          category || ''
+          String(category || '').trim()
         ]
       );
 
@@ -1714,22 +1589,28 @@ app.post('/api/register', async (req, res) => {
         },
         SECRET,
         {
-          expiresIn: '30d'
+          expiresIn: '7d'
         }
       );
 
     res.status(201).json({
       token,
-      business: publicBusiness(business)
+      business
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      'REGISTER ERROR:',
+      error
+    );
 
-    res.status(500).json({
-      error: 'Kayıt sırasında hata oluştu'
-    });
+    res
+      .status(500)
+      .json({
+        error:
+          'Kayıt sırasında hata oluştu'
+      });
 
   }
 
@@ -1737,7 +1618,7 @@ app.post('/api/register', async (req, res) => {
 
 
 /* =========================================================
-   LOGIN
+   BUSINESS LOGIN
 ========================================================= */
 
 app.post('/api/login', async (req, res) => {
@@ -1751,14 +1632,19 @@ app.post('/api/login', async (req, res) => {
 
     if (!email || !password) {
 
-      return res.status(400).json({
-        error: 'E-posta ve şifre gerekli'
-      });
+      return res
+        .status(400)
+        .json({
+          error:
+            'E-posta ve şifre gerekli'
+        });
 
     }
 
     const normalizedEmail =
-      String(email).trim().toLowerCase();
+      String(email)
+        .trim()
+        .toLowerCase();
 
     const result =
       await pool.query(
@@ -1766,15 +1652,21 @@ app.post('/api/login', async (req, res) => {
         SELECT *
         FROM businesses
         WHERE email=$1
+        LIMIT 1
         `,
-        [normalizedEmail]
+        [
+          normalizedEmail
+        ]
       );
 
     if (!result.rows.length) {
 
-      return res.status(401).json({
-        error: 'E-posta veya şifre hatalı'
-      });
+      return res
+        .status(401)
+        .json({
+          error:
+            'E-posta veya şifre hatalı'
+        });
 
     }
 
@@ -1783,15 +1675,18 @@ app.post('/api/login', async (req, res) => {
 
     const valid =
       await bcrypt.compare(
-        password,
+        String(password),
         business.password_hash
       );
 
     if (!valid) {
 
-      return res.status(401).json({
-        error: 'E-posta veya şifre hatalı'
-      });
+      return res
+        .status(401)
+        .json({
+          error:
+            'E-posta veya şifre hatalı'
+        });
 
     }
 
@@ -1804,22 +1699,32 @@ app.post('/api/login', async (req, res) => {
         },
         SECRET,
         {
-          expiresIn: '30d'
+          expiresIn: '7d'
         }
       );
 
     res.json({
+
       token,
-      business: publicBusiness(business)
+
+      business:
+        publicBusiness(business)
+
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      'LOGIN ERROR:',
+      error
+    );
 
-    res.status(500).json({
-      error: 'Giriş sırasında hata oluştu'
-    });
+    res
+      .status(500)
+      .json({
+        error:
+          'Giriş sırasında hata oluştu'
+      });
 
   }
 
@@ -1827,7 +1732,7 @@ app.post('/api/login', async (req, res) => {
 
 
 /* =========================================================
-   ME
+   CURRENT BUSINESS
 ========================================================= */
 
 app.get('/api/me', auth, async (req, res) => {
@@ -1837,32 +1742,65 @@ app.get('/api/me', auth, async (req, res) => {
     const result =
       await pool.query(
         `
-        SELECT *
+        SELECT
+          id,
+          name,
+          slug,
+          email,
+          category,
+          description,
+          phone,
+          whatsapp,
+          address,
+          instagram,
+          tiktok,
+          google_review,
+          website,
+          menu,
+          iban,
+          iban_holder,
+          hours,
+          logo_url,
+          created_at
         FROM businesses
         WHERE id=$1
+        LIMIT 1
         `,
-        [req.user.id]
+        [
+          req.user.id
+        ]
       );
 
     if (!result.rows.length) {
 
-      return res.status(404).json({
-        error: 'İşletme bulunamadı'
-      });
+      return res
+        .status(404)
+        .json({
+          error:
+            'İşletme bulunamadı'
+        });
 
     }
 
     res.json(
-      publicBusiness(result.rows[0])
+      publicBusiness(
+        result.rows[0]
+      )
     );
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      'ME ERROR:',
+      error
+    );
 
-    res.status(500).json({
-      error: 'Profil alınamadı'
-    });
+    res
+      .status(500)
+      .json({
+        error:
+          'Profil bilgileri alınamadı'
+      });
 
   }
 
@@ -1870,7 +1808,7 @@ app.get('/api/me', auth, async (req, res) => {
 
 
 /* =========================================================
-   UPDATE ME
+   UPDATE BUSINESS PROFILE
 ========================================================= */
 
 app.put('/api/me', auth, async (req, res) => {
@@ -1895,79 +1833,155 @@ app.put('/api/me', auth, async (req, res) => {
       logo_url
     } = req.body;
 
-    if (!name) {
+    const current =
+      await pool.query(
+        `
+        SELECT
+          id,
+          name,
+          slug
+        FROM businesses
+        WHERE id=$1
+        LIMIT 1
+        `,
+        [
+          req.user.id
+        ]
+      );
 
-      return res.status(400).json({
-        error: 'İşletme adı gerekli'
-      });
+    if (!current.rows.length) {
+
+      return res
+        .status(404)
+        .json({
+          error:
+            'İşletme bulunamadı'
+        });
 
     }
 
-    await pool.query(
-      `
-      UPDATE businesses
+    /*
+      ÖNEMLİ:
+      Mevcut slug kesinlikle değiştirilmez.
 
-      SET
-        name=$1,
-        category=$2,
-        description=$3,
-        phone=$4,
-        whatsapp=$5,
-        address=$6,
-        instagram=$7,
-        tiktok=$8,
-        google_review=$9,
-        website=$10,
-        menu=$11,
-        iban=$12,
-        iban_holder=$13,
-        hours=$14,
-        logo_url=$15
-
-      WHERE id=$16
-      `,
-      [
-        name,
-        category || '',
-        description || '',
-        phone || '',
-        whatsapp || '',
-        address || '',
-        instagram || '',
-        tiktok || '',
-        google_review || '',
-        website || '',
-        menu || '',
-        iban || '',
-        iban_holder || '',
-        hours || '',
-        logo_url || '',
-        req.user.id
-      ]
-    );
+      Böylece daha önce oluşturulmuş QR kodların
+      adresi bozulmaz.
+    */
 
     const result =
       await pool.query(
         `
-        SELECT *
-        FROM businesses
-        WHERE id=$1
+        UPDATE businesses
+
+        SET
+
+          name =
+            COALESCE($1, name),
+
+          category =
+            COALESCE($2, category),
+
+          description =
+            COALESCE($3, description),
+
+          phone =
+            COALESCE($4, phone),
+
+          whatsapp =
+            COALESCE($5, whatsapp),
+
+          address =
+            COALESCE($6, address),
+
+          instagram =
+            COALESCE($7, instagram),
+
+          tiktok =
+            COALESCE($8, tiktok),
+
+          google_review =
+            COALESCE($9, google_review),
+
+          website =
+            COALESCE($10, website),
+
+          menu =
+            COALESCE($11, menu),
+
+          iban =
+            COALESCE($12, iban),
+
+          iban_holder =
+            COALESCE($13, iban_holder),
+
+          hours =
+            COALESCE($14, hours),
+
+          logo_url =
+            COALESCE($15, logo_url)
+
+        WHERE id=$16
+
+        RETURNING
+          id,
+          name,
+          slug,
+          email,
+          category,
+          description,
+          phone,
+          whatsapp,
+          address,
+          instagram,
+          tiktok,
+          google_review,
+          website,
+          menu,
+          iban,
+          iban_holder,
+          hours,
+          logo_url,
+          created_at
         `,
-        [req.user.id]
+        [
+          name,
+          category,
+          description,
+          phone,
+          whatsapp,
+          address,
+          instagram,
+          tiktok,
+          google_review,
+          website,
+          menu,
+          iban,
+          iban_holder,
+          hours,
+          logo_url,
+          req.user.id
+        ]
       );
 
-    res.json({
-      business:
-        publicBusiness(result.rows[0])
-    });
+    res.json(
+      publicBusiness(
+        result.rows[0]
+      )
+    );
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      'UPDATE PROFILE ERROR:',
+      error
+    );
 
-    res.status(500).json({
-      error: 'Profil güncellenemedi'
-    });
+    res
+      .status(500)
+      .json({
+        error:
+          'Profil güncellenemedi'
+      });
 
   }
 
@@ -1975,7 +1989,207 @@ app.put('/api/me', auth, async (req, res) => {
 
 
 /* =========================================================
-   QR
+   PUBLIC PROFILE API
+========================================================= */
+
+app.get(
+  '/api/profile/:slug',
+  async (req, res) => {
+
+    try {
+
+      const slug =
+        String(
+          req.params.slug || ''
+        )
+        .trim()
+        .toLowerCase();
+
+      if (!slug) {
+
+        return res
+          .status(400)
+          .json({
+            error:
+              'Profil adresi gerekli'
+          });
+
+      }
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+            id,
+            name,
+            slug,
+            category,
+            description,
+            phone,
+            whatsapp,
+            address,
+            instagram,
+            tiktok,
+            google_review,
+            website,
+            menu,
+            iban,
+            iban_holder,
+            hours,
+            logo_url,
+            created_at
+          FROM businesses
+          WHERE slug=$1
+          LIMIT 1
+          `,
+          [
+            slug
+          ]
+        );
+
+      if (!result.rows.length) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'Profil bulunamadı'
+          });
+
+      }
+
+      res.json(
+        publicBusiness(
+          result.rows[0]
+        )
+      );
+
+    } catch (error) {
+
+      console.error(
+        'PUBLIC PROFILE API ERROR:',
+        error
+      );
+
+      res
+        .status(500)
+        .json({
+          error:
+            'Profil yüklenemedi'
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   PUBLIC NFC PROFILE API
+========================================================= */
+
+app.get(
+  '/api/profile-by-nfc/:code',
+  async (req, res) => {
+
+    try {
+
+      const code =
+        String(
+          req.params.code || ''
+        )
+        .trim();
+
+      if (!code) {
+
+        return res
+          .status(400)
+          .json({
+            error:
+              'NFC kodu gerekli'
+          });
+
+      }
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            b.id,
+            b.name,
+            b.slug,
+            b.category,
+            b.description,
+            b.phone,
+            b.whatsapp,
+            b.address,
+            b.instagram,
+            b.tiktok,
+            b.google_review,
+            b.website,
+            b.menu,
+            b.iban,
+            b.iban_holder,
+            b.hours,
+            b.logo_url,
+            b.created_at
+
+          FROM nfc_tags t
+
+          INNER JOIN businesses b
+            ON b.id=t.business_id
+
+          WHERE
+            t.code=$1
+            AND t.is_active=TRUE
+
+          LIMIT 1
+          `,
+          [
+            code
+          ]
+        );
+
+      if (!result.rows.length) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'NFC profili bulunamadı'
+          });
+
+      }
+
+      res.json(
+        publicBusiness(
+          result.rows[0]
+        )
+      );
+
+    } catch (error) {
+
+      console.error(
+        'PUBLIC NFC PROFILE API ERROR:',
+        error
+      );
+
+      res
+        .status(500)
+        .json({
+          error:
+            'NFC profili yüklenemedi'
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   BUSINESS QR
 ========================================================= */
 
 app.get('/api/qr', auth, async (req, res) => {
@@ -1989,30 +2203,37 @@ app.get('/api/qr', auth, async (req, res) => {
         FROM businesses
         WHERE id=$1
         `,
-        [req.user.id]
+        [
+          req.user.id
+        ]
       );
 
     if (!result.rows.length) {
 
-      return res.status(404).json({
-        error: 'İşletme bulunamadı'
-      });
+      return res
+        .status(404)
+        .json({
+          error:
+            'İşletme bulunamadı'
+        });
 
     }
 
-    const baseUrl =
-      process.env.PUBLIC_URL ||
-      process.env.RENDER_EXTERNAL_URL ||
-      `${req.protocol}://${req.get('host')}`;
+    const slug =
+      result.rows[0].slug;
+
+    /*
+      Mevcut QR adres yapısı korunuyor.
+    */
 
     const url =
-      `${baseUrl}/p/${result.rows[0].slug}?source=qr`;
+      `${req.protocol}://${req.get('host')}/p/${slug}?source=qr`;
 
-    const qr =
+    const dataUrl =
       await QRCode.toDataURL(
         url,
         {
-          width: 900,
+          width: 1200,
           margin: 2,
           errorCorrectionLevel: 'H'
         }
@@ -2020,216 +2241,44 @@ app.get('/api/qr', auth, async (req, res) => {
 
     res.json({
       url,
-      qr
+      dataUrl
     });
 
   } catch (error) {
 
-    console.error(error);
-
-    res.status(500).json({
-      error: 'QR oluşturulamadı'
-    });
-
-  }
-
-});
-
-
-/* =========================================================
-   STATS
-========================================================= */
-
-app.get('/api/stats', auth, async (req, res) => {
-
-  try {
-
-    const result =
-      await pool.query(
-        `
-        SELECT
-          COUNT(*)::int AS total_events,
-
-          COUNT(*) FILTER(
-            WHERE type='profile_view'
-          )::int AS profile_views,
-
-          COUNT(*) FILTER(
-            WHERE type IN ('qr_scan','qr')
-          )::int AS qr_scans,
-
-          COUNT(*) FILTER(
-            WHERE type='nfc'
-          )::int AS nfc_scans,
-
-          COUNT(*) FILTER(
-            WHERE type='whatsapp'
-          )::int AS whatsapp_clicks,
-
-          COUNT(*) FILTER(
-            WHERE type='phone'
-          )::int AS phone_clicks,
-
-          COUNT(*) FILTER(
-            WHERE type='instagram'
-          )::int AS instagram_clicks,
-
-          COUNT(*) FILTER(
-            WHERE type='tiktok'
-          )::int AS tiktok_clicks,
-
-          COUNT(*) FILTER(
-            WHERE type='website'
-          )::int AS website_clicks,
-
-          COUNT(*) FILTER(
-            WHERE type='menu'
-          )::int AS menu_clicks,
-
-          COUNT(*) FILTER(
-            WHERE type='google_review'
-          )::int AS google_review_clicks
-
-        FROM events
-
-        WHERE business_id=$1
-        `,
-        [req.user.id]
-      );
-
-    const tags =
-      await pool.query(
-        `
-        SELECT COUNT(*)::int AS count
-        FROM nfc_tags
-        WHERE business_id=$1
-        `,
-        [req.user.id]
-      );
-
-    res.json({
-      ...result.rows[0],
-      nfc_tags: tags.rows[0].count
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'İstatistikler alınamadı'
-    });
-
-  }
-
-});
-
-
-/* =========================================================
-   EVENT
-========================================================= */
-
-app.post('/api/event/:slug', async (req, res) => {
-
-  try {
-
-    const slug =
-      String(req.params.slug || '');
-
-    const type =
-      String(req.body.type || '');
-
-    const allowedTypes = [
-      'profile_view',
-      'qr_scan',
-      'qr',
-      'nfc',
-      'whatsapp',
-      'phone',
-      'instagram',
-      'tiktok',
-      'website',
-      'menu',
-      'google_review'
-    ];
-
-    if (!allowedTypes.includes(type)) {
-
-      return res.status(400).json({
-        error: 'Geçersiz event tipi'
-      });
-
-    }
-
-    const business =
-      await pool.query(
-        `
-        SELECT id
-        FROM businesses
-        WHERE slug=$1
-        `,
-        [slug]
-      );
-
-    if (!business.rows.length) {
-
-      return res.status(404).json({
-        error: 'İşletme bulunamadı'
-      });
-
-    }
-
-    await pool.query(
-      `
-      INSERT INTO events(
-        business_id,
-        type
-      )
-
-      VALUES(
-        $1,
-        $2
-      )
-      `,
-      [
-        business.rows[0].id,
-        type
-      ]
+    console.error(
+      'QR ERROR:',
+      error
     );
 
-    res.json({
-      success: true
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Event kaydedilemedi'
-    });
+    res
+      .status(500)
+      .json({
+        error:
+          'QR oluşturulamadı'
+      });
 
   }
 
 });
 
-
 /* =========================================================
-   NFC TAG MANAGEMENT 2.0
+   NFC TAG MANAGEMENT
 ========================================================= */
 
 
-/*
-   GET ALL TAGS
-*/
+/* =========================================================
+   LIST NFC TAGS
+========================================================= */
 
-app.get('/api/nfc-tags', auth, async (req, res) => {
+app.get(
+  '/api/nfc-tags',
+  auth,
+  async (req, res) => {
 
-  try {
+    try {
 
-    const result =
-      await pool.query(
-        `
+      const result = await pool.query(`
         SELECT
 
           t.id,
@@ -2260,30 +2309,35 @@ app.get('/api/nfc-tags', auth, async (req, res) => {
         WHERE t.business_id=$1
 
         ORDER BY t.id DESC
-        `,
-        [req.user.id]
+      `, [
+        req.user.id
+      ]);
+
+      res.json(
+        result.rows.map(nfcTagPublic)
       );
 
-    res.json(
-      result.rows.map(nfcTagPublic)
-    );
+    } catch (error) {
 
-  } catch (error) {
+      console.error(
+        'NFC LIST ERROR:',
+        error
+      );
 
-    console.error(error);
+      res.status(500).json({
+        error:
+          'NFC etiketleri alınamadı'
+      });
 
-    res.status(500).json({
-      error: 'NFC etiketleri alınamadı'
-    });
+    }
 
   }
+);
 
-});
 
-
-/*
-   GET SINGLE TAG
-*/
+/* =========================================================
+   GET SINGLE NFC TAG
+========================================================= */
 
 app.get(
   '/api/nfc-tags/:id',
@@ -2325,8 +2379,11 @@ app.get(
 
           FROM nfc_tags t
 
-          WHERE t.id=$1
-          AND t.business_id=$2
+          WHERE
+            t.id=$1
+            AND t.business_id=$2
+
+          LIMIT 1
           `,
           [
             id,
@@ -2337,21 +2394,28 @@ app.get(
       if (!result.rows.length) {
 
         return res.status(404).json({
-          error: 'NFC etiketi bulunamadı'
+          error:
+            'NFC etiketi bulunamadı'
         });
 
       }
 
       res.json(
-        nfcTagPublic(result.rows[0])
+        nfcTagPublic(
+          result.rows[0]
+        )
       );
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        'NFC DETAIL ERROR:',
+        error
+      );
 
       res.status(500).json({
-        error: 'NFC etiketi alınamadı'
+        error:
+          'NFC etiketi alınamadı'
       });
 
     }
@@ -2360,121 +2424,153 @@ app.get(
 );
 
 
-/*
-   CREATE TAG
-*/
+/* =========================================================
+   CREATE NFC TAG
+========================================================= */
 
-app.post('/api/nfc-tags', auth, async (req, res) => {
+app.post(
+  '/api/nfc-tags',
+  auth,
+  async (req, res) => {
 
-  try {
+    try {
 
-    const {
-      name,
-      placement
-    } = req.body;
+      const {
+        name,
+        placement
+      } = req.body;
 
-    const tagName =
-      String(name || '').trim();
+      const tagName =
+        String(
+          name || ''
+        ).trim();
 
-    const tagPlacement =
-      String(placement || '').trim();
+      const tagPlacement =
+        String(
+          placement || 'Diğer'
+        ).trim();
 
-    if (!tagName) {
+      if (!tagName) {
 
-      return res.status(400).json({
-        error: 'NFC etiket adı gerekli'
-      });
+        return res.status(400).json({
+          error:
+            'NFC etiketi adı gerekli'
+        });
 
-    }
-
-    let code = '';
-
-    /*
-      Benzersiz code üret.
-    */
-
-    for (let i = 0; i < 10; i++) {
-
-      const candidate =
-        createNfcCode();
-
-      const exists =
-        await pool.query(
-          `
-          SELECT id
-          FROM nfc_tags
-          WHERE code=$1
-          `,
-          [candidate]
-        );
-
-      if (!exists.rows.length) {
-
-        code = candidate;
-
-        break;
       }
 
-    }
+      let code = null;
 
-    if (!code) {
+      /*
+        Benzersiz NFC kodu üret.
+      */
 
-      return res.status(500).json({
-        error: 'NFC kodu oluşturulamadı'
+      for (
+        let attempt = 0;
+        attempt < 10;
+        attempt++
+      ) {
+
+        const candidate =
+          createNfcCode();
+
+        const exists =
+          await pool.query(
+            `
+            SELECT id
+            FROM nfc_tags
+            WHERE code=$1
+            LIMIT 1
+            `,
+            [
+              candidate
+            ]
+          );
+
+        if (!exists.rows.length) {
+
+          code = candidate;
+
+          break;
+
+        }
+
+      }
+
+      if (!code) {
+
+        return res.status(500).json({
+          error:
+            'Benzersiz NFC kodu oluşturulamadı'
+        });
+
+      }
+
+      const result =
+        await pool.query(
+          `
+          INSERT INTO nfc_tags(
+            business_id,
+            name,
+            placement,
+            code,
+            is_active
+          )
+
+          VALUES(
+            $1,
+            $2,
+            $3,
+            $4,
+            TRUE
+          )
+
+          RETURNING
+            id,
+            business_id,
+            name,
+            placement,
+            code,
+            is_active,
+            created_at,
+            updated_at
+          `,
+          [
+            req.user.id,
+            tagName,
+            tagPlacement,
+            code
+          ]
+        );
+
+      res.status(201).json({
+        tag:
+          nfcTagPublic(
+            result.rows[0]
+          )
+      });
+
+    } catch (error) {
+
+      console.error(
+        'NFC CREATE ERROR:',
+        error
+      );
+
+      res.status(500).json({
+        error:
+          'NFC etiketi oluşturulamadı'
       });
 
     }
 
-    const result =
-      await pool.query(
-        `
-        INSERT INTO nfc_tags(
-          business_id,
-          name,
-          placement,
-          code,
-          is_active
-        )
-
-        VALUES(
-          $1,
-          $2,
-          $3,
-          $4,
-          TRUE
-        )
-
-        RETURNING *
-        `,
-        [
-          req.user.id,
-          tagName,
-          tagPlacement,
-          code
-        ]
-      );
-
-    res.status(201).json({
-      tag:
-        nfcTagPublic(result.rows[0])
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'NFC etiketi oluşturulamadı'
-    });
-
   }
+);
 
-});
 
-
-/*
-   UPDATE TAG
-*/
+/* =========================================================
+   UPDATE NFC TAG
+========================================================= */
 
 app.put(
   '/api/nfc-tags/:id',
@@ -2493,15 +2589,20 @@ app.put(
       } = req.body;
 
       const tagName =
-        String(name || '').trim();
+        String(
+          name || ''
+        ).trim();
 
       const tagPlacement =
-        String(placement || '').trim();
+        String(
+          placement || 'Diğer'
+        ).trim();
 
       if (!tagName) {
 
         return res.status(400).json({
-          error: 'NFC etiket adı gerekli'
+          error:
+            'NFC etiketi adı gerekli'
         });
 
       }
@@ -2517,15 +2618,25 @@ app.put(
           UPDATE nfc_tags
 
           SET
+
             name=$1,
             placement=$2,
             is_active=$3,
             updated_at=CURRENT_TIMESTAMP
 
-          WHERE id=$4
-          AND business_id=$5
+          WHERE
+            id=$4
+            AND business_id=$5
 
-          RETURNING *
+          RETURNING
+            id,
+            business_id,
+            name,
+            placement,
+            code,
+            is_active,
+            created_at,
+            updated_at
           `,
           [
             tagName,
@@ -2539,14 +2650,11 @@ app.put(
       if (!result.rows.length) {
 
         return res.status(404).json({
-          error: 'NFC etiketi bulunamadı'
+          error:
+            'NFC etiketi bulunamadı'
         });
 
       }
-
-      /*
-        İstatistikleri tekrar hesaplayarak döndür.
-      */
 
       const stats =
         await pool.query(
@@ -2556,28 +2664,28 @@ app.put(
             COALESCE((
               SELECT COUNT(*)
               FROM events e
-              WHERE e.nfc_tag_id=t.id
+              WHERE e.nfc_tag_id=$1
               AND e.type='nfc'
             ),0)::int AS tap_count,
 
             (
               SELECT MAX(e.created_at)
               FROM events e
-              WHERE e.nfc_tag_id=t.id
+              WHERE e.nfc_tag_id=$1
               AND e.type='nfc'
             ) AS last_tap
-
-          FROM nfc_tags t
-
-          WHERE t.id=$1
           `,
-          [id]
+          [
+            id
+          ]
         );
 
       const tag = {
         ...result.rows[0],
+
         tap_count:
           stats.rows[0]?.tap_count || 0,
+
         last_tap:
           stats.rows[0]?.last_tap || null
       };
@@ -2589,10 +2697,14 @@ app.put(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        'NFC UPDATE ERROR:',
+        error
+      );
 
       res.status(500).json({
-        error: 'NFC etiketi güncellenemedi'
+        error:
+          'NFC etiketi güncellenemedi'
       });
 
     }
@@ -2601,9 +2713,9 @@ app.put(
 );
 
 
-/*
-   DELETE TAG
-*/
+/* =========================================================
+   DELETE NFC TAG
+========================================================= */
 
 app.delete(
   '/api/nfc-tags/:id',
@@ -2620,8 +2732,9 @@ app.delete(
           `
           DELETE FROM nfc_tags
 
-          WHERE id=$1
-          AND business_id=$2
+          WHERE
+            id=$1
+            AND business_id=$2
 
           RETURNING id
           `,
@@ -2634,7 +2747,8 @@ app.delete(
       if (!result.rows.length) {
 
         return res.status(404).json({
-          error: 'NFC etiketi bulunamadı'
+          error:
+            'NFC etiketi bulunamadı'
         });
 
       }
@@ -2646,10 +2760,14 @@ app.delete(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        'NFC DELETE ERROR:',
+        error
+      );
 
       res.status(500).json({
-        error: 'NFC etiketi silinemedi'
+        error:
+          'NFC etiketi silinemedi'
       });
 
     }
@@ -2659,7 +2777,7 @@ app.delete(
 
 
 /* =========================================================
-   NFC TAG ANALYTICS
+   NFC ANALYTICS
 ========================================================= */
 
 app.get(
@@ -2675,10 +2793,17 @@ app.get(
       const tag =
         await pool.query(
           `
-          SELECT id
+          SELECT
+            id,
+            name,
+            placement,
+            code,
+            is_active
           FROM nfc_tags
-          WHERE id=$1
-          AND business_id=$2
+          WHERE
+            id=$1
+            AND business_id=$2
+          LIMIT 1
           `,
           [
             id,
@@ -2689,7 +2814,8 @@ app.get(
       if (!tag.rows.length) {
 
         return res.status(404).json({
-          error: 'NFC etiketi bulunamadı'
+          error:
+            'NFC etiketi bulunamadı'
         });
 
       }
@@ -2698,14 +2824,22 @@ app.get(
         await pool.query(
           `
           SELECT
-            COUNT(*)::int AS total_taps,
-            MAX(created_at) AS last_tap
+
+            COUNT(*)::int
+              AS total_taps,
+
+            MAX(created_at)
+              AS last_tap
+
           FROM events
 
-          WHERE nfc_tag_id=$1
-          AND type='nfc'
+          WHERE
+            nfc_tag_id=$1
+            AND type='nfc'
           `,
-          [id]
+          [
+            id
+          ]
         );
 
       const daily =
@@ -2713,40 +2847,57 @@ app.get(
           `
           SELECT
 
-            DATE(created_at) AS date,
-            COUNT(*)::int AS taps
+            DATE(created_at)
+              AS date,
+
+            COUNT(*)::int
+              AS taps
 
           FROM events
 
-          WHERE nfc_tag_id=$1
-          AND type='nfc'
+          WHERE
+            nfc_tag_id=$1
+            AND type='nfc'
 
-          GROUP BY DATE(created_at)
+          GROUP BY
+            DATE(created_at)
 
-          ORDER BY date DESC
+          ORDER BY
+            date DESC
 
           LIMIT 90
           `,
-          [id]
+          [
+            id
+          ]
         );
 
       res.json({
+
+        tag:
+          tag.rows[0],
+
         total_taps:
-          total.rows[0].total_taps,
+          total.rows[0]?.total_taps || 0,
 
         last_tap:
-          total.rows[0].last_tap,
+          total.rows[0]?.last_tap || null,
 
         daily:
           daily.rows
+
       });
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        'NFC ANALYTICS ERROR:',
+        error
+      );
 
       res.status(500).json({
-        error: 'NFC analizleri alınamadı'
+        error:
+          'NFC analizleri alınamadı'
       });
 
     }
@@ -2756,22 +2907,8 @@ app.get(
 
 
 /* =========================================================
-   PUBLIC NFC TAG ROUTE
+   PUBLIC NFC ROUTE
 ========================================================= */
-
-/*
-   DİKKAT:
-
-   Bu route /p/:slug route'undan ÖNCE bulunuyor.
-
-   NFC TAG:
-   /p/nfc/CODE
-
-   -> tag bulunur
-   -> işletme bulunur
-   -> NFC event'i tag ID ile kaydedilir
-   -> profile.html açılır
-*/
 
 app.get(
   '/p/nfc/:code',
@@ -2780,7 +2917,9 @@ app.get(
     try {
 
       const code =
-        String(req.params.code || '').trim();
+        String(
+          req.params.code || ''
+        ).trim();
 
       if (!code) {
 
@@ -2806,11 +2945,14 @@ app.get(
           INNER JOIN businesses b
             ON b.id=t.business_id
 
-          WHERE t.code=$1
+          WHERE
+            t.code=$1
 
           LIMIT 1
           `,
-          [code]
+          [
+            code
+          ]
         );
 
       if (!result.rows.length) {
@@ -2825,59 +2967,90 @@ app.get(
         result.rows[0];
 
       /*
-        Pasif tag çalışmaz.
+        Pasif NFC etiketi çalışmaz.
       */
 
       if (!tag.is_active) {
 
         return res.status(410).send(`
           <!DOCTYPE html>
+
           <html lang="tr">
+
           <head>
+
             <meta charset="UTF-8">
-            <meta name="viewport"
-              content="width=device-width,initial-scale=1">
+
+            <meta
+              name="viewport"
+              content="width=device-width,initial-scale=1"
+            >
+
             <title>NFC Pasif</title>
 
             <style>
-              body{
-                margin:0;
-                min-height:100vh;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                background:#050505;
-                color:#fff;
-                font-family:Arial,sans-serif;
-                text-align:center;
-                padding:30px;
+
+              *{
                 box-sizing:border-box;
               }
 
+              body{
+                margin:0;
+                min-height:100vh;
+
+                display:flex;
+                align-items:center;
+                justify-content:center;
+
+                padding:30px;
+
+                background:#050505;
+                color:#fff;
+
+                font-family:
+                  Arial,
+                  sans-serif;
+
+                text-align:center;
+              }
+
               .box{
-                max-width:420px;
-                padding:35px;
-                border:1px solid rgba(212,175,55,.3);
-                border-radius:24px;
+                width:100%;
+                max-width:430px;
+
+                padding:40px 30px;
+
+                border:
+                  1px solid
+                  rgba(212,175,55,.35);
+
+                border-radius:26px;
+
                 background:#0c0c0c;
+
+                box-shadow:
+                  0 25px 80px
+                  rgba(0,0,0,.5);
               }
 
               .icon{
-                font-size:54px;
+                font-size:58px;
                 margin-bottom:20px;
               }
 
               h1{
                 margin:0 0 12px;
-                font-size:26px;
+                font-size:27px;
               }
 
               p{
-                color:#aaa;
-                line-height:1.6;
                 margin:0;
+                color:#aaa;
+                line-height:1.7;
               }
+
             </style>
+
           </head>
 
           <body>
@@ -2893,19 +3066,22 @@ app.get(
               </h1>
 
               <p>
-                Bu NFC bağlantısı şu anda aktif değil.
+                Bu NFC bağlantısı
+                şu anda aktif değil.
               </p>
 
             </div>
 
           </body>
+
           </html>
         `);
 
       }
 
+
       /*
-        Önce profil görüntüleme.
+        Profil görüntüleme eventi.
       */
 
       await pool.query(
@@ -2930,7 +3106,7 @@ app.get(
 
 
       /*
-        Sonra gerçek NFC tap.
+        NFC dokunuş eventi.
       */
 
       await pool.query(
@@ -2955,7 +3131,7 @@ app.get(
 
 
       /*
-        Profile aç.
+        Profil sayfasını aç.
       */
 
       return res.sendFile(
@@ -2968,7 +3144,10 @@ app.get(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        'PUBLIC NFC ROUTE ERROR:',
+        error
+      );
 
       res.status(500).send(
         'NFC bağlantısı açılırken hata oluştu'
@@ -2981,7 +3160,7 @@ app.get(
 
 
 /* =========================================================
-   PUBLIC PROFILE
+   PUBLIC PROFILE PAGE
 ========================================================= */
 
 app.get(
@@ -2991,7 +3170,17 @@ app.get(
     try {
 
       const slug =
-        String(req.params.slug || '');
+        String(
+          req.params.slug || ''
+        ).trim();
+
+      if (!slug) {
+
+        return res.status(404).send(
+          'İşletme bulunamadı'
+        );
+
+      }
 
       const result =
         await pool.query(
@@ -2999,8 +3188,11 @@ app.get(
           SELECT *
           FROM businesses
           WHERE slug=$1
+          LIMIT 1
           `,
-          [slug]
+          [
+            slug
+          ]
         );
 
       if (!result.rows.length) {
@@ -3014,8 +3206,9 @@ app.get(
       const business =
         result.rows[0];
 
+
       /*
-        Profile view
+        Genel profil görüntüleme.
       */
 
       await pool.query(
@@ -3030,12 +3223,15 @@ app.get(
           'profile_view'
         )
         `,
-        [business.id]
+        [
+          business.id
+        ]
       );
 
 
       /*
-        QR
+        QR üzerinden geldiyse
+        QR taraması olarak kaydet.
       */
 
       if (
@@ -3054,21 +3250,17 @@ app.get(
             'qr_scan'
           )
           `,
-          [business.id]
+          [
+            business.id
+          ]
         );
 
       }
 
 
       /*
-        Eski NFC bağlantıları:
-
-        /p/slug?source=nfc
-
-        Bunlar yeni tag sistemi kullanılmadan
-        oluşturulmuş NFC bağlantıları olabilir.
-
-        Backward compatibility korunuyor.
+        Eski NFC URL'leri için
+        geriye dönük uyumluluk.
       */
 
       if (
@@ -3087,13 +3279,15 @@ app.get(
             'nfc'
           )
           `,
-          [business.id]
+          [
+            business.id
+          ]
         );
 
       }
 
 
-      res.sendFile(
+      return res.sendFile(
         path.join(
           __dirname,
           'public',
@@ -3103,7 +3297,10 @@ app.get(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        'PUBLIC PROFILE ROUTE ERROR:',
+        error
+      );
 
       res.status(500).send(
         'Profil açılırken hata oluştu'
@@ -3116,7 +3313,7 @@ app.get(
 
 
 /* =========================================================
-   DASHBOARD PAGE
+   DASHBOARD
 ========================================================= */
 
 app.get(
@@ -3176,7 +3373,7 @@ app.get(
 
 
 /* =========================================================
-   ADMIN PAGE
+   ADMIN
 ========================================================= */
 
 app.get(
@@ -3196,7 +3393,7 @@ app.get(
 
 
 /* =========================================================
-   REGISTER PAGE
+   REGISTER
 ========================================================= */
 
 app.get(
@@ -3216,7 +3413,7 @@ app.get(
 
 
 /* =========================================================
-   LOGIN PAGE
+   LOGIN
 ========================================================= */
 
 app.get(
@@ -3275,7 +3472,7 @@ app.use(
 
 
 /* =========================================================
-   START
+   START SERVER
 ========================================================= */
 
 initDatabase()
@@ -3287,7 +3484,7 @@ initDatabase()
       () => {
 
         console.log(
-          `LEO CONNECT 3.7 NFC TAGS çalışıyor: ${PORT}`
+          `LEO CONNECT 3.8 STABLE PUBLIC PROFILE çalışıyor: ${PORT}`
         );
 
       }
