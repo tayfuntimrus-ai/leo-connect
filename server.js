@@ -81,7 +81,7 @@ app.use(
 async function initDatabase() {
 
   await pool.query(`
-    
+
     CREATE TABLE IF NOT EXISTS businesses(
 
       id SERIAL PRIMARY KEY,
@@ -197,6 +197,7 @@ async function pub(id) {
   const result =
     await pool.query(
       `
+
       SELECT
 
         id,
@@ -293,8 +294,10 @@ function auth(
       return res
         .status(403)
         .json({
+
           error:
             'İşletme yetkisi gerekli'
+
         });
 
     }
@@ -312,8 +315,10 @@ function auth(
     res
       .status(401)
       .json({
+
         error:
           'Oturum gerekli'
+
       });
 
   }
@@ -358,8 +363,10 @@ function adminAuth(
       return res
         .status(403)
         .json({
+
           error:
             'Admin yetkisi gerekli'
+
         });
 
     }
@@ -377,8 +384,10 @@ function adminAuth(
     res
       .status(401)
       .json({
+
         error:
           'Admin oturumu gerekli'
+
       });
 
   }
@@ -409,7 +418,7 @@ app.get(
         ok: true,
 
         version:
-          '3.2-admin-business-management'
+          '3.3-admin-create-business'
 
       });
 
@@ -879,6 +888,256 @@ app.get(
 
 
 /* =========================
+   ADMIN CREATE BUSINESS
+========================= */
+
+app.post(
+  '/api/admin/business',
+  adminAuth,
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      const {
+        name,
+        email,
+        password,
+        category
+      } = req.body;
+
+
+      /* VALIDATION */
+
+      if (
+        !name ||
+        !email ||
+        !password
+      ) {
+
+        return res
+          .status(400)
+          .json({
+
+            error:
+              'İşletme adı, e-posta ve şifre gerekli'
+
+          });
+
+      }
+
+
+      if (
+        String(password).length < 8
+      ) {
+
+        return res
+          .status(400)
+          .json({
+
+            error:
+              'Şifre en az 8 karakter olmalı'
+
+          });
+
+      }
+
+
+      const normalizedEmail =
+        String(email)
+          .trim()
+          .toLowerCase();
+
+
+      /* EMAIL CHECK */
+
+      const existing =
+        await pool.query(
+          `
+          SELECT id
+          FROM businesses
+          WHERE email=$1
+          `,
+          [
+            normalizedEmail
+          ]
+        );
+
+
+      if (
+        existing.rows.length
+      ) {
+
+        return res
+          .status(409)
+          .json({
+
+            error:
+              'Bu e-posta adresi zaten kayıtlı'
+
+          });
+
+      }
+
+
+      /* SLUG */
+
+      const base =
+        slug(
+          name
+        );
+
+
+      let businessSlug =
+        base;
+
+
+      let number =
+        1;
+
+
+      while (true) {
+
+        const check =
+          await pool.query(
+            `
+            SELECT id
+            FROM businesses
+            WHERE slug=$1
+            `,
+            [
+              businessSlug
+            ]
+          );
+
+
+        if (
+          !check.rows.length
+        ) {
+
+          break;
+
+        }
+
+
+        number++;
+
+
+        businessSlug =
+          base +
+          '-' +
+          number;
+
+      }
+
+
+      /* PASSWORD */
+
+      const passwordHash =
+        await bcrypt.hash(
+          String(password),
+          12
+        );
+
+
+      /* CREATE */
+
+      const result =
+        await pool.query(
+          `
+          INSERT INTO businesses(
+
+            name,
+
+            slug,
+
+            email,
+
+            password_hash,
+
+            category
+
+          )
+
+          VALUES(
+
+            $1,
+
+            $2,
+
+            $3,
+
+            $4,
+
+            $5
+
+          )
+
+          RETURNING id
+
+          `,
+          [
+
+            String(name)
+              .trim(),
+
+            businessSlug,
+
+            normalizedEmail,
+
+            passwordHash,
+
+            String(
+              category || ''
+            ).trim()
+
+          ]
+        );
+
+
+      const business =
+        await pub(
+          result.rows[0].id
+        );
+
+
+      res
+        .status(201)
+        .json({
+
+          ok:
+            true,
+
+          business
+
+        });
+
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+
+      res
+        .status(500)
+        .json({
+
+          error:
+            'Yeni işletme oluşturulamadı'
+
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================
    ADMIN BUSINESS DETAIL
 ========================= */
 
@@ -940,7 +1199,9 @@ app.get(
           WHERE id=$1
 
           `,
-          [req.params.id]
+          [
+            req.params.id
+          ]
         );
 
 
@@ -984,7 +1245,9 @@ app.get(
             type
 
           `,
-          [business.id]
+          [
+            business.id
+          ]
         );
 
 
@@ -1005,11 +1268,19 @@ app.get(
         await pool.query(
           `
           SELECT
-            COUNT(*)::int AS count
+
+            COUNT(*)::int
+            AS count
+
           FROM events
-          WHERE business_id=$1
+
+          WHERE
+            business_id=$1
+
           `,
-          [business.id]
+          [
+            business.id
+          ]
         );
 
 
@@ -1217,7 +1488,7 @@ app.put(
           .join(',');
 
 
-      const updateResult =
+      const result =
         await pool.query(
 
           `
@@ -1234,6 +1505,7 @@ app.put(
           `,
 
           [
+
             ...values,
 
             req.params.id
@@ -1244,7 +1516,7 @@ app.put(
 
 
       if (
-        !updateResult.rows.length
+        !result.rows.length
       ) {
 
         return res
@@ -1321,7 +1593,9 @@ app.delete(
           RETURNING id
 
           `,
-          [req.params.id]
+          [
+            req.params.id
+          ]
         );
 
 
@@ -1411,6 +1685,12 @@ app.post(
       }
 
 
+      const normalizedEmail =
+        String(email)
+          .trim()
+          .toLowerCase();
+
+
       const existing =
         await pool.query(
           `
@@ -1418,7 +1698,9 @@ app.post(
           FROM businesses
           WHERE email=$1
           `,
-          [email]
+          [
+            normalizedEmail
+          ]
         );
 
 
@@ -1461,7 +1743,9 @@ app.post(
             FROM businesses
             WHERE slug=$1
             `,
-            [sl]
+            [
+              sl
+            ]
           );
 
 
@@ -1475,6 +1759,7 @@ app.post(
 
 
         n++;
+
 
         sl =
           base +
@@ -1509,11 +1794,17 @@ app.post(
           )
 
           VALUES(
+
             $1,
+
             $2,
+
             $3,
+
             $4,
+
             $5
+
           )
 
           RETURNING id
@@ -1525,7 +1816,7 @@ app.post(
 
             sl,
 
-            email,
+            normalizedEmail,
 
             passwordHash,
 
@@ -1598,7 +1889,7 @@ app.post(
 
 
 /* =========================
-   LOGIN
+   BUSINESS LOGIN
 ========================= */
 
 app.post(
@@ -1609,6 +1900,15 @@ app.post(
   ) => {
 
     try {
+
+      const normalizedEmail =
+        String(
+          req.body.email
+          || ''
+        )
+          .trim()
+          .toLowerCase();
+
 
       const result =
         await pool.query(
@@ -1622,8 +1922,7 @@ app.post(
 
           `,
           [
-            req.body.email
-            || ''
+            normalizedEmail
           ]
         );
 
@@ -2029,7 +2328,7 @@ app.get(
 
 
 /* =========================
-   STATISTICS
+   BUSINESS STATISTICS
 ========================= */
 
 app.get(
@@ -2185,6 +2484,7 @@ app.post(
 
 
       await pool.query(
+
         `
         INSERT INTO events(
 
@@ -2195,11 +2495,15 @@ app.post(
         )
 
         VALUES(
+
           $1,
+
           $2
+
         )
 
         `,
+
         [
 
           business.id,
@@ -2207,6 +2511,7 @@ app.post(
           req.body.type
 
         ]
+
       );
 
 
@@ -2399,6 +2704,7 @@ app.get(
       /* PROFILE VIEW */
 
       await pool.query(
+
         `
         INSERT INTO events(
 
@@ -2409,11 +2715,15 @@ app.get(
         )
 
         VALUES(
+
           $1,
+
           $2
+
         )
 
         `,
+
         [
 
           business.id,
@@ -2421,6 +2731,7 @@ app.get(
           'profile_view'
 
         ]
+
       );
 
 
@@ -2431,6 +2742,7 @@ app.get(
       ) {
 
         await pool.query(
+
           `
           INSERT INTO events(
 
@@ -2441,11 +2753,15 @@ app.get(
           )
 
           VALUES(
+
             $1,
+
             $2
+
           )
 
           `,
+
           [
 
             business.id,
@@ -2453,6 +2769,7 @@ app.get(
             'qr_scan'
 
           ]
+
         );
 
       }
@@ -2465,6 +2782,7 @@ app.get(
       ) {
 
         await pool.query(
+
           `
           INSERT INTO events(
 
@@ -2475,11 +2793,15 @@ app.get(
           )
 
           VALUES(
+
             $1,
+
             $2
+
           )
 
           `,
+
           [
 
             business.id,
@@ -2487,6 +2809,7 @@ app.get(
             'nfc'
 
           ]
+
         );
 
       }
@@ -2689,7 +3012,7 @@ initDatabase()
 
           console.log(
 
-            `LEO CONNECT 3.2 çalışıyor: ${PORT}`
+            `LEO CONNECT 3.3 çalışıyor: ${PORT}`
 
           );
 
