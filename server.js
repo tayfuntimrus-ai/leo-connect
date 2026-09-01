@@ -18,7 +18,7 @@ const db = new Database(
 );
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
 
 app.use(
   express.static(
@@ -41,12 +41,17 @@ CREATE TABLE IF NOT EXISTS businesses(
   category TEXT,
   description TEXT,
   phone TEXT,
+  whatsapp TEXT,
   address TEXT,
   instagram TEXT,
   tiktok TEXT,
+  google_review TEXT,
+  website TEXT,
   menu TEXT,
   iban TEXT,
+  iban_holder TEXT,
   hours TEXT,
+  logo_url TEXT,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -57,6 +62,35 @@ CREATE TABLE IF NOT EXISTS events(
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 `);
+
+
+/* =========================
+   ESKİ VERİTABANINI KORU
+========================= */
+
+function addColumn(columnName) {
+
+  try {
+
+    db.exec(
+      `ALTER TABLE businesses ADD COLUMN ${columnName} TEXT`
+    );
+
+  } catch (error) {
+
+    // Kolon zaten varsa hata verme.
+  }
+
+}
+
+
+[
+  'whatsapp',
+  'google_review',
+  'website',
+  'iban_holder',
+  'logo_url'
+].forEach(addColumn);
 
 
 /* =========================
@@ -75,7 +109,7 @@ const slug = (s) =>
 
 const pub = (id) => {
 
-  const b = db
+  return db
     .prepare(`
       SELECT
         id,
@@ -85,20 +119,28 @@ const pub = (id) => {
         category,
         description,
         phone,
+        whatsapp,
         address,
         instagram,
         tiktok,
+        google_review,
+        website,
         menu,
         iban,
-        hours
+        iban_holder,
+        hours,
+        logo_url
       FROM businesses
       WHERE id=?
     `)
     .get(id);
 
-  return b;
 };
 
+
+/* =========================
+   AUTH
+========================= */
 
 function auth(req, res, next) {
 
@@ -113,7 +155,7 @@ function auth(req, res, next) {
 
     next();
 
-  } catch (e) {
+  } catch (error) {
 
     res
       .status(401)
@@ -136,7 +178,7 @@ app.get(
 
     res.json({
       ok: true,
-      version: '2.0'
+      version: '2.2'
     });
 
   }
@@ -196,7 +238,8 @@ app.post(
     }
 
 
-    const base = slug(name);
+    const base =
+      slug(name);
 
     let sl = base;
     let n = 1;
@@ -211,13 +254,18 @@ app.post(
     ) {
 
       n++;
-      sl = base + '-' + n;
+
+      sl =
+        base + '-' + n;
 
     }
 
 
     const passwordHash =
-      await bcrypt.hash(password, 12);
+      await bcrypt.hash(
+        password,
+        12
+      );
 
 
     const result =
@@ -279,7 +327,9 @@ app.post(
         .prepare(
           'SELECT * FROM businesses WHERE email=?'
         )
-        .get(req.body.email || '');
+        .get(
+          req.body.email || ''
+        );
 
 
     if (
@@ -314,7 +364,8 @@ app.post(
 
     res.json({
       token,
-      business: pub(business.id)
+      business:
+        pub(business.id)
     });
 
   }
@@ -348,30 +399,50 @@ app.put(
   (req, res) => {
 
     const keys = [
+
       'name',
       'category',
       'description',
+
       'phone',
+      'whatsapp',
+
       'address',
+
       'instagram',
       'tiktok',
+
+      'google_review',
+      'website',
       'menu',
+
       'iban',
-      'hours'
+      'iban_holder',
+
+      'hours',
+
+      'logo_url'
+
     ];
 
 
     db
       .prepare(`
         UPDATE businesses
-        SET ${keys.map(k => k + '=?').join(',')}
+        SET
+          ${keys.map(
+            k => k + '=?'
+          ).join(',')}
         WHERE id=?
       `)
       .run(
+
         ...keys.map(
           k => req.body[k] ?? ''
         ),
+
         req.user.id
+
       );
 
 
@@ -396,11 +467,6 @@ app.get(
       pub(req.user.id);
 
 
-    /*
-      Render üzerinde localhost
-      kullanılmasını engelliyoruz.
-    */
-
     const protocol =
       req.get('x-forwarded-proto') ||
       req.protocol;
@@ -415,7 +481,7 @@ app.get(
 
 
     const url =
-      `${base}/p/${business.slug}`;
+      `${base}/p/${business.slug}?source=qr`;
 
 
     const dataUrl =
@@ -430,8 +496,11 @@ app.get(
 
 
     res.json({
+
       url,
+
       dataUrl
+
     });
 
   }
@@ -452,15 +521,98 @@ app.get(
         .prepare(`
           SELECT
             type,
-            COUNT(*) count
+            COUNT(*) AS count
           FROM events
           WHERE business_id=?
           GROUP BY type
         `)
-        .all(req.user.id);
+        .all(
+          req.user.id
+        );
 
 
     res.json(stats);
+
+  }
+);
+
+
+/* =========================
+   EVENT TRACKING
+========================= */
+
+app.post(
+  '/api/event/:slug',
+  (req, res) => {
+
+    const business =
+      db
+        .prepare(
+          'SELECT id FROM businesses WHERE slug=?'
+        )
+        .get(
+          req.params.slug
+        );
+
+
+    const allowed = [
+
+      'profile_view',
+
+      'qr_scan',
+      'nfc',
+
+      'phone',
+      'whatsapp',
+      'location',
+
+      'instagram',
+      'tiktok',
+
+      'google_review',
+
+      'website',
+      'menu',
+
+      'iban'
+
+    ];
+
+
+    if (
+      !business ||
+      !allowed.includes(
+        req.body.type
+      )
+    ) {
+
+      return res
+        .status(400)
+        .json({
+          error:
+            'Geçersiz etkinlik'
+        });
+
+    }
+
+
+    db
+      .prepare(`
+        INSERT INTO events(
+          business_id,
+          type
+        )
+        VALUES(?,?)
+      `)
+      .run(
+        business.id,
+        req.body.type
+      );
+
+
+    res.json({
+      ok: true
+    });
 
   }
 );
@@ -479,7 +631,9 @@ app.get(
         .prepare(
           'SELECT * FROM businesses WHERE slug=?'
         )
-        .get(req.params.slug);
+        .get(
+          req.params.slug
+        );
 
 
     if (!business) {
@@ -497,14 +651,16 @@ app.get(
     delete business.password_hash;
 
 
-    res.json(business);
+    res.json(
+      business
+    );
 
   }
 );
 
 
 /* =========================
-   PUBLIC BUSINESS PROFILE
+   PUBLIC PROFILE
 ========================= */
 
 app.get(
@@ -516,17 +672,25 @@ app.get(
         .prepare(
           'SELECT id FROM businesses WHERE slug=?'
         )
-        .get(req.params.slug);
+        .get(
+          req.params.slug
+        );
 
 
     if (!business) {
 
       return res
         .status(404)
-        .send('Profil bulunamadı');
+        .send(
+          'Profil bulunamadı'
+        );
 
     }
 
+
+    /*
+      Her profil açılışını kaydet.
+    */
 
     db
       .prepare(`
@@ -540,6 +704,56 @@ app.get(
         business.id,
         'profile_view'
       );
+
+
+    /*
+      QR üzerinden geldiyse
+      ayrıca QR taramasını kaydet.
+    */
+
+    if (
+      req.query.source === 'qr'
+    ) {
+
+      db
+        .prepare(`
+          INSERT INTO events(
+            business_id,
+            type
+          )
+          VALUES(?,?)
+        `)
+        .run(
+          business.id,
+          'qr_scan'
+        );
+
+    }
+
+
+    /*
+      NFC üzerinden geldiyse
+      NFC etkileşimini kaydet.
+    */
+
+    if (
+      req.query.source === 'nfc'
+    ) {
+
+      db
+        .prepare(`
+          INSERT INTO events(
+            business_id,
+            type
+          )
+          VALUES(?,?)
+        `)
+        .run(
+          business.id,
+          'nfc'
+        );
+
+    }
 
 
     res.sendFile(
@@ -634,7 +848,7 @@ app.use(
 
 
 /* =========================
-   START SERVER
+   START
 ========================= */
 
 app.listen(
@@ -643,7 +857,7 @@ app.listen(
   () => {
 
     console.log(
-      `LEO CONNECT çalışıyor: ${PORT}`
+      `LEO CONNECT V2.2 çalışıyor: ${PORT}`
     );
 
   }
