@@ -1,2185 +1,1476 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
-
 <head>
-
-<meta charset="utf-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1"
->
-
-<title>LEO CONNECT — Yönetim Merkezi</title>
-
-<style>
-
-:root{
-  --gold:#c59a52;
-  --gold-light:#e0bd7b;
-  --black:#080808;
-  --dark:#101010;
-  --dark-2:#151515;
-  --border:#292929;
-  --green:#45c27a;
-  --red:#d95c5c;
-  --white:#fff;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  background:#080808;
-  color:#fff;
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-button,
-input,
-textarea{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-
-/* =========================
-   LOGIN
-========================= */
-
-#loginScreen{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
-
-  background:
-    radial-gradient(
-      circle at 50% 20%,
-      #c59a5218,
-      transparent 35%
-    ),
-    #080808;
-}
-
-.login-card{
-  width:min(430px,100%);
-  padding:38px;
-  border-radius:28px;
-  border:1px solid #c59a5238;
-
-  background:
-    linear-gradient(
-      145deg,
-      #151515,
-      #0d0d0d
-    );
-
-  box-shadow:
-    0 30px 100px #000;
-}
-
-.lion{
-  width:74px;
-  height:74px;
-  margin:0 auto 22px;
-
-  display:grid;
-  place-items:center;
-
-  border-radius:22px;
-  background:#000;
-  border:1px solid #c59a5266;
-
-  font-size:38px;
-}
-
-.brand{
-  text-align:center;
-  font-size:22px;
-  font-weight:800;
-  letter-spacing:.12em;
-}
-
-.brand span{
-  color:var(--gold-light);
-}
-
-.login-subtitle{
-  text-align:center;
-  color:#777;
-  font-size:11px;
-  letter-spacing:.14em;
-  margin:9px 0 30px;
-}
-
-.login-card label{
-  display:block;
-  color:#999;
-  font-size:11px;
-  margin-bottom:7px;
-}
-
-.login-card input{
-  width:100%;
-  padding:15px;
-  margin-bottom:16px;
-
-  border-radius:12px;
-  border:1px solid var(--border);
-
-  background:#111;
-  color:#fff;
-  outline:none;
-}
-
-.login-card input:focus{
-  border-color:var(--gold);
-}
-
-.login-button{
-  width:100%;
-  padding:15px;
-
-  border:0;
-  border-radius:12px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #c59a52,
-      #9e7738
-    );
-
-  color:#fff;
-  font-weight:800;
-}
-
-#loginMessage{
-  min-height:18px;
-  margin-top:15px;
-
-  text-align:center;
-  color:#df6969;
-  font-size:12px;
-}
-
-
-/* =========================
-   APP
-========================= */
-
-#adminApp{
-  display:none;
-}
-
-header{
-  height:72px;
-
-  position:sticky;
-  top:0;
-  z-index:100;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  padding:0 28px;
-
-  background:#0c0c0ced;
-  backdrop-filter:blur(18px);
-
-  border-bottom:1px solid var(--border);
-}
-
-.header-brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.header-logo{
-  width:40px;
-  height:40px;
-
-  display:grid;
-  place-items:center;
-
-  border-radius:12px;
-  background:#000;
-
-  border:1px solid #c59a5255;
-
-  font-size:21px;
-}
-
-.header-brand strong{
-  font-size:15px;
-  letter-spacing:.1em;
-}
-
-.header-brand strong span{
-  color:var(--gold-light);
-}
-
-.admin-label{
-  margin-top:3px;
-  color:#666;
-  font-size:9px;
-  letter-spacing:.16em;
-}
-
-.header-actions{
-  display:flex;
-  gap:8px;
-  align-items:center;
-}
-
-.new-business{
-  padding:10px 15px;
-
-  border:1px solid #c59a5266;
-  border-radius:10px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #c59a52,
-      #9e7738
-    );
-
-  color:#fff;
-  font-size:12px;
-  font-weight:800;
-}
-
-.logout{
-  padding:10px 14px;
-
-  border-radius:10px;
-  border:1px solid #333;
-
-  background:#151515;
-  color:#ddd;
-
-  font-size:12px;
-  font-weight:700;
-}
-
-main{
-  width:min(1250px,94%);
-  margin:38px auto 80px;
-}
-
-.page-head{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:20px;
-
-  margin-bottom:30px;
-}
-
-.eyebrow{
-  color:var(--gold-light);
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.2em;
-}
-
-h1{
-  margin:8px 0 0;
-  font-size:36px;
-}
-
-.page-head p{
-  margin:7px 0 0;
-  color:#777;
-  font-size:13px;
-}
-
-.live{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color:#aaa;
-  font-size:11px;
-}
-
-.live-dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 12px #45c27a88;
-}
-
-
-/* =========================
-   STATS
-========================= */
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:12px;
-  margin-bottom:22px;
-}
-
-.stat{
-  min-height:145px;
-  padding:20px;
-
-  border-radius:18px;
-  border:1px solid var(--border);
-
-  background:
-    linear-gradient(
-      145deg,
-      #151515,
-      #0f0f0f
-    );
-
-  position:relative;
-  overflow:hidden;
-}
-
-.stat-icon{
-  font-size:21px;
-  margin-bottom:15px;
-}
-
-.stat small{
-  display:block;
-  color:#777;
-  font-size:9px;
-  letter-spacing:.14em;
-  margin-bottom:7px;
-}
-
-.stat strong{
-  font-size:30px;
-  color:var(--gold-light);
-}
-
-
-/* =========================
-   PANEL
-========================= */
-
-.panel{
-  margin-top:22px;
-  overflow:hidden;
-
-  border-radius:22px;
-  border:1px solid var(--border);
-
-  background:
-    linear-gradient(
-      145deg,
-      #131313,
-      #0e0e0e
-    );
-}
-
-.panel-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-
-  padding:23px 25px;
-
-  border-bottom:1px solid var(--border);
-}
-
-.panel-head h2{
-  margin:0;
-  font-size:19px;
-}
-
-.panel-head p{
-  margin:5px 0 0;
-  color:#777;
-  font-size:11px;
-}
-
-.refresh{
-  padding:10px 14px;
-
-  border-radius:10px;
-  border:1px solid #333;
-
-  background:#181818;
-  color:#ddd;
-
-  font-size:11px;
-  font-weight:700;
-}
-
-
-/* =========================
-   TABLE
-========================= */
-
-.table-wrap{
-  overflow-x:auto;
-}
-
-table{
-  width:100%;
-  min-width:900px;
-  border-collapse:collapse;
-}
-
-th{
-  padding:15px 18px;
-  text-align:left;
-
-  color:#666;
-  font-size:9px;
-  letter-spacing:.13em;
-
-  border-bottom:1px solid var(--border);
-}
-
-td{
-  padding:17px 18px;
-
-  border-bottom:1px solid #1d1d1d;
-
-  color:#ccc;
-  font-size:12px;
-}
-
-tbody tr{
-  cursor:pointer;
-}
-
-tbody tr:hover{
-  background:#c59a5208;
-}
-
-.business-name{
-  color:#fff;
-  font-weight:800;
-  margin-bottom:4px;
-}
-
-.business-email{
-  color:#666;
-  font-size:10px;
-}
-
-.category{
-  display:inline-block;
-
-  padding:6px 9px;
-
-  border-radius:999px;
-  border:1px solid #c59a5222;
-
-  background:#c59a5212;
-
-  color:var(--gold-light);
-  font-size:9px;
-}
-
-.number{
-  color:#ddd;
-  font-weight:700;
-}
-
-.number.gold{
-  color:var(--gold-light);
-}
-
-.empty{
-  padding:55px 20px;
-  text-align:center;
-  color:#666;
-}
-
-
-/* =========================
-   OVERLAY
-========================= */
-
-.overlay{
-  position:fixed;
-  inset:0;
-  z-index:500;
-
-  display:none;
-
-  overflow-y:auto;
-
-  padding:20px;
-
-  background:#000000dd;
-
-  backdrop-filter:blur(10px);
-}
-
-.modal{
-  width:min(1100px,100%);
-  margin:20px auto 60px;
-
-  border-radius:25px;
-
-  border:1px solid #c59a5235;
-
-  background:
-    linear-gradient(
-      145deg,
-      #151515,
-      #0b0b0b
-    );
-
-  box-shadow:
-    0 40px 120px #000;
-}
-
-.modal-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-
-  padding:25px;
-
-  border-bottom:1px solid var(--border);
-}
-
-.modal-header h2{
-  margin:6px 0 0;
-  font-size:27px;
-}
-
-.modal-header p{
-  margin:5px 0 0;
-  color:#777;
-  font-size:11px;
-}
-
-.close{
-  width:42px;
-  height:42px;
-
-  border-radius:12px;
-  border:1px solid #333;
-
-  background:#181818;
-  color:#fff;
-
-  font-size:20px;
-}
-
-.modal-body{
-  padding:25px;
-}
-
-
-/* =========================
-   DETAIL STATS
-========================= */
-
-.detail-stats{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:10px;
-
-  margin-bottom:22px;
-}
-
-.detail-stat{
-  padding:16px;
-
-  border-radius:15px;
-
-  background:#111;
-  border:1px solid var(--border);
-}
-
-.detail-stat small{
-  display:block;
-  color:#777;
-  font-size:9px;
-  margin-bottom:8px;
-}
-
-.detail-stat strong{
-  font-size:23px;
-  color:var(--gold-light);
-}
-
-
-/* =========================
-   ANALYTICS
-========================= */
-
-.analytics{
-  margin:25px 0;
-
-  padding:22px;
-
-  border-radius:20px;
-
-  border:1px solid #c59a5230;
-
-  background:
-    linear-gradient(
-      145deg,
-      #121212,
-      #0c0c0c
-    );
-}
-
-.analytics-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-
-  margin-bottom:20px;
-}
-
-.analytics-title h3{
-  margin:5px 0 0;
-  font-size:20px;
-}
-
-.analytics-title p{
-  margin:5px 0 0;
-  color:#666;
-  font-size:11px;
-}
-
-.periods{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-}
-
-.period{
-  padding:9px 12px;
-
-  border-radius:9px;
-
-  border:1px solid #333;
-
-  background:#171717;
-  color:#aaa;
-
-  font-size:10px;
-  font-weight:800;
-}
-
-.period.active{
-  background:#b8893f;
-  border-color:#b8893f;
-  color:#fff;
-}
-
-.analytics-kpis{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-
-  margin-bottom:18px;
-}
-
-.analytics-kpi{
-  padding:15px;
-
-  border-radius:14px;
-
-  background:#101010;
-  border:1px solid #242424;
-}
-
-.analytics-kpi small{
-  display:block;
-
-  color:#666;
-
-  font-size:8px;
-
-  letter-spacing:.1em;
-
-  margin-bottom:7px;
-}
-
-.analytics-kpi strong{
-  font-size:22px;
-  color:var(--gold-light);
-}
-
-.analytics-grid{
-  display:grid;
-  grid-template-columns:1.4fr .8fr;
-  gap:15px;
-}
-
-.analytics-card{
-  padding:18px;
-
-  border-radius:16px;
-
-  background:#0e0e0e;
-
-  border:1px solid #242424;
-}
-
-.analytics-card h4{
-  margin:0 0 15px;
-
-  font-size:13px;
-}
-
-.chart{
-  height:230px;
-
-  display:flex;
-  align-items:flex-end;
-
-  gap:7px;
-
-  overflow-x:auto;
-
-  padding:10px 3px 5px;
-}
-
-.chart-item{
-  min-width:27px;
-
-  height:100%;
-
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-  align-items:center;
-  gap:5px;
-}
-
-.chart-value{
-  color:#aaa;
-  font-size:8px;
-}
-
-.chart-bar{
-  width:18px;
-
-  min-height:3px;
-
-  border-radius:5px 5px 2px 2px;
-
-  background:
-    linear-gradient(
-      to top,
-      #8d6834,
-      #e0bd7b
-    );
-}
-
-.chart-label{
-  color:#555;
-  font-size:7px;
-
-  white-space:nowrap;
-}
-
-.source-row{
-  margin-bottom:16px;
-}
-
-.source-top{
-  display:flex;
-  justify-content:space-between;
-
-  margin-bottom:7px;
-
-  color:#aaa;
-  font-size:10px;
-}
-
-.source-track{
-  height:7px;
-
-  overflow:hidden;
-
-  border-radius:99px;
-
-  background:#1c1c1c;
-}
-
-.source-fill{
-  height:100%;
-
-  border-radius:99px;
-
-  background:
-    linear-gradient(
-      90deg,
-      #8d6834,
-      #e0bd7b
-    );
-}
-
-.channel-list{
-  display:flex;
-  flex-direction:column;
-  gap:9px;
-
-  max-height:240px;
-  overflow-y:auto;
-}
-
-.channel-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  padding:10px 12px;
-
-  border-radius:10px;
-
-  background:#151515;
-
-  border:1px solid #222;
-}
-
-.channel-name{
-  color:#aaa;
-  font-size:10px;
-}
-
-.channel-count{
-  color:var(--gold-light);
-  font-size:11px;
-  font-weight:800;
-}
-
-.analytics-loading{
-  padding:30px;
-
-  text-align:center;
-
-  color:#666;
-
-  font-size:11px;
-}
-
-
-/* =========================
-   FORM
-========================= */
-
-.form-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-
-.field{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
-.field.full{
-  grid-column:1/-1;
-}
-
-.field label{
-  color:#777;
-  font-size:10px;
-  letter-spacing:.1em;
-}
-
-.field input,
-.field textarea{
-  width:100%;
-
-  padding:13px;
-
-  border-radius:11px;
-
-  border:1px solid #292929;
-
-  background:#0d0d0d;
-  color:#fff;
-
-  outline:none;
-}
-
-.field textarea{
-  min-height:90px;
-  resize:vertical;
-}
-
-.field input:focus,
-.field textarea:focus{
-  border-color:var(--gold);
-}
-
-
-/* =========================
-   MODAL ACTIONS
-========================= */
-
-.modal-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:9px;
-
-  margin-top:22px;
-  padding-top:22px;
-
-  border-top:1px solid var(--border);
-}
-
-.action{
-  padding:12px 15px;
-
-  border-radius:10px;
-
-  border:1px solid #333;
-
-  background:#181818;
-  color:#fff;
-
-  text-decoration:none;
-
-  font-size:11px;
-  font-weight:700;
-}
-
-.action.gold{
-  background:#b8893f;
-  border-color:#b8893f;
-}
-
-.action.danger{
-  background:#351818;
-  border-color:#6b2c2c;
-  color:#ff9b9b;
-}
-
-.message{
-  min-height:18px;
-  margin-top:13px;
-
-  color:var(--gold-light);
-  font-size:12px;
-}
-
-
-/* =========================
-   DIGITAL BOX
-========================= */
-
-.digital-box{
-  display:none;
-
-  margin-top:20px;
-  padding:22px;
-
-  border-radius:18px;
-
-  background:#0d0d0d;
-  border:1px solid var(--border);
-}
-
-.qr-image{
-  width:260px;
-  max-width:100%;
-  display:block;
-  margin:15px auto;
-}
-
-.digital-url{
-  padding:12px;
-
-  border-radius:10px;
-
-  background:#171717;
-
-  color:#aaa;
-
-  font-size:10px;
-
-  word-break:break-all;
-}
-
-.nfc-url{
-  padding:14px;
-
-  border-radius:10px;
-
-  background:#171717;
-
-  color:#fff;
-
-  font-size:10px;
-
-  word-break:break-all;
-}
-
-
-/* =========================
-   NEW BUSINESS
-========================= */
-
-.new-modal{
-  width:min(600px,100%);
-}
-
-.new-intro{
-  color:#888;
-  font-size:13px;
-  line-height:1.6;
-  margin:0 0 22px;
-}
-
-.new-note{
-  margin-top:15px;
-  padding:14px;
-
-  border-radius:12px;
-
-  background:#c59a5210;
-  border:1px solid #c59a5225;
-
-  color:#aaa;
-
-  font-size:11px;
-  line-height:1.5;
-}
-
-.created-box{
-  display:none;
-
-  margin-top:20px;
-  padding:20px;
-
-  border-radius:16px;
-
-  background:#0b170f;
-
-  border:1px solid #2b6841;
-}
-
-.created-box h3{
-  margin:0 0 12px;
-  color:#72d99a;
-}
-
-.created-row{
-  margin:9px 0;
-  padding:11px;
-
-  border-radius:9px;
-
-  background:#101b14;
-
-  color:#ddd;
-
-  font-size:12px;
-
-  word-break:break-all;
-}
-
-.created-row b{
-  color:#888;
-}
-
-
-/* =========================
-   FOOTER
-========================= */
-
-.footer{
-  text-align:center;
-  margin-top:35px;
-
-  color:#444;
-
-  font-size:10px;
-  letter-spacing:.12em;
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media(max-width:1000px){
-
-  .stats{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .detail-stats{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .analytics-kpis{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .analytics-grid{
-    grid-template-columns:1fr;
-  }
-
-}
-
-@media(max-width:650px){
-
-  header{
-    height:auto;
-    min-height:72px;
-    padding:14px 16px;
-  }
-
-  .header-actions{
-    flex-direction:column;
-    align-items:stretch;
-  }
-
-  .new-business,
-  .logout{
-    font-size:10px;
-    padding:9px 10px;
-  }
-
-  main{
-    width:92%;
-    margin-top:25px;
-  }
-
-  .page-head{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  h1{
-    font-size:29px;
-  }
-
-  .stats{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .detail-stats{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .analytics{
-    padding:15px;
-  }
-
-  .analytics-header{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .analytics-kpis{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .periods{
-    width:100%;
-  }
-
-  .period{
-    flex:1;
-  }
-
-  .analytics-grid{
-    grid-template-columns:1fr;
-  }
-
-  .chart{
-    height:190px;
-  }
-
-  .form-grid{
-    grid-template-columns:1fr;
-  }
-
-  .field.full{
-    grid-column:auto;
-  }
-
-  .overlay{
-    padding:10px;
-  }
-
-  .modal{
-    margin:10px auto 40px;
-  }
-
-  .modal-header{
-    padding:18px;
-  }
-
-  .modal-body{
-    padding:18px;
-  }
-
-}
-
-
-/* =========================
-   UTIL
-========================= */
-
-.hidden{
-  display:none !important;
-}
-
-</style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#070707">
+  <title>LEO CONNECT — Admin Control Center</title>
+
+  <style>
+    :root{
+      --bg:#050505;
+      --bg2:#0a0a0a;
+      --panel:#0e0e0e;
+      --panel2:#131313;
+      --line:rgba(255,255,255,.08);
+      --line2:rgba(212,175,55,.22);
+      --gold:#d4af37;
+      --gold2:#f1d477;
+      --text:#f6f1df;
+      --muted:#9d9a90;
+      --green:#43d17a;
+      --red:#ff5d5d;
+      --blue:#6ea8ff;
+      --shadow:0 24px 80px rgba(0,0,0,.45);
+      --radius:22px;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 85% 0%,rgba(212,175,55,.10),transparent 28%),
+        radial-gradient(circle at 0% 35%,rgba(212,175,55,.055),transparent 24%),
+        var(--bg);
+      color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+
+    button,
+    input,
+    select,
+    textarea{
+      font:inherit;
+    }
+
+    button{
+      cursor:pointer;
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    .hidden{
+      display:none!important;
+    }
+
+    /* =========================
+       LOGIN
+    ========================= */
+
+    #loginScreen{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .login-glow{
+      position:absolute;
+      width:520px;
+      height:520px;
+      border-radius:50%;
+      background:radial-gradient(circle,rgba(212,175,55,.13),transparent 68%);
+      filter:blur(10px);
+      pointer-events:none;
+    }
+
+    .login-card{
+      width:100%;
+      max-width:470px;
+      background:linear-gradient(145deg,rgba(18,18,18,.97),rgba(7,7,7,.98));
+      border:1px solid var(--line2);
+      border-radius:30px;
+      padding:38px;
+      box-shadow:var(--shadow);
+      position:relative;
+      z-index:2;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom:30px;
+    }
+
+    .brand-mark{
+      width:54px;
+      height:54px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(212,175,55,.45);
+      background:linear-gradient(145deg,#171717,#080808);
+      color:var(--gold2);
+      font-size:24px;
+      box-shadow:0 0 35px rgba(212,175,55,.10);
+    }
+
+    .brand-title{
+      font-size:20px;
+      font-weight:900;
+      letter-spacing:.12em;
+    }
+
+    .brand-sub{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:3px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .login-card h1{
+      font-size:32px;
+      line-height:1.1;
+      margin-bottom:10px;
+    }
+
+    .login-card > p{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.7;
+      margin-bottom:28px;
+    }
+
+    .field{
+      margin-bottom:16px;
+    }
+
+    .field label{
+      display:block;
+      font-size:12px;
+      font-weight:800;
+      color:#d8d4c7;
+      margin-bottom:8px;
+    }
+
+    .input,
+    .select,
+    .textarea{
+      width:100%;
+      border:1px solid var(--line);
+      background:#090909;
+      color:var(--text);
+      border-radius:14px;
+      padding:13px 14px;
+      outline:none;
+      transition:.2s;
+    }
+
+    .textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus{
+      border-color:rgba(212,175,55,.65);
+      box-shadow:0 0 0 4px rgba(212,175,55,.07);
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background:#121212;
+      color:var(--text);
+      border-radius:13px;
+      padding:11px 15px;
+      font-weight:800;
+      font-size:12px;
+      transition:.2s;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+      border-color:rgba(212,175,55,.4);
+    }
+
+    .btn-gold{
+      background:linear-gradient(135deg,#b88d19,#e5c65f);
+      color:#080808;
+      border-color:transparent;
+      box-shadow:0 10px 28px rgba(212,175,55,.15);
+    }
+
+    .btn-danger{
+      color:#ff8585;
+      border-color:rgba(255,93,93,.2);
+      background:rgba(255,93,93,.05);
+    }
+
+    .btn-success{
+      color:#75e7a1;
+      border-color:rgba(67,209,122,.2);
+      background:rgba(67,209,122,.05);
+    }
+
+    .btn-blue{
+      color:#91baff;
+      border-color:rgba(110,168,255,.2);
+      background:rgba(110,168,255,.05);
+    }
+
+    .login-error{
+      color:#ff8989;
+      font-size:12px;
+      margin-top:12px;
+      min-height:18px;
+    }
+
+    /* =========================
+       APP
+    ========================= */
+
+    #app{
+      min-height:100vh;
+    }
+
+    .topbar{
+      height:76px;
+      border-bottom:1px solid var(--line);
+      background:rgba(5,5,5,.84);
+      backdrop-filter:blur(20px);
+      position:sticky;
+      top:0;
+      z-index:50;
+    }
+
+    .topbar-inner{
+      width:min(1500px,calc(100% - 40px));
+      height:100%;
+      margin:auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .top-brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .top-mark{
+      width:42px;
+      height:42px;
+      border-radius:13px;
+      border:1px solid rgba(212,175,55,.38);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--gold2);
+      font-weight:900;
+    }
+
+    .top-brand strong{
+      display:block;
+      font-size:15px;
+      letter-spacing:.12em;
+    }
+
+    .top-brand span{
+      color:var(--muted);
+      font-size:10px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .admin-badge{
+      padding:9px 12px;
+      border:1px solid rgba(212,175,55,.18);
+      border-radius:999px;
+      color:var(--gold2);
+      font-size:11px;
+      font-weight:800;
+      background:rgba(212,175,55,.05);
+    }
+
+    .shell{
+      width:min(1500px,calc(100% - 40px));
+      margin:0 auto;
+      padding:30px 0 70px;
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+
+    .hero{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:30px;
+      margin-bottom:26px;
+    }
+
+    .eyebrow{
+      color:var(--gold2);
+      text-transform:uppercase;
+      letter-spacing:.2em;
+      font-size:10px;
+      font-weight:900;
+      margin-bottom:9px;
+    }
+
+    .hero h1{
+      font-size:clamp(30px,4vw,48px);
+      line-height:1;
+      letter-spacing:-.04em;
+      margin-bottom:12px;
+    }
+
+    .hero p{
+      color:var(--muted);
+      max-width:680px;
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:9px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    /* =========================
+       STATS
+    ========================= */
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:12px;
+      margin-bottom:28px;
+    }
+
+    .stat{
+      min-height:126px;
+      padding:19px;
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,.008)),
+        var(--panel);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .stat::after{
+      content:"";
+      position:absolute;
+      width:90px;
+      height:90px;
+      border-radius:50%;
+      right:-35px;
+      bottom:-45px;
+      background:radial-gradient(circle,rgba(212,175,55,.13),transparent 70%);
+    }
+
+    .stat-label{
+      font-size:11px;
+      color:var(--muted);
+      font-weight:800;
+      margin-bottom:13px;
+    }
+
+    .stat-value{
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:-.04em;
+    }
+
+    .stat-icon{
+      color:var(--gold);
+      font-size:17px;
+      margin-bottom:12px;
+    }
+
+    /* =========================
+       PANELS
+    ========================= */
+
+    .panel{
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.022),rgba(255,255,255,.006)),
+        var(--panel);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:0 14px 50px rgba(0,0,0,.15);
+      overflow:hidden;
+    }
+
+    .panel-head{
+      padding:20px 22px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:15px;
+    }
+
+    .panel-title{
+      font-size:15px;
+      font-weight:900;
+    }
+
+    .panel-sub{
+      color:var(--muted);
+      font-size:11px;
+      margin-top:4px;
+    }
+
+    .toolbar{
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid var(--line);
+      flex-wrap:wrap;
+    }
+
+    .search{
+      position:relative;
+      flex:1;
+      min-width:230px;
+    }
+
+    .search input{
+      width:100%;
+      background:#090909;
+      border:1px solid var(--line);
+      color:var(--text);
+      border-radius:13px;
+      padding:11px 13px 11px 38px;
+      outline:none;
+    }
+
+    .search-icon{
+      position:absolute;
+      left:13px;
+      top:50%;
+      transform:translateY(-50%);
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .table-wrap{
+      overflow:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:900px;
+    }
+
+    th{
+      text-align:left;
+      color:#817e74;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      padding:14px 18px;
+      border-bottom:1px solid var(--line);
+      white-space:nowrap;
+    }
+
+    td{
+      padding:16px 18px;
+      border-bottom:1px solid rgba(255,255,255,.045);
+      font-size:12px;
+      vertical-align:middle;
+    }
+
+    tbody tr{
+      transition:.15s;
+    }
+
+    tbody tr:hover{
+      background:rgba(212,175,55,.025);
+    }
+
+    .business-cell{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:200px;
+    }
+
+    .business-logo{
+      width:42px;
+      height:42px;
+      border-radius:13px;
+      object-fit:cover;
+      border:1px solid var(--line);
+      background:#111;
+      flex-shrink:0;
+    }
+
+    .business-placeholder{
+      width:42px;
+      height:42px;
+      border-radius:13px;
+      border:1px solid rgba(212,175,55,.2);
+      background:#111;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--gold);
+      font-weight:900;
+      flex-shrink:0;
+    }
+
+    .business-name{
+      font-weight:900;
+      color:#f5f0e1;
+    }
+
+    .business-meta{
+      color:var(--muted);
+      font-size:10px;
+      margin-top:3px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      padding:6px 9px;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .pill-green{
+      color:#72e39a;
+      background:rgba(67,209,122,.07);
+      border:1px solid rgba(67,209,122,.16);
+    }
+
+    .pill-red{
+      color:#ff8d8d;
+      background:rgba(255,93,93,.07);
+      border:1px solid rgba(255,93,93,.16);
+    }
+
+    .pill-gold{
+      color:var(--gold2);
+      background:rgba(212,175,55,.07);
+      border:1px solid rgba(212,175,55,.16);
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+
+    .mini-btn{
+      border:1px solid var(--line);
+      background:#111;
+      color:#dcd8ca;
+      padding:7px 9px;
+      border-radius:9px;
+      font-size:10px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .mini-btn:hover{
+      border-color:rgba(212,175,55,.35);
+      color:var(--gold2);
+    }
+
+    /* =========================
+       NFC
+    ========================= */
+
+    .nfc-section{
+      margin-top:22px;
+    }
+
+    .nfc-table td{
+      padding-top:14px;
+      padding-bottom:14px;
+    }
+
+    .tag-name{
+      font-weight:900;
+    }
+
+    .tag-code{
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      color:#8f8c83;
+      font-size:9px;
+      margin-top:4px;
+      word-break:break-all;
+      max-width:190px;
+    }
+
+    .placement{
+      color:#d9d5c8;
+    }
+
+    .muted{
+      color:var(--muted);
+    }
+
+    /* =========================
+       MODAL
+    ========================= */
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.75);
+      backdrop-filter:blur(12px);
+      z-index:100;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .modal-card{
+      width:min(700px,100%);
+      max-height:90vh;
+      overflow:auto;
+      background:linear-gradient(145deg,#151515,#080808);
+      border:1px solid rgba(212,175,55,.24);
+      border-radius:25px;
+      box-shadow:0 40px 120px rgba(0,0,0,.6);
+    }
+
+    .modal-card.large{
+      width:min(1000px,100%);
+    }
+
+    .modal-head{
+      padding:20px 22px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:15px;
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      background:#101010;
+      z-index:2;
+    }
+
+    .modal-head h3{
+      font-size:17px;
+    }
+
+    .modal-body{
+      padding:22px;
+    }
+
+    .close{
+      width:34px;
+      height:34px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#111;
+      color:#aaa;
+      font-size:17px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+    }
+
+    .full{
+      grid-column:1 / -1;
+    }
+
+    .modal-footer{
+      padding:18px 22px;
+      border-top:1px solid var(--line);
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    /* =========================
+       BUSINESS DETAIL
+    ========================= */
+
+    .detail-hero{
+      display:flex;
+      align-items:center;
+      gap:15px;
+      margin-bottom:22px;
+    }
+
+    .detail-logo{
+      width:72px;
+      height:72px;
+      border-radius:20px;
+      object-fit:cover;
+      background:#111;
+      border:1px solid var(--line2);
+    }
+
+    .detail-title{
+      font-size:24px;
+      font-weight:900;
+    }
+
+    .detail-meta{
+      color:var(--muted);
+      margin-top:4px;
+      font-size:12px;
+    }
+
+    .detail-stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin-bottom:22px;
+    }
+
+    .detail-stat{
+      background:#0c0c0c;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
+
+    .detail-stat span{
+      display:block;
+      color:var(--muted);
+      font-size:10px;
+      margin-bottom:7px;
+    }
+
+    .detail-stat strong{
+      font-size:22px;
+    }
+
+    .detail-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+    }
+
+    .info-card{
+      border:1px solid var(--line);
+      border-radius:17px;
+      padding:16px;
+      background:#0b0b0b;
+    }
+
+    .info-card h4{
+      color:var(--gold2);
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+      margin-bottom:12px;
+    }
+
+    .info-row{
+      display:flex;
+      justify-content:space-between;
+      gap:15px;
+      padding:8px 0;
+      border-bottom:1px solid rgba(255,255,255,.045);
+      font-size:11px;
+    }
+
+    .info-row:last-child{
+      border-bottom:0;
+    }
+
+    .info-row span:first-child{
+      color:var(--muted);
+    }
+
+    .info-row span:last-child{
+      text-align:right;
+      max-width:65%;
+      word-break:break-word;
+    }
+
+    /* =========================
+       QR MODAL
+    ========================= */
+
+    .qr-center{
+      text-align:center;
+      padding:10px 0;
+    }
+
+    .qr-box{
+      width:260px;
+      height:260px;
+      margin:0 auto 20px;
+      background:#fff;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .qr-box img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    .url-box{
+      background:#090909;
+      border:1px solid var(--line);
+      border-radius:13px;
+      padding:12px;
+      color:#aaa;
+      font-size:11px;
+      word-break:break-all;
+      text-align:left;
+    }
+
+    /* =========================
+       ANALYTICS
+    ========================= */
+
+    .analytics-cards{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-bottom:18px;
+    }
+
+    .analytics-card{
+      background:#0b0b0b;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:17px;
+    }
+
+    .analytics-card span{
+      display:block;
+      color:var(--muted);
+      font-size:10px;
+      margin-bottom:8px;
+    }
+
+    .analytics-card strong{
+      font-size:25px;
+    }
+
+    .event-list{
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+    }
+
+    .event-row{
+      padding:13px 15px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.045);
+      font-size:11px;
+    }
+
+    .event-row:last-child{
+      border-bottom:0;
+    }
+
+    /* =========================
+       TOAST
+    ========================= */
+
+    #toast{
+      position:fixed;
+      right:22px;
+      bottom:22px;
+      z-index:200;
+      background:#151515;
+      color:#eee;
+      border:1px solid rgba(212,175,55,.3);
+      border-radius:14px;
+      padding:13px 16px;
+      box-shadow:0 20px 60px rgba(0,0,0,.4);
+      font-size:12px;
+      font-weight:800;
+      transform:translateY(20px);
+      opacity:0;
+      pointer-events:none;
+      transition:.25s;
+      max-width:350px;
+    }
+
+    #toast.show{
+      transform:translateY(0);
+      opacity:1;
+    }
+
+    #toast.success{
+      border-color:rgba(67,209,122,.3);
+    }
+
+    #toast.error{
+      border-color:rgba(255,93,93,.3);
+      color:#ffaaaa;
+    }
+
+    /* =========================
+       EMPTY
+    ========================= */
+
+    .empty{
+      padding:45px 20px;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    .empty-icon{
+      font-size:35px;
+      margin-bottom:10px;
+      opacity:.7;
+    }
+
+    .empty strong{
+      display:block;
+      color:#ddd8ca;
+      margin-bottom:5px;
+    }
+
+    /* =========================
+       LOADING
+    ========================= */
+
+    .loading{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:45px;
+      color:var(--muted);
+      gap:10px;
+      font-size:12px;
+    }
+
+    .spinner{
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      border:2px solid rgba(212,175,55,.18);
+      border-top-color:var(--gold);
+      animation:spin .8s linear infinite;
+    }
+
+    @keyframes spin{
+      to{transform:rotate(360deg)}
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media(max-width:1200px){
+      .stats-grid{
+        grid-template-columns:repeat(3,1fr);
+      }
+    }
+
+    @media(max-width:800px){
+      .shell,
+      .topbar-inner{
+        width:min(100% - 24px,1500px);
+      }
+
+      .topbar{
+        height:68px;
+      }
+
+      .admin-badge{
+        display:none;
+      }
+
+      .hero{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .hero-actions{
+        justify-content:flex-start;
+      }
+
+      .stats-grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      .detail-stats{
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      .detail-grid,
+      .form-grid{
+        grid-template-columns:1fr;
+      }
+
+      .full{
+        grid-column:auto;
+      }
+
+      .login-card{
+        padding:27px 22px;
+      }
+    }
+
+    @media(max-width:500px){
+      .shell{
+        padding-top:20px;
+      }
+
+      .top-brand span{
+        display:none;
+      }
+
+      .top-brand strong{
+        font-size:13px;
+      }
+
+      .top-mark{
+        width:38px;
+        height:38px;
+      }
+
+      .hero h1{
+        font-size:32px;
+      }
+
+      .stats-grid{
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+      }
+
+      .stat{
+        min-height:110px;
+        padding:14px;
+      }
+
+      .stat-value{
+        font-size:24px;
+      }
+
+      .stat-label{
+        font-size:10px;
+      }
+
+      .hero-actions{
+        width:100%;
+      }
+
+      .hero-actions .btn{
+        flex:1;
+      }
+
+      .modal{
+        padding:10px;
+        align-items:flex-end;
+      }
+
+      .modal-card{
+        max-height:94vh;
+        border-radius:22px 22px 0 0;
+      }
+
+      .detail-stats{
+        gap:7px;
+      }
+
+      .detail-stat{
+        padding:12px;
+      }
+
+      .detail-stat strong{
+        font-size:19px;
+      }
+
+      #toast{
+        left:12px;
+        right:12px;
+        bottom:12px;
+        max-width:none;
+      }
+    }
+  </style>
 </head>
-
 
 <body>
 
-
-<!-- ==================================================
+<!-- =========================
      LOGIN
-================================================== -->
+========================= -->
 
 <section id="loginScreen">
+  <div class="login-glow"></div>
 
   <div class="login-card">
 
-    <div class="lion">
-      🦁
-    </div>
-
     <div class="brand">
-      LEO <span>CONNECT</span>
-    </div>
+      <div class="brand-mark">♛</div>
 
-    <div class="login-subtitle">
-      PRIVATE ADMINISTRATION
-    </div>
-
-    <label>
-      ADMIN E-POSTA
-    </label>
-
-    <input
-      id="adminEmail"
-      type="email"
-      autocomplete="username"
-      placeholder="Admin e-posta adresi"
-    >
-
-    <label>
-      ADMIN ŞİFRE
-    </label>
-
-    <input
-      id="adminPassword"
-      type="password"
-      autocomplete="current-password"
-      placeholder="Admin şifresi"
-    >
-
-    <button
-      class="login-button"
-      onclick="adminLogin()"
-    >
-      YÖNETİM MERKEZİNE GİR
-    </button>
-
-    <div id="loginMessage"></div>
-
-  </div>
-
-</section>
-
-
-
-<!-- ==================================================
-     ADMIN APP
-================================================== -->
-
-<section id="adminApp">
-
-
-<header>
-
-  <div class="header-brand">
-
-    <div class="header-logo">
-      🦁
-    </div>
-
-    <div>
-
-      <strong>
-        LEO <span>CONNECT</span>
-      </strong>
-
-      <div class="admin-label">
-        PRIVATE ADMIN
+      <div>
+        <div class="brand-title">LEO CONNECT</div>
+        <div class="brand-sub">Admin Control Center</div>
       </div>
-
     </div>
 
-  </div>
-
-
-  <div class="header-actions">
-
-    <button
-      class="new-business"
-      onclick="openNewBusiness()"
-    >
-      ＋ Yeni İşletme
-    </button>
-
-    <button
-      class="logout"
-      onclick="logout()"
-    >
-      Çıkış Yap
-    </button>
-
-  </div>
-
-</header>
-
-
-
-<main>
-
-
-<div class="page-head">
-
-  <div>
-
-    <div class="eyebrow">
-      LEO CONNECT • CONTROL CENTER
-    </div>
-
-    <h1>
-      Yönetim Merkezi
-    </h1>
+    <h1>Hoş geldin.</h1>
 
     <p>
-      Tüm işletmeleri, bağlantıları ve etkileşimleri tek merkezden yönet.
+      Tüm işletmeleri, QR bağlantılarını, NFC etiketlerini
+      ve sistem performansını tek merkezden yönet.
     </p>
 
+    <form id="loginForm">
+
+      <div class="field">
+        <label>ADMIN E-POSTA</label>
+        <input
+          id="loginEmail"
+          class="input"
+          type="email"
+          autocomplete="username"
+          placeholder="admin@email.com"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label>ŞİFRE</label>
+        <input
+          id="loginPassword"
+          class="input"
+          type="password"
+          autocomplete="current-password"
+          placeholder="••••••••"
+          required
+        >
+      </div>
+
+      <button
+        id="loginBtn"
+        class="btn btn-gold"
+        type="submit"
+        style="width:100%;padding:14px"
+      >
+        ADMIN PANELİNE GİR
+      </button>
+
+      <div id="loginError" class="login-error"></div>
+
+    </form>
+
   </div>
+</section>
 
 
-  <div class="live">
+<!-- =========================
+     APP
+========================= -->
 
-    <span class="live-dot"></span>
+<section id="app" class="hidden">
 
-    Sistem aktif
+  <header class="topbar">
 
-  </div>
+    <div class="topbar-inner">
 
-</div>
+      <div class="top-brand">
+        <div class="top-mark">♛</div>
 
+        <div>
+          <strong>LEO CONNECT</strong>
+          <span>Admin Control Center</span>
+        </div>
+      </div>
 
+      <div class="top-actions">
 
-<!-- ==================================================
-     STATS
-================================================== -->
+        <div class="admin-badge">
+          ADMIN ACCESS
+        </div>
 
-<div class="stats">
+        <button
+          class="btn"
+          onclick="refreshAll()"
+        >
+          ↻ Yenile
+        </button>
 
+        <button
+          class="btn btn-danger"
+          onclick="logout()"
+        >
+          Çıkış
+        </button>
 
-  <div class="stat">
-    <div class="stat-icon">🏢</div>
-    <small>İŞLETMELER</small>
-    <strong id="businessCount">0</strong>
-  </div>
-
-
-  <div class="stat">
-    <div class="stat-icon">👁️</div>
-    <small>PROFİL GÖRÜNTÜLEME</small>
-    <strong id="profileCount">0</strong>
-  </div>
-
-
-  <div class="stat">
-    <div class="stat-icon">▣</div>
-    <small>QR TARAMA</small>
-    <strong id="qrCount">0</strong>
-  </div>
-
-
-  <div class="stat">
-    <div class="stat-icon">📡</div>
-    <small>NFC DOKUNMA</small>
-    <strong id="nfcCount">0</strong>
-  </div>
-
-
-  <div class="stat">
-    <div class="stat-icon">💬</div>
-    <small>WHATSAPP</small>
-    <strong id="whatsappCount">0</strong>
-  </div>
-
-
-  <div class="stat">
-    <div class="stat-icon">📞</div>
-    <small>TELEFON</small>
-    <strong id="phoneCount">0</strong>
-  </div>
-
-
-</div>
-
-
-
-<!-- ==================================================
-     BUSINESS LIST
-================================================== -->
-
-<section class="panel">
-
-  <div class="panel-head">
-
-    <div>
-
-      <h2>
-        İşletmeler
-      </h2>
-
-      <p>
-        İşletmeye dokunarak detaylı yönetim ekranını aç.
-      </p>
+      </div>
 
     </div>
 
-
-    <button
-      class="refresh"
-      onclick="loadAdmin()"
-    >
-      ↻ Yenile
-    </button>
-
-  </div>
+  </header>
 
 
-  <div class="table-wrap">
+  <main class="shell">
 
-    <table>
+    <!-- HERO -->
 
-      <thead>
+    <section class="hero">
 
-        <tr>
+      <div>
+        <div class="eyebrow">LEO CONNECT / CONTROL</div>
 
-          <th>İŞLETME</th>
-          <th>KATEGORİ</th>
-          <th>PROFİL</th>
-          <th>QR</th>
-          <th>NFC</th>
-          <th>WHATSAPP</th>
-          <th>TELEFON</th>
-          <th>KAYIT</th>
+        <h1>Kontrol Merkezi</h1>
 
-        </tr>
+        <p>
+          Tüm işletmelerin dijital profillerini, QR bağlantılarını,
+          NFC etiketlerini ve etkileşimlerini merkezi olarak yönet.
+        </p>
+      </div>
 
-      </thead>
+      <div class="hero-actions">
+
+        <button
+          class="btn btn-gold"
+          onclick="openCreateNfcModal()"
+        >
+          ＋ NFC Etiketi
+        </button>
+
+        <button
+          class="btn"
+          onclick="openBusinessCreateModal()"
+        >
+          ＋ İşletme
+        </button>
+
+      </div>
+
+    </section>
 
 
-      <tbody id="businessTable">
+    <!-- STATS -->
 
-        <tr>
+    <section class="stats-grid">
 
-          <td
-            colspan="8"
-            class="empty"
+      <div class="stat">
+        <div class="stat-icon">♙</div>
+        <div class="stat-label">TOPLAM İŞLETME</div>
+        <div id="statBusinesses" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-icon">◉</div>
+        <div class="stat-label">PROFİL GÖRÜNTÜLEME</div>
+        <div id="statViews" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-icon">▣</div>
+        <div class="stat-label">QR TARAMA</div>
+        <div id="statQr" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-icon">⌁</div>
+        <div class="stat-label">NFC DOKUNUŞ</div>
+        <div id="statNfc" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-icon">☎</div>
+        <div class="stat-label">WHATSAPP</div>
+        <div id="statWhatsapp" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-icon">▰</div>
+        <div class="stat-label">NFC ETİKETİ</div>
+        <div id="statNfcTags" class="stat-value">—</div>
+      </div>
+
+    </section>
+
+
+    <!-- BUSINESSES -->
+
+    <section class="panel">
+
+      <div class="panel-head">
+
+        <div>
+          <div class="panel-title">İşletmeler</div>
+          <div class="panel-sub">
+            Sistemde kayıtlı tüm işletmeleri yönet.
+          </div>
+        </div>
+
+        <button
+          class="btn btn-gold"
+          onclick="openBusinessCreateModal()"
+        >
+          ＋ Yeni İşletme
+        </button>
+
+      </div>
+
+
+      <div class="toolbar">
+
+        <div class="search">
+          <span class="search-icon">⌕</span>
+
+          <input
+            id="businessSearch"
+            type="search"
+            placeholder="İşletme, kategori veya slug ara..."
+            oninput="renderBusinesses()"
           >
-            İşletmeler yükleniyor...
-          </td>
+        </div>
 
-        </tr>
+        <button
+          class="btn"
+          onclick="loadBusinesses()"
+        >
+          ↻ İşletmeleri Yenile
+        </button>
 
-      </tbody>
+      </div>
 
-    </table>
 
-  </div>
+      <div id="businessTableContainer">
+        <div class="loading">
+          <div class="spinner"></div>
+          İşletmeler yükleniyor...
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- NFC -->
+
+    <section class="panel nfc-section">
+
+      <div class="panel-head">
+
+        <div>
+          <div class="panel-title">NFC Etiket Yönetimi</div>
+          <div class="panel-sub">
+            Tüm işletmelerin NFC etiketlerini tek merkezden kontrol et.
+          </div>
+        </div>
+
+        <button
+          class="btn btn-gold"
+          onclick="openCreateNfcModal()"
+        >
+          ＋ NFC Etiketi Oluştur
+        </button>
+
+      </div>
+
+
+      <div class="toolbar">
+
+        <div class="search">
+          <span class="search-icon">⌕</span>
+
+          <input
+            id="nfcSearch"
+            type="search"
+            placeholder="Etiket, işletme veya konum ara..."
+            oninput="renderNfcTags()"
+          >
+        </div>
+
+        <button
+          class="btn"
+          onclick="loadNfcTags()"
+        >
+          ↻ NFC Yenile
+        </button>
+
+      </div>
+
+
+      <div id="nfcTableContainer">
+        <div class="loading">
+          <div class="spinner"></div>
+          NFC etiketleri yükleniyor...
+        </div>
+      </div>
+
+    </section>
+
+  </main>
 
 </section>
 
 
-
-<div class="footer">
-  LEO CONNECT • PREMIUM DIGITAL BUSINESS SYSTEM
-</div>
-
-
-</main>
-
-</section>
-
-
-
-<!-- ==================================================
+<!-- =========================
      BUSINESS DETAIL MODAL
-================================================== -->
+========================= -->
 
-<div
-  id="detailOverlay"
-  class="overlay"
->
+<div id="businessDetailModal" class="modal hidden">
 
-  <div class="modal">
+  <div class="modal-card large">
 
-
-    <div class="modal-header">
+    <div class="modal-head">
 
       <div>
-
-        <div class="eyebrow">
-          BUSINESS MANAGEMENT
-        </div>
-
-        <h2 id="detailTitle">
-          İşletme
-        </h2>
-
-        <p id="detailEmail">
-          -
-        </p>
-
+        <h3>İşletme Detayı</h3>
       </div>
-
 
       <button
         class="close"
-        onclick="closeDetail()"
+        onclick="closeModal('businessDetailModal')"
       >
         ×
       </button>
 
     </div>
 
-
-
-    <div class="modal-body">
-
-
-      <!-- DETAIL QUICK STATS -->
-
-      <div class="detail-stats">
-
-        <div class="detail-stat">
-          <small>PROFİL</small>
-          <strong id="detailProfile">0</strong>
-        </div>
-
-        <div class="detail-stat">
-          <small>QR</small>
-          <strong id="detailQR">0</strong>
-        </div>
-
-        <div class="detail-stat">
-          <small>NFC</small>
-          <strong id="detailNFC">0</strong>
-        </div>
-
-        <div class="detail-stat">
-          <small>WHATSAPP</small>
-          <strong id="detailWhatsapp">0</strong>
-        </div>
-
-        <div class="detail-stat">
-          <small>TELEFON</small>
-          <strong id="detailPhone">0</strong>
-        </div>
-
-        <div class="detail-stat">
-          <small>TOPLAM</small>
-          <strong id="detailTotal">0</strong>
-        </div>
-
+    <div id="businessDetailBody" class="modal-body">
+      <div class="loading">
+        <div class="spinner"></div>
+        Yükleniyor...
       </div>
-
-
-
-      <!-- ==================================================
-           ANALYTICS
-      ================================================== -->
-
-      <section class="analytics">
-
-        <div class="analytics-header">
-
-          <div class="analytics-title">
-
-            <div class="eyebrow">
-              BUSINESS ANALYTICS
-            </div>
-
-            <h3>
-              Etkileşim Merkezi
-            </h3>
-
-            <p>
-              İşletmenin dijital bağlantı performansını incele.
-            </p>
-
-          </div>
-
-
-          <div class="periods">
-
-            <button
-              class="period"
-              data-period="today"
-              onclick="loadAnalytics('today')"
-            >
-              BUGÜN
-            </button>
-
-            <button
-              class="period"
-              data-period="7d"
-              onclick="loadAnalytics('7d')"
-            >
-              7 GÜN
-            </button>
-
-            <button
-              class="period active"
-              data-period="30d"
-              onclick="loadAnalytics('30d')"
-            >
-              30 GÜN
-            </button>
-
-            <button
-              class="period"
-              data-period="all"
-              onclick="loadAnalytics('all')"
-            >
-              TÜMÜ
-            </button>
-
-          </div>
-
-        </div>
-
-
-
-        <div
-          id="analyticsLoading"
-          class="analytics-loading"
-        >
-          Analitik verileri yükleniyor...
-        </div>
-
-
-
-        <div
-          id="analyticsContent"
-          style="display:none"
-        >
-
-
-          <!-- KPI -->
-
-          <div class="analytics-kpis">
-
-            <div class="analytics-kpi">
-
-              <small>
-                TOPLAM ETKİLEŞİM
-              </small>
-
-              <strong id="analyticsTotal">
-                0
-              </strong>
-
-            </div>
-
-
-            <div class="analytics-kpi">
-
-              <small>
-                PROFİL
-              </small>
-
-              <strong id="analyticsProfile">
-                0
-              </strong>
-
-            </div>
-
-
-            <div class="analytics-kpi">
-
-              <small>
-                QR
-              </small>
-
-              <strong id="analyticsQR">
-                0
-              </strong>
-
-            </div>
-
-
-            <div class="analytics-kpi">
-
-              <small>
-                NFC
-              </small>
-
-              <strong id="analyticsNFC">
-                0
-              </strong>
-
-            </div>
-
-
-            <div class="analytics-kpi">
-
-              <small>
-                WHATSAPP
-              </small>
-
-              <strong id="analyticsWhatsapp">
-                0
-              </strong>
-
-            </div>
-
-          </div>
-
-
-
-          <!-- GRAPH + SOURCES -->
-
-          <div class="analytics-grid">
-
-
-            <div class="analytics-card">
-
-              <h4>
-                📈 Günlük Etkileşim
-              </h4>
-
-              <div
-                id="dailyChart"
-                class="chart"
-              ></div>
-
-            </div>
-
-
-
-            <div class="analytics-card">
-
-              <h4>
-                ⚡ QR / NFC
-              </h4>
-
-
-              <div class="source-row">
-
-                <div class="source-top">
-
-                  <span>
-                    📷 QR
-                  </span>
-
-                  <strong id="sourceQR">
-                    0
-                  </strong>
-
-                </div>
-
-                <div class="source-track">
-
-                  <div
-                    id="sourceQRBar"
-                    class="source-fill"
-                    style="width:0%"
-                  ></div>
-
-                </div>
-
-              </div>
-
-
-              <div class="source-row">
-
-                <div class="source-top">
-
-                  <span>
-                    📡 NFC
-                  </span>
-
-                  <strong id="sourceNFC">
-                    0
-                  </strong>
-
-                </div>
-
-                <div class="source-track">
-
-                  <div
-                    id="sourceNFCBar"
-                    class="source-fill"
-                    style="width:0%"
-                  ></div>
-
-                </div>
-
-              </div>
-
-
-              <h4 style="margin-top:25px">
-                🏆 Kanallar
-              </h4>
-
-              <div
-                id="channelList"
-                class="channel-list"
-              ></div>
-
-            </div>
-
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-
-      <!-- ==================================================
-           BUSINESS FORM
-      ================================================== -->
-
-      <div class="form-grid">
-
-
-        <div class="field">
-
-          <label>
-            İŞLETME ADI
-          </label>
-
-          <input id="f_name">
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            KATEGORİ
-          </label>
-
-          <input id="f_category">
-
-        </div>
-
-
-        <div class="field full">
-
-          <label>
-            AÇIKLAMA
-          </label>
-
-          <textarea id="f_description"></textarea>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            TELEFON
-          </label>
-
-          <input id="f_phone">
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            WHATSAPP
-          </label>
-
-          <input id="f_whatsapp">
-
-        </div>
-
-
-        <div class="field full">
-
-          <label>
-            KONUM / GOOGLE MAPS
-          </label>
-
-          <input id="f_address">
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            INSTAGRAM
-          </label>
-
-          <input id="f_instagram">
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            TIKTOK
-          </label>
-
-          <input id="f_tiktok">
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            GOOGLE YORUM
-          </label>
-
-          <input id="f_google_review">
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            WEB SİTESİ
-          </label>
-
-          <input id="f_website">
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            MENÜ
-          </label>
-
-          <input id="f_menu">
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            ÇALIŞMA SAATLERİ
-          </label>
-
-          <input id="f_hours">
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            IBAN
-          </label>
-
-          <input id="f_iban">
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            IBAN SAHİBİ
-          </label>
-
-          <input id="f_iban_holder">
-
-        </div>
-
-
-        <div class="field full">
-
-          <label>
-            LOGO URL
-          </label>
-
-          <input id="f_logo_url">
-
-        </div>
-
-
-      </div>
-
-
-
-      <!-- ACTIONS -->
-
-      <div class="modal-actions">
-
-
-        <button
-          class="action gold"
-          onclick="saveBusiness()"
-        >
-          ✓ Bilgileri Kaydet
-        </button>
-
-
-        <a
-          id="detailProfileLink"
-          class="action"
-          target="_blank"
-        >
-          👤 Profili Aç
-        </a>
-
-
-        <button
-          class="action"
-          onclick="showQR()"
-        >
-          ▣ QR Kod
-        </button>
-
-
-        <button
-          class="action"
-          onclick="showNFC()"
-        >
-          📡 NFC
-        </button>
-
-
-        <button
-          class="action danger"
-          onclick="deleteBusiness()"
-        >
-          🗑 İşletmeyi Sil
-        </button>
-
-
-      </div>
-
-
-      <div
-        id="saveMessage"
-        class="message"
-      ></div>
-
-
-
-      <!-- QR -->
-
-      <div
-        id="qrBox"
-        class="digital-box"
-      >
-
-        <div class="eyebrow">
-          QR CONNECTION
-        </div>
-
-        <h3>
-          İşletme QR Kodu
-        </h3>
-
-        <img
-          id="detailQRImage"
-          class="qr-image"
-          alt="QR Kod"
-        >
-
-        <div
-          id="detailQRUrl"
-          class="digital-url"
-        ></div>
-
-        <br>
-
-        <a
-          id="detailQRDownload"
-          class="action gold"
-          download="leo-connect-qr.png"
-        >
-          QR'ı İndir
-        </a>
-
-      </div>
-
-
-
-      <!-- NFC -->
-
-      <div
-        id="nfcBox"
-        class="digital-box"
-      >
-
-        <div class="eyebrow">
-          NFC CONNECTION
-        </div>
-
-        <h3>
-          NFC Bağlantısı
-        </h3>
-
-        <p>
-          Bu bağlantıyı NFC etiketine yazdırabilirsin.
-        </p>
-
-        <div
-          id="detailNFCUrl"
-          class="nfc-url"
-        ></div>
-
-        <br>
-
-        <button
-          class="action gold"
-          onclick="copyNFC()"
-        >
-          NFC Bağlantısını Kopyala
-        </button>
-
-      </div>
-
-
     </div>
 
   </div>
@@ -2187,188 +1478,392 @@ tbody tr:hover{
 </div>
 
 
+<!-- =========================
+     BUSINESS EDIT MODAL
+========================= -->
 
-<!-- ==================================================
-     NEW BUSINESS MODAL
-================================================== -->
+<div id="businessEditModal" class="modal hidden">
 
-<div
-  id="newBusinessOverlay"
-  class="overlay"
->
+  <div class="modal-card">
 
-  <div class="modal new-modal">
+    <div class="modal-head">
 
-
-    <div class="modal-header">
-
-      <div>
-
-        <div class="eyebrow">
-          LEO CONNECT • BUSINESS
-        </div>
-
-        <h2>
-          Yeni İşletme
-        </h2>
-
-        <p>
-          Yeni müşteri hesabını oluştur.
-        </p>
-
-      </div>
-
+      <h3 id="businessEditTitle">
+        İşletme Düzenle
+      </h3>
 
       <button
         class="close"
-        onclick="closeNewBusiness()"
+        onclick="closeModal('businessEditModal')"
       >
         ×
       </button>
 
     </div>
 
+    <form id="businessForm">
 
+      <div class="modal-body">
 
-    <div class="modal-body">
-
-
-      <p class="new-intro">
-
-        Buradan yeni işletmenin giriş hesabını oluşturabilirsin.
-        İşletme daha sonra kendi panelinden profil bilgilerini güncelleyebilir.
-
-      </p>
-
-
-      <div class="form-grid">
-
-
-        <div class="field full">
-
-          <label>
-            İŞLETME ADI *
-          </label>
-
-          <input
-            id="new_name"
-            placeholder="Örn. Zelo Bowl"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            E-POSTA *
-          </label>
-
-          <input
-            id="new_email"
-            type="email"
-            placeholder="musteri@email.com"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            ŞİFRE *
-          </label>
-
-          <input
-            id="new_password"
-            type="text"
-            placeholder="En az 8 karakter"
-          >
-
-        </div>
-
-
-        <div class="field full">
-
-          <label>
-            KATEGORİ
-          </label>
-
-          <input
-            id="new_category"
-            placeholder="Örn. Restoran"
-          >
-
-        </div>
-
-
-      </div>
-
-
-      <div class="new-note">
-
-        🔐 E-posta ve şifre müşterinin işletme paneline
-        giriş yapması için kullanılacaktır.
-
-      </div>
-
-
-      <div class="modal-actions">
-
-        <button
-          class="action gold"
-          onclick="createBusiness()"
+        <input
+          type="hidden"
+          id="businessId"
         >
-          ＋ İşletmeyi Oluştur
-        </button>
+
+        <div class="form-grid">
+
+          <div class="field">
+            <label>İŞLETME ADI</label>
+            <input
+              id="businessName"
+              class="input"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label>KATEGORİ</label>
+            <input
+              id="businessCategory"
+              class="input"
+            >
+          </div>
+
+          <div class="field full">
+            <label>AÇIKLAMA</label>
+            <textarea
+              id="businessDescription"
+              class="textarea"
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label>TELEFON</label>
+            <input
+              id="businessPhone"
+              class="input"
+            >
+          </div>
+
+          <div class="field">
+            <label>WHATSAPP</label>
+            <input
+              id="businessWhatsapp"
+              class="input"
+            >
+          </div>
+
+          <div class="field full">
+            <label>ADRES</label>
+            <input
+              id="businessAddress"
+              class="input"
+            >
+          </div>
+
+          <div class="field">
+            <label>INSTAGRAM</label>
+            <input
+              id="businessInstagram"
+              class="input"
+            >
+          </div>
+
+          <div class="field">
+            <label>TIKTOK</label>
+            <input
+              id="businessTiktok"
+              class="input"
+            >
+          </div>
+
+          <div class="field">
+            <label>GOOGLE YORUM</label>
+            <input
+              id="businessGoogleReview"
+              class="input"
+            >
+          </div>
+
+          <div class="field">
+            <label>WEBSITE</label>
+            <input
+              id="businessWebsite"
+              class="input"
+            >
+          </div>
+
+          <div class="field">
+            <label>MENÜ</label>
+            <input
+              id="businessMenu"
+              class="input"
+            >
+          </div>
+
+          <div class="field">
+            <label>ÇALIŞMA SAATLERİ</label>
+            <input
+              id="businessHours"
+              class="input"
+            >
+          </div>
+
+          <div class="field">
+            <label>IBAN</label>
+            <input
+              id="businessIban"
+              class="input"
+            >
+          </div>
+
+          <div class="field">
+            <label>IBAN HESAP SAHİBİ</label>
+            <input
+              id="businessIbanHolder"
+              class="input"
+            >
+          </div>
+
+          <div class="field full">
+            <label>LOGO URL</label>
+            <input
+              id="businessLogo"
+              class="input"
+            >
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
 
         <button
-          class="action"
-          onclick="closeNewBusiness()"
+          type="button"
+          class="btn"
+          onclick="closeModal('businessEditModal')"
         >
           Vazgeç
         </button>
 
+        <button
+          id="businessDeleteBtn"
+          type="button"
+          class="btn btn-danger hidden"
+          onclick="deleteCurrentBusiness()"
+        >
+          İşletmeyi Sil
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-gold"
+        >
+          Kaydet
+        </button>
+
       </div>
 
+    </form>
 
-      <div
-        id="newBusinessMessage"
-        class="message"
-      ></div>
+  </div>
+
+</div>
 
 
-      <div
-        id="createdBox"
-        class="created-box"
-      >
+<!-- =========================
+     NFC CREATE / EDIT MODAL
+========================= -->
 
-        <h3>
-          ✓ İşletme Başarıyla Oluşturuldu
+<div id="nfcModal" class="modal hidden">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <div>
+        <h3 id="nfcModalTitle">
+          NFC Etiketi Oluştur
         </h3>
 
-        <div
-          id="createdBusinessName"
-          class="created-row"
-        ></div>
+        <div class="panel-sub">
+          İşletmeye özel yeni bir NFC bağlantısı oluştur.
+        </div>
+      </div>
+
+      <button
+        class="close"
+        onclick="closeModal('nfcModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <form id="nfcForm">
+
+      <div class="modal-body">
+
+        <input
+          type="hidden"
+          id="nfcId"
+        >
+
+        <div class="field">
+          <label>İŞLETME</label>
+
+          <select
+            id="nfcBusiness"
+            class="select"
+            required
+          >
+            <option value="">
+              İşletme seç...
+            </option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>ETİKET ADI</label>
+
+          <input
+            id="nfcName"
+            class="input"
+            placeholder="Örn. Masa 1 NFC"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>KONUM / KULLANIM ALANI</label>
+
+          <select
+            id="nfcPlacement"
+            class="select"
+          >
+            <option value="Masa">Masa</option>
+            <option value="Menü">Menü</option>
+            <option value="Vitrin">Vitrin</option>
+            <option value="Kasa">Kasa</option>
+            <option value="Kartvizit">Kartvizit</option>
+            <option value="Stand">Stand</option>
+            <option value="Paket">Paket</option>
+            <option value="Kapı">Kapı</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+        </div>
 
         <div
-          id="createdBusinessEmail"
-          class="created-row"
-        ></div>
+          id="nfcActiveField"
+          class="field hidden"
+        >
+          <label>DURUM</label>
 
-        <div
-          id="createdBusinessPassword"
-          class="created-row"
-        ></div>
+          <select
+            id="nfcActive"
+            class="select"
+          >
+            <option value="true">
+              Aktif
+            </option>
 
-        <div
-          id="createdBusinessUrl"
-          class="created-row"
-        ></div>
+            <option value="false">
+              Pasif
+            </option>
+          </select>
+        </div>
 
       </div>
 
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="btn"
+          onclick="closeModal('nfcModal')"
+        >
+          Vazgeç
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-gold"
+        >
+          Kaydet
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     NFC URL MODAL
+========================= -->
+
+<div id="nfcUrlModal" class="modal hidden">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <div>
+        <h3>NFC Bağlantısı</h3>
+        <div class="panel-sub">
+          Bu bağlantıyı NFC etiketine yazabilirsin.
+        </div>
+      </div>
+
+      <button
+        class="close"
+        onclick="closeModal('nfcUrlModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div
+        id="nfcUrlName"
+        style="font-weight:900;margin-bottom:12px"
+      ></div>
+
+      <div
+        id="nfcUrlValue"
+        class="url-box"
+      ></div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button
+        class="btn"
+        onclick="copyNfcUrl()"
+      >
+        ⧉ Kopyala
+      </button>
+
+      <button
+        class="btn btn-blue"
+        onclick="openNfcUrl()"
+      >
+        ↗ Test Et
+      </button>
+
+      <button
+        class="btn btn-gold"
+        onclick="closeModal('nfcUrlModal')"
+      >
+        Tamam
+      </button>
 
     </div>
 
@@ -2377,1409 +1872,1418 @@ tbody tr:hover{
 </div>
 
 
+<!-- =========================
+     QR MODAL
+========================= -->
+
+<div id="qrModal" class="modal hidden">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <div>
+        <h3>QR Merkezi</h3>
+        <div
+          id="qrBusinessName"
+          class="panel-sub"
+        ></div>
+      </div>
+
+      <button
+        class="close"
+        onclick="closeModal('qrModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="qr-center">
+
+        <div class="qr-box">
+          <img
+            id="qrImage"
+            alt="QR Code"
+          >
+        </div>
+
+        <div
+          id="qrUrl"
+          class="url-box"
+        ></div>
+
+        <div
+          style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:14px"
+        >
+
+          <button
+            class="btn"
+            onclick="copyQrUrl()"
+          >
+            ⧉ URL Kopyala
+          </button>
+
+          <button
+            class="btn btn-blue"
+            onclick="openQrProfile()"
+          >
+            ↗ Profili Aç
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     NFC ANALYTICS MODAL
+========================= -->
+
+<div id="nfcAnalyticsModal" class="modal hidden">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <div>
+        <h3>NFC Analytics</h3>
+        <div
+          id="analyticsTagName"
+          class="panel-sub"
+        ></div>
+      </div>
+
+      <button
+        class="close"
+        onclick="closeModal('nfcAnalyticsModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      id="nfcAnalyticsBody"
+      class="modal-body"
+    >
+      <div class="loading">
+        <div class="spinner"></div>
+        Analytics yükleniyor...
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     TOAST
+========================= -->
+
+<div id="toast"></div>
+
 
 <script>
+/* =========================================================
+   LEO CONNECT ADMIN CONTROL CENTER
+========================================================= */
+
+const API = "/api";
+
+let adminToken = localStorage.getItem("adminToken") || "";
+
+let businesses = [];
+let nfcTags = [];
+
+let currentNfcUrl = "";
+let currentQrUrl = "";
 
 
-/* ==================================================
-   GLOBAL
-================================================== */
+/* =========================================================
+   HELPERS
+========================================================= */
 
-const ADMIN_TOKEN_KEY =
-  "leo_admin_token";
+function esc(value){
+  if(value === null || value === undefined) return "";
 
-let currentBusinessId =
-  null;
-
-let currentBusiness =
-  null;
-
-let currentAnalyticsPeriod =
-  "30d";
-
-
-/* ==================================================
-   ADMIN LOGIN
-================================================== */
-
-async function adminLogin(){
-
-  const email =
-    document
-      .getElementById("adminEmail")
-      .value
-      .trim();
-
-  const password =
-    document
-      .getElementById("adminPassword")
-      .value;
-
-  const message =
-    document.getElementById(
-      "loginMessage"
-    );
-
-  message.textContent = "";
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
 
 
-  if(!email || !password){
+function formatNumber(value){
+  const n = Number(value || 0);
 
-    message.textContent =
-      "E-posta ve şifre gerekli.";
+  return n.toLocaleString("tr-TR");
+}
 
-    return;
 
+function formatDate(value){
+
+  if(!value){
+    return "—";
   }
-
 
   try{
 
-    const response =
-      await fetch(
-        "/api/admin/login",
-        {
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-              email,
-              password
-            })
-        }
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if(!response.ok){
-
-      message.textContent =
-        data.error ||
-        "Admin girişi başarısız.";
-
-      return;
-
-    }
-
-
-    localStorage.setItem(
-      ADMIN_TOKEN_KEY,
-      data.token
-    );
-
-
-    showAdmin();
-
-
-  }catch(error){
-
-    console.error(error);
-
-    message.textContent =
-      "Sunucuya bağlanılamadı.";
-
-  }
-
-}
-
-
-/* ==================================================
-   SHOW ADMIN
-================================================== */
-
-function showAdmin(){
-
-  document
-    .getElementById("loginScreen")
-    .style.display =
-      "none";
-
-
-  document
-    .getElementById("adminApp")
-    .style.display =
-      "block";
-
-
-  loadAdmin();
-
-}
-
-
-/* ==================================================
-   LOGOUT
-================================================== */
-
-function logout(){
-
-  localStorage.removeItem(
-    ADMIN_TOKEN_KEY
-  );
-
-
-  document
-    .getElementById("adminApp")
-    .style.display =
-      "none";
-
-
-  document
-    .getElementById("loginScreen")
-    .style.display =
-      "flex";
-
-
-  document
-    .getElementById("adminPassword")
-    .value = "";
-
-}
-
-
-/* ==================================================
-   ADMIN API
-================================================== */
-
-async function adminApi(
-  url,
-  options={}
-){
-
-  const token =
-    localStorage.getItem(
-      ADMIN_TOKEN_KEY
-    );
-
-
-  if(!token){
-
-    logout();
-
-    return null;
-
-  }
-
-
-  options.headers = {
-
-    ...(options.headers || {}),
-
-    "Authorization":
-      "Bearer " + token,
-
-    "Content-Type":
-      "application/json"
-
-  };
-
-
-  const response =
-    await fetch(
-      url,
-      options
-    );
-
-
-  if(response.status === 401){
-
-    logout();
-
-    return null;
-
-  }
-
-
-  return response.json();
-
-}
-
-
-/* ==================================================
-   LOAD ADMIN
-================================================== */
-
-async function loadAdmin(){
-
-  const overview =
-    await adminApi(
-      "/api/admin/overview"
-    );
-
-
-  if(!overview)
-    return;
-
-
-  document.getElementById(
-    "businessCount"
-  ).textContent =
-    overview.businesses ?? 0;
-
-
-  document.getElementById(
-    "profileCount"
-  ).textContent =
-    overview.profile_views ?? 0;
-
-
-  document.getElementById(
-    "qrCount"
-  ).textContent =
-    overview.qr_scans ?? 0;
-
-
-  document.getElementById(
-    "nfcCount"
-  ).textContent =
-    overview.nfc_scans ?? 0;
-
-
-  document.getElementById(
-    "whatsappCount"
-  ).textContent =
-    overview.whatsapp_clicks ?? 0;
-
-
-  document.getElementById(
-    "phoneCount"
-  ).textContent =
-    overview.phone_clicks ?? 0;
-
-
-  const businesses =
-    await adminApi(
-      "/api/admin/businesses"
-    );
-
-
-  if(!businesses)
-    return;
-
-
-  renderBusinesses(
-    businesses
-  );
-
-}
-
-
-/* ==================================================
-   RENDER BUSINESSES
-================================================== */
-
-function renderBusinesses(
-  businesses
-){
-
-  const table =
-    document.getElementById(
-      "businessTable"
-    );
-
-
-  if(
-    !Array.isArray(businesses)
-    ||
-    businesses.length === 0
-  ){
-
-    table.innerHTML = `
-
-      <tr>
-
-        <td
-          colspan="8"
-          class="empty"
-        >
-          Henüz kayıtlı işletme bulunmuyor.
-        </td>
-
-      </tr>
-
-    `;
-
-    return;
-
-  }
-
-
-  table.innerHTML =
-    businesses
-      .map(
-        business => {
-
-          const date =
-            business.created_at
-              ? new Date(
-                  business.created_at
-                ).toLocaleDateString(
-                  "tr-TR"
-                )
-              : "-";
-
-
-          return `
-
-            <tr
-              onclick="openBusiness(${business.id})"
-            >
-
-              <td>
-
-                <div class="business-name">
-                  ${escapeHtml(
-                    business.name || "-"
-                  )}
-                </div>
-
-                <div class="business-email">
-                  ${escapeHtml(
-                    business.email || "-"
-                  )}
-                </div>
-
-              </td>
-
-
-              <td>
-
-                <span class="category">
-                  ${escapeHtml(
-                    business.category || "Genel"
-                  )}
-                </span>
-
-              </td>
-
-
-              <td class="number gold">
-                ${business.profile_views ?? 0}
-              </td>
-
-
-              <td class="number">
-                ${business.qr_scans ?? 0}
-              </td>
-
-
-              <td class="number">
-                ${business.nfc_scans ?? 0}
-              </td>
-
-
-              <td class="number">
-                ${business.whatsapp_clicks ?? 0}
-              </td>
-
-
-              <td class="number">
-                ${business.phone_clicks ?? 0}
-              </td>
-
-
-              <td>
-                ${date}
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      )
-      .join("");
-
-}
-
-
-/* ==================================================
-   OPEN BUSINESS
-================================================== */
-
-async function openBusiness(id){
-
-  currentBusinessId =
-    id;
-
-
-  document
-    .getElementById("detailOverlay")
-    .style.display =
-      "block";
-
-
-  document.body.style.overflow =
-    "hidden";
-
-
-  document
-    .getElementById("detailTitle")
-    .textContent =
-      "Yükleniyor...";
-
-
-  document
-    .getElementById("saveMessage")
-    .textContent =
-      "";
-
-
-  hideDigitalBoxes();
-
-
-  document
-    .getElementById("analyticsLoading")
-    .style.display =
-      "block";
-
-
-  document
-    .getElementById("analyticsContent")
-    .style.display =
-      "none";
-
-
-  const data =
-    await adminApi(
-      "/api/admin/business/" +
-      encodeURIComponent(id)
-    );
-
-
-  if(!data){
-
-    closeDetail();
-
-    return;
-
-  }
-
-
-  currentBusiness =
-    data.business;
-
-
-  const stats =
-    data.stats || {};
-
-
-  fillBusiness(
-    currentBusiness
-  );
-
-
-  document.getElementById(
-    "detailProfile"
-  ).textContent =
-    stats.profile_view ?? 0;
-
-
-  document.getElementById(
-    "detailQR"
-  ).textContent =
-    (
-      stats.qr_scan ?? 0
-    )
-    +
-    (
-      stats.qr ?? 0
-    );
-
-
-  document.getElementById(
-    "detailNFC"
-  ).textContent =
-    stats.nfc ?? 0;
-
-
-  document.getElementById(
-    "detailWhatsapp"
-  ).textContent =
-    stats.whatsapp ?? 0;
-
-
-  document.getElementById(
-    "detailPhone"
-  ).textContent =
-    stats.phone ?? 0;
-
-
-  document.getElementById(
-    "detailTotal"
-  ).textContent =
-    data.total_events ?? 0;
-
-
-  await loadAnalytics(
-    currentAnalyticsPeriod
-  );
-
-}
-
-
-/* ==================================================
-   ANALYTICS
-================================================== */
-
-async function loadAnalytics(
-  period="30d"
-){
-
-  if(!currentBusinessId)
-    return;
-
-
-  currentAnalyticsPeriod =
-    period;
-
-
-  document
-    .querySelectorAll(
-      ".period"
-    )
-    .forEach(
-      button => {
-
-        button.classList.toggle(
-          "active",
-          button.dataset.period === period
-        );
-
+    return new Date(value).toLocaleString(
+      "tr-TR",
+      {
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit"
       }
     );
 
-
-  const loading =
-    document.getElementById(
-      "analyticsLoading"
-    );
-
-
-  const content =
-    document.getElementById(
-      "analyticsContent"
-    );
-
-
-  loading.style.display =
-    "block";
-
-
-  content.style.display =
-    "none";
-
-
-  const result =
-    await adminApi(
-
-      "/api/admin/business/" +
-      encodeURIComponent(
-        currentBusinessId
-      ) +
-      "/analytics?period=" +
-      encodeURIComponent(
-        period
-      )
-
-    );
-
-
-  if(!result){
-
-    loading.textContent =
-      "Analitik verileri alınamadı.";
-
-    return;
-
+  }catch{
+    return value;
   }
-
-
-  if(result.error){
-
-    loading.textContent =
-      result.error;
-
-    return;
-
-  }
-
-
-  renderAnalytics(
-    result
-  );
-
-
-  loading.style.display =
-    "none";
-
-
-  content.style.display =
-    "block";
-
 }
 
 
-/* ==================================================
-   RENDER ANALYTICS
-================================================== */
+function toast(message,type="success"){
 
-function renderAnalytics(
-  data
-){
+  const el = document.getElementById("toast");
 
-  const totals =
-    data.totals || {};
+  el.textContent = message;
 
-  const sources =
-    data.sources || {};
+  el.className = "";
+  el.id = "toast";
+  el.classList.add("show",type);
 
-  const channels =
-    Array.isArray(
-      data.channels
-    )
-      ? data.channels
-      : [];
+  clearTimeout(window.__toastTimer);
 
-
-  document.getElementById(
-    "analyticsTotal"
-  ).textContent =
-    data.total_events ?? 0;
-
-
-  document.getElementById(
-    "analyticsProfile"
-  ).textContent =
-    totals.profile_view ?? 0;
-
-
-  document.getElementById(
-    "analyticsQR"
-  ).textContent =
-    sources.qr ?? 0;
-
-
-  document.getElementById(
-    "analyticsNFC"
-  ).textContent =
-    sources.nfc ?? 0;
-
-
-  document.getElementById(
-    "analyticsWhatsapp"
-  ).textContent =
-    totals.whatsapp ?? 0;
-
-
-  document.getElementById(
-    "sourceQR"
-  ).textContent =
-    sources.qr ?? 0;
-
-
-  document.getElementById(
-    "sourceNFC"
-  ).textContent =
-    sources.nfc ?? 0;
-
-
-  const qr =
-    Number(
-      sources.qr || 0
-    );
-
-
-  const nfc =
-    Number(
-      sources.nfc || 0
-    );
-
-
-  const sourceTotal =
-    qr + nfc;
-
-
-  document.getElementById(
-    "sourceQRBar"
-  ).style.width =
-    sourceTotal
-      ? (
-          qr /
-          sourceTotal *
-          100
-        ) + "%"
-      : "0%";
-
-
-  document.getElementById(
-    "sourceNFCBar"
-  ).style.width =
-    sourceTotal
-      ? (
-          nfc /
-          sourceTotal *
-          100
-        ) + "%"
-      : "0%";
-
-
-  renderDailyChart(
-    data.daily || []
-  );
-
-
-  renderChannels(
-    channels
-  );
-
+  window.__toastTimer = setTimeout(()=>{
+    el.classList.remove("show");
+  },3000);
 }
 
 
-/* ==================================================
-   DAILY CHART
-================================================== */
-
-function renderDailyChart(
-  daily
-){
-
-  const chart =
-    document.getElementById(
-      "dailyChart"
-    );
+function closeModal(id){
+  document.getElementById(id)?.classList.add("hidden");
+}
 
 
-  if(
-    !Array.isArray(daily)
-    ||
-    !daily.length
-  ){
+function openModal(id){
+  document.getElementById(id)?.classList.remove("hidden");
+}
 
-    chart.innerHTML = `
 
-      <div
-        style="
-          width:100%;
-          display:grid;
-          place-items:center;
-          color:#555;
-          font-size:10px;
-        "
-      >
-        Bu dönem için henüz veri yok.
-      </div>
+function profileUrl(slug){
 
-    `;
+  if(!slug) return "";
 
+  return `${location.origin}/p/${encodeURIComponent(slug)}`;
+}
+
+
+async function copyText(text){
+
+  if(!text){
+    toast("Kopyalanacak bilgi bulunamadı","error");
     return;
-
   }
 
+  try{
 
-  const values =
-    daily.map(
-      item =>
-        Number(
-          item.total || 0
-        )
+    await navigator.clipboard.writeText(text);
+
+    toast("Kopyalandı");
+
+  }catch{
+
+    const area = document.createElement("textarea");
+
+    area.value = text;
+
+    document.body.appendChild(area);
+
+    area.select();
+
+    document.execCommand("copy");
+
+    area.remove();
+
+    toast("Kopyalandı");
+
+  }
+}
+
+
+/* =========================================================
+   API
+========================================================= */
+
+async function apiFetch(path,options={}){
+
+  const headers = {
+    ...(options.headers || {})
+  };
+
+  if(!headers["Content-Type"] && options.body){
+    headers["Content-Type"] = "application/json";
+  }
+
+  if(adminToken){
+    headers.Authorization = `Bearer ${adminToken}`;
+  }
+
+  const response = await fetch(API + path,{
+    ...options,
+    headers
+  });
+
+  let data = null;
+
+  try{
+    data = await response.json();
+  }catch{
+    data = null;
+  }
+
+  if(response.status === 401 || response.status === 403){
+
+    logout(false);
+
+    throw new Error(
+      data?.error ||
+      "Admin oturumu sona erdi."
     );
+  }
 
+  if(!response.ok){
 
-  const max =
-    Math.max(
-      ...values,
-      1
+    throw new Error(
+      data?.error ||
+      data?.message ||
+      "İşlem başarısız."
     );
+  }
+
+  return data;
+}
 
 
-  chart.innerHTML =
-    daily
-      .map(
-        item => {
+/* =========================================================
+   AUTH
+========================================================= */
 
-          const value =
-            Number(
-              item.total || 0
-            );
+document
+  .getElementById("loginForm")
+  .addEventListener("submit",async(event)=>{
 
+    event.preventDefault();
 
-          const height =
-            Math.max(
-              3,
-              (
-                value /
-                max
-              ) * 175
-            );
+    const email =
+      document.getElementById("loginEmail").value.trim();
 
+    const password =
+      document.getElementById("loginPassword").value;
 
-          const date =
-            item.day
-              ? new Date(
-                  item.day
-                )
-                  .toLocaleDateString(
-                    "tr-TR",
-                    {
-                      day:"2-digit",
-                      month:"2-digit"
-                    }
-                  )
-              : "";
+    const btn =
+      document.getElementById("loginBtn");
 
+    const error =
+      document.getElementById("loginError");
 
-          return `
+    error.textContent = "";
 
-            <div
-              class="chart-item"
-              title="${date}: ${value}"
-            >
+    btn.disabled = true;
+    btn.textContent = "Giriş yapılıyor...";
 
-              <div class="chart-value">
-                ${value}
-              </div>
+    try{
 
-              <div
-                class="chart-bar"
-                style="
-                  height:${height}px
-                "
-              ></div>
-
-              <div class="chart-label">
-                ${date}
-              </div>
-
-            </div>
-
-          `;
-
+      const result = await fetch(
+        `${API}/admin/login`,
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify({
+            email,
+            password
+          })
         }
-      )
-      .join("");
+      );
+
+      const data = await result.json();
+
+      if(!result.ok){
+        throw new Error(
+          data?.error ||
+          data?.message ||
+          "Giriş başarısız."
+        );
+      }
+
+      if(!data.token){
+        throw new Error(
+          "Admin token alınamadı."
+        );
+      }
+
+      adminToken = data.token;
+
+      localStorage.setItem(
+        "adminToken",
+        adminToken
+      );
+
+      showApp();
+
+    }catch(errorObject){
+
+      error.textContent =
+        errorObject.message ||
+        "Giriş başarısız.";
+
+    }finally{
+
+      btn.disabled = false;
+      btn.textContent = "ADMIN PANELİNE GİR";
+
+    }
+
+  });
+
+
+function logout(showToast=true){
+
+  adminToken = "";
+
+  localStorage.removeItem("adminToken");
+
+  document
+    .getElementById("app")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginScreen")
+    .classList.remove("hidden");
+
+  if(showToast){
+    toast("Admin oturumu kapatıldı");
+  }
+}
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+async function showApp(){
+
+  document
+    .getElementById("loginScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("app")
+    .classList.remove("hidden");
+
+  await refreshAll();
 
 }
 
 
-/* ==================================================
-   CHANNELS
-================================================== */
+async function init(){
 
-function renderChannels(
-  channels
-){
+  if(!adminToken){
+
+    document
+      .getElementById("loginScreen")
+      .classList.remove("hidden");
+
+    document
+      .getElementById("app")
+      .classList.add("hidden");
+
+    return;
+  }
+
+  try{
+
+    await showApp();
+
+  }catch{
+
+    logout(false);
+
+  }
+
+}
+
+
+/* =========================================================
+   REFRESH ALL
+========================================================= */
+
+async function refreshAll(){
+
+  await Promise.all([
+    loadOverview(),
+    loadBusinesses(),
+    loadNfcTags()
+  ]);
+
+}
+
+
+/* =========================================================
+   OVERVIEW
+========================================================= */
+
+async function loadOverview(){
+
+  try{
+
+    const data =
+      await apiFetch("/admin/overview");
+
+    const source =
+      data?.overview ||
+      data?.stats ||
+      data ||
+      {};
+
+    const businessesCount =
+      source.businesses ??
+      source.total_businesses ??
+      source.totalBusinesses ??
+      source.business_count ??
+      0;
+
+    const views =
+      source.profile_views ??
+      source.profileViews ??
+      source.total_profile_views ??
+      source.views ??
+      0;
+
+    const qr =
+      source.qr_scans ??
+      source.qrScans ??
+      source.total_qr_scans ??
+      source.qr ??
+      0;
+
+    const nfc =
+      source.nfc_taps ??
+      source.nfcTaps ??
+      source.total_nfc_taps ??
+      source.nfc ??
+      0;
+
+    const whatsapp =
+      source.whatsapp_clicks ??
+      source.whatsappClicks ??
+      source.whatsapp ??
+      0;
+
+    const tags =
+      source.nfc_tags ??
+      source.nfcTags ??
+      source.total_nfc_tags ??
+      0;
+
+    document.getElementById("statBusinesses")
+      .textContent = formatNumber(businessesCount);
+
+    document.getElementById("statViews")
+      .textContent = formatNumber(views);
+
+    document.getElementById("statQr")
+      .textContent = formatNumber(qr);
+
+    document.getElementById("statNfc")
+      .textContent = formatNumber(nfc);
+
+    document.getElementById("statWhatsapp")
+      .textContent = formatNumber(whatsapp);
+
+    document.getElementById("statNfcTags")
+      .textContent = formatNumber(tags);
+
+  }catch(error){
+
+    console.error(
+      "Overview error:",
+      error
+    );
+
+    toast(
+      error.message ||
+      "Overview yüklenemedi.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   BUSINESSES
+========================================================= */
+
+async function loadBusinesses(){
 
   const container =
     document.getElementById(
-      "channelList"
+      "businessTableContainer"
     );
 
+  container.innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      İşletmeler yükleniyor...
+    </div>
+  `;
 
-  if(
-    !channels.length
-  ){
+  try{
+
+    const data =
+      await apiFetch("/admin/businesses");
+
+    businesses =
+      Array.isArray(data)
+        ? data
+        : (
+            data?.businesses ||
+            data?.data ||
+            []
+          );
+
+    renderBusinesses();
+
+    populateBusinessSelect();
+
+  }catch(error){
 
     container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠</div>
+        <strong>İşletmeler yüklenemedi</strong>
+        <span>${esc(error.message)}</span>
+      </div>
+    `;
 
-      <div
-        style="
-          color:#555;
-          font-size:10px;
-          padding:10px;
-        "
-      >
-        Henüz kanal etkileşimi yok.
+  }
+
+}
+
+
+function renderBusinesses(){
+
+  const container =
+    document.getElementById(
+      "businessTableContainer"
+    );
+
+  const query =
+    (
+      document.getElementById(
+        "businessSearch"
+      )?.value || ""
+    )
+    .trim()
+    .toLowerCase();
+
+  const filtered =
+    businesses.filter(b=>{
+
+      const text = [
+        b.name,
+        b.category,
+        b.slug,
+        b.email,
+        b.phone
+      ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+      return text.includes(query);
+
+    });
+
+  if(!filtered.length){
+
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">♙</div>
+        <strong>İşletme bulunamadı</strong>
+        <span>Arama kriterlerini değiştirebilirsin.</span>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML = `
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>İşletme</th>
+            <th>Kategori</th>
+            <th>NFC</th>
+            <th>Oluşturulma</th>
+            <th>Durum</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          ${filtered.map(b=>{
+
+            const tagCount =
+              b.nfc_tags ??
+              b.nfcTags ??
+              b.nfc_tag_count ??
+              0;
+
+            const logo =
+              b.logo_url ||
+              b.logo ||
+              "";
+
+            return `
+
+              <tr>
+
+                <td>
+
+                  <div class="business-cell">
+
+                    ${
+                      logo
+
+                      ? `
+                        <img
+                          class="business-logo"
+                          src="${esc(logo)}"
+                          alt=""
+                          onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')"
+                        >
+
+                        <div class="business-placeholder hidden">
+                          ♛
+                        </div>
+                      `
+
+                      : `
+                        <div class="business-placeholder">
+                          ♛
+                        </div>
+                      `
+                    }
+
+                    <div>
+
+                      <div class="business-name">
+                        ${esc(b.name || "İsimsiz")}
+                      </div>
+
+                      <div class="business-meta">
+                        /p/${esc(b.slug || "—")}
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td>
+                  ${esc(b.category || "—")}
+                </td>
+
+                <td>
+                  <span class="pill pill-gold">
+                    ⌁ ${formatNumber(tagCount)}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="muted">
+                    ${formatDate(b.created_at)}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="pill pill-green">
+                    ● Aktif
+                  </span>
+                </td>
+
+                <td>
+
+                  <div class="actions">
+
+                    <button
+                      class="mini-btn"
+                      onclick="openBusinessDetail(${Number(b.id)})"
+                    >
+                      Detay
+                    </button>
+
+                    <button
+                      class="mini-btn"
+                      onclick="openBusinessEdit(${Number(b.id)})"
+                    >
+                      Düzenle
+                    </button>
+
+                    <button
+                      class="mini-btn"
+                      onclick="openBusinessQr(${Number(b.id)})"
+                    >
+                      QR
+                    </button>
+
+                    <button
+                      class="mini-btn"
+                      onclick="openCreateNfcModal(${Number(b.id)})"
+                    >
+                      + NFC
+                    </button>
+
+                    <button
+                      class="mini-btn"
+                      onclick="openProfile(${JSON.stringify(b.slug || "")})"
+                    >
+                      Profil
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            `;
+
+          }).join("")}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   BUSINESS DETAIL
+========================================================= */
+
+async function openBusinessDetail(id){
+
+  openModal("businessDetailModal");
+
+  const body =
+    document.getElementById(
+      "businessDetailBody"
+    );
+
+  body.innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      İşletme bilgileri yükleniyor...
+    </div>
+  `;
+
+  try{
+
+    const data =
+      await apiFetch(
+        `/admin/business/${id}`
+      );
+
+    const business =
+      data?.business ||
+      data;
+
+    const tags =
+      data?.nfc_tags ||
+      data?.nfcTags ||
+      business?.nfc_tags ||
+      [];
+
+    const logo =
+      business.logo_url ||
+      business.logo ||
+      "";
+
+    body.innerHTML = `
+
+      <div class="detail-hero">
+
+        ${
+          logo
+
+          ? `
+            <img
+              class="detail-logo"
+              src="${esc(logo)}"
+              alt=""
+            >
+          `
+
+          : `
+            <div class="detail-logo"
+              style="display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:25px"
+            >
+              ♛
+            </div>
+          `
+        }
+
+        <div>
+
+          <div class="detail-title">
+            ${esc(business.name || "İşletme")}
+          </div>
+
+          <div class="detail-meta">
+            ${esc(business.category || "Kategori yok")}
+            · /p/${esc(business.slug || "")}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="detail-stats">
+
+        <div class="detail-stat">
+          <span>NFC ETİKETİ</span>
+          <strong>${formatNumber(tags.length)}</strong>
+        </div>
+
+        <div class="detail-stat">
+          <span>TELEFON</span>
+          <strong>${business.phone ? "✓" : "—"}</strong>
+        </div>
+
+        <div class="detail-stat">
+          <span>WHATSAPP</span>
+          <strong>${business.whatsapp ? "✓" : "—"}</strong>
+        </div>
+
+        <div class="detail-stat">
+          <span>IBAN</span>
+          <strong>${business.iban ? "✓" : "—"}</strong>
+        </div>
+
+      </div>
+
+
+      <div class="detail-grid">
+
+        <div class="info-card">
+
+          <h4>Genel Bilgiler</h4>
+
+          <div class="info-row">
+            <span>İşletme</span>
+            <span>${esc(business.name || "—")}</span>
+          </div>
+
+          <div class="info-row">
+            <span>Kategori</span>
+            <span>${esc(business.category || "—")}</span>
+          </div>
+
+          <div class="info-row">
+            <span>E-posta</span>
+            <span>${esc(business.email || "—")}</span>
+          </div>
+
+          <div class="info-row">
+            <span>Telefon</span>
+            <span>${esc(business.phone || "—")}</span>
+          </div>
+
+          <div class="info-row">
+            <span>WhatsApp</span>
+            <span>${esc(business.whatsapp || "—")}</span>
+          </div>
+
+          <div class="info-row">
+            <span>Adres</span>
+            <span>${esc(business.address || "—")}</span>
+          </div>
+
+        </div>
+
+
+        <div class="info-card">
+
+          <h4>Dijital Alanlar</h4>
+
+          <div class="info-row">
+            <span>Instagram</span>
+            <span>${esc(business.instagram || "—")}</span>
+          </div>
+
+          <div class="info-row">
+            <span>TikTok</span>
+            <span>${esc(business.tiktok || "—")}</span>
+          </div>
+
+          <div class="info-row">
+            <span>Google</span>
+            <span>${esc(business.google_review || "—")}</span>
+          </div>
+
+          <div class="info-row">
+            <span>Website</span>
+            <span>${esc(business.website || "—")}</span>
+          </div>
+
+          <div class="info-row">
+            <span>Menü</span>
+            <span>${esc(business.menu || "—")}</span>
+          </div>
+
+        </div>
+
+
+        <div class="info-card">
+
+          <h4>Ödeme</h4>
+
+          <div class="info-row">
+            <span>IBAN</span>
+            <span>${esc(business.iban || "—")}</span>
+          </div>
+
+          <div class="info-row">
+            <span>Hesap Sahibi</span>
+            <span>${esc(business.iban_holder || "—")}</span>
+          </div>
+
+        </div>
+
+
+        <div class="info-card">
+
+          <h4>NFC Etiketleri</h4>
+
+          ${
+            tags.length
+
+            ? tags.map(tag=>`
+
+              <div class="info-row">
+
+                <span>
+                  ${esc(tag.name)}
+                </span>
+
+                <span>
+                  ${formatNumber(tag.tap_count || 0)} dokunuş
+                </span>
+
+              </div>
+
+            `).join("")
+
+            : `
+              <div class="muted">
+                Henüz NFC etiketi yok.
+              </div>
+            `
+          }
+
+        </div>
+
       </div>
 
     `;
 
-    return;
-
-  }
-
-
-  const sorted =
-    [...channels]
-      .sort(
-        (
-          a,
-          b
-        ) =>
-          Number(
-            b.value || 0
-          )
-          -
-          Number(
-            a.value || 0
-          )
-      );
-
-
-  container.innerHTML =
-    sorted
-      .map(
-        item => `
-
-          <div class="channel-row">
-
-            <span class="channel-name">
-              ${escapeHtml(
-                item.label || item.key
-              )}
-            </span>
-
-            <span class="channel-count">
-              ${Number(
-                item.value || 0
-              )}
-            </span>
-
-          </div>
-
-        `
-      )
-      .join("");
-
-}
-
-
-/* ==================================================
-   FILL BUSINESS
-================================================== */
-
-function fillBusiness(
-  business
-){
-
-  document.getElementById(
-    "detailTitle"
-  ).textContent =
-    business.name || "İşletme";
-
-
-  document.getElementById(
-    "detailEmail"
-  ).textContent =
-    business.email || "-";
-
-
-  const fields = [
-
-    "name",
-    "category",
-    "description",
-    "phone",
-    "whatsapp",
-    "address",
-    "instagram",
-    "tiktok",
-    "google_review",
-    "website",
-    "menu",
-    "iban",
-    "iban_holder",
-    "hours",
-    "logo_url"
-
-  ];
-
-
-  fields.forEach(
-    field => {
-
-      const element =
-        document.getElementById(
-          "f_" + field
-        );
-
-
-      if(element){
-
-        element.value =
-          business[field] || "";
-
-      }
-
-    }
-  );
-
-
-  document.getElementById(
-    "detailProfileLink"
-  ).href =
-    "/p/" +
-    business.slug;
-
-}
-
-
-/* ==================================================
-   SAVE BUSINESS
-================================================== */
-
-async function saveBusiness(){
-
-  if(!currentBusinessId)
-    return;
-
-
-  const fields = [
-
-    "name",
-    "category",
-    "description",
-    "phone",
-    "whatsapp",
-    "address",
-    "instagram",
-    "tiktok",
-    "google_review",
-    "website",
-    "menu",
-    "iban",
-    "iban_holder",
-    "hours",
-    "logo_url"
-
-  ];
-
-
-  const data = {};
-
-
-  fields.forEach(
-    field => {
-
-      const element =
-        document.getElementById(
-          "f_" + field
-        );
-
-
-      data[field] =
-        element
-          ? element.value
-          : "";
-
-    }
-  );
-
-
-  const message =
-    document.getElementById(
-      "saveMessage"
-    );
-
-
-  message.textContent =
-    "Kaydediliyor...";
-
-
-  const result =
-    await adminApi(
-
-      "/api/admin/business/" +
-      encodeURIComponent(
-        currentBusinessId
-      ),
-
-      {
-
-        method:"PUT",
-
-        body:
-          JSON.stringify(
-            data
-          )
-
-      }
-
-    );
-
-
-  if(
-    result &&
-    result.ok
-  ){
-
-    currentBusiness =
-      result.business;
-
-
-    fillBusiness(
-      currentBusiness
-    );
-
-
-    message.textContent =
-      "✓ İşletme bilgileri başarıyla güncellendi.";
-
-
-    await loadAdmin();
-
-  }else{
-
-    message.textContent =
-      result?.error ||
-      "İşletme güncellenemedi.";
-
-  }
-
-}
-
-
-/* ==================================================
-   QR
-================================================== */
-
-async function showQR(){
-
-  if(!currentBusinessId)
-    return;
-
-
-  document.getElementById(
-    "nfcBox"
-  ).style.display =
-    "none";
-
-
-  document.getElementById(
-    "qrBox"
-  ).style.display =
-    "block";
-
-
-  const result =
-    await adminApi(
-
-      "/api/admin/business/" +
-      encodeURIComponent(
-        currentBusinessId
-      ) +
-      "/qr"
-
-    );
-
-
-  if(!result)
-    return;
-
-
-  document.getElementById(
-    "detailQRImage"
-  ).src =
-    result.dataUrl;
-
-
-  document.getElementById(
-    "detailQRUrl"
-  ).textContent =
-    result.url;
-
-
-  document.getElementById(
-    "detailQRDownload"
-  ).href =
-    result.dataUrl;
-
-}
-
-
-/* ==================================================
-   NFC
-================================================== */
-
-function showNFC(){
-
-  if(!currentBusiness)
-    return;
-
-
-  document.getElementById(
-    "qrBox"
-  ).style.display =
-    "none";
-
-
-  document.getElementById(
-    "nfcBox"
-  ).style.display =
-    "block";
-
-
-  const url =
-    window.location.origin +
-    "/p/" +
-    currentBusiness.slug +
-    "?source=nfc";
-
-
-  document.getElementById(
-    "detailNFCUrl"
-  ).textContent =
-    url;
-
-}
-
-
-/* ==================================================
-   COPY NFC
-================================================== */
-
-async function copyNFC(){
-
-  if(!currentBusiness)
-    return;
-
-
-  const url =
-    window.location.origin +
-    "/p/" +
-    currentBusiness.slug +
-    "?source=nfc";
-
-
-  try{
-
-    await navigator.clipboard.writeText(
-      url
-    );
-
-
-    document.getElementById(
-      "saveMessage"
-    ).textContent =
-      "✓ NFC bağlantısı kopyalandı.";
-
   }catch(error){
 
-    document.getElementById(
-      "saveMessage"
-    ).textContent =
-      url;
+    body.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠</div>
+        <strong>Detay yüklenemedi</strong>
+        <span>${esc(error.message)}</span>
+      </div>
+    `;
 
   }
 
 }
 
 
-/* ==================================================
-   HIDE BOXES
-================================================== */
+/* =========================================================
+   BUSINESS EDIT
+========================================================= */
 
-function hideDigitalBoxes(){
+function emptyBusinessForm(){
 
-  document.getElementById(
-    "qrBox"
-  ).style.display =
-    "none";
+  const ids = [
+    "businessId",
+    "businessName",
+    "businessCategory",
+    "businessDescription",
+    "businessPhone",
+    "businessWhatsapp",
+    "businessAddress",
+    "businessInstagram",
+    "businessTiktok",
+    "businessGoogleReview",
+    "businessWebsite",
+    "businessMenu",
+    "businessHours",
+    "businessIban",
+    "businessIbanHolder",
+    "businessLogo"
+  ];
 
+  ids.forEach(id=>{
+    const el = document.getElementById(id);
 
-  document.getElementById(
-    "nfcBox"
-  ).style.display =
-    "none";
-
-}
-
-
-/* ==================================================
-   CLOSE DETAIL
-================================================== */
-
-function closeDetail(){
-
-  document.getElementById(
-    "detailOverlay"
-  ).style.display =
-    "none";
-
-
-  document.body.style.overflow =
-    "";
-
-
-  currentBusinessId =
-    null;
-
-
-  currentBusiness =
-    null;
+    if(el){
+      el.value = "";
+    }
+  });
 
 }
 
 
-/* ==================================================
-   DELETE BUSINESS
-================================================== */
+function openBusinessCreateModal(){
 
-async function deleteBusiness(){
+  emptyBusinessForm();
 
-  if(!currentBusinessId)
+  document.getElementById(
+    "businessEditTitle"
+  ).textContent = "Yeni İşletme";
+
+  document.getElementById(
+    "businessDeleteBtn"
+  ).classList.add("hidden");
+
+  openModal("businessEditModal");
+
+}
+
+
+function openBusinessEdit(id){
+
+  const business =
+    businesses.find(
+      b => Number(b.id) === Number(id)
+    );
+
+  if(!business){
+
+    toast(
+      "İşletme bulunamadı.",
+      "error"
+    );
+
     return;
+  }
+
+  document.getElementById("businessId").value =
+    business.id || "";
+
+  document.getElementById("businessName").value =
+    business.name || "";
+
+  document.getElementById("businessCategory").value =
+    business.category || "";
+
+  document.getElementById("businessDescription").value =
+    business.description || "";
+
+  document.getElementById("businessPhone").value =
+    business.phone || "";
+
+  document.getElementById("businessWhatsapp").value =
+    business.whatsapp || "";
+
+  document.getElementById("businessAddress").value =
+    business.address || "";
+
+  document.getElementById("businessInstagram").value =
+    business.instagram || "";
+
+  document.getElementById("businessTiktok").value =
+    business.tiktok || "";
+
+  document.getElementById("businessGoogleReview").value =
+    business.google_review || "";
+
+  document.getElementById("businessWebsite").value =
+    business.website || "";
+
+  document.getElementById("businessMenu").value =
+    business.menu || "";
+
+  document.getElementById("businessHours").value =
+    business.hours || "";
+
+  document.getElementById("businessIban").value =
+    business.iban || "";
+
+  document.getElementById("businessIbanHolder").value =
+    business.iban_holder || "";
+
+  document.getElementById("businessLogo").value =
+    business.logo_url || "";
+
+  document.getElementById(
+    "businessEditTitle"
+  ).textContent =
+    "İşletme Düzenle";
+
+  document.getElementById(
+    "businessDeleteBtn"
+  ).classList.remove("hidden");
+
+  openModal("businessEditModal");
+
+}
 
 
-  const name =
-    currentBusiness?.name ||
-    "bu işletme";
+/* =========================================================
+   BUSINESS SAVE
+========================================================= */
 
+document
+  .getElementById("businessForm")
+  .addEventListener("submit",async(event)=>{
+
+    event.preventDefault();
+
+    const id =
+      document.getElementById(
+        "businessId"
+      ).value;
+
+    const payload = {
+
+      name:
+        document.getElementById(
+          "businessName"
+        ).value.trim(),
+
+      category:
+        document.getElementById(
+          "businessCategory"
+        ).value.trim(),
+
+      description:
+        document.getElementById(
+          "businessDescription"
+        ).value.trim(),
+
+      phone:
+        document.getElementById(
+          "businessPhone"
+        ).value.trim(),
+
+      whatsapp:
+        document.getElementById(
+          "businessWhatsapp"
+        ).value.trim(),
+
+      address:
+        document.getElementById(
+          "businessAddress"
+        ).value.trim(),
+
+      instagram:
+        document.getElementById(
+          "businessInstagram"
+        ).value.trim(),
+
+      tiktok:
+        document.getElementById(
+          "businessTiktok"
+        ).value.trim(),
+
+      google_review:
+        document.getElementById(
+          "businessGoogleReview"
+        ).value.trim(),
+
+      website:
+        document.getElementById(
+          "businessWebsite"
+        ).value.trim(),
+
+      menu:
+        document.getElementById(
+          "businessMenu"
+        ).value.trim(),
+
+      hours:
+        document.getElementById(
+          "businessHours"
+        ).value.trim(),
+
+      iban:
+        document.getElementById(
+          "businessIban"
+        ).value.trim(),
+
+      iban_holder:
+        document.getElementById(
+          "businessIbanHolder"
+        ).value.trim(),
+
+      logo_url:
+        document.getElementById(
+          "businessLogo"
+        ).value.trim()
+
+    };
+
+
+    if(!payload.name){
+
+      toast(
+        "İşletme adı gerekli.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    try{
+
+      if(id){
+
+        await apiFetch(
+          `/admin/business/${id}`,
+          {
+            method:"PUT",
+            body:JSON.stringify(payload)
+          }
+        );
+
+        toast(
+          "İşletme güncellendi."
+        );
+
+      }else{
+
+        await apiFetch(
+          `/admin/business`,
+          {
+            method:"POST",
+            body:JSON.stringify(payload)
+          }
+        );
+
+        toast(
+          "İşletme oluşturuldu."
+        );
+
+      }
+
+      closeModal("businessEditModal");
+
+      await refreshAll();
+
+    }catch(error){
+
+      toast(
+        error.message ||
+        "İşlem başarısız.",
+        "error"
+      );
+
+    }
+
+  });
+
+
+/* =========================================================
+   BUSINESS DELETE
+========================================================= */
+
+async function deleteCurrentBusiness(){
+
+  const id =
+    document.getElementById(
+      "businessId"
+    ).value;
+
+  if(!id){
+    return;
+  }
+
+  const business =
+    businesses.find(
+      b=>Number(b.id) === Number(id)
+    );
 
   const confirmed =
     confirm(
-
-      name +
-      " işletmesini silmek istediğine emin misin?\n\n" +
-      "Bu işlem işletmeye ait etkinlik kayıtlarını da silecektir."
-
+      `"${business?.name || "Bu işletme"}" işletmesini silmek istediğine emin misin?\n\nBu işlem geri alınamaz.`
     );
 
-
-  if(!confirmed)
+  if(!confirmed){
     return;
+  }
 
+  try{
 
-  const result =
-    await adminApi(
-
-      "/api/admin/business/" +
-      encodeURIComponent(
-        currentBusinessId
-      ),
-
+    await apiFetch(
+      `/admin/business/${id}`,
       {
         method:"DELETE"
       }
-
     );
 
+    closeModal("businessEditModal");
 
-  if(
-    result &&
-    result.ok
-  ){
-
-    closeDetail();
-
-    await loadAdmin();
-
-    alert(
-      "İşletme başarıyla silindi."
+    toast(
+      "İşletme silindi."
     );
 
-  }else{
+    await refreshAll();
 
-    alert(
-      result?.error ||
-      "İşletme silinemedi."
+  }catch(error){
+
+    toast(
+      error.message ||
+      "İşletme silinemedi.",
+      "error"
     );
 
   }
@@ -3787,303 +3291,1165 @@ async function deleteBusiness(){
 }
 
 
-/* ==================================================
-   NEW BUSINESS
-================================================== */
+/* =========================================================
+   NFC BUSINESS SELECT
+========================================================= */
 
-function openNewBusiness(){
+function populateBusinessSelect(){
+
+  const select =
+    document.getElementById(
+      "nfcBusiness"
+    );
+
+  const current =
+    select.value;
+
+  select.innerHTML = `
+    <option value="">
+      İşletme seç...
+    </option>
+
+    ${
+      businesses.map(b=>`
+
+        <option value="${Number(b.id)}">
+          ${esc(b.name || "İsimsiz")}
+          ${
+            b.category
+              ? ` — ${esc(b.category)}`
+              : ""
+          }
+        </option>
+
+      `).join("")
+    }
+  `;
+
+  if(current){
+    select.value = current;
+  }
+
+}
+
+
+/* =========================================================
+   NFC LOAD
+========================================================= */
+
+async function loadNfcTags(){
+
+  const container =
+    document.getElementById(
+      "nfcTableContainer"
+    );
+
+  container.innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      NFC etiketleri yükleniyor...
+    </div>
+  `;
+
+  try{
+
+    const data =
+      await apiFetch(
+        "/admin/nfc-tags"
+      );
+
+    nfcTags =
+      Array.isArray(data)
+        ? data
+        : (
+            data?.nfc_tags ||
+            data?.nfcTags ||
+            data?.data ||
+            []
+          );
+
+    renderNfcTags();
+
+    updateNfcStatFromTags();
+
+  }catch(error){
+
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⌁</div>
+        <strong>NFC etiketleri yüklenemedi</strong>
+        <span>${esc(error.message)}</span>
+      </div>
+    `;
+
+  }
+
+}
+
+
+function updateNfcStatFromTags(){
+
+  const el =
+    document.getElementById(
+      "statNfcTags"
+    );
+
+  if(el){
+    el.textContent =
+      formatNumber(nfcTags.length);
+  }
+
+}
+
+
+/* =========================================================
+   NFC RENDER
+========================================================= */
+
+function renderNfcTags(){
+
+  const container =
+    document.getElementById(
+      "nfcTableContainer"
+    );
+
+  const query =
+    (
+      document.getElementById(
+        "nfcSearch"
+      )?.value || ""
+    )
+    .trim()
+    .toLowerCase();
+
+
+  const filtered =
+    nfcTags.filter(tag=>{
+
+      const text = [
+        tag.name,
+        tag.placement,
+        tag.business_name,
+        tag.business_slug,
+        tag.code
+      ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+      return text.includes(query);
+
+    });
+
+
+  if(!filtered.length){
+
+    container.innerHTML = `
+      <div class="empty">
+
+        <div class="empty-icon">
+          ⌁
+        </div>
+
+        <strong>
+          NFC etiketi bulunamadı
+        </strong>
+
+        <span>
+          Yeni bir NFC etiketi oluşturabilirsin.
+        </span>
+
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML = `
+
+    <div class="table-wrap">
+
+      <table class="nfc-table">
+
+        <thead>
+
+          <tr>
+            <th>Etiket</th>
+            <th>İşletme</th>
+            <th>Konum</th>
+            <th>Durum</th>
+            <th>Dokunuş</th>
+            <th>Son Dokunuş</th>
+            <th>İşlemler</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${filtered.map(tag=>{
+
+            const active =
+              tag.is_active !== false;
+
+            const url =
+              tag.url ||
+              (
+                tag.code
+                  ? `${location.origin}/p/nfc/${encodeURIComponent(tag.code)}`
+                  : ""
+              );
+
+            return `
+
+              <tr>
+
+                <td>
+
+                  <div class="tag-name">
+                    ${esc(tag.name || "NFC Etiketi")}
+                  </div>
+
+                  <div class="tag-code">
+                    ${esc(tag.code || "—")}
+                  </div>
+
+                </td>
+
+
+                <td>
+
+                  <div class="business-name">
+                    ${esc(tag.business_name || "—")}
+                  </div>
+
+                  <div class="business-meta">
+                    ${esc(tag.business_slug ? "/" + tag.business_slug : "")}
+                  </div>
+
+                </td>
+
+
+                <td>
+
+                  <span class="placement">
+                    ${esc(tag.placement || "Diğer")}
+                  </span>
+
+                </td>
+
+
+                <td>
+
+                  ${
+                    active
+
+                    ? `
+                      <span class="pill pill-green">
+                        ● Aktif
+                      </span>
+                    `
+
+                    : `
+                      <span class="pill pill-red">
+                        ● Pasif
+                      </span>
+                    `
+                  }
+
+                </td>
+
+
+                <td>
+
+                  <strong>
+                    ${formatNumber(tag.tap_count || 0)}
+                  </strong>
+
+                </td>
+
+
+                <td>
+
+                  <span class="muted">
+                    ${formatDate(tag.last_tap)}
+                  </span>
+
+                </td>
+
+
+                <td>
+
+                  <div class="actions">
+
+                    <button
+                      class="mini-btn"
+                      onclick='showNfcUrl(${JSON.stringify(url)},${JSON.stringify(tag.name || "NFC")})'
+                    >
+                      URL
+                    </button>
+
+                    <button
+                      class="mini-btn"
+                      onclick='testNfcUrl(${JSON.stringify(url)})'
+                    >
+                      Test
+                    </button>
+
+                    <button
+                      class="mini-btn"
+                      onclick="openNfcAnalytics(${Number(tag.id)})"
+                    >
+                      Analytics
+                    </button>
+
+                    <button
+                      class="mini-btn"
+                      onclick="openEditNfcModal(${Number(tag.id)})"
+                    >
+                      Düzenle
+                    </button>
+
+                    <button
+                      class="mini-btn"
+                      onclick="toggleNfc(${Number(tag.id)},${active})"
+                    >
+                      ${active ? "Pasifleştir" : "Aktifleştir"}
+                    </button>
+
+                    <button
+                      class="mini-btn"
+                      onclick="deleteNfc(${Number(tag.id)})"
+                    >
+                      Sil
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            `;
+
+          }).join("")}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   NFC CREATE
+========================================================= */
+
+function openCreateNfcModal(preselectedBusinessId=""){
 
   document.getElementById(
-    "newBusinessOverlay"
-  ).style.display =
-    "block";
-
-
-  document.body.style.overflow =
-    "hidden";
-
-
-  document.getElementById(
-    "newBusinessMessage"
+    "nfcModalTitle"
   ).textContent =
-    "";
-
-
-  document.getElementById(
-    "createdBox"
-  ).style.display =
-    "none";
-
-}
-
-
-function closeNewBusiness(){
+    "NFC Etiketi Oluştur";
 
   document.getElementById(
-    "newBusinessOverlay"
-  ).style.display =
-    "none";
+    "nfcId"
+  ).value = "";
 
+  document.getElementById(
+    "nfcName"
+  ).value = "";
 
-  document.body.style.overflow =
-    "";
+  document.getElementById(
+    "nfcPlacement"
+  ).value = "Masa";
+
+  document.getElementById(
+    "nfcActiveField"
+  ).classList.add("hidden");
+
+  populateBusinessSelect();
+
+  document.getElementById(
+    "nfcBusiness"
+  ).value =
+    preselectedBusinessId
+      ? String(preselectedBusinessId)
+      : "";
+
+  openModal("nfcModal");
 
 }
 
 
-async function createBusiness(){
+/* =========================================================
+   NFC EDIT
+========================================================= */
 
-  const name =
-    document.getElementById(
-      "new_name"
-    ).value.trim();
+function openEditNfcModal(id){
 
-
-  const email =
-    document.getElementById(
-      "new_email"
-    ).value.trim();
-
-
-  const password =
-    document.getElementById(
-      "new_password"
-    ).value;
-
-
-  const category =
-    document.getElementById(
-      "new_category"
-    ).value.trim();
-
-
-  const message =
-    document.getElementById(
-      "newBusinessMessage"
+  const tag =
+    nfcTags.find(
+      t=>Number(t.id) === Number(id)
     );
 
+  if(!tag){
 
-  message.textContent =
-    "";
-
-
-  if(
-    !name ||
-    !email ||
-    !password
-  ){
-
-    message.textContent =
-      "İşletme adı, e-posta ve şifre gerekli.";
+    toast(
+      "NFC etiketi bulunamadı.",
+      "error"
+    );
 
     return;
-
   }
 
+  populateBusinessSelect();
 
-  if(
-    password.length < 8
-  ){
+  document.getElementById(
+    "nfcModalTitle"
+  ).textContent =
+    "NFC Etiketini Düzenle";
 
-    message.textContent =
-      "Şifre en az 8 karakter olmalı.";
+  document.getElementById(
+    "nfcId"
+  ).value =
+    tag.id;
 
-    return;
+  document.getElementById(
+    "nfcBusiness"
+  ).value =
+    tag.business_id || "";
 
-  }
+  document.getElementById(
+    "nfcName"
+  ).value =
+    tag.name || "";
 
+  document.getElementById(
+    "nfcPlacement"
+  ).value =
+    tag.placement || "Diğer";
 
-  message.textContent =
-    "İşletme oluşturuluyor...";
+  document.getElementById(
+    "nfcActive"
+  ).value =
+    tag.is_active === false
+      ? "false"
+      : "true";
 
+  document.getElementById(
+    "nfcActiveField"
+  ).classList.remove("hidden");
 
-  const result =
-    await adminApi(
-
-      "/api/admin/business",
-
-      {
-
-        method:"POST",
-
-        body:
-          JSON.stringify({
-
-            name,
-            email,
-            password,
-            category
-
-          })
-
-      }
-
-    );
-
-
-  if(
-    result &&
-    result.ok
-  ){
-
-    message.textContent =
-      "✓ İşletme oluşturuldu.";
-
-
-    const business =
-      result.business;
-
-
-    document.getElementById(
-      "createdBusinessName"
-    ).innerHTML =
-      "<b>İŞLETME:</b> " +
-      escapeHtml(
-        business.name
-      );
-
-
-    document.getElementById(
-      "createdBusinessEmail"
-    ).innerHTML =
-      "<b>E-POSTA:</b> " +
-      escapeHtml(
-        email
-      );
-
-
-    document.getElementById(
-      "createdBusinessPassword"
-    ).innerHTML =
-      "<b>ŞİFRE:</b> " +
-      escapeHtml(
-        password
-      );
-
-
-    document.getElementById(
-      "createdBusinessUrl"
-    ).innerHTML =
-      "<b>PANEL:</b> " +
-      window.location.origin +
-      "/login";
-
-
-    document.getElementById(
-      "createdBox"
-    ).style.display =
-      "block";
-
-
-    document.getElementById(
-      "new_name"
-    ).value = "";
-
-
-    document.getElementById(
-      "new_email"
-    ).value = "";
-
-
-    document.getElementById(
-      "new_password"
-    ).value = "";
-
-
-    document.getElementById(
-      "new_category"
-    ).value = "";
-
-
-    await loadAdmin();
-
-  }else{
-
-    message.textContent =
-      result?.error ||
-      "İşletme oluşturulamadı.";
-
-  }
+  openModal("nfcModal");
 
 }
 
 
-/* ==================================================
-   ESCAPE HTML
-================================================== */
-
-function escapeHtml(
-  value
-){
-
-  return String(value)
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
-}
-
-
-/* ==================================================
-   ENTER LOGIN
-================================================== */
+/* =========================================================
+   NFC SAVE
+========================================================= */
 
 document
-  .getElementById(
-    "adminPassword"
-  )
-  .addEventListener(
-    "keydown",
-    function(event){
+  .getElementById("nfcForm")
+  .addEventListener("submit",async(event)=>{
 
-      if(
-        event.key === "Enter"
-      ){
+    event.preventDefault();
 
-        adminLogin();
+    const id =
+      document.getElementById(
+        "nfcId"
+      ).value;
 
+    const businessId =
+      document.getElementById(
+        "nfcBusiness"
+      ).value;
+
+    const name =
+      document.getElementById(
+        "nfcName"
+      ).value.trim();
+
+    const placement =
+      document.getElementById(
+        "nfcPlacement"
+      ).value;
+
+    if(!businessId){
+
+      toast(
+        "İşletme seçmelisin.",
+        "error"
+      );
+
+      return;
+    }
+
+    if(!name){
+
+      toast(
+        "Etiket adı gerekli.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    try{
+
+      if(id){
+
+        const active =
+          document.getElementById(
+            "nfcActive"
+          ).value === "true";
+
+        await apiFetch(
+          `/admin/nfc-tags/${id}`,
+          {
+            method:"PUT",
+            body:JSON.stringify({
+              name,
+              placement,
+              is_active:active
+            })
+          }
+        );
+
+        toast(
+          "NFC etiketi güncellendi."
+        );
+
+      }else{
+
+        const result =
+          await apiFetch(
+            "/admin/nfc-tags",
+            {
+              method:"POST",
+              body:JSON.stringify({
+                business_id:Number(businessId),
+                name,
+                placement
+              })
+            }
+          );
+
+        toast(
+          "NFC etiketi oluşturuldu."
+        );
+
+        closeModal("nfcModal");
+
+        await loadNfcTags();
+
+        const created =
+          result?.nfc_tag ||
+          result?.tag ||
+          result?.data ||
+          result;
+
+        if(created?.url){
+
+          setTimeout(()=>{
+
+            showNfcUrl(
+              created.url,
+              created.name || name
+            );
+
+          },200);
+
+        }
+
+        return;
       }
 
+      closeModal("nfcModal");
+
+      await loadNfcTags();
+
+    }catch(error){
+
+      toast(
+        error.message ||
+        "NFC işlemi başarısız.",
+        "error"
+      );
+
     }
+
+  });
+
+
+/* =========================================================
+   NFC TOGGLE
+========================================================= */
+
+async function toggleNfc(id,currentActive){
+
+  try{
+
+    const tag =
+      nfcTags.find(
+        t=>Number(t.id) === Number(id)
+      );
+
+    if(!tag){
+      return;
+    }
+
+    await apiFetch(
+      `/admin/nfc-tags/${id}`,
+      {
+        method:"PUT",
+        body:JSON.stringify({
+          name:
+            tag.name || "NFC Etiketi",
+
+          placement:
+            tag.placement || "Diğer",
+
+          is_active:
+            !currentActive
+        })
+      }
+    );
+
+    toast(
+      currentActive
+        ? "NFC etiketi pasifleştirildi."
+        : "NFC etiketi aktifleştirildi."
+    );
+
+    await loadNfcTags();
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Durum değiştirilemedi.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   NFC DELETE
+========================================================= */
+
+async function deleteNfc(id){
+
+  const tag =
+    nfcTags.find(
+      t=>Number(t.id) === Number(id)
+    );
+
+  const confirmed =
+    confirm(
+      `"${tag?.name || "Bu NFC etiketi"}" silinsin mi?\n\nBu işlem geri alınamaz.`
+    );
+
+  if(!confirmed){
+    return;
+  }
+
+  try{
+
+    await apiFetch(
+      `/admin/nfc-tags/${id}`,
+      {
+        method:"DELETE"
+      }
+    );
+
+    toast(
+      "NFC etiketi silindi."
+    );
+
+    await loadNfcTags();
+
+    await loadOverview();
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "NFC etiketi silinemedi.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   NFC URL
+========================================================= */
+
+function showNfcUrl(url,name){
+
+  currentNfcUrl =
+    url || "";
+
+  document.getElementById(
+    "nfcUrlName"
+  ).textContent =
+    name || "NFC Etiketi";
+
+  document.getElementById(
+    "nfcUrlValue"
+  ).textContent =
+    currentNfcUrl || "URL bulunamadı.";
+
+  openModal("nfcUrlModal");
+
+}
+
+
+function copyNfcUrl(){
+
+  copyText(
+    currentNfcUrl
   );
 
+}
 
-/* ==================================================
-   ESC
-================================================== */
+
+function openNfcUrl(){
+
+  if(!currentNfcUrl){
+
+    toast(
+      "NFC URL bulunamadı.",
+      "error"
+    );
+
+    return;
+  }
+
+  window.open(
+    currentNfcUrl,
+    "_blank",
+    "noopener"
+  );
+
+}
+
+
+function testNfcUrl(url){
+
+  if(!url){
+
+    toast(
+      "NFC URL bulunamadı.",
+      "error"
+    );
+
+    return;
+  }
+
+  window.open(
+    url,
+    "_blank",
+    "noopener"
+  );
+
+}
+
+
+/* =========================================================
+   NFC ANALYTICS
+========================================================= */
+
+async function openNfcAnalytics(id){
+
+  openModal(
+    "nfcAnalyticsModal"
+  );
+
+  const tag =
+    nfcTags.find(
+      t=>Number(t.id) === Number(id)
+    );
+
+  document.getElementById(
+    "analyticsTagName"
+  ).textContent =
+    tag?.name || "NFC Etiketi";
+
+  const body =
+    document.getElementById(
+      "nfcAnalyticsBody"
+    );
+
+  body.innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      Analytics yükleniyor...
+    </div>
+  `;
+
+  try{
+
+    const data =
+      await apiFetch(
+        `/admin/nfc-tags/${id}/analytics`
+      );
+
+    renderNfcAnalytics(
+      body,
+      data
+    );
+
+  }catch(error){
+
+    body.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠</div>
+        <strong>Analytics yüklenemedi</strong>
+        <span>${esc(error.message)}</span>
+      </div>
+    `;
+
+  }
+
+}
+
+
+function renderNfcAnalytics(body,data){
+
+  const summary =
+    data?.summary ||
+    data?.stats ||
+    data ||
+    {};
+
+  const total =
+    summary.tap_count ??
+    summary.taps ??
+    summary.total ??
+    data?.tap_count ??
+    0;
+
+  const today =
+    summary.today ??
+    summary.today_taps ??
+    data?.today ??
+    0;
+
+  const last =
+    summary.last_tap ??
+    data?.last_tap ??
+    null;
+
+  const events =
+    data?.events ||
+    data?.recent_events ||
+    [];
+
+
+  body.innerHTML = `
+
+    <div class="analytics-cards">
+
+      <div class="analytics-card">
+        <span>TOPLAM DOKUNUŞ</span>
+        <strong>${formatNumber(total)}</strong>
+      </div>
+
+      <div class="analytics-card">
+        <span>BUGÜN</span>
+        <strong>${formatNumber(today)}</strong>
+      </div>
+
+      <div class="analytics-card">
+        <span>SON DOKUNUŞ</span>
+        <strong style="font-size:14px">
+          ${formatDate(last)}
+        </strong>
+      </div>
+
+    </div>
+
+
+    ${
+      events.length
+
+      ? `
+
+        <div
+          style="font-size:11px;font-weight:900;margin:0 0 9px"
+        >
+          Son Etkileşimler
+        </div>
+
+        <div class="event-list">
+
+          ${
+            events.slice(0,20).map(event=>`
+
+              <div class="event-row">
+
+                <span>
+                  ${esc(event.type || "nfc")}
+                </span>
+
+                <span class="muted">
+                  ${formatDate(event.created_at)}
+                </span>
+
+              </div>
+
+            `).join("")
+          }
+
+        </div>
+
+      `
+
+      : `
+
+        <div class="empty">
+
+          <div class="empty-icon">
+            ⌁
+          </div>
+
+          <strong>
+            Henüz etkileşim yok
+          </strong>
+
+          <span>
+            Bu NFC etiketi üzerinden veri oluştuğunda burada görünecek.
+          </span>
+
+        </div>
+
+      `
+    }
+
+  `;
+
+}
+
+
+/* =========================================================
+   QR
+========================================================= */
+
+async function openBusinessQr(id){
+
+  const business =
+    businesses.find(
+      b=>Number(b.id) === Number(id)
+    );
+
+  try{
+
+    const data =
+      await apiFetch(
+        `/admin/business/${id}/qr`
+      );
+
+    const image =
+      data?.dataUrl ||
+      data?.data_url ||
+      data?.qr ||
+      data?.image ||
+      data?.url;
+
+    currentQrUrl =
+      data?.profile_url ||
+      data?.profileUrl ||
+      data?.url ||
+      profileUrl(
+        business?.slug
+      );
+
+    document.getElementById(
+      "qrBusinessName"
+    ).textContent =
+      business?.name || "İşletme";
+
+    const qrImage =
+      document.getElementById(
+        "qrImage"
+      );
+
+    if(image){
+
+      qrImage.src =
+        image;
+
+    }else{
+
+      /*
+       * Backend image döndürmezse
+       * public QR endpoint üzerinden üret.
+       */
+
+      qrImage.src =
+        `${API}/qr?slug=${encodeURIComponent(business?.slug || "")}`;
+
+    }
+
+    document.getElementById(
+      "qrUrl"
+    ).textContent =
+      currentQrUrl || "URL bulunamadı.";
+
+    openModal("qrModal");
+
+  }catch(error){
+
+    /*
+     * Admin QR endpoint farklı bir response
+     * döndürürse profile URL üzerinden
+     * QR fallback hazırlanır.
+     */
+
+    if(business?.slug){
+
+      currentQrUrl =
+        profileUrl(
+          business.slug
+        );
+
+      document.getElementById(
+        "qrBusinessName"
+      ).textContent =
+        business.name || "İşletme";
+
+      document.getElementById(
+        "qrUrl"
+      ).textContent =
+        currentQrUrl;
+
+      document.getElementById(
+        "qrImage"
+      ).src =
+        `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(currentQrUrl)}`;
+
+      openModal("qrModal");
+
+    }else{
+
+      toast(
+        error.message ||
+        "QR oluşturulamadı.",
+        "error"
+      );
+
+    }
+
+  }
+
+}
+
+
+function copyQrUrl(){
+
+  copyText(
+    currentQrUrl
+  );
+
+}
+
+
+function openQrProfile(){
+
+  if(!currentQrUrl){
+    return;
+  }
+
+  window.open(
+    currentQrUrl,
+    "_blank",
+    "noopener"
+  );
+
+}
+
+
+/* =========================================================
+   OPEN PROFILE
+========================================================= */
+
+function openProfile(slug){
+
+  if(!slug){
+
+    toast(
+      "Profil adresi bulunamadı.",
+      "error"
+    );
+
+    return;
+  }
+
+  window.open(
+    profileUrl(slug),
+    "_blank",
+    "noopener"
+  );
+
+}
+
+
+/* =========================================================
+   ESC CLOSE
+========================================================= */
 
 document.addEventListener(
   "keydown",
-  function(event){
+  event=>{
+
+    if(event.key !== "Escape"){
+      return;
+    }
+
+    [
+      "businessDetailModal",
+      "businessEditModal",
+      "nfcModal",
+      "nfcUrlModal",
+      "qrModal",
+      "nfcAnalyticsModal"
+    ].forEach(closeModal);
+
+  }
+);
+
+
+/* =========================================================
+   CLICK OUTSIDE MODAL
+========================================================= */
+
+document.addEventListener(
+  "click",
+  event=>{
 
     if(
-      event.key === "Escape"
+      event.target.classList.contains(
+        "modal"
+      )
     ){
 
-      closeDetail();
-      closeNewBusiness();
+      event.target.classList.add(
+        "hidden"
+      );
 
     }
 
@@ -4091,21 +4457,11 @@ document.addEventListener(
 );
 
 
-/* ==================================================
-   EXISTING ADMIN TOKEN
-================================================== */
+/* =========================================================
+   START
+========================================================= */
 
-const existingToken =
-  localStorage.getItem(
-    ADMIN_TOKEN_KEY
-  );
-
-
-if(existingToken){
-
-  showAdmin();
-
-}
+init();
 
 </script>
 
