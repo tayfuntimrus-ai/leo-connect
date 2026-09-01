@@ -724,6 +724,628 @@ app.get(
   }
 );
 
+/* ==================================================
+   ADMIN NFC MANAGEMENT
+================================================== */
+
+/* =========================
+   ADMIN NFC LIST
+========================= */
+
+app.get(
+  '/api/admin/nfc-tags',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const result =
+        await pool.query(`
+          SELECT
+
+            n.id,
+            n.business_id,
+            n.name,
+            n.placement,
+            n.code,
+            n.is_active,
+            n.created_at,
+            n.updated_at,
+
+            b.name AS business_name,
+            b.slug AS business_slug,
+
+            COALESCE((
+              SELECT COUNT(*)
+              FROM events e
+              WHERE
+                e.nfc_tag_id = n.id
+                AND e.type = 'nfc'
+            ), 0)::int AS tap_count,
+
+            (
+              SELECT MAX(e.created_at)
+              FROM events e
+              WHERE
+                e.nfc_tag_id = n.id
+                AND e.type = 'nfc'
+            ) AS last_tap
+
+          FROM nfc_tags n
+
+          INNER JOIN businesses b
+            ON b.id = n.business_id
+
+          ORDER BY
+            n.id DESC
+        `);
+
+      const tags =
+        result.rows.map(
+          tag => ({
+
+            ...tag,
+
+            url:
+              `${req.protocol}://${req.get('host')}/p/nfc/${tag.code}`
+
+          })
+        );
+
+      res.json(tags);
+
+    } catch (error) {
+
+      console.error(
+        'ADMIN NFC LIST ERROR:',
+        error
+      );
+
+      res
+        .status(500)
+        .json({
+          error:
+            'NFC etiketleri alınamadı'
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ADMIN NFC CREATE
+========================= */
+
+app.post(
+  '/api/admin/nfc-tags',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const {
+        business_id,
+        name,
+        placement
+      } = req.body;
+
+      if (!business_id) {
+
+        return res
+          .status(400)
+          .json({
+            error:
+              'İşletme seçilmesi gerekli'
+          });
+
+      }
+
+      const business =
+        await pool.query(
+          `
+          SELECT
+            id,
+            name,
+            slug
+          FROM businesses
+          WHERE id=$1
+          `,
+          [
+            business_id
+          ]
+        );
+
+      if (!business.rows.length) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'İşletme bulunamadı'
+          });
+
+      }
+
+      const code =
+        crypto
+          .randomBytes(12)
+          .toString('hex');
+
+      const result =
+        await pool.query(
+          `
+          INSERT INTO nfc_tags(
+            business_id,
+            name,
+            placement,
+            code,
+            is_active
+          )
+
+          VALUES(
+            $1,
+            $2,
+            $3,
+            $4,
+            true
+          )
+
+          RETURNING
+            id,
+            business_id,
+            name,
+            placement,
+            code,
+            is_active,
+            created_at,
+            updated_at
+          `,
+          [
+            business_id,
+            String(name || 'NFC Etiketi')
+              .trim(),
+
+            String(
+              placement || 'Diğer'
+            ).trim(),
+
+            code
+          ]
+        );
+
+      const tag =
+        result.rows[0];
+
+      res.status(201).json({
+
+        ...tag,
+
+        business_name:
+          business.rows[0].name,
+
+        business_slug:
+          business.rows[0].slug,
+
+        url:
+          `${req.protocol}://${req.get('host')}/p/nfc/${tag.code}`
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        'ADMIN NFC CREATE ERROR:',
+        error
+      );
+
+      res
+        .status(500)
+        .json({
+          error:
+            'NFC etiketi oluşturulamadı'
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ADMIN NFC DETAIL
+========================= */
+
+app.get(
+  '/api/admin/nfc-tags/:id',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            n.id,
+            n.business_id,
+            n.name,
+            n.placement,
+            n.code,
+            n.is_active,
+            n.created_at,
+            n.updated_at,
+
+            b.name AS business_name,
+            b.slug AS business_slug,
+
+            COALESCE((
+              SELECT COUNT(*)
+              FROM events e
+              WHERE
+                e.nfc_tag_id = n.id
+                AND e.type='nfc'
+            ),0)::int AS tap_count,
+
+            (
+              SELECT MAX(e.created_at)
+              FROM events e
+              WHERE
+                e.nfc_tag_id=n.id
+                AND e.type='nfc'
+            ) AS last_tap
+
+          FROM nfc_tags n
+
+          INNER JOIN businesses b
+            ON b.id=n.business_id
+
+          WHERE n.id=$1
+          `,
+          [
+            req.params.id
+          ]
+        );
+
+      if (!result.rows.length) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'NFC etiketi bulunamadı'
+          });
+
+      }
+
+      const tag =
+        result.rows[0];
+
+      res.json({
+
+        ...tag,
+
+        url:
+          `${req.protocol}://${req.get('host')}/p/nfc/${tag.code}`
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        'ADMIN NFC DETAIL ERROR:',
+        error
+      );
+
+      res
+        .status(500)
+        .json({
+          error:
+            'NFC etiketi alınamadı'
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ADMIN NFC UPDATE
+========================= */
+
+app.put(
+  '/api/admin/nfc-tags/:id',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const {
+        name,
+        placement,
+        is_active
+      } = req.body;
+
+      const result =
+        await pool.query(
+          `
+          UPDATE nfc_tags
+
+          SET
+
+            name =
+              COALESCE($1, name),
+
+            placement =
+              COALESCE($2, placement),
+
+            is_active =
+              COALESCE($3, is_active),
+
+            updated_at =
+              CURRENT_TIMESTAMP
+
+          WHERE id=$4
+
+          RETURNING
+            id,
+            business_id,
+            name,
+            placement,
+            code,
+            is_active,
+            created_at,
+            updated_at
+          `,
+          [
+            name,
+            placement,
+            typeof is_active === 'boolean'
+              ? is_active
+              : null,
+            req.params.id
+          ]
+        );
+
+      if (!result.rows.length) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'NFC etiketi bulunamadı'
+          });
+
+      }
+
+      const tag =
+        result.rows[0];
+
+      res.json({
+
+        ...tag,
+
+        url:
+          `${req.protocol}://${req.get('host')}/p/nfc/${tag.code}`
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        'ADMIN NFC UPDATE ERROR:',
+        error
+      );
+
+      res
+        .status(500)
+        .json({
+          error:
+            'NFC etiketi güncellenemedi'
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ADMIN NFC DELETE
+========================= */
+
+app.delete(
+  '/api/admin/nfc-tags/:id',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const result =
+        await pool.query(
+          `
+          DELETE FROM nfc_tags
+
+          WHERE id=$1
+
+          RETURNING id
+          `,
+          [
+            req.params.id
+          ]
+        );
+
+      if (!result.rows.length) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'NFC etiketi bulunamadı'
+          });
+
+      }
+
+      res.json({
+        ok: true
+      });
+
+    } catch (error) {
+
+      console.error(
+        'ADMIN NFC DELETE ERROR:',
+        error
+      );
+
+      res
+        .status(500)
+        .json({
+          error:
+            'NFC etiketi silinemedi'
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ADMIN NFC ANALYTICS
+========================= */
+
+app.get(
+  '/api/admin/nfc-tags/:id/analytics',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const tag =
+        await pool.query(
+          `
+          SELECT
+            n.id,
+            n.name,
+            n.placement,
+            n.code,
+            n.is_active,
+            b.name AS business_name
+
+          FROM nfc_tags n
+
+          INNER JOIN businesses b
+            ON b.id=n.business_id
+
+          WHERE n.id=$1
+          `,
+          [
+            req.params.id
+          ]
+        );
+
+      if (!tag.rows.length) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'NFC etiketi bulunamadı'
+          });
+
+      }
+
+      const totals =
+        await pool.query(
+          `
+          SELECT
+
+            COUNT(*)::int
+              AS total_taps,
+
+            COUNT(
+              DISTINCT DATE(created_at)
+            )::int
+              AS active_days,
+
+            MAX(created_at)
+              AS last_tap
+
+          FROM events
+
+          WHERE
+            nfc_tag_id=$1
+            AND type='nfc'
+          `,
+          [
+            req.params.id
+          ]
+        );
+
+      const daily =
+        await pool.query(
+          `
+          SELECT
+
+            DATE(created_at)
+              AS day,
+
+            COUNT(*)::int
+              AS taps
+
+          FROM events
+
+          WHERE
+            nfc_tag_id=$1
+            AND type='nfc'
+
+          GROUP BY
+            DATE(created_at)
+
+          ORDER BY
+            day DESC
+
+          LIMIT 30
+          `,
+          [
+            req.params.id
+          ]
+        );
+
+      res.json({
+
+        tag:
+          tag.rows[0],
+
+        totals:
+          totals.rows[0],
+
+        daily:
+          daily.rows
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        'ADMIN NFC ANALYTICS ERROR:',
+        error
+      );
+
+      res
+        .status(500)
+        .json({
+          error:
+            'NFC analizleri alınamadı'
+        });
+
+    }
+
+  }
+);
 
 /* =========================================================
    ADMIN BUSINESS QR
