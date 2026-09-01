@@ -528,7 +528,7 @@ tbody tr:hover{
 }
 
 .modal{
-  width:min(1050px,100%);
+  width:min(1100px,100%);
   margin:20px auto 60px;
 
   border-radius:25px;
@@ -583,6 +583,297 @@ tbody tr:hover{
 
 .modal-body{
   padding:25px;
+}
+
+
+/* =========================
+   DETAIL STATS
+========================= */
+
+.detail-stats{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:10px;
+
+  margin-bottom:22px;
+}
+
+.detail-stat{
+  padding:16px;
+
+  border-radius:15px;
+
+  background:#111;
+  border:1px solid var(--border);
+}
+
+.detail-stat small{
+  display:block;
+  color:#777;
+  font-size:9px;
+  margin-bottom:8px;
+}
+
+.detail-stat strong{
+  font-size:23px;
+  color:var(--gold-light);
+}
+
+
+/* =========================
+   ANALYTICS
+========================= */
+
+.analytics{
+  margin:25px 0;
+
+  padding:22px;
+
+  border-radius:20px;
+
+  border:1px solid #c59a5230;
+
+  background:
+    linear-gradient(
+      145deg,
+      #121212,
+      #0c0c0c
+    );
+}
+
+.analytics-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+
+  margin-bottom:20px;
+}
+
+.analytics-title h3{
+  margin:5px 0 0;
+  font-size:20px;
+}
+
+.analytics-title p{
+  margin:5px 0 0;
+  color:#666;
+  font-size:11px;
+}
+
+.periods{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
+.period{
+  padding:9px 12px;
+
+  border-radius:9px;
+
+  border:1px solid #333;
+
+  background:#171717;
+  color:#aaa;
+
+  font-size:10px;
+  font-weight:800;
+}
+
+.period.active{
+  background:#b8893f;
+  border-color:#b8893f;
+  color:#fff;
+}
+
+.analytics-kpis{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+
+  margin-bottom:18px;
+}
+
+.analytics-kpi{
+  padding:15px;
+
+  border-radius:14px;
+
+  background:#101010;
+  border:1px solid #242424;
+}
+
+.analytics-kpi small{
+  display:block;
+
+  color:#666;
+
+  font-size:8px;
+
+  letter-spacing:.1em;
+
+  margin-bottom:7px;
+}
+
+.analytics-kpi strong{
+  font-size:22px;
+  color:var(--gold-light);
+}
+
+.analytics-grid{
+  display:grid;
+  grid-template-columns:1.4fr .8fr;
+  gap:15px;
+}
+
+.analytics-card{
+  padding:18px;
+
+  border-radius:16px;
+
+  background:#0e0e0e;
+
+  border:1px solid #242424;
+}
+
+.analytics-card h4{
+  margin:0 0 15px;
+
+  font-size:13px;
+}
+
+.chart{
+  height:230px;
+
+  display:flex;
+  align-items:flex-end;
+
+  gap:7px;
+
+  overflow-x:auto;
+
+  padding:10px 3px 5px;
+}
+
+.chart-item{
+  min-width:27px;
+
+  height:100%;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  align-items:center;
+  gap:5px;
+}
+
+.chart-value{
+  color:#aaa;
+  font-size:8px;
+}
+
+.chart-bar{
+  width:18px;
+
+  min-height:3px;
+
+  border-radius:5px 5px 2px 2px;
+
+  background:
+    linear-gradient(
+      to top,
+      #8d6834,
+      #e0bd7b
+    );
+}
+
+.chart-label{
+  color:#555;
+  font-size:7px;
+
+  white-space:nowrap;
+}
+
+.source-row{
+  margin-bottom:16px;
+}
+
+.source-top{
+  display:flex;
+  justify-content:space-between;
+
+  margin-bottom:7px;
+
+  color:#aaa;
+  font-size:10px;
+}
+
+.source-track{
+  height:7px;
+
+  overflow:hidden;
+
+  border-radius:99px;
+
+  background:#1c1c1c;
+}
+
+.source-fill{
+  height:100%;
+
+  border-radius:99px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #8d6834,
+      #e0bd7b
+    );
+}
+
+.channel-list{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+
+  max-height:240px;
+  overflow-y:auto;
+}
+
+.channel-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:10px 12px;
+
+  border-radius:10px;
+
+  background:#151515;
+
+  border:1px solid #222;
+}
+
+.channel-name{
+  color:#aaa;
+  font-size:10px;
+}
+
+.channel-count{
+  color:var(--gold-light);
+  font-size:11px;
+  font-weight:800;
+}
+
+.analytics-loading{
+  padding:30px;
+
+  text-align:center;
+
+  color:#666;
+
+  font-size:11px;
 }
 
 
@@ -687,40 +978,6 @@ tbody tr:hover{
 
   color:var(--gold-light);
   font-size:12px;
-}
-
-
-/* =========================
-   STATS DETAIL
-========================= */
-
-.detail-stats{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:10px;
-
-  margin-bottom:22px;
-}
-
-.detail-stat{
-  padding:16px;
-
-  border-radius:15px;
-
-  background:#111;
-  border:1px solid var(--border);
-}
-
-.detail-stat small{
-  display:block;
-  color:#777;
-  font-size:9px;
-  margin-bottom:8px;
-}
-
-.detail-stat strong{
-  font-size:23px;
-  color:var(--gold-light);
 }
 
 
@@ -873,6 +1130,14 @@ tbody tr:hover{
     grid-template-columns:repeat(3,1fr);
   }
 
+  .analytics-kpis{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .analytics-grid{
+    grid-template-columns:1fr;
+  }
+
 }
 
 @media(max-width:650px){
@@ -914,6 +1179,35 @@ tbody tr:hover{
 
   .detail-stats{
     grid-template-columns:1fr 1fr;
+  }
+
+  .analytics{
+    padding:15px;
+  }
+
+  .analytics-header{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .analytics-kpis{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .periods{
+    width:100%;
+  }
+
+  .period{
+    flex:1;
+  }
+
+  .analytics-grid{
+    grid-template-columns:1fr;
+  }
+
+  .chart{
+    height:190px;
   }
 
   .form-grid{
@@ -1110,104 +1404,44 @@ tbody tr:hover{
 
 
   <div class="stat">
-
-    <div class="stat-icon">
-      🏢
-    </div>
-
-    <small>
-      İŞLETMELER
-    </small>
-
-    <strong id="businessCount">
-      0
-    </strong>
-
+    <div class="stat-icon">🏢</div>
+    <small>İŞLETMELER</small>
+    <strong id="businessCount">0</strong>
   </div>
 
 
   <div class="stat">
-
-    <div class="stat-icon">
-      👁️
-    </div>
-
-    <small>
-      PROFİL GÖRÜNTÜLEME
-    </small>
-
-    <strong id="profileCount">
-      0
-    </strong>
-
+    <div class="stat-icon">👁️</div>
+    <small>PROFİL GÖRÜNTÜLEME</small>
+    <strong id="profileCount">0</strong>
   </div>
 
 
   <div class="stat">
-
-    <div class="stat-icon">
-      ▣
-    </div>
-
-    <small>
-      QR TARAMA
-    </small>
-
-    <strong id="qrCount">
-      0
-    </strong>
-
+    <div class="stat-icon">▣</div>
+    <small>QR TARAMA</small>
+    <strong id="qrCount">0</strong>
   </div>
 
 
   <div class="stat">
-
-    <div class="stat-icon">
-      📡
-    </div>
-
-    <small>
-      NFC DOKUNMA
-    </small>
-
-    <strong id="nfcCount">
-      0
-    </strong>
-
+    <div class="stat-icon">📡</div>
+    <small>NFC DOKUNMA</small>
+    <strong id="nfcCount">0</strong>
   </div>
 
 
   <div class="stat">
-
-    <div class="stat-icon">
-      💬
-    </div>
-
-    <small>
-      WHATSAPP
-    </small>
-
-    <strong id="whatsappCount">
-      0
-    </strong>
-
+    <div class="stat-icon">💬</div>
+    <small>WHATSAPP</small>
+    <strong id="whatsappCount">0</strong>
   </div>
 
 
   <div class="stat">
-
-    <div class="stat-icon">
-      📞
-    </div>
-
-    <small>
-      TELEFON
-    </small>
-
-    <strong id="phoneCount">
-      0
-    </strong>
-
+    <div class="stat-icon">📞</div>
+    <small>TELEFON</small>
+    <strong id="phoneCount">0</strong>
   </div>
 
 
@@ -1254,37 +1488,14 @@ tbody tr:hover{
 
         <tr>
 
-          <th>
-            İŞLETME
-          </th>
-
-          <th>
-            KATEGORİ
-          </th>
-
-          <th>
-            PROFİL
-          </th>
-
-          <th>
-            QR
-          </th>
-
-          <th>
-            NFC
-          </th>
-
-          <th>
-            WHATSAPP
-          </th>
-
-          <th>
-            TELEFON
-          </th>
-
-          <th>
-            KAYIT
-          </th>
+          <th>İŞLETME</th>
+          <th>KATEGORİ</th>
+          <th>PROFİL</th>
+          <th>QR</th>
+          <th>NFC</th>
+          <th>WHATSAPP</th>
+          <th>TELEFON</th>
+          <th>KAYIT</th>
 
         </tr>
 
@@ -1370,48 +1581,300 @@ tbody tr:hover{
     <div class="modal-body">
 
 
-      <div class="detail-stats">
+      <!-- DETAIL QUICK STATS -->
 
+      <div class="detail-stats">
 
         <div class="detail-stat">
           <small>PROFİL</small>
           <strong id="detailProfile">0</strong>
         </div>
 
-
         <div class="detail-stat">
           <small>QR</small>
           <strong id="detailQR">0</strong>
         </div>
-
 
         <div class="detail-stat">
           <small>NFC</small>
           <strong id="detailNFC">0</strong>
         </div>
 
-
         <div class="detail-stat">
           <small>WHATSAPP</small>
           <strong id="detailWhatsapp">0</strong>
         </div>
-
 
         <div class="detail-stat">
           <small>TELEFON</small>
           <strong id="detailPhone">0</strong>
         </div>
 
-
         <div class="detail-stat">
           <small>TOPLAM</small>
           <strong id="detailTotal">0</strong>
         </div>
 
-
       </div>
 
 
+
+      <!-- ==================================================
+           ANALYTICS
+      ================================================== -->
+
+      <section class="analytics">
+
+        <div class="analytics-header">
+
+          <div class="analytics-title">
+
+            <div class="eyebrow">
+              BUSINESS ANALYTICS
+            </div>
+
+            <h3>
+              Etkileşim Merkezi
+            </h3>
+
+            <p>
+              İşletmenin dijital bağlantı performansını incele.
+            </p>
+
+          </div>
+
+
+          <div class="periods">
+
+            <button
+              class="period"
+              data-period="today"
+              onclick="loadAnalytics('today')"
+            >
+              BUGÜN
+            </button>
+
+            <button
+              class="period"
+              data-period="7d"
+              onclick="loadAnalytics('7d')"
+            >
+              7 GÜN
+            </button>
+
+            <button
+              class="period active"
+              data-period="30d"
+              onclick="loadAnalytics('30d')"
+            >
+              30 GÜN
+            </button>
+
+            <button
+              class="period"
+              data-period="all"
+              onclick="loadAnalytics('all')"
+            >
+              TÜMÜ
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <div
+          id="analyticsLoading"
+          class="analytics-loading"
+        >
+          Analitik verileri yükleniyor...
+        </div>
+
+
+
+        <div
+          id="analyticsContent"
+          style="display:none"
+        >
+
+
+          <!-- KPI -->
+
+          <div class="analytics-kpis">
+
+            <div class="analytics-kpi">
+
+              <small>
+                TOPLAM ETKİLEŞİM
+              </small>
+
+              <strong id="analyticsTotal">
+                0
+              </strong>
+
+            </div>
+
+
+            <div class="analytics-kpi">
+
+              <small>
+                PROFİL
+              </small>
+
+              <strong id="analyticsProfile">
+                0
+              </strong>
+
+            </div>
+
+
+            <div class="analytics-kpi">
+
+              <small>
+                QR
+              </small>
+
+              <strong id="analyticsQR">
+                0
+              </strong>
+
+            </div>
+
+
+            <div class="analytics-kpi">
+
+              <small>
+                NFC
+              </small>
+
+              <strong id="analyticsNFC">
+                0
+              </strong>
+
+            </div>
+
+
+            <div class="analytics-kpi">
+
+              <small>
+                WHATSAPP
+              </small>
+
+              <strong id="analyticsWhatsapp">
+                0
+              </strong>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- GRAPH + SOURCES -->
+
+          <div class="analytics-grid">
+
+
+            <div class="analytics-card">
+
+              <h4>
+                📈 Günlük Etkileşim
+              </h4>
+
+              <div
+                id="dailyChart"
+                class="chart"
+              ></div>
+
+            </div>
+
+
+
+            <div class="analytics-card">
+
+              <h4>
+                ⚡ QR / NFC
+              </h4>
+
+
+              <div class="source-row">
+
+                <div class="source-top">
+
+                  <span>
+                    📷 QR
+                  </span>
+
+                  <strong id="sourceQR">
+                    0
+                  </strong>
+
+                </div>
+
+                <div class="source-track">
+
+                  <div
+                    id="sourceQRBar"
+                    class="source-fill"
+                    style="width:0%"
+                  ></div>
+
+                </div>
+
+              </div>
+
+
+              <div class="source-row">
+
+                <div class="source-top">
+
+                  <span>
+                    📡 NFC
+                  </span>
+
+                  <strong id="sourceNFC">
+                    0
+                  </strong>
+
+                </div>
+
+                <div class="source-track">
+
+                  <div
+                    id="sourceNFCBar"
+                    class="source-fill"
+                    style="width:0%"
+                  ></div>
+
+                </div>
+
+              </div>
+
+
+              <h4 style="margin-top:25px">
+                🏆 Kanallar
+              </h4>
+
+              <div
+                id="channelList"
+                class="channel-list"
+              ></div>
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- ==================================================
+           BUSINESS FORM
+      ================================================== -->
 
       <div class="form-grid">
 
@@ -1585,6 +2048,8 @@ tbody tr:hover{
 
 
 
+      <!-- ACTIONS -->
+
       <div class="modal-actions">
 
 
@@ -1639,6 +2104,8 @@ tbody tr:hover{
 
 
 
+      <!-- QR -->
+
       <div
         id="qrBox"
         class="digital-box"
@@ -1676,6 +2143,8 @@ tbody tr:hover{
       </div>
 
 
+
+      <!-- NFC -->
 
       <div
         id="nfcBox"
@@ -1924,6 +2393,9 @@ let currentBusinessId =
 
 let currentBusiness =
   null;
+
+let currentAnalyticsPeriod =
+  "30d";
 
 
 /* ==================================================
@@ -2363,6 +2835,18 @@ async function openBusiness(id){
   hideDigitalBoxes();
 
 
+  document
+    .getElementById("analyticsLoading")
+    .style.display =
+      "block";
+
+
+  document
+    .getElementById("analyticsContent")
+    .style.display =
+      "none";
+
+
   const data =
     await adminApi(
       "/api/admin/business/" +
@@ -2432,6 +2916,437 @@ async function openBusiness(id){
     "detailTotal"
   ).textContent =
     data.total_events ?? 0;
+
+
+  await loadAnalytics(
+    currentAnalyticsPeriod
+  );
+
+}
+
+
+/* ==================================================
+   ANALYTICS
+================================================== */
+
+async function loadAnalytics(
+  period="30d"
+){
+
+  if(!currentBusinessId)
+    return;
+
+
+  currentAnalyticsPeriod =
+    period;
+
+
+  document
+    .querySelectorAll(
+      ".period"
+    )
+    .forEach(
+      button => {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.period === period
+        );
+
+      }
+    );
+
+
+  const loading =
+    document.getElementById(
+      "analyticsLoading"
+    );
+
+
+  const content =
+    document.getElementById(
+      "analyticsContent"
+    );
+
+
+  loading.style.display =
+    "block";
+
+
+  content.style.display =
+    "none";
+
+
+  const result =
+    await adminApi(
+
+      "/api/admin/business/" +
+      encodeURIComponent(
+        currentBusinessId
+      ) +
+      "/analytics?period=" +
+      encodeURIComponent(
+        period
+      )
+
+    );
+
+
+  if(!result){
+
+    loading.textContent =
+      "Analitik verileri alınamadı.";
+
+    return;
+
+  }
+
+
+  if(result.error){
+
+    loading.textContent =
+      result.error;
+
+    return;
+
+  }
+
+
+  renderAnalytics(
+    result
+  );
+
+
+  loading.style.display =
+    "none";
+
+
+  content.style.display =
+    "block";
+
+}
+
+
+/* ==================================================
+   RENDER ANALYTICS
+================================================== */
+
+function renderAnalytics(
+  data
+){
+
+  const totals =
+    data.totals || {};
+
+  const sources =
+    data.sources || {};
+
+  const channels =
+    Array.isArray(
+      data.channels
+    )
+      ? data.channels
+      : [];
+
+
+  document.getElementById(
+    "analyticsTotal"
+  ).textContent =
+    data.total_events ?? 0;
+
+
+  document.getElementById(
+    "analyticsProfile"
+  ).textContent =
+    totals.profile_view ?? 0;
+
+
+  document.getElementById(
+    "analyticsQR"
+  ).textContent =
+    sources.qr ?? 0;
+
+
+  document.getElementById(
+    "analyticsNFC"
+  ).textContent =
+    sources.nfc ?? 0;
+
+
+  document.getElementById(
+    "analyticsWhatsapp"
+  ).textContent =
+    totals.whatsapp ?? 0;
+
+
+  document.getElementById(
+    "sourceQR"
+  ).textContent =
+    sources.qr ?? 0;
+
+
+  document.getElementById(
+    "sourceNFC"
+  ).textContent =
+    sources.nfc ?? 0;
+
+
+  const qr =
+    Number(
+      sources.qr || 0
+    );
+
+
+  const nfc =
+    Number(
+      sources.nfc || 0
+    );
+
+
+  const sourceTotal =
+    qr + nfc;
+
+
+  document.getElementById(
+    "sourceQRBar"
+  ).style.width =
+    sourceTotal
+      ? (
+          qr /
+          sourceTotal *
+          100
+        ) + "%"
+      : "0%";
+
+
+  document.getElementById(
+    "sourceNFCBar"
+  ).style.width =
+    sourceTotal
+      ? (
+          nfc /
+          sourceTotal *
+          100
+        ) + "%"
+      : "0%";
+
+
+  renderDailyChart(
+    data.daily || []
+  );
+
+
+  renderChannels(
+    channels
+  );
+
+}
+
+
+/* ==================================================
+   DAILY CHART
+================================================== */
+
+function renderDailyChart(
+  daily
+){
+
+  const chart =
+    document.getElementById(
+      "dailyChart"
+    );
+
+
+  if(
+    !Array.isArray(daily)
+    ||
+    !daily.length
+  ){
+
+    chart.innerHTML = `
+
+      <div
+        style="
+          width:100%;
+          display:grid;
+          place-items:center;
+          color:#555;
+          font-size:10px;
+        "
+      >
+        Bu dönem için henüz veri yok.
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  const values =
+    daily.map(
+      item =>
+        Number(
+          item.total || 0
+        )
+    );
+
+
+  const max =
+    Math.max(
+      ...values,
+      1
+    );
+
+
+  chart.innerHTML =
+    daily
+      .map(
+        item => {
+
+          const value =
+            Number(
+              item.total || 0
+            );
+
+
+          const height =
+            Math.max(
+              3,
+              (
+                value /
+                max
+              ) * 175
+            );
+
+
+          const date =
+            item.day
+              ? new Date(
+                  item.day
+                )
+                  .toLocaleDateString(
+                    "tr-TR",
+                    {
+                      day:"2-digit",
+                      month:"2-digit"
+                    }
+                  )
+              : "";
+
+
+          return `
+
+            <div
+              class="chart-item"
+              title="${date}: ${value}"
+            >
+
+              <div class="chart-value">
+                ${value}
+              </div>
+
+              <div
+                class="chart-bar"
+                style="
+                  height:${height}px
+                "
+              ></div>
+
+              <div class="chart-label">
+                ${date}
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+
+/* ==================================================
+   CHANNELS
+================================================== */
+
+function renderChannels(
+  channels
+){
+
+  const container =
+    document.getElementById(
+      "channelList"
+    );
+
+
+  if(
+    !channels.length
+  ){
+
+    container.innerHTML = `
+
+      <div
+        style="
+          color:#555;
+          font-size:10px;
+          padding:10px;
+        "
+      >
+        Henüz kanal etkileşimi yok.
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  const sorted =
+    [...channels]
+      .sort(
+        (
+          a,
+          b
+        ) =>
+          Number(
+            b.value || 0
+          )
+          -
+          Number(
+            a.value || 0
+          )
+      );
+
+
+  container.innerHTML =
+    sorted
+      .map(
+        item => `
+
+          <div class="channel-row">
+
+            <span class="channel-name">
+              ${escapeHtml(
+                item.label || item.key
+              )}
+            </span>
+
+            <span class="channel-count">
+              ${Number(
+                item.value || 0
+              )}
+            </span>
+
+          </div>
+
+        `
+      )
+      .join("");
 
 }
 
@@ -2995,11 +3910,8 @@ async function createBusiness(){
           JSON.stringify({
 
             name,
-
             email,
-
             password,
-
             category
 
           })
