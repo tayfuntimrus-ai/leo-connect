@@ -111,5 +111,5 @@ app.post('/api/event/:slug',express.json(),(req,res)=>{
  res.json({ok:true});
 });
 
-app.get('*',(req,res)=>res.sendFile(path.join(__dirname,'public','index.html')));
+app.use((req,res)=>res.sendFile(path.join(__dirname,'public','index.html')));
 app.listen(PORT,()=>console.log(`LEO CONNECT çalışıyor: ${BASE}`));
