@@ -5,7 +5,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const QR = require('qrcode');
-const Database = require('better-sqlite3');
+const { Pool } = require('pg');
 const path = require('path');
 
 const app = express();
@@ -13,9 +13,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SECRET = process.env.JWT_SECRET || 'change-me';
 
-const db = new Database(
-  process.env.DB_FILE || 'leo.db'
-);
+if (!process.env.DATABASE_URL) {
+  console.error('DATABASE_URL bulunamadı!');
+  process.exit(1);
+}
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production'
+    ? { rejectUnauthorized: false }
+    : false
+});
 
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
@@ -31,74 +39,50 @@ app.use(
    DATABASE
 ========================= */
 
-db.exec(`
-CREATE TABLE IF NOT EXISTS businesses(
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  slug TEXT UNIQUE,
-  email TEXT UNIQUE,
-  password_hash TEXT,
-  category TEXT,
-  description TEXT,
-  phone TEXT,
-  whatsapp TEXT,
-  address TEXT,
-  instagram TEXT,
-  tiktok TEXT,
-  google_review TEXT,
-  website TEXT,
-  menu TEXT,
-  iban TEXT,
-  iban_holder TEXT,
-  hours TEXT,
-  logo_url TEXT,
-  created_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
+async function initDatabase() {
 
-CREATE TABLE IF NOT EXISTS events(
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  business_id INTEGER,
-  type TEXT,
-  created_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-`);
-
-
-/* =========================
-   ESKİ VERİTABANINI KORU
-========================= */
-
-function addColumn(columnName) {
-
-  try {
-
-    db.exec(
-      `ALTER TABLE businesses ADD COLUMN ${columnName} TEXT`
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS businesses(
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      slug TEXT UNIQUE,
+      email TEXT UNIQUE,
+      password_hash TEXT,
+      category TEXT,
+      description TEXT,
+      phone TEXT,
+      whatsapp TEXT,
+      address TEXT,
+      instagram TEXT,
+      tiktok TEXT,
+      google_review TEXT,
+      website TEXT,
+      menu TEXT,
+      iban TEXT,
+      iban_holder TEXT,
+      hours TEXT,
+      logo_url TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
-  } catch (error) {
-
-    // Kolon zaten varsa hata verme.
-  }
+    CREATE TABLE IF NOT EXISTS events(
+      id SERIAL PRIMARY KEY,
+      business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
+      type TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 
 }
-
-
-[
-  'whatsapp',
-  'google_review',
-  'website',
-  'iban_holder',
-  'logo_url'
-].forEach(addColumn);
 
 
 /* =========================
    HELPERS
 ========================= */
 
-const slug = (s) =>
-  s
+function slug(s) {
+
+  return String(s || '')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -106,36 +90,41 @@ const slug = (s) =>
     .replace(/^-|-$/g, '')
     .slice(0, 50) || 'isletme';
 
+}
 
-const pub = (id) => {
 
-  return db
-    .prepare(`
-      SELECT
-        id,
-        name,
-        slug,
-        email,
-        category,
-        description,
-        phone,
-        whatsapp,
-        address,
-        instagram,
-        tiktok,
-        google_review,
-        website,
-        menu,
-        iban,
-        iban_holder,
-        hours,
-        logo_url
-      FROM businesses
-      WHERE id=?
-    `)
-    .get(id);
+async function pub(id) {
 
-};
+  const result = await pool.query(
+    `
+    SELECT
+      id,
+      name,
+      slug,
+      email,
+      category,
+      description,
+      phone,
+      whatsapp,
+      address,
+      instagram,
+      tiktok,
+      google_review,
+      website,
+      menu,
+      iban,
+      iban_holder,
+      hours,
+      logo_url
+    FROM businesses
+    WHERE id=$1
+    `,
+    [id]
+  );
+
+  return result.rows[0] || null;
+
+}
 
 
 /* =========================
@@ -174,12 +163,29 @@ function auth(req, res, next) {
 
 app.get(
   '/api/health',
-  (req, res) => {
+  async (req, res) => {
 
-    res.json({
-      ok: true,
-      version: '2.2'
-    });
+    try {
+
+      await pool.query('SELECT 1');
+
+      res.json({
+        ok: true,
+        version: '3.0-postgres'
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          ok: false,
+          error: 'Veritabanı bağlantı hatası'
+        });
+
+    }
 
   }
 );
@@ -193,84 +199,87 @@ app.post(
   '/api/register',
   async (req, res) => {
 
-    const {
-      name,
-      email,
-      password,
-      category
-    } = req.body;
+    try {
 
-
-    if (
-      !name ||
-      !email ||
-      !password ||
-      password.length < 8
-    ) {
-
-      return res
-        .status(400)
-        .json({
-          error:
-            'İşletme adı, e-posta ve 8+ karakter şifre gerekli'
-        });
-
-    }
-
-
-    const existing =
-      db
-        .prepare(
-          'SELECT id FROM businesses WHERE email=?'
-        )
-        .get(email);
-
-
-    if (existing) {
-
-      return res
-        .status(409)
-        .json({
-          error:
-            'E-posta zaten kayıtlı'
-        });
-
-    }
-
-
-    const base =
-      slug(name);
-
-    let sl = base;
-    let n = 1;
-
-
-    while (
-      db
-        .prepare(
-          'SELECT id FROM businesses WHERE slug=?'
-        )
-        .get(sl)
-    ) {
-
-      n++;
-
-      sl =
-        base + '-' + n;
-
-    }
-
-
-    const passwordHash =
-      await bcrypt.hash(
+      const {
+        name,
+        email,
         password,
-        12
-      );
+        category
+      } = req.body;
 
 
-    const result =
-      db
-        .prepare(`
+      if (
+        !name ||
+        !email ||
+        !password ||
+        password.length < 8
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            error:
+              'İşletme adı, e-posta ve 8+ karakter şifre gerekli'
+          });
+
+      }
+
+
+      const existing =
+        await pool.query(
+          'SELECT id FROM businesses WHERE email=$1',
+          [email]
+        );
+
+
+      if (existing.rows.length) {
+
+        return res
+          .status(409)
+          .json({
+            error:
+              'E-posta zaten kayıtlı'
+          });
+
+      }
+
+
+      const base =
+        slug(name);
+
+      let sl = base;
+      let n = 1;
+
+
+      while (true) {
+
+        const check =
+          await pool.query(
+            'SELECT id FROM businesses WHERE slug=$1',
+            [sl]
+          );
+
+        if (!check.rows.length) {
+          break;
+        }
+
+        n++;
+        sl = base + '-' + n;
+
+      }
+
+
+      const passwordHash =
+        await bcrypt.hash(
+          password,
+          12
+        );
+
+
+      const result =
+        await pool.query(
+          `
           INSERT INTO businesses(
             name,
             slug,
@@ -278,37 +287,54 @@ app.post(
             password_hash,
             category
           )
-          VALUES(?,?,?,?,?)
-        `)
-        .run(
-          name,
-          sl,
-          email,
-          passwordHash,
-          category || ''
+          VALUES($1,$2,$3,$4,$5)
+          RETURNING id
+          `,
+          [
+            name,
+            sl,
+            email,
+            passwordHash,
+            category || ''
+          ]
         );
 
 
-    const business =
-      pub(result.lastInsertRowid);
+      const business =
+        await pub(
+          result.rows[0].id
+        );
 
 
-    const token =
-      jwt.sign(
-        {
-          id: business.id
-        },
-        SECRET,
-        {
-          expiresIn: '7d'
-        }
-      );
+      const token =
+        jwt.sign(
+          {
+            id: business.id
+          },
+          SECRET,
+          {
+            expiresIn: '7d'
+          }
+        );
 
 
-    res.json({
-      token,
-      business
-    });
+      res.json({
+        token,
+        business
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          error:
+            'Kayıt sırasında hata oluştu'
+        });
+
+    }
 
   }
 );
@@ -322,51 +348,71 @@ app.post(
   '/api/login',
   async (req, res) => {
 
-    const business =
-      db
-        .prepare(
-          'SELECT * FROM businesses WHERE email=?'
-        )
-        .get(
-          req.body.email || ''
+    try {
+
+      const result =
+        await pool.query(
+          `
+          SELECT *
+          FROM businesses
+          WHERE email=$1
+          `,
+          [req.body.email || '']
         );
 
 
-    if (
-      !business ||
-      !(await bcrypt.compare(
-        req.body.password || '',
-        business.password_hash
-      ))
-    ) {
+      const business =
+        result.rows[0];
 
-      return res
-        .status(401)
+
+      if (
+        !business ||
+        !(await bcrypt.compare(
+          req.body.password || '',
+          business.password_hash
+        ))
+      ) {
+
+        return res
+          .status(401)
+          .json({
+            error:
+              'E-posta veya şifre hatalı'
+          });
+
+      }
+
+
+      const token =
+        jwt.sign(
+          {
+            id: business.id
+          },
+          SECRET,
+          {
+            expiresIn: '7d'
+          }
+        );
+
+
+      res.json({
+        token,
+        business:
+          await pub(business.id)
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
         .json({
           error:
-            'E-posta veya şifre hatalı'
+            'Giriş sırasında hata oluştu'
         });
 
     }
-
-
-    const token =
-      jwt.sign(
-        {
-          id: business.id
-        },
-        SECRET,
-        {
-          expiresIn: '7d'
-        }
-      );
-
-
-    res.json({
-      token,
-      business:
-        pub(business.id)
-    });
 
   }
 );
@@ -379,11 +425,26 @@ app.post(
 app.get(
   '/api/me',
   auth,
-  (req, res) => {
+  async (req, res) => {
 
-    res.json(
-      pub(req.user.id)
-    );
+    try {
+
+      res.json(
+        await pub(req.user.id)
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          error:
+            'İşletme bilgileri alınamadı'
+        });
+
+    }
 
   }
 );
@@ -396,59 +457,81 @@ app.get(
 app.put(
   '/api/me',
   auth,
-  (req, res) => {
+  async (req, res) => {
 
-    const keys = [
+    try {
 
-      'name',
-      'category',
-      'description',
+      const keys = [
 
-      'phone',
-      'whatsapp',
+        'name',
+        'category',
+        'description',
 
-      'address',
+        'phone',
+        'whatsapp',
 
-      'instagram',
-      'tiktok',
+        'address',
 
-      'google_review',
-      'website',
-      'menu',
+        'instagram',
+        'tiktok',
 
-      'iban',
-      'iban_holder',
+        'google_review',
+        'website',
+        'menu',
 
-      'hours',
+        'iban',
+        'iban_holder',
 
-      'logo_url'
+        'hours',
 
-    ];
+        'logo_url'
+
+      ];
 
 
-    db
-      .prepare(`
-        UPDATE businesses
-        SET
-          ${keys.map(
-            k => k + '=?'
-          ).join(',')}
-        WHERE id=?
-      `)
-      .run(
-
-        ...keys.map(
+      const values =
+        keys.map(
           k => req.body[k] ?? ''
-        ),
+        );
 
-        req.user.id
 
+      const setClause =
+        keys
+          .map(
+            (k, i) => `${k}=$${i + 1}`
+          )
+          .join(',');
+
+
+      await pool.query(
+        `
+        UPDATE businesses
+        SET ${setClause}
+        WHERE id=$${keys.length + 1}
+        `,
+        [
+          ...values,
+          req.user.id
+        ]
       );
 
 
-    res.json(
-      pub(req.user.id)
-    );
+      res.json(
+        await pub(req.user.id)
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          error:
+            'Bilgiler güncellenemedi'
+        });
+
+    }
 
   }
 );
@@ -463,45 +546,60 @@ app.get(
   auth,
   async (req, res) => {
 
-    const business =
-      pub(req.user.id);
+    try {
+
+      const business =
+        await pub(req.user.id);
 
 
-    const protocol =
-      req.get('x-forwarded-proto') ||
-      req.protocol;
+      const protocol =
+        req.get('x-forwarded-proto') ||
+        req.protocol;
 
 
-    const host =
-      req.get('host');
+      const host =
+        req.get('host');
 
 
-    const base =
-      `${protocol}://${host}`;
+      const base =
+        `${protocol}://${host}`;
 
 
-    const url =
-      `${base}/p/${business.slug}?source=qr`;
+      const url =
+        `${base}/p/${business.slug}?source=qr`;
 
 
-    const dataUrl =
-      await QR.toDataURL(
+      const dataUrl =
+        await QR.toDataURL(
+          url,
+          {
+            width: 900,
+            margin: 2,
+            errorCorrectionLevel: 'H'
+          }
+        );
+
+
+      res.json({
+
         url,
-        {
-          width: 900,
-          margin: 2,
-          errorCorrectionLevel: 'H'
-        }
-      );
 
+        dataUrl
 
-    res.json({
+      });
 
-      url,
+    } catch (error) {
 
-      dataUrl
+      console.error(error);
 
-    });
+      res
+        .status(500)
+        .json({
+          error:
+            'QR kod oluşturulamadı'
+        });
+
+    }
 
   }
 );
@@ -514,24 +612,41 @@ app.get(
 app.get(
   '/api/stats',
   auth,
-  (req, res) => {
+  async (req, res) => {
 
-    const stats =
-      db
-        .prepare(`
+    try {
+
+      const result =
+        await pool.query(
+          `
           SELECT
             type,
-            COUNT(*) AS count
+            COUNT(*)::int AS count
           FROM events
-          WHERE business_id=?
+          WHERE business_id=$1
           GROUP BY type
-        `)
-        .all(
-          req.user.id
+          ORDER BY type
+          `,
+          [req.user.id]
         );
 
 
-    res.json(stats);
+      res.json(
+        result.rows
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          error:
+            'İstatistikler alınamadı'
+        });
+
+    }
 
   }
 );
@@ -543,76 +658,98 @@ app.get(
 
 app.post(
   '/api/event/:slug',
-  (req, res) => {
+  async (req, res) => {
 
-    const business =
-      db
-        .prepare(
-          'SELECT id FROM businesses WHERE slug=?'
-        )
-        .get(
-          req.params.slug
+    try {
+
+      const result =
+        await pool.query(
+          `
+          SELECT id
+          FROM businesses
+          WHERE slug=$1
+          `,
+          [req.params.slug]
         );
 
 
-    const allowed = [
-
-      'profile_view',
-
-      'qr_scan',
-      'nfc',
-
-      'phone',
-      'whatsapp',
-      'location',
-
-      'instagram',
-      'tiktok',
-
-      'google_review',
-
-      'website',
-      'menu',
-
-      'iban'
-
-    ];
+      const business =
+        result.rows[0];
 
 
-    if (
-      !business ||
-      !allowed.includes(
-        req.body.type
-      )
-    ) {
+      const allowed = [
 
-      return res
-        .status(400)
-        .json({
-          error:
-            'Geçersiz etkinlik'
-        });
+        'profile_view',
 
-    }
+        'qr_scan',
+        'qr',
+        'nfc',
+
+        'phone',
+        'whatsapp',
+        'location',
+
+        'instagram',
+        'tiktok',
+
+        'google_review',
+
+        'website',
+        'menu',
+
+        'iban'
+
+      ];
 
 
-    db
-      .prepare(`
+      if (
+        !business ||
+        !allowed.includes(
+          req.body.type
+        )
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            error:
+              'Geçersiz etkinlik'
+          });
+
+      }
+
+
+      await pool.query(
+        `
         INSERT INTO events(
           business_id,
           type
         )
-        VALUES(?,?)
-      `)
-      .run(
-        business.id,
-        req.body.type
+        VALUES($1,$2)
+        `,
+        [
+          business.id,
+          req.body.type
+        ]
       );
 
 
-    res.json({
-      ok: true
-    });
+      res.json({
+        ok: true
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          error:
+            'Etkinlik kaydedilemedi'
+        });
+
+    }
 
   }
 );
@@ -624,36 +761,56 @@ app.post(
 
 app.get(
   '/api/profile/:slug',
-  (req, res) => {
+  async (req, res) => {
 
-    const business =
-      db
-        .prepare(
-          'SELECT * FROM businesses WHERE slug=?'
-        )
-        .get(
-          req.params.slug
+    try {
+
+      const result =
+        await pool.query(
+          `
+          SELECT *
+          FROM businesses
+          WHERE slug=$1
+          `,
+          [req.params.slug]
         );
 
 
-    if (!business) {
+      const business =
+        result.rows[0];
 
-      return res
-        .status(404)
+
+      if (!business) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'Profil bulunamadı'
+          });
+
+      }
+
+
+      delete business.password_hash;
+
+
+      res.json(
+        business
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
         .json({
           error:
-            'Profil bulunamadı'
+            'Profil alınamadı'
         });
 
     }
-
-
-    delete business.password_hash;
-
-
-    res.json(
-      business
-    );
 
   }
 );
@@ -665,104 +822,112 @@ app.get(
 
 app.get(
   '/p/:slug',
-  (req, res) => {
+  async (req, res) => {
 
-    const business =
-      db
-        .prepare(
-          'SELECT id FROM businesses WHERE slug=?'
-        )
-        .get(
-          req.params.slug
+    try {
+
+      const result =
+        await pool.query(
+          `
+          SELECT id
+          FROM businesses
+          WHERE slug=$1
+          `,
+          [req.params.slug]
         );
 
 
-    if (!business) {
-
-      return res
-        .status(404)
-        .send(
-          'Profil bulunamadı'
-        );
-
-    }
+      const business =
+        result.rows[0];
 
 
-    /*
-      Her profil açılışını kaydet.
-    */
+      if (!business) {
 
-    db
-      .prepare(`
+        return res
+          .status(404)
+          .send(
+            'Profil bulunamadı'
+          );
+
+      }
+
+
+      await pool.query(
+        `
         INSERT INTO events(
           business_id,
           type
         )
-        VALUES(?,?)
-      `)
-      .run(
-        business.id,
-        'profile_view'
+        VALUES($1,$2)
+        `,
+        [
+          business.id,
+          'profile_view'
+        ]
       );
 
 
-    /*
-      QR üzerinden geldiyse
-      ayrıca QR taramasını kaydet.
-    */
+      if (
+        req.query.source === 'qr'
+      ) {
 
-    if (
-      req.query.source === 'qr'
-    ) {
-
-      db
-        .prepare(`
+        await pool.query(
+          `
           INSERT INTO events(
             business_id,
             type
           )
-          VALUES(?,?)
-        `)
-        .run(
-          business.id,
-          'qr_scan'
+          VALUES($1,$2)
+          `,
+          [
+            business.id,
+            'qr_scan'
+          ]
         );
 
-    }
+      }
 
 
-    /*
-      NFC üzerinden geldiyse
-      NFC etkileşimini kaydet.
-    */
+      if (
+        req.query.source === 'nfc'
+      ) {
 
-    if (
-      req.query.source === 'nfc'
-    ) {
-
-      db
-        .prepare(`
+        await pool.query(
+          `
           INSERT INTO events(
             business_id,
             type
           )
-          VALUES(?,?)
-        `)
-        .run(
-          business.id,
-          'nfc'
+          VALUES($1,$2)
+          `,
+          [
+            business.id,
+            'nfc'
+          ]
+        );
+
+      }
+
+
+      res.sendFile(
+        path.join(
+          __dirname,
+          'public',
+          'profile.html'
+        )
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .send(
+          'Profil açılırken hata oluştu'
         );
 
     }
-
-
-    res.sendFile(
-      path.join(
-        __dirname,
-        'public',
-        'profile.html'
-      )
-    );
 
   }
 );
@@ -851,14 +1016,29 @@ app.use(
    START
 ========================= */
 
-app.listen(
-  PORT,
-  '0.0.0.0',
-  () => {
+initDatabase()
+  .then(() => {
 
-    console.log(
-      `LEO CONNECT V2.2 çalışıyor: ${PORT}`
+    app.listen(
+      PORT,
+      '0.0.0.0',
+      () => {
+
+        console.log(
+          `LEO CONNECT PostgreSQL çalışıyor: ${PORT}`
+        );
+
+      }
     );
 
-  }
-);
+  })
+  .catch(error => {
+
+    console.error(
+      'DATABASE BAŞLATMA HATASI:',
+      error
+    );
+
+    process.exit(1);
+
+  });
