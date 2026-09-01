@@ -1,0 +1,24 @@
+require('dotenv').config();
+const express=require('express'),cors=require('cors'),bcrypt=require('bcryptjs'),jwt=require('jsonwebtoken'),QR=require('qrcode'),Database=require('better-sqlite3'),path=require('path');
+const app=express(),PORT=process.env.PORT||3000,SECRET=process.env.JWT_SECRET||'change-me';
+const BASE=process.env.BASE_URL||`http://localhost:${PORT}`,db=new Database(process.env.DB_FILE||'leo.db');
+app.use(cors());app.use(express.json());app.use(express.static(path.join(__dirname,'public')));
+db.exec(`CREATE TABLE IF NOT EXISTS businesses(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,slug TEXT UNIQUE,email TEXT UNIQUE,password_hash TEXT,category TEXT,description TEXT,phone TEXT,address TEXT,instagram TEXT,tiktok TEXT,menu TEXT,iban TEXT,hours TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT,business_id INTEGER,type TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);`);
+const slug=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50)||'isletme';
+const pub=id=>{let b=db.prepare('SELECT id,name,slug,email,category,description,phone,address,instagram,tiktok,menu,iban,hours FROM businesses WHERE id=?').get(id);return b};
+function auth(req,res,next){try{req.user=jwt.verify((req.headers.authorization||'').replace(/^Bearer\s+/,''),SECRET);next()}catch(e){res.status(401).json({error:'Oturum gerekli'})}}
+app.get('/api/health',(q,s)=>s.json({ok:true,version:'2.0'}));
+app.post('/api/register',async(req,res)=>{let {name,email,password,category}=req.body;if(!name||!email||!password||password.length<8)return res.status(400).json({error:'İşletme adı, e-posta ve 8+ karakter şifre gerekli'});if(db.prepare('SELECT id FROM businesses WHERE email=?').get(email))return res.status(409).json({error:'E-posta zaten kayıtlı'});let base=slug(name),sl=base,n=1;while(db.prepare('SELECT id FROM businesses WHERE slug=?').get(sl))sl=base+'-'+(++n);let r=db.prepare('INSERT INTO businesses(name,slug,email,password_hash,category) VALUES(?,?,?,?,?)').run(name,sl,email,await bcrypt.hash(password,12),category||'');let b=pub(r.lastInsertRowid);res.json({token:jwt.sign({id:b.id},SECRET,{expiresIn:'7d'}),business:b})});
+app.post('/api/login',async(req,res)=>{let b=db.prepare('SELECT * FROM businesses WHERE email=?').get(req.body.email||'');if(!b||!(await bcrypt.compare(req.body.password||'',b.password_hash)))return res.status(401).json({error:'E-posta veya şifre hatalı'});res.json({token:jwt.sign({id:b.id},SECRET,{expiresIn:'7d'}),business:pub(b.id)})});
+app.get('/api/me',auth,(req,res)=>res.json(pub(req.user.id)));
+app.put('/api/me',auth,(req,res)=>{let keys=['name','category','description','phone','address','instagram','tiktok','menu','iban','hours'];db.prepare(`UPDATE businesses SET ${keys.map(k=>k+'=?').join(',')} WHERE id=?`).run(...keys.map(k=>req.body[k]??''),req.user.id);res.json(pub(req.user.id))});
+app.get('/api/qr',auth,async(req,res)=>{let b=pub(req.user.id),url=BASE+'/p/'+b.slug;res.json({url,dataUrl:await QR.toDataURL(url,{width:900,margin:2,errorCorrectionLevel:'H'})})});
+app.get('/api/stats',auth,(req,res)=>res.json(db.prepare('SELECT type,COUNT(*) count FROM events WHERE business_id=? GROUP BY type').all(req.user.id)));
+app.get('/api/profile/:slug',(req,res)=>{let b=db.prepare('SELECT * FROM businesses WHERE slug=?').get(req.params.slug);if(!b)return res.status(404).json({error:'Profil bulunamadı'});delete b.password_hash;res.json(b)});
+app.get('/p/:slug',(req,res)=>{let b=db.prepare('SELECT id FROM businesses WHERE slug=?').get(req.params.slug);if(!b)return res.status(404).send('Profil bulunamadı');db.prepare('INSERT INTO events(business_id,type) VALUES(?,?)').run(b.id,'profile_view');res.sendFile(path.join(__dirname,'public','profile.html'))});
+app.get('/dashboard',(req,res)=>res.sendFile(path.join(__dirname,'public','dashboard.html')));
+app.get('/register',(req,res)=>res.sendFile(path.join(__dirname,'public','register.html')));
+app.get('/login',(req,res)=>res.sendFile(path.join(__dirname,'public','login.html')));
+app.use((req,res)=>res.sendFile(path.join(__dirname,'public','index.html')));
+app.listen(PORT,'0.0.0.0',()=>console.log('LEO CONNECT V2 live on '+PORT));

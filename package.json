@@ -1,0 +1,17 @@
+{
+  "name": "leo-connect-v2",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "qrcode": "^1.5.4",
+    "better-sqlite3": "^12.4.1",
+    "dotenv": "^17.2.2"
+  }
+}
