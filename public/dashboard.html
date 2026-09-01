@@ -7,12 +7,17 @@
 
 <meta
   name="viewport"
-  content="width=device-width, initial-scale=1"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
 >
 
 <meta
   name="theme-color"
   content="#080808"
+>
+
+<meta
+  name="description"
+  content="LEO CONNECT Business Center"
 >
 
 <title>LEO CONNECT — Business Center</title>
@@ -23,6 +28,7 @@
 
   --gold:#c59a52;
   --gold-light:#e0bd7b;
+  --gold-soft:#c59a5218;
 
   --black:#080808;
   --dark:#101010;
@@ -31,33 +37,46 @@
 
   --white:#fff;
   --muted:#888;
+  --muted-2:#555;
 
   --border:#292929;
+  --border-light:#383838;
 
   --green:#45c27a;
-}
+  --red:#d85c5c;
 
+  --shadow:
+    0 25px 70px rgba(0,0,0,.42);
+
+}
 
 *{
   box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
-
 
 html{
   scroll-behavior:smooth;
 }
 
-
 body{
 
   margin:0;
 
+  min-height:100vh;
+
   background:
 
     radial-gradient(
-      circle at 80% 0%,
-      #c59a5215,
-      transparent 30%
+      circle at 85% -5%,
+      #c59a5218,
+      transparent 28%
+    ),
+
+    radial-gradient(
+      circle at 0% 55%,
+      #c59a5208,
+      transparent 25%
     ),
 
     #080808;
@@ -69,7 +88,22 @@ body{
     Helvetica,
     sans-serif;
 
+  overflow-x:hidden;
+
 }
+
+button,
+input,
+textarea{
+  font-family:inherit;
+}
+
+button,
+a{
+  -webkit-user-select:none;
+  user-select:none;
+}
+
 
 
 /* ==================================================
@@ -84,7 +118,7 @@ header{
 
   z-index:100;
 
-  height:72px;
+  min-height:72px;
 
   display:flex;
 
@@ -92,17 +126,19 @@ header{
 
   justify-content:space-between;
 
-  padding:0 28px;
+  gap:15px;
 
-  background:#0a0a0aed;
+  padding:
+    12px 28px;
 
-  backdrop-filter:blur(20px);
+  background:#090909eF;
+
+  backdrop-filter:blur(22px);
 
   border-bottom:
     1px solid var(--border);
 
 }
-
 
 .brand{
 
@@ -112,49 +148,63 @@ header{
 
   gap:12px;
 
-}
+  min-width:0;
 
+}
 
 .brand-icon{
 
-  width:42px;
+  width:43px;
 
-  height:42px;
+  height:43px;
+
+  flex:none;
 
   display:grid;
 
   place-items:center;
 
-  border-radius:13px;
+  border-radius:14px;
 
-  background:#000;
+  background:
+
+    radial-gradient(
+      circle at 50% 30%,
+      #202020,
+      #000
+    );
 
   border:
     1px solid #c59a5260;
+
+  box-shadow:
+    0 8px 25px #000;
 
   font-size:22px;
 
 }
 
+.brand-text{
+
+  min-width:0;
+
+}
 
 .brand-text strong{
 
   display:block;
 
-  font-size:15px;
+  font-size:14px;
 
-  letter-spacing:.12em;
+  letter-spacing:.13em;
 
 }
-
 
 .brand-text strong span{
 
-  color:
-    var(--gold-light);
+  color:var(--gold-light);
 
 }
-
 
 .brand-text small{
 
@@ -162,14 +212,13 @@ header{
 
   margin-top:3px;
 
-  color:#666;
+  color:#5d5d5d;
 
-  font-size:9px;
+  font-size:8px;
 
-  letter-spacing:.15em;
+  letter-spacing:.16em;
 
 }
-
 
 .header-actions{
 
@@ -181,11 +230,18 @@ header{
 
 }
 
-
 .header-button{
 
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  min-height:40px;
+
   padding:
-    10px 14px;
+    9px 13px;
 
   border-radius:10px;
 
@@ -198,12 +254,13 @@ header{
 
   text-decoration:none;
 
-  font-size:11px;
+  font-size:10px;
 
-  font-weight:700;
+  font-weight:800;
+
+  cursor:pointer;
 
 }
-
 
 .header-button.gold{
 
@@ -214,12 +271,12 @@ header{
       #9e7738
     );
 
-  border-color:
-    #c59a52;
+  border-color:#c59a52;
 
   color:#fff;
 
 }
+
 
 
 /* ==================================================
@@ -229,44 +286,46 @@ header{
 main{
 
   width:min(
-    1100px,
+    1120px,
     94%
   );
 
   margin:
-    35px auto 80px;
+    32px auto 80px;
 
 }
 
+
+
+/* ==================================================
+   PAGE HEAD
+================================================== */
 
 .page-head{
 
   display:flex;
 
-  justify-content:space-between;
-
   align-items:flex-end;
+
+  justify-content:space-between;
 
   gap:20px;
 
-  margin-bottom:25px;
+  margin-bottom:22px;
 
 }
 
-
 .eyebrow{
 
-  color:
-    var(--gold-light);
+  color:var(--gold-light);
 
-  font-size:10px;
+  font-size:9px;
 
-  font-weight:800;
+  font-weight:900;
 
   letter-spacing:.2em;
 
 }
-
 
 .page-head h1{
 
@@ -275,20 +334,22 @@ main{
 
   font-size:36px;
 
-}
+  line-height:1.1;
 
+  letter-spacing:-.025em;
+
+}
 
 .page-head p{
 
   margin:
-    7px 0 0;
+    8px 0 0;
 
   color:#777;
 
-  font-size:13px;
+  font-size:12px;
 
 }
-
 
 .live{
 
@@ -300,10 +361,9 @@ main{
 
   color:#aaa;
 
-  font-size:11px;
+  font-size:10px;
 
 }
-
 
 .live-dot{
 
@@ -313,13 +373,13 @@ main{
 
   border-radius:50%;
 
-  background:
-    var(--green);
+  background:var(--green);
 
   box-shadow:
-    0 0 12px #45c27a88;
+    0 0 13px #45c27a88;
 
 }
+
 
 
 /* ==================================================
@@ -332,11 +392,11 @@ main{
 
   overflow:hidden;
 
-  margin-bottom:20px;
+  margin-bottom:15px;
 
-  padding:28px;
+  padding:27px;
 
-  border-radius:24px;
+  border-radius:25px;
 
   border:
     1px solid #c59a5235;
@@ -344,41 +404,47 @@ main{
   background:
 
     radial-gradient(
-      circle at 90% 20%,
+      circle at 90% 15%,
       #c59a5218,
       transparent 35%
     ),
 
+    radial-gradient(
+      circle at 30% 100%,
+      #c59a5207,
+      transparent 30%
+    ),
+
     linear-gradient(
       145deg,
-      #171717,
+      #181818,
       #0d0d0d
     );
 
+  box-shadow:var(--shadow);
+
 }
 
-
-.profile-hero::after{
+.profile-hero::before{
 
   content:"";
 
   position:absolute;
 
-  width:180px;
+  width:260px;
 
-  height:180px;
+  height:260px;
 
-  right:-80px;
+  right:-160px;
 
-  bottom:-100px;
+  top:-160px;
 
   border-radius:50%;
 
   border:
-    1px solid #c59a5218;
+    1px solid #c59a5215;
 
 }
-
 
 .profile-hero-inner{
 
@@ -390,16 +456,15 @@ main{
 
   align-items:center;
 
-  gap:22px;
+  gap:20px;
 
 }
 
-
 .logo-wrap{
 
-  width:92px;
+  width:94px;
 
-  height:92px;
+  height:94px;
 
   flex:none;
 
@@ -409,7 +474,7 @@ main{
 
   overflow:hidden;
 
-  border-radius:24px;
+  border-radius:25px;
 
   background:#050505;
 
@@ -421,7 +486,6 @@ main{
 
 }
 
-
 .logo-wrap img{
 
   width:100%;
@@ -432,13 +496,11 @@ main{
 
 }
 
-
 .logo-placeholder{
 
   font-size:36px;
 
 }
-
 
 .profile-info{
 
@@ -446,21 +508,21 @@ main{
 
 }
 
-
 .profile-info h2{
 
   margin:0;
 
   font-size:27px;
 
+  line-height:1.15;
+
   word-break:break-word;
 
 }
 
-
 .profile-category{
 
-  display:inline-block;
+  display:inline-flex;
 
   margin-top:8px;
 
@@ -474,27 +536,28 @@ main{
   border:
     1px solid #c59a5230;
 
-  color:
-    var(--gold-light);
+  color:var(--gold-light);
 
-  font-size:10px;
+  font-size:9px;
+
+  font-weight:800;
 
 }
-
 
 .profile-description{
 
   margin:
-    12px 0 0;
+    10px 0 0;
 
   color:#888;
 
-  font-size:12px;
+  font-size:11px;
 
   line-height:1.6;
 
-}
+  max-width:500px;
 
+}
 
 .profile-actions{
 
@@ -510,7 +573,6 @@ main{
 
 }
 
-
 .action{
 
   display:inline-flex;
@@ -519,8 +581,10 @@ main{
 
   justify-content:center;
 
+  min-height:40px;
+
   padding:
-    11px 15px;
+    10px 14px;
 
   border-radius:10px;
 
@@ -533,14 +597,21 @@ main{
 
   text-decoration:none;
 
-  font-size:11px;
+  font-size:10px;
 
-  font-weight:700;
+  font-weight:800;
 
   cursor:pointer;
 
+  transition:
+    transform .15s,
+    border-color .15s;
+
 }
 
+.action:active{
+  transform:scale(.97);
+}
 
 .action.gold{
 
@@ -551,10 +622,202 @@ main{
       #9e7738
     );
 
-  border-color:
-    #c59a52;
+  border-color:#c59a52;
 
 }
+
+
+
+/* ==================================================
+   HEALTH
+================================================== */
+
+.health{
+
+  display:grid;
+
+  grid-template-columns:
+    190px 1fr;
+
+  gap:20px;
+
+  align-items:center;
+
+  margin-bottom:15px;
+
+  padding:22px;
+
+  border-radius:20px;
+
+  border:
+    1px solid var(--border);
+
+  background:
+    linear-gradient(
+      145deg,
+      #151515,
+      #0d0d0d
+    );
+
+}
+
+.health-score{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:15px;
+
+}
+
+.health-ring{
+
+  width:76px;
+
+  height:76px;
+
+  flex:none;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:50%;
+
+  background:
+    conic-gradient(
+      var(--gold) 0deg,
+      var(--gold) var(--score,0deg),
+      #252525 var(--score,0deg),
+      #252525 360deg
+    );
+
+  position:relative;
+
+}
+
+.health-ring::after{
+
+  content:"";
+
+  position:absolute;
+
+  inset:7px;
+
+  border-radius:50%;
+
+  background:#101010;
+
+}
+
+.health-ring strong{
+
+  position:relative;
+
+  z-index:2;
+
+  font-size:18px;
+
+}
+
+.health-copy strong{
+
+  display:block;
+
+  font-size:14px;
+
+}
+
+.health-copy span{
+
+  display:block;
+
+  margin-top:5px;
+
+  color:#666;
+
+  font-size:9px;
+
+}
+
+.health-details{
+
+  min-width:0;
+
+}
+
+.health-bar{
+
+  height:7px;
+
+  overflow:hidden;
+
+  border-radius:999px;
+
+  background:#252525;
+
+}
+
+.health-fill{
+
+  height:100%;
+
+  width:0;
+
+  border-radius:999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9e7738,
+      #e0bd7b
+    );
+
+  transition:width .6s ease;
+
+}
+
+.health-message{
+
+  margin-top:9px;
+
+  color:#777;
+
+  font-size:10px;
+
+}
+
+.missing-list{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:6px;
+
+  margin-top:10px;
+
+}
+
+.missing-item{
+
+  padding:
+    5px 8px;
+
+  border-radius:999px;
+
+  background:#171717;
+
+  border:
+    1px solid #292929;
+
+  color:#777;
+
+  font-size:8px;
+
+}
+
 
 
 /* ==================================================
@@ -566,20 +829,23 @@ main{
   display:grid;
 
   grid-template-columns:
-    repeat(5,1fr);
+    repeat(6,1fr);
 
-  gap:10px;
+  gap:9px;
 
-  margin-bottom:20px;
+  margin-bottom:15px;
 
 }
 
-
 .stat{
 
-  padding:18px;
+  position:relative;
 
-  border-radius:17px;
+  overflow:hidden;
+
+  padding:16px;
+
+  border-radius:16px;
 
   border:
     1px solid var(--border);
@@ -593,6 +859,25 @@ main{
 
 }
 
+.stat::after{
+
+  content:"";
+
+  position:absolute;
+
+  width:60px;
+
+  height:60px;
+
+  right:-30px;
+
+  bottom:-30px;
+
+  border-radius:50%;
+
+  background:#c59a5208;
+
+}
 
 .stat small{
 
@@ -600,38 +885,124 @@ main{
 
   color:#777;
 
-  font-size:9px;
+  font-size:8px;
 
-  letter-spacing:.14em;
+  font-weight:800;
 
-  margin-bottom:9px;
+  letter-spacing:.13em;
+
+  margin-bottom:8px;
 
 }
-
 
 .stat strong{
 
   display:block;
 
-  color:
-    var(--gold-light);
+  color:var(--gold-light);
 
-  font-size:27px;
+  font-size:24px;
 
 }
-
 
 .stat span{
 
   display:block;
 
-  margin-top:5px;
+  margin-top:4px;
 
   color:#555;
+
+  font-size:9px;
+
+}
+
+
+
+/* ==================================================
+   QUICK ACTIONS
+================================================== */
+
+.quick-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(5,1fr);
+
+  gap:9px;
+
+  margin-bottom:15px;
+
+}
+
+.quick{
+
+  min-height:82px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:flex-start;
+
+  justify-content:center;
+
+  gap:7px;
+
+  padding:14px;
+
+  border-radius:15px;
+
+  border:
+    1px solid #292929;
+
+  background:#101010;
+
+  color:#fff;
+
+  text-decoration:none;
+
+  cursor:pointer;
+
+  transition:
+    transform .15s,
+    border-color .15s;
+
+}
+
+.quick:active{
+
+  transform:scale(.98);
+
+}
+
+.quick:hover{
+
+  border-color:#414141;
+
+}
+
+.quick-icon{
+
+  font-size:20px;
+
+}
+
+.quick strong{
 
   font-size:10px;
 
 }
+
+.quick span{
+
+  color:#555;
+
+  font-size:8px;
+
+}
+
 
 
 /* ==================================================
@@ -640,11 +1011,11 @@ main{
 
 .box{
 
-  margin-top:20px;
+  margin-top:15px;
 
-  padding:26px;
+  padding:25px;
 
-  border-radius:22px;
+  border-radius:21px;
 
   border:
     1px solid var(--border);
@@ -658,7 +1029,6 @@ main{
 
 }
 
-
 .box-head{
 
   display:flex;
@@ -669,20 +1039,18 @@ main{
 
   gap:15px;
 
-  margin-bottom:22px;
+  margin-bottom:20px;
 
 }
-
 
 .box-head h2{
 
   margin:
     7px 0 0;
 
-  font-size:20px;
+  font-size:19px;
 
 }
-
 
 .box-head p{
 
@@ -691,11 +1059,12 @@ main{
 
   color:#777;
 
-  font-size:11px;
+  font-size:10px;
 
-  line-height:1.5;
+  line-height:1.6;
 
 }
+
 
 
 /* ==================================================
@@ -709,10 +1078,9 @@ main{
   grid-template-columns:
     1fr 1fr;
 
-  gap:14px;
+  gap:13px;
 
 }
-
 
 .field{
 
@@ -724,7 +1092,6 @@ main{
 
 }
 
-
 .field.full{
 
   grid-column:
@@ -732,28 +1099,26 @@ main{
 
 }
 
-
 .field label{
 
   color:#777;
 
-  font-size:9px;
+  font-size:8px;
 
-  font-weight:700;
+  font-weight:800;
 
   letter-spacing:.12em;
 
 }
-
 
 .field input,
 .field textarea{
 
   width:100%;
 
-  padding:14px;
+  padding:13px;
 
-  border-radius:11px;
+  border-radius:10px;
 
   border:
     1px solid #292929;
@@ -764,10 +1129,9 @@ main{
 
   outline:none;
 
-  font-size:13px;
+  font-size:12px;
 
 }
-
 
 .field textarea{
 
@@ -779,36 +1143,33 @@ main{
 
 }
 
-
 .field input:focus,
 .field textarea:focus{
 
-  border-color:
-    var(--gold);
+  border-color:var(--gold);
 
   box-shadow:
     0 0 0 3px #c59a5212;
 
 }
 
-
 .field input::placeholder,
 .field textarea::placeholder{
 
-  color:#555;
+  color:#4f4f4f;
 
 }
-
 
 .field-hint{
 
   color:#555;
 
-  font-size:10px;
+  font-size:9px;
 
   line-height:1.4;
 
 }
+
 
 
 /* ==================================================
@@ -823,26 +1184,27 @@ main{
 
   flex-wrap:wrap;
 
-  gap:12px;
+  gap:10px;
 
-  margin-top:22px;
+  margin-top:20px;
 
-  padding-top:20px;
+  padding-top:18px;
 
   border-top:
     1px solid var(--border);
 
 }
 
-
 .save-button{
 
+  min-height:43px;
+
   padding:
-    13px 20px;
+    11px 19px;
 
   border:0;
 
-  border-radius:11px;
+  border-radius:10px;
 
   background:
     linear-gradient(
@@ -853,29 +1215,36 @@ main{
 
   color:#fff;
 
-  font-size:12px;
+  font-size:10px;
 
-  font-weight:800;
+  font-weight:900;
 
   cursor:pointer;
 
 }
 
+.save-button.loading{
+
+  opacity:.65;
+
+  pointer-events:none;
+
+}
 
 #message{
 
-  min-height:17px;
+  min-height:15px;
 
-  color:
-    var(--gold-light);
+  color:var(--gold-light);
 
-  font-size:11px;
+  font-size:10px;
 
 }
 
 
+
 /* ==================================================
-   DIGITAL GRID
+   DIGITAL
 ================================================== */
 
 .digital-grid{
@@ -885,16 +1254,15 @@ main{
   grid-template-columns:
     1fr 1fr;
 
-  gap:15px;
+  gap:14px;
 
 }
 
-
 .digital-card{
 
-  padding:22px;
+  padding:21px;
 
-  border-radius:18px;
+  border-radius:17px;
 
   background:#101010;
 
@@ -903,18 +1271,17 @@ main{
 
 }
 
-
 .digital-icon{
 
-  width:52px;
+  width:50px;
 
-  height:52px;
+  height:50px;
 
   display:grid;
 
   place-items:center;
 
-  margin-bottom:15px;
+  margin-bottom:14px;
 
   border-radius:15px;
 
@@ -923,61 +1290,62 @@ main{
   border:
     1px solid #c59a5235;
 
-  font-size:25px;
+  font-size:24px;
 
 }
-
 
 .digital-card h3{
 
   margin:0;
 
-  font-size:17px;
+  font-size:16px;
 
 }
-
 
 .digital-card p{
 
   margin:
-    8px 0 0;
+    7px 0 0;
 
   color:#777;
 
-  font-size:11px;
+  font-size:10px;
 
   line-height:1.6;
 
 }
 
-
 .qr-image{
 
-  width:230px;
+  width:220px;
 
   max-width:100%;
 
   display:block;
 
   margin:
-    20px auto;
+    18px auto;
 
-  border-radius:8px;
+  padding:6px;
+
+  background:#fff;
+
+  border-radius:10px;
 
 }
 
+.digital-url,
+.nfc-url{
 
-.digital-url{
-
-  padding:12px;
+  padding:11px;
 
   border-radius:10px;
 
   background:#080808;
 
-  color:#888;
+  color:#777;
 
-  font-size:9px;
+  font-size:8px;
 
   line-height:1.5;
 
@@ -988,70 +1356,50 @@ main{
 
 }
 
-
 .digital-actions{
 
   display:flex;
 
   flex-wrap:wrap;
 
-  gap:8px;
+  gap:7px;
 
-  margin-top:12px;
+  margin-top:11px;
 
 }
 
-
 .nfc-symbol{
 
-  width:64px;
+  width:62px;
 
-  height:64px;
+  height:62px;
 
   display:grid;
 
   place-items:center;
 
-  margin-bottom:15px;
+  margin-bottom:14px;
 
-  border-radius:18px;
+  border-radius:17px;
 
   background:#000;
 
   border:
     1px solid #c59a5235;
 
-  color:
-    var(--gold-light);
+  color:var(--gold-light);
 
-  font-size:30px;
+  font-size:28px;
 
 }
-
 
 .nfc-url{
 
-  margin-top:18px;
-
-  padding:15px;
-
-  border-radius:11px;
-
-  background:#000;
+  margin-top:16px;
 
   color:#fff;
 
-  border:
-    1px solid #292929;
-
-  font-size:9px;
-
-  line-height:1.5;
-
-  word-break:break-all;
-
 }
-
 
 .nfc-status{
 
@@ -1061,31 +1409,188 @@ main{
 
   gap:7px;
 
-  margin-top:12px;
+  margin-top:11px;
 
   color:#666;
 
-  font-size:10px;
+  font-size:9px;
 
 }
 
-
-.status-dot{
+.nfc-status .status-dot{
 
   width:7px;
 
   height:7px;
 
-  border-radius:50%;
+}
+
+
+
+/* ==================================================
+   PERFORMANCE
+================================================== */
+
+.performance{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:14px;
+
+}
+
+.performance-card{
+
+  padding:20px;
+
+  border-radius:17px;
+
+  border:
+    1px solid var(--border);
+
+  background:#101010;
+
+}
+
+.performance-head{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  margin-bottom:16px;
+
+}
+
+.performance-head strong{
+
+  font-size:12px;
+
+}
+
+.performance-head span{
+
+  color:#555;
+
+  font-size:8px;
+
+}
+
+.channel{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-top:11px;
+
+}
+
+.channel-icon{
+
+  width:32px;
+
+  height:32px;
+
+  display:grid;
+
+  place-items:center;
+
+  flex:none;
+
+  border-radius:9px;
+
+  background:#080808;
+
+  border:
+    1px solid #242424;
+
+  font-size:13px;
+
+}
+
+.channel-main{
+
+  min-width:0;
+
+  flex:1;
+
+}
+
+.channel-top{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+}
+
+.channel-top strong{
+
+  font-size:9px;
+
+}
+
+.channel-top span{
+
+  color:var(--gold-light);
+
+  font-size:9px;
+
+  font-weight:800;
+
+}
+
+.channel-bar{
+
+  height:5px;
+
+  margin-top:5px;
+
+  overflow:hidden;
+
+  border-radius:999px;
+
+  background:#252525;
+
+}
+
+.channel-fill{
+
+  width:0;
+
+  height:100%;
+
+  border-radius:999px;
 
   background:
-    var(--green);
+    linear-gradient(
+      90deg,
+      #9e7738,
+      #e0bd7b
+    );
+
+  transition:width .5s ease;
 
 }
 
 
+
 /* ==================================================
-   QUICK INFO
+   INFO
 ================================================== */
 
 .info-grid{
@@ -1095,16 +1600,17 @@ main{
   grid-template-columns:
     repeat(3,1fr);
 
-  gap:10px;
+  gap:9px;
 
 }
 
-
 .info-card{
 
-  padding:17px;
+  min-width:0;
 
-  border-radius:15px;
+  padding:15px;
+
+  border-radius:14px;
 
   background:#101010;
 
@@ -1113,24 +1619,21 @@ main{
 
 }
 
-
 .info-card-icon{
 
-  font-size:19px;
+  font-size:18px;
 
-  margin-bottom:9px;
+  margin-bottom:8px;
 
 }
-
 
 .info-card strong{
 
   display:block;
 
-  font-size:12px;
+  font-size:10px;
 
 }
-
 
 .info-card span{
 
@@ -1140,7 +1643,7 @@ main{
 
   color:#666;
 
-  font-size:10px;
+  font-size:9px;
 
   line-height:1.5;
 
@@ -1149,100 +1652,236 @@ main{
 }
 
 
+
+/* ==================================================
+   TOAST
+================================================== */
+
+.toast{
+
+  position:fixed;
+
+  z-index:9999;
+
+  left:50%;
+
+  bottom:
+    calc(22px + env(safe-area-inset-bottom));
+
+  transform:
+    translate(-50%,20px);
+
+  max-width:
+    calc(100% - 30px);
+
+  padding:
+    11px 15px;
+
+  border-radius:999px;
+
+  background:#171717;
+
+  border:
+    1px solid #c59a5245;
+
+  box-shadow:
+    0 15px 45px #000;
+
+  color:#ddd;
+
+  font-size:9px;
+
+  font-weight:800;
+
+  opacity:0;
+
+  pointer-events:none;
+
+  transition:
+    opacity .2s,
+    transform .2s;
+
+}
+
+.toast.show{
+
+  opacity:1;
+
+  transform:
+    translate(-50%,0);
+
+}
+
+
+
+/* ==================================================
+   LOADING
+================================================== */
+
+.loading{
+
+  position:fixed;
+
+  inset:0;
+
+  z-index:10000;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:#080808;
+
+  transition:
+    opacity .3s,
+    visibility .3s;
+
+}
+
+.loading.hide{
+
+  opacity:0;
+
+  visibility:hidden;
+
+}
+
+.loading-lion{
+
+  width:65px;
+
+  height:65px;
+
+  display:grid;
+
+  place-items:center;
+
+  margin:auto;
+
+  border-radius:20px;
+
+  background:#050505;
+
+  border:
+    1px solid #c59a5245;
+
+  font-size:29px;
+
+  animation:
+    loadingPulse 1.3s infinite;
+
+}
+
+@keyframes loadingPulse{
+
+  0%,100%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.05);
+  }
+
+}
+
+.loading-text{
+
+  margin-top:12px;
+
+  color:#555;
+
+  font-size:8px;
+
+  font-weight:800;
+
+  letter-spacing:.16em;
+
+}
+
+
+
 /* ==================================================
    FOOTER
 ================================================== */
 
 .footer{
 
-  margin-top:35px;
+  margin-top:30px;
 
   text-align:center;
 
-  color:#3f3f3f;
+  color:#373737;
 
-  font-size:9px;
+  font-size:8px;
 
   letter-spacing:.15em;
 
 }
 
 
+
 /* ==================================================
    RESPONSIVE
 ================================================== */
 
-@media(max-width:900px){
+@media(max-width:1000px){
 
   .stats{
-
     grid-template-columns:
       repeat(3,1fr);
+  }
 
+  .quick-grid{
+    grid-template-columns:
+      repeat(3,1fr);
   }
 
   .profile-hero-inner{
-
     align-items:flex-start;
-
     flex-wrap:wrap;
-
   }
 
   .profile-actions{
-
     width:100%;
-
     margin-left:0;
-
     justify-content:flex-start;
-
   }
 
 }
-
 
 @media(max-width:700px){
 
   header{
 
-    height:auto;
-
-    min-height:70px;
-
     padding:
-      12px 16px;
+      11px 15px;
 
   }
 
+  .brand-text small{
+    display:none;
+  }
 
   .header-actions{
-
-    flex-direction:column;
-
-    align-items:stretch;
-
+    gap:5px;
   }
-
 
   .header-button{
-
+    min-height:37px;
     padding:
-      8px 10px;
-
-    font-size:9px;
-
+      8px 9px;
+    font-size:8px;
   }
-
 
   main{
 
     width:92%;
 
-    margin-top:24px;
+    margin-top:22px;
 
   }
-
 
   .page-head{
 
@@ -1252,13 +1891,11 @@ main{
 
   }
 
-
   .page-head h1{
 
-    font-size:29px;
+    font-size:28px;
 
   }
-
 
   .profile-hero{
 
@@ -1266,13 +1903,11 @@ main{
 
   }
 
-
   .profile-hero-inner{
 
     display:block;
 
   }
-
 
   .logo-wrap{
 
@@ -1280,10 +1915,9 @@ main{
 
     height:78px;
 
-    margin-bottom:15px;
+    margin-bottom:14px;
 
   }
-
 
   .profile-info h2{
 
@@ -1291,13 +1925,25 @@ main{
 
   }
 
-
   .profile-actions{
 
-    margin-top:18px;
+    margin-top:17px;
 
   }
 
+  .action{
+
+    flex:1;
+
+  }
+
+  .health{
+
+    grid-template-columns:1fr;
+
+    gap:16px;
+
+  }
 
   .stats{
 
@@ -1306,22 +1952,26 @@ main{
 
   }
 
-
   .stat strong{
 
-    font-size:24px;
+    font-size:23px;
 
   }
 
+  .quick-grid{
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
 
   .box{
 
-    padding:20px;
+    padding:19px;
 
     border-radius:18px;
 
   }
-
 
   .box-head{
 
@@ -1329,14 +1979,11 @@ main{
 
   }
 
-
   .form-grid{
 
-    grid-template-columns:
-      1fr;
+    grid-template-columns:1fr;
 
   }
-
 
   .field.full{
 
@@ -1344,14 +1991,17 @@ main{
 
   }
 
-
   .digital-grid{
 
-    grid-template-columns:
-      1fr;
+    grid-template-columns:1fr;
 
   }
 
+  .performance{
+
+    grid-template-columns:1fr;
+
+  }
 
   .info-grid{
 
@@ -1362,13 +2012,39 @@ main{
 
 }
 
-
 @media(max-width:430px){
+
+  .brand-icon{
+
+    width:38px;
+
+    height:38px;
+
+    font-size:19px;
+
+  }
+
+  .brand-text strong{
+
+    font-size:11px;
+
+  }
+
+  .header-button{
+
+    font-size:7px;
+
+  }
+
+  .quick{
+
+    min-height:76px;
+
+  }
 
   .info-grid{
 
-    grid-template-columns:
-      1fr;
+    grid-template-columns:1fr;
 
   }
 
@@ -1379,7 +2055,34 @@ main{
 </head>
 
 
+
 <body>
+
+
+
+<!-- ==================================================
+     LOADING
+================================================== -->
+
+<div
+  id="loading"
+  class="loading"
+>
+
+  <div>
+
+    <div class="loading-lion">
+      🦁
+    </div>
+
+    <div class="loading-text">
+      LEO CONNECT
+    </div>
+
+  </div>
+
+</div>
+
 
 
 <!-- ==================================================
@@ -1387,7 +2090,6 @@ main{
 ================================================== -->
 
 <header>
-
 
   <div class="brand">
 
@@ -1410,12 +2112,14 @@ main{
   </div>
 
 
+
   <div class="header-actions">
 
     <a
       id="headerProfile"
       class="header-button gold"
       target="_blank"
+      rel="noopener"
     >
       👤 Profilim
     </a>
@@ -1429,12 +2133,12 @@ main{
 
   </div>
 
-
 </header>
 
 
 
 <main>
+
 
 
 <!-- ==================================================
@@ -1454,10 +2158,11 @@ main{
     </h1>
 
     <p>
-      Dijital işletme profilini ve bağlantılarını yönet.
+      İşletmenin dijital dünyasını tek merkezden yönet.
     </p>
 
   </div>
+
 
 
   <div class="live">
@@ -1478,9 +2183,7 @@ main{
 
 <section class="profile-hero">
 
-
   <div class="profile-hero-inner">
-
 
     <div class="logo-wrap">
 
@@ -1498,6 +2201,7 @@ main{
       >
 
     </div>
+
 
 
     <div class="profile-info">
@@ -1523,12 +2227,14 @@ main{
     </div>
 
 
+
     <div class="profile-actions">
 
       <a
         id="heroProfile"
         class="action"
         target="_blank"
+        rel="noopener"
       >
         👤 Müşteri Profilini Gör
       </a>
@@ -1542,6 +2248,69 @@ main{
 
     </div>
 
+  </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     PROFILE HEALTH
+================================================== -->
+
+<section class="health">
+
+  <div class="health-score">
+
+    <div
+      id="healthRing"
+      class="health-ring"
+    >
+
+      <strong id="healthScore">
+        0
+      </strong>
+
+    </div>
+
+    <div class="health-copy">
+
+      <strong id="healthTitle">
+        Profil kontrol ediliyor
+      </strong>
+
+      <span>
+        Profil sağlık skoru
+      </span>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="health-details">
+
+    <div class="health-bar">
+
+      <div
+        id="healthFill"
+        class="health-fill"
+      ></div>
+
+    </div>
+
+    <div
+      id="healthMessage"
+      class="health-message"
+    >
+      Profil bilgileri analiz ediliyor...
+    </div>
+
+    <div
+      id="missingList"
+      class="missing-list"
+    ></div>
 
   </div>
 
@@ -1555,91 +2324,203 @@ main{
 
 <section class="stats">
 
-
   <div class="stat">
 
-    <small>
-      PROFİL
-    </small>
+    <small>PROFİL</small>
 
     <strong id="profileViews">
       0
     </strong>
 
-    <span>
-      Görüntüleme
-    </span>
+    <span>Görüntüleme</span>
 
   </div>
 
 
+
   <div class="stat">
 
-    <small>
-      WHATSAPP
-    </small>
+    <small>WHATSAPP</small>
 
     <strong id="whatsappViews">
       0
     </strong>
 
-    <span>
-      Etkileşim
-    </span>
+    <span>Etkileşim</span>
 
   </div>
 
 
+
   <div class="stat">
 
-    <small>
-      TELEFON
-    </small>
+    <small>TELEFON</small>
 
     <strong id="phoneViews">
       0
     </strong>
 
-    <span>
-      Tıklama
-    </span>
+    <span>Tıklama</span>
 
   </div>
 
 
+
   <div class="stat">
 
-    <small>
-      QR
-    </small>
+    <small>QR</small>
 
     <strong id="qrViews">
       0
     </strong>
 
-    <span>
-      Tarama
-    </span>
+    <span>Tarama</span>
 
   </div>
 
 
+
   <div class="stat">
 
-    <small>
-      NFC
-    </small>
+    <small>NFC</small>
 
     <strong id="nfcViews">
       0
     </strong>
 
-    <span>
-      Dokunma
-    </span>
+    <span>Dokunma</span>
 
   </div>
 
+
+
+  <div class="stat">
+
+    <small>TOPLAM</small>
+
+    <strong id="totalViews">
+      0
+    </strong>
+
+    <span>Etkileşim</span>
+
+  </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     QUICK ACTIONS
+================================================== -->
+
+<section class="quick-grid">
+
+  <a
+    href="#profile"
+    class="quick"
+  >
+
+    <div class="quick-icon">
+      ✏️
+    </div>
+
+    <strong>
+      Profili Düzenle
+    </strong>
+
+    <span>
+      Bilgilerini güncelle
+    </span>
+
+  </a>
+
+
+
+  <a
+    id="quickProfile"
+    class="quick"
+    target="_blank"
+    rel="noopener"
+  >
+
+    <div class="quick-icon">
+      👁️
+    </div>
+
+    <strong>
+      Profili Gör
+    </strong>
+
+    <span>
+      Müşteri görünümü
+    </span>
+
+  </a>
+
+
+
+  <a
+    href="#digital"
+    class="quick"
+  >
+
+    <div class="quick-icon">
+      🔲
+    </div>
+
+    <strong>
+      QR Merkezi
+    </strong>
+
+    <span>
+      QR kodunu yönet
+    </span>
+
+  </a>
+
+
+
+  <a
+    href="#digital"
+    class="quick"
+  >
+
+    <div class="quick-icon">
+      📡
+    </div>
+
+    <strong>
+      NFC Merkezi
+    </strong>
+
+    <span>
+      NFC bağlantını yönet
+    </span>
+
+  </a>
+
+
+
+  <button
+    class="quick"
+    type="button"
+    onclick="shareProfile()"
+  >
+
+    <div class="quick-icon">
+      ↗️
+    </div>
+
+    <strong>
+      Profili Paylaş
+    </strong>
+
+    <span>
+      İşletmeni paylaş
+    </span>
+
+  </button>
 
 </section>
 
@@ -1654,7 +2535,6 @@ main{
   class="box"
 >
 
-
   <div class="box-head">
 
     <div>
@@ -1668,7 +2548,7 @@ main{
       </h2>
 
       <p>
-        Müşterilerinin göreceği bilgileri buradan yönet.
+        Müşterilerinin göreceği tüm bilgileri buradan yönet.
       </p>
 
     </div>
@@ -1678,6 +2558,7 @@ main{
 
 
   <div class="form-grid">
+
 
 
     <div class="field">
@@ -1694,6 +2575,7 @@ main{
     </div>
 
 
+
     <div class="field">
 
       <label>
@@ -1706,6 +2588,7 @@ main{
       >
 
     </div>
+
 
 
     <div class="field full">
@@ -1722,6 +2605,7 @@ main{
     </div>
 
 
+
     <div class="field">
 
       <label>
@@ -1736,6 +2620,7 @@ main{
     </div>
 
 
+
     <div class="field">
 
       <label>
@@ -1748,10 +2633,11 @@ main{
       >
 
       <span class="field-hint">
-        Numara yazarsan WhatsApp bağlantısı otomatik oluşturulur.
+        Numara yazarsan bağlantı otomatik oluşturulur.
       </span>
 
     </div>
+
 
 
     <div class="field full">
@@ -1768,6 +2654,7 @@ main{
     </div>
 
 
+
     <div class="field">
 
       <label>
@@ -1780,6 +2667,7 @@ main{
       >
 
     </div>
+
 
 
     <div class="field">
@@ -1796,6 +2684,7 @@ main{
     </div>
 
 
+
     <div class="field">
 
       <label>
@@ -1808,6 +2697,7 @@ main{
       >
 
     </div>
+
 
 
     <div class="field">
@@ -1824,6 +2714,7 @@ main{
     </div>
 
 
+
     <div class="field">
 
       <label>
@@ -1836,6 +2727,7 @@ main{
       >
 
     </div>
+
 
 
     <div class="field">
@@ -1852,6 +2744,7 @@ main{
     </div>
 
 
+
     <div class="field">
 
       <label>
@@ -1864,6 +2757,7 @@ main{
       >
 
     </div>
+
 
 
     <div class="field">
@@ -1880,6 +2774,7 @@ main{
     </div>
 
 
+
     <div class="field full">
 
       <label>
@@ -1893,10 +2788,11 @@ main{
       >
 
       <span class="field-hint">
-        Logo bağlantısını buraya eklediğinde üstteki önizleme otomatik güncellenir.
+        Logo bağlantısını eklediğinde üstteki önizleme güncellenir.
       </span>
 
     </div>
+
 
 
   </div>
@@ -1906,8 +2802,10 @@ main{
   <div class="save-area">
 
     <button
+      id="saveButton"
       class="save-button"
       onclick="save()"
+      type="button"
     >
       ✓ Bilgileri Kaydet
     </button>
@@ -1916,17 +2814,18 @@ main{
 
   </div>
 
-
 </section>
 
 
 
 <!-- ==================================================
-     DIGITAL CONNECTION
+     DIGITAL
 ================================================== -->
 
-<section class="box">
-
+<section
+  id="digital"
+  class="box"
+>
 
   <div class="box-head">
 
@@ -1937,11 +2836,11 @@ main{
       </div>
 
       <h2>
-        QR + NFC
+        QR + NFC Merkezi
       </h2>
 
       <p>
-        İşletmeni müşterilerine tek tarama veya tek dokunuşla ulaştır.
+        İşletmeni tek tarama veya tek dokunuşla müşterilerine ulaştır.
       </p>
 
     </div>
@@ -1951,6 +2850,7 @@ main{
 
 
   <div class="digital-grid">
+
 
 
     <!-- QR -->
@@ -1966,8 +2866,9 @@ main{
       </h3>
 
       <p>
-        Masa, stand, vitrin, menü veya kartvizitte kullanabileceğin QR bağlantın.
+        Masa, stand, vitrin, menü veya kartvizit üzerinde kullan.
       </p>
+
 
 
       <img
@@ -1975,6 +2876,7 @@ main{
         class="qr-image"
         alt="LEO CONNECT QR"
       >
+
 
 
       <div
@@ -1985,14 +2887,16 @@ main{
       </div>
 
 
+
       <div class="digital-actions">
 
         <a
           id="open"
           class="action"
           target="_blank"
+          rel="noopener"
         >
-          Profili Aç
+          👁 Profili Aç
         </a>
 
         <a
@@ -2000,10 +2904,12 @@ main{
           class="action gold"
           download="leo-connect-qr.png"
         >
-          QR'ı İndir
+          ↓ QR'ı İndir
         </a>
 
       </div>
+
+
 
     </div>
 
@@ -2022,8 +2928,9 @@ main{
       </h3>
 
       <p>
-        Bu bağlantıyı NFC etiketine yazdır. Müşteri telefonunu etikete dokundurduğunda profilin açılır.
+        Bu bağlantıyı NFC etiketine yaz. Müşteri dokunduğunda profilin açılır.
       </p>
+
 
 
       <div
@@ -2034,16 +2941,27 @@ main{
       </div>
 
 
+
       <div class="digital-actions">
 
         <button
           class="action gold"
           onclick="copyNFC()"
+          type="button"
         >
-          NFC Bağlantısını Kopyala
+          🔗 NFC'yi Kopyala
+        </button>
+
+        <button
+          class="action"
+          onclick="openNFC()"
+          type="button"
+        >
+          ↗ Test Et
         </button>
 
       </div>
+
 
 
       <div class="nfc-status">
@@ -2055,6 +2973,7 @@ main{
       </div>
 
 
+
       <div
         id="nfcMessage"
         class="field-hint"
@@ -2064,8 +2983,330 @@ main{
     </div>
 
 
+
   </div>
 
+</section>
+
+
+
+<!-- ==================================================
+     PERFORMANCE
+================================================== -->
+
+<section class="box">
+
+  <div class="box-head">
+
+    <div>
+
+      <div class="eyebrow">
+        PERFORMANCE
+      </div>
+
+      <h2>
+        Kanal Performansı
+      </h2>
+
+      <p>
+        Müşterilerinin işletmenle hangi yollarla etkileşime geçtiğini gör.
+      </p>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="performance">
+
+
+
+    <div class="performance-card">
+
+      <div class="performance-head">
+
+        <strong>
+          Etkileşim Dağılımı
+        </strong>
+
+        <span id="strongestChannel">
+          Analiz ediliyor
+        </span>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          👁️
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              Profil
+            </strong>
+
+            <span id="channelProfile">
+              0
+            </span>
+
+          </div>
+
+          <div class="channel-bar">
+
+            <div
+              id="barProfile"
+              class="channel-fill"
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          🔲
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              QR
+            </strong>
+
+            <span id="channelQR">
+              0
+            </span>
+
+          </div>
+
+          <div class="channel-bar">
+
+            <div
+              id="barQR"
+              class="channel-fill"
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          📡
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              NFC
+            </strong>
+
+            <span id="channelNFC">
+              0
+            </span>
+
+          </div>
+
+          <div class="channel-bar">
+
+            <div
+              id="barNFC"
+              class="channel-fill"
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          💬
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              WhatsApp
+            </strong>
+
+            <span id="channelWhatsApp">
+              0
+            </span>
+
+          </div>
+
+          <div class="channel-bar">
+
+            <div
+              id="barWhatsApp"
+              class="channel-fill"
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="performance-card">
+
+      <div class="performance-head">
+
+        <strong>
+          Hızlı Özet
+        </strong>
+
+        <span>
+          LEO CONNECT
+        </span>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          📞
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              Telefon
+            </strong>
+
+            <span id="summaryPhone">
+              0
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          📍
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              Konum
+            </strong>
+
+            <span id="summaryLocation">
+              0
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          📸
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              Instagram
+            </strong>
+
+            <span id="summaryInstagram">
+              0
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          ⭐
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              Google
+            </strong>
+
+            <span id="summaryGoogle">
+              0
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
 
 </section>
 
@@ -2076,7 +3317,6 @@ main{
 ================================================== -->
 
 <section class="box">
-
 
   <div class="box-head">
 
@@ -2091,7 +3331,7 @@ main{
       </h2>
 
       <p>
-        Müşterilerinin işletmenle hangi kanallardan iletişim kurabileceğini kontrol et.
+        İşletme profilindeki bağlantıların mevcut durumunu kontrol et.
       </p>
 
     </div>
@@ -2101,6 +3341,7 @@ main{
 
 
   <div class="info-grid">
+
 
 
     <div class="info-card">
@@ -2120,6 +3361,7 @@ main{
     </div>
 
 
+
     <div class="info-card">
 
       <div class="info-card-icon">
@@ -2135,6 +3377,7 @@ main{
       </span>
 
     </div>
+
 
 
     <div class="info-card">
@@ -2154,6 +3397,7 @@ main{
     </div>
 
 
+
     <div class="info-card">
 
       <div class="info-card-icon">
@@ -2169,6 +3413,7 @@ main{
       </span>
 
     </div>
+
 
 
     <div class="info-card">
@@ -2188,6 +3433,7 @@ main{
     </div>
 
 
+
     <div class="info-card">
 
       <div class="info-card-icon">
@@ -2205,8 +3451,8 @@ main{
     </div>
 
 
-  </div>
 
+  </div>
 
 </section>
 
@@ -2219,11 +3465,24 @@ main{
 </div>
 
 
+
 </main>
 
 
 
+<!-- ==================================================
+     TOAST
+================================================== -->
+
+<div
+  id="toast"
+  class="toast"
+></div>
+
+
+
 <script>
+
 
 
 /* ==================================================
@@ -2236,12 +3495,14 @@ const token =
   );
 
 
+
 if(!token){
 
   window.location.href =
     "/login";
 
 }
+
 
 
 /* ==================================================
@@ -2276,6 +3537,19 @@ const fields = [
 ];
 
 
+
+/* ==================================================
+   GLOBAL STATE
+================================================== */
+
+let currentBusiness = null;
+
+let nfcUrl = "";
+
+let statsData = [];
+
+
+
 /* ==================================================
    API
 ================================================== */
@@ -2298,40 +3572,54 @@ async function api(
   };
 
 
-  const response =
-    await fetch(
-      url,
-      options
+
+  try{
+
+    const response =
+      await fetch(
+        url,
+        options
+      );
+
+
+
+    if(
+      response.status === 401
+    ){
+
+      localStorage.removeItem(
+        "token"
+      );
+
+      window.location.href =
+        "/login";
+
+      return null;
+
+    }
+
+
+
+    return await response.json();
+
+  }catch(error){
+
+    console.error(
+      "API error:",
+      error
     );
-
-
-  if(
-    response.status === 401
-  ){
-
-    localStorage.removeItem(
-      "token"
-    );
-
-    window.location.href =
-      "/login";
 
     return null;
 
   }
 
-
-  return response.json();
-
 }
+
 
 
 /* ==================================================
    NFC
 ================================================== */
-
-let nfcUrl = "";
-
 
 function createNFCUrl(
   business
@@ -2352,10 +3640,12 @@ function createNFCUrl(
 }
 
 
+
 async function copyNFC(){
 
   if(!nfcUrl)
     return;
+
 
 
   try{
@@ -2364,12 +3654,14 @@ async function copyNFC(){
       nfcUrl
     );
 
-
     document.getElementById(
       "nfcMessage"
     ).textContent =
       "✓ NFC bağlantısı kopyalandı.";
 
+    showToast(
+      "NFC bağlantısı kopyalandı."
+    );
 
   }catch(error){
 
@@ -2383,8 +3675,23 @@ async function copyNFC(){
 }
 
 
+
+function openNFC(){
+
+  if(!nfcUrl)
+    return;
+
+  window.open(
+    nfcUrl,
+    "_blank"
+  );
+
+}
+
+
+
 /* ==================================================
-   LOGO PREVIEW
+   LOGO
 ================================================== */
 
 function previewLogo(){
@@ -2395,16 +3702,19 @@ function previewLogo(){
     ).value.trim();
 
 
+
   const img =
     document.getElementById(
       "logoPreview"
     );
 
 
+
   const placeholder =
     document.getElementById(
       "logoPlaceholder"
     );
+
 
 
   if(!url){
@@ -2420,6 +3730,7 @@ function previewLogo(){
   }
 
 
+
   img.onload =
     function(){
 
@@ -2430,6 +3741,7 @@ function previewLogo(){
         "none";
 
     };
+
 
 
   img.onerror =
@@ -2444,10 +3756,686 @@ function previewLogo(){
     };
 
 
+
   img.src =
     url;
 
 }
+
+
+
+/* ==================================================
+   INFO
+================================================== */
+
+function setInfo(
+  id,
+  value
+){
+
+  const element =
+    document.getElementById(
+      id
+    );
+
+
+
+  if(!element)
+    return;
+
+
+
+  element.textContent =
+    value ||
+    "Eklenmedi";
+
+}
+
+
+
+/* ==================================================
+   PROFILE HEALTH
+================================================== */
+
+function calculateHealth(
+  business
+){
+
+  const checks = [
+
+    {
+      label:"İşletme adı",
+      value:business.name
+    },
+
+    {
+      label:"Kategori",
+      value:business.category
+    },
+
+    {
+      label:"Açıklama",
+      value:business.description
+    },
+
+    {
+      label:"Telefon",
+      value:business.phone
+    },
+
+    {
+      label:"WhatsApp",
+      value:business.whatsapp
+    },
+
+    {
+      label:"Konum",
+      value:business.address
+    },
+
+    {
+      label:"Instagram",
+      value:business.instagram
+    },
+
+    {
+      label:"Google yorum",
+      value:business.google_review
+    },
+
+    {
+      label:"Çalışma saatleri",
+      value:business.hours
+    },
+
+    {
+      label:"Logo",
+      value:business.logo_url
+    }
+
+  ];
+
+
+
+  const completed =
+    checks.filter(
+      item =>
+        String(
+          item.value || ""
+        ).trim()
+    ).length;
+
+
+
+  const score =
+    Math.round(
+      completed /
+      checks.length *
+      100
+    );
+
+
+
+  const missing =
+    checks.filter(
+      item =>
+        !String(
+          item.value || ""
+        ).trim()
+    );
+
+
+
+  return {
+    score,
+    missing
+  };
+
+}
+
+
+
+function renderHealth(
+  business
+){
+
+  const result =
+    calculateHealth(
+      business
+    );
+
+
+
+  const score =
+    result.score;
+
+
+
+  const ring =
+    document.getElementById(
+      "healthRing"
+    );
+
+
+
+  ring.style.setProperty(
+    "--score",
+    (
+      score *
+      3.6
+    ) +
+    "deg"
+  );
+
+
+
+  document.getElementById(
+    "healthScore"
+  ).textContent =
+    score;
+
+
+
+  document.getElementById(
+    "healthFill"
+  ).style.width =
+    score + "%";
+
+
+
+  const title =
+    document.getElementById(
+      "healthTitle"
+    );
+
+
+
+  const message =
+    document.getElementById(
+      "healthMessage"
+    );
+
+
+
+  if(score >= 90){
+
+    title.textContent =
+      "Mükemmel profil";
+
+    message.textContent =
+      "Profilin müşterilerin için neredeyse tamamen hazır.";
+
+  }else if(score >= 70){
+
+    title.textContent =
+      "Güçlü profil";
+
+    message.textContent =
+      "Birkaç küçük dokunuşla profilini daha da güçlendirebilirsin.";
+
+  }else if(score >= 50){
+
+    title.textContent =
+      "Geliştirilebilir";
+
+    message.textContent =
+      "Eksik bilgileri tamamlayarak müşteri deneyimini yükseltebilirsin.";
+
+  }else{
+
+    title.textContent =
+      "Profil eksik";
+
+    message.textContent =
+      "Daha fazla bilgi ekleyerek profilini güçlendir.";
+
+  }
+
+
+
+  const list =
+    document.getElementById(
+      "missingList"
+    );
+
+
+
+  list.innerHTML =
+    "";
+
+
+
+  result.missing
+    .slice(0,5)
+    .forEach(
+      item => {
+
+        const element =
+          document.createElement(
+            "div"
+          );
+
+        element.className =
+          "missing-item";
+
+        element.textContent =
+          "＋ " +
+          item.label;
+
+        list.appendChild(
+          element
+        );
+
+      }
+    );
+
+
+
+  if(!result.missing.length){
+
+    const element =
+      document.createElement(
+        "div"
+      );
+
+    element.className =
+      "missing-item";
+
+    element.textContent =
+      "✓ Tüm temel alanlar tamam";
+
+    list.appendChild(
+      element
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   STATS HELPERS
+================================================== */
+
+function getStat(
+  type
+){
+
+  const item =
+    statsData.find(
+      stat =>
+        stat.type === type
+    );
+
+
+
+  return item
+    ? Number(item.count || 0)
+    : 0;
+
+}
+
+
+
+function renderStats(){
+
+  const profile =
+    getStat(
+      "profile_view"
+    );
+
+
+
+  const whatsapp =
+    getStat(
+      "whatsapp"
+    );
+
+
+
+  const phone =
+    getStat(
+      "phone"
+    );
+
+
+
+  const qr =
+    getStat("qr") ||
+    getStat("qr_scan");
+
+
+
+  const nfc =
+    getStat("nfc");
+
+
+
+  const total =
+    statsData.reduce(
+      (
+        sum,
+        item
+      ) =>
+        sum +
+        Number(
+          item.count || 0
+        ),
+      0
+    );
+
+
+
+  document.getElementById(
+    "profileViews"
+  ).textContent =
+    profile;
+
+
+
+  document.getElementById(
+    "whatsappViews"
+  ).textContent =
+    whatsapp;
+
+
+
+  document.getElementById(
+    "phoneViews"
+  ).textContent =
+    phone;
+
+
+
+  document.getElementById(
+    "qrViews"
+  ).textContent =
+    qr;
+
+
+
+  document.getElementById(
+    "nfcViews"
+  ).textContent =
+    nfc;
+
+
+
+  document.getElementById(
+    "totalViews"
+  ).textContent =
+    total;
+
+
+
+  renderPerformance(
+    profile,
+    qr,
+    nfc,
+    whatsapp,
+    phone
+  );
+
+}
+
+
+
+/* ==================================================
+   PERFORMANCE
+================================================== */
+
+function renderPerformance(
+  profile,
+  qr,
+  nfc,
+  whatsapp,
+  phone
+){
+
+  const values = [
+
+    {
+      name:"Profil",
+      value:profile
+    },
+
+    {
+      name:"QR",
+      value:qr
+    },
+
+    {
+      name:"NFC",
+      value:nfc
+    },
+
+    {
+      name:"WhatsApp",
+      value:whatsapp
+    }
+
+  ];
+
+
+
+  const max =
+    Math.max(
+      1,
+      ...values.map(
+        item => item.value
+      )
+    );
+
+
+
+  document.getElementById(
+    "channelProfile"
+  ).textContent =
+    profile;
+
+
+
+  document.getElementById(
+    "channelQR"
+  ).textContent =
+    qr;
+
+
+
+  document.getElementById(
+    "channelNFC"
+  ).textContent =
+    nfc;
+
+
+
+  document.getElementById(
+    "channelWhatsApp"
+  ).textContent =
+    whatsapp;
+
+
+
+  document.getElementById(
+    "barProfile"
+  ).style.width =
+    (
+      profile / max * 100
+    ) + "%";
+
+
+
+  document.getElementById(
+    "barQR"
+  ).style.width =
+    (
+      qr / max * 100
+    ) + "%";
+
+
+
+  document.getElementById(
+    "barNFC"
+  ).style.width =
+    (
+      nfc / max * 100
+    ) + "%";
+
+
+
+  document.getElementById(
+    "barWhatsApp"
+  ).style.width =
+    (
+      whatsapp / max * 100
+    ) + "%";
+
+
+
+  const strongest =
+    values.sort(
+      (
+        a,
+        b
+      ) =>
+        b.value -
+        a.value
+    )[0];
+
+
+
+  document.getElementById(
+    "strongestChannel"
+  ).textContent =
+    strongest.value > 0
+      ? "En güçlü: " + strongest.name
+      : "Henüz veri yok";
+
+
+
+  document.getElementById(
+    "summaryPhone"
+  ).textContent =
+    phone;
+
+
+
+  document.getElementById(
+    "summaryLocation"
+  ).textContent =
+    getStat(
+      "location"
+    );
+
+
+
+  document.getElementById(
+    "summaryInstagram"
+  ).textContent =
+    getStat(
+      "instagram"
+    );
+
+
+
+  document.getElementById(
+    "summaryGoogle"
+  ).textContent =
+    getStat(
+      "google_review"
+    );
+
+}
+
+
+
+/* ==================================================
+   SHARE
+================================================== */
+
+async function shareProfile(){
+
+  if(!currentBusiness?.slug)
+    return;
+
+
+
+  const url =
+    window.location.origin +
+    "/p/" +
+    currentBusiness.slug;
+
+
+
+  const data = {
+
+    title:
+      currentBusiness.name ||
+      "LEO CONNECT",
+
+    text:
+      (
+        currentBusiness.name ||
+        "İşletme"
+      ) +
+      " — LEO CONNECT dijital profil",
+
+    url
+
+  };
+
+
+
+  if(
+    navigator.share
+  ){
+
+    try{
+
+      await navigator.share(
+        data
+      );
+
+      return;
+
+    }catch(error){
+
+      if(
+        error?.name ===
+        "AbortError"
+      ){
+
+        return;
+
+      }
+
+    }
+
+  }
+
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      url
+    );
+
+    showToast(
+      "Profil bağlantısı kopyalandı."
+    );
+
+  }catch(error){
+
+    showToast(
+      "Profil bağlantısı: " + url
+    );
+
+  }
+
+}
+
 
 
 /* ==================================================
@@ -2462,8 +4450,15 @@ async function load(){
     );
 
 
+
   if(!business)
     return;
+
+
+
+  currentBusiness =
+    business;
+
 
 
   /* TITLE */
@@ -2475,11 +4470,13 @@ async function load(){
     "İşletme Paneli";
 
 
+
   document.getElementById(
     "heroName"
   ).textContent =
     business.name ||
     "İşletme";
+
 
 
   document.getElementById(
@@ -2489,11 +4486,13 @@ async function load(){
     "İşletme";
 
 
+
   document.getElementById(
     "heroDescription"
   ).textContent =
     business.description ||
     "Dijital işletme profilini yönet.";
+
 
 
   /* FIELDS */
@@ -2505,6 +4504,7 @@ async function load(){
         document.getElementById(
           field
         );
+
 
 
       if(element){
@@ -2519,7 +4519,17 @@ async function load(){
   );
 
 
+
   previewLogo();
+
+
+
+  /* HEALTH */
+
+  renderHealth(
+    business
+  );
+
 
 
   /* PROFILE URL */
@@ -2530,16 +4540,26 @@ async function load(){
     business.slug;
 
 
+
   document.getElementById(
     "headerProfile"
   ).href =
     profileUrl;
 
 
+
   document.getElementById(
     "heroProfile"
   ).href =
     profileUrl;
+
+
+
+  document.getElementById(
+    "quickProfile"
+  ).href =
+    profileUrl;
+
 
 
   /* NFC */
@@ -2550,10 +4570,12 @@ async function load(){
     );
 
 
+
   document.getElementById(
     "nfcUrl"
   ).textContent =
     nfcUrl;
+
 
 
   /* QR */
@@ -2564,6 +4586,7 @@ async function load(){
     );
 
 
+
   if(qr){
 
     document.getElementById(
@@ -2572,16 +4595,19 @@ async function load(){
       qr.dataUrl;
 
 
+
     document.getElementById(
       "url"
     ).textContent =
       qr.url;
 
 
+
     document.getElementById(
       "open"
     ).href =
       qr.url;
+
 
 
     document.getElementById(
@@ -2592,6 +4618,7 @@ async function load(){
   }
 
 
+
   /* STATS */
 
   const stats =
@@ -2600,80 +4627,18 @@ async function load(){
     );
 
 
+
   if(
     Array.isArray(stats)
   ){
 
-    stats.forEach(
-      item => {
+    statsData =
+      stats;
 
-        if(
-          item.type ===
-          "profile_view"
-        ){
-
-          document.getElementById(
-            "profileViews"
-          ).textContent =
-            item.count;
-
-        }
-
-
-        if(
-          item.type ===
-          "whatsapp"
-        ){
-
-          document.getElementById(
-            "whatsappViews"
-          ).textContent =
-            item.count;
-
-        }
-
-
-        if(
-          item.type ===
-          "phone"
-        ){
-
-          document.getElementById(
-            "phoneViews"
-          ).textContent =
-            item.count;
-
-        }
-
-
-        if(
-          item.type === "qr" ||
-          item.type === "qr_scan"
-        ){
-
-          document.getElementById(
-            "qrViews"
-          ).textContent =
-            item.count;
-
-        }
-
-
-        if(
-          item.type === "nfc"
-        ){
-
-          document.getElementById(
-            "nfcViews"
-          ).textContent =
-            item.count;
-
-        }
-
-      }
-    );
+    renderStats();
 
   }
+
 
 
   /* INFO */
@@ -2684,10 +4649,12 @@ async function load(){
   );
 
 
+
   setInfo(
     "infoWhatsapp",
     business.whatsapp
   );
+
 
 
   setInfo(
@@ -2696,10 +4663,12 @@ async function load(){
   );
 
 
+
   setInfo(
     "infoInstagram",
     business.instagram
   );
+
 
 
   setInfo(
@@ -2708,38 +4677,18 @@ async function load(){
   );
 
 
+
   setInfo(
     "infoHours",
     business.hours
   );
 
-}
 
 
-/* ==================================================
-   INFO HELPER
-================================================== */
-
-function setInfo(
-  id,
-  value
-){
-
-  const element =
-    document.getElementById(
-      id
-    );
-
-
-  if(!element)
-    return;
-
-
-  element.textContent =
-    value ||
-    "Eklenmedi";
+  hideLoading();
 
 }
+
 
 
 /* ==================================================
@@ -2748,7 +4697,22 @@ function setInfo(
 
 async function save(){
 
+  const button =
+    document.getElementById(
+      "saveButton"
+    );
+
+
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+
   const data = {};
+
 
 
   fields.forEach(
@@ -2760,6 +4724,7 @@ async function save(){
         );
 
 
+
       data[field] =
         element
           ? element.value.trim()
@@ -2769,19 +4734,21 @@ async function save(){
   );
 
 
+
   /* WHATSAPP */
 
-  const whatsapp =
+  const whatsappNumber =
     data.whatsapp.replace(
       /\D/g,
       ""
     );
 
 
+
   if(
-    whatsapp &&
-    !data.whatsapp.includes(
-      "http"
+    whatsappNumber &&
+    !/^https?:\/\//i.test(
+      data.whatsapp
     )
   ){
 
@@ -2790,25 +4757,33 @@ async function save(){
 
       (
 
-        whatsapp.startsWith("90")
+        whatsappNumber.startsWith("90")
 
-          ? whatsapp
+          ? whatsappNumber
 
-          : "90" + whatsapp
+          : "90" +
+            whatsappNumber
 
       );
 
   }
 
 
-  const message =
-    document.getElementById(
-      "message"
-    );
+
+  button.classList.add(
+    "loading"
+  );
+
+
+
+  button.textContent =
+    "Kaydediliyor...";
+
 
 
   message.textContent =
-    "Kaydediliyor...";
+    "";
+
 
 
   const result =
@@ -2830,20 +4805,34 @@ async function save(){
     );
 
 
+
   if(
     result &&
     !result.error
   ){
 
+    currentBusiness =
+      result;
+
+
+
     message.textContent =
       "✓ Bilgiler başarıyla kaydedildi.";
 
+    showToast(
+      "İşletme bilgileri güncellendi."
+    );
+
+
+
+    /* HERO */
 
     document.getElementById(
       "title"
     ).textContent =
       result.name ||
       "İşletme Paneli";
+
 
 
     document.getElementById(
@@ -2853,6 +4842,7 @@ async function save(){
       "İşletme";
 
 
+
     document.getElementById(
       "heroCategory"
     ).textContent =
@@ -2860,11 +4850,13 @@ async function save(){
       "İşletme";
 
 
+
     document.getElementById(
       "heroDescription"
     ).textContent =
       result.description ||
       "Dijital işletme profilini yönet.";
+
 
 
     /* PROFILE */
@@ -2875,16 +4867,26 @@ async function save(){
       result.slug;
 
 
+
     document.getElementById(
       "headerProfile"
     ).href =
       profileUrl;
 
 
+
     document.getElementById(
       "heroProfile"
     ).href =
       profileUrl;
+
+
+
+    document.getElementById(
+      "quickProfile"
+    ).href =
+      profileUrl;
+
 
 
     /* NFC */
@@ -2895,15 +4897,26 @@ async function save(){
       );
 
 
+
     document.getElementById(
       "nfcUrl"
     ).textContent =
       nfcUrl;
 
 
+
     /* LOGO */
 
     previewLogo();
+
+
+
+    /* HEALTH */
+
+    renderHealth(
+      result
+    );
+
 
 
     /* INFO */
@@ -2914,10 +4927,12 @@ async function save(){
     );
 
 
+
     setInfo(
       "infoWhatsapp",
       result.whatsapp
     );
+
 
 
     setInfo(
@@ -2926,10 +4941,12 @@ async function save(){
     );
 
 
+
     setInfo(
       "infoInstagram",
       result.instagram
     );
+
 
 
     setInfo(
@@ -2938,10 +4955,12 @@ async function save(){
     );
 
 
+
     setInfo(
       "infoHours",
       result.hours
     );
+
 
 
     /* QR */
@@ -2952,6 +4971,7 @@ async function save(){
       );
 
 
+
     if(qr){
 
       document.getElementById(
@@ -2960,16 +4980,19 @@ async function save(){
         qr.dataUrl;
 
 
+
       document.getElementById(
         "url"
       ).textContent =
         qr.url;
 
 
+
       document.getElementById(
         "open"
       ).href =
         qr.url;
+
 
 
       document.getElementById(
@@ -2980,15 +5003,124 @@ async function save(){
     }
 
 
+
   }else{
 
     message.textContent =
       result?.error ||
       "Bir hata oluştu.";
 
+    showToast(
+      "Kaydetme sırasında hata oluştu."
+    );
+
   }
 
+
+
+  button.classList.remove(
+    "loading"
+  );
+
+
+
+  button.textContent =
+    "✓ Bilgileri Kaydet";
+
+
+
+  setTimeout(
+    function(){
+
+      message.textContent =
+        "";
+
+    },
+    3500
+  );
+
 }
+
+
+
+/* ==================================================
+   TOAST
+================================================== */
+
+let toastTimer = null;
+
+
+
+function showToast(
+  text
+){
+
+  const toast =
+    document.getElementById(
+      "toast"
+    );
+
+
+
+  toast.textContent =
+    text;
+
+
+
+  toast.classList.add(
+    "show"
+  );
+
+
+
+  clearTimeout(
+    toastTimer
+  );
+
+
+
+  toastTimer =
+    setTimeout(
+      function(){
+
+        toast.classList.remove(
+          "show"
+        );
+
+      },
+      2400
+    );
+
+}
+
+
+
+/* ==================================================
+   LOADING
+================================================== */
+
+function hideLoading(){
+
+  const loading =
+    document.getElementById(
+      "loading"
+    );
+
+
+
+  setTimeout(
+    function(){
+
+      loading.classList.add(
+        "hide"
+      );
+
+    },
+    150
+  );
+
+}
+
 
 
 /* ==================================================
@@ -2997,7 +5129,10 @@ async function save(){
 
 load();
 
+
+
 </script>
+
 
 
 </body>
