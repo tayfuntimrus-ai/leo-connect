@@ -128,7 +128,7 @@ async function pub(id) {
 
 
 /* =========================
-   AUTH
+   BUSINESS AUTH
 ========================= */
 
 function auth(req, res, next) {
@@ -139,8 +139,20 @@ function auth(req, res, next) {
       (req.headers.authorization || '')
         .replace(/^Bearer\s+/, '');
 
-    req.user =
+    const user =
       jwt.verify(token, SECRET);
+
+    if (!user.id) {
+
+      return res
+        .status(403)
+        .json({
+          error: 'İşletme yetkisi gerekli'
+        });
+
+    }
+
+    req.user = user;
 
     next();
 
@@ -150,6 +162,48 @@ function auth(req, res, next) {
       .status(401)
       .json({
         error: 'Oturum gerekli'
+      });
+
+  }
+
+}
+
+
+/* =========================
+   ADMIN AUTH
+========================= */
+
+function adminAuth(req, res, next) {
+
+  try {
+
+    const token =
+      (req.headers.authorization || '')
+        .replace(/^Bearer\s+/, '');
+
+    const user =
+      jwt.verify(token, SECRET);
+
+    if (user.role !== 'admin') {
+
+      return res
+        .status(403)
+        .json({
+          error: 'Admin yetkisi gerekli'
+        });
+
+    }
+
+    req.admin = user;
+
+    next();
+
+  } catch (error) {
+
+    res
+      .status(401)
+      .json({
+        error: 'Admin oturumu gerekli'
       });
 
   }
@@ -171,7 +225,7 @@ app.get(
 
       res.json({
         ok: true,
-        version: '3.0-postgres'
+        version: '3.1-admin-postgres'
       });
 
     } catch (error) {
@@ -183,6 +237,285 @@ app.get(
         .json({
           ok: false,
           error: 'Veritabanı bağlantı hatası'
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ADMIN LOGIN
+========================= */
+
+app.post(
+  '/api/admin/login',
+  (req, res) => {
+
+    try {
+
+      const {
+        email,
+        password
+      } = req.body;
+
+      const adminEmail =
+        process.env.ADMIN_EMAIL || '';
+
+      const adminPassword =
+        process.env.ADMIN_PASSWORD || '';
+
+
+      if (!adminEmail || !adminPassword) {
+
+        return res
+          .status(503)
+          .json({
+            error:
+              'Admin hesabı henüz yapılandırılmadı'
+          });
+
+      }
+
+
+      if (
+        String(email || '').trim().toLowerCase() !==
+        String(adminEmail).trim().toLowerCase() ||
+        String(password || '') !==
+        String(adminPassword)
+      ) {
+
+        return res
+          .status(401)
+          .json({
+            error:
+              'Admin e-posta veya şifre hatalı'
+          });
+
+      }
+
+
+      const token =
+        jwt.sign(
+          {
+            role: 'admin',
+            email: adminEmail
+          },
+          SECRET,
+          {
+            expiresIn: '7d'
+          }
+        );
+
+
+      res.json({
+        token,
+        admin: {
+          email: adminEmail
+        }
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          error:
+            'Admin girişi sırasında hata oluştu'
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ADMIN OVERVIEW
+========================= */
+
+app.get(
+  '/api/admin/overview',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const businesses =
+        await pool.query(
+          `SELECT COUNT(*)::int AS count
+           FROM businesses`
+        );
+
+
+      const events =
+        await pool.query(
+          `SELECT COUNT(*)::int AS count
+           FROM events`
+        );
+
+
+      const profiles =
+        await pool.query(
+          `SELECT COUNT(*)::int AS count
+           FROM events
+           WHERE type='profile_view'`
+        );
+
+
+      const qr =
+        await pool.query(
+          `SELECT COUNT(*)::int AS count
+           FROM events
+           WHERE type IN ('qr_scan','qr')`
+        );
+
+
+      const nfc =
+        await pool.query(
+          `SELECT COUNT(*)::int AS count
+           FROM events
+           WHERE type='nfc'`
+        );
+
+
+      const whatsapp =
+        await pool.query(
+          `SELECT COUNT(*)::int AS count
+           FROM events
+           WHERE type='whatsapp'`
+        );
+
+
+      const phone =
+        await pool.query(
+          `SELECT COUNT(*)::int AS count
+           FROM events
+           WHERE type='phone'`
+        );
+
+
+      res.json({
+
+        businesses:
+          businesses.rows[0].count,
+
+        events:
+          events.rows[0].count,
+
+        profile_views:
+          profiles.rows[0].count,
+
+        qr_scans:
+          qr.rows[0].count,
+
+        nfc_scans:
+          nfc.rows[0].count,
+
+        whatsapp_clicks:
+          whatsapp.rows[0].count,
+
+        phone_clicks:
+          phone.rows[0].count
+
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          error:
+            'Genel istatistikler alınamadı'
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ADMIN BUSINESSES
+========================= */
+
+app.get(
+  '/api/admin/businesses',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const result =
+        await pool.query(`
+          SELECT
+            b.id,
+            b.name,
+            b.slug,
+            b.email,
+            b.category,
+            b.phone,
+            b.created_at,
+
+            COALESCE((
+              SELECT COUNT(*)
+              FROM events e
+              WHERE e.business_id = b.id
+              AND e.type = 'profile_view'
+            ), 0)::int AS profile_views,
+
+            COALESCE((
+              SELECT COUNT(*)
+              FROM events e
+              WHERE e.business_id = b.id
+              AND e.type IN ('qr_scan','qr')
+            ), 0)::int AS qr_scans,
+
+            COALESCE((
+              SELECT COUNT(*)
+              FROM events e
+              WHERE e.business_id = b.id
+              AND e.type = 'nfc'
+            ), 0)::int AS nfc_scans,
+
+            COALESCE((
+              SELECT COUNT(*)
+              FROM events e
+              WHERE e.business_id = b.id
+              AND e.type = 'whatsapp'
+            ), 0)::int AS whatsapp_clicks,
+
+            COALESCE((
+              SELECT COUNT(*)
+              FROM events e
+              WHERE e.business_id = b.id
+              AND e.type = 'phone'
+            ), 0)::int AS phone_clicks
+
+          FROM businesses b
+
+          ORDER BY b.id DESC
+        `);
+
+
+      res.json(
+        result.rows
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          error:
+            'İşletmeler alınamadı'
         });
 
     }
@@ -309,7 +642,8 @@ app.post(
       const token =
         jwt.sign(
           {
-            id: business.id
+            id: business.id,
+            role: 'business'
           },
           SECRET,
           {
@@ -386,7 +720,8 @@ app.post(
       const token =
         jwt.sign(
           {
-            id: business.id
+            id: business.id,
+            role: 'business'
           },
           SECRET,
           {
@@ -429,9 +764,21 @@ app.get(
 
     try {
 
-      res.json(
-        await pub(req.user.id)
-      );
+      const business =
+        await pub(req.user.id);
+
+      if (!business) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'İşletme bulunamadı'
+          });
+
+      }
+
+      res.json(business);
 
     } catch (error) {
 
@@ -552,6 +899,18 @@ app.get(
         await pub(req.user.id);
 
 
+      if (!business) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'İşletme bulunamadı'
+          });
+
+      }
+
+
       const protocol =
         req.get('x-forwarded-proto') ||
         req.protocol;
@@ -581,11 +940,8 @@ app.get(
 
 
       res.json({
-
         url,
-
         dataUrl
-
       });
 
     } catch (error) {
@@ -768,7 +1124,25 @@ app.get(
       const result =
         await pool.query(
           `
-          SELECT *
+          SELECT
+            id,
+            name,
+            slug,
+            category,
+            description,
+            phone,
+            whatsapp,
+            address,
+            instagram,
+            tiktok,
+            google_review,
+            website,
+            menu,
+            iban,
+            iban_holder,
+            hours,
+            logo_url,
+            created_at
           FROM businesses
           WHERE slug=$1
           `,
@@ -790,9 +1164,6 @@ app.get(
           });
 
       }
-
-
-      delete business.password_hash;
 
 
       res.json(
@@ -954,6 +1325,26 @@ app.get(
 
 
 /* =========================
+   ADMIN PAGE
+========================= */
+
+app.get(
+  '/admin',
+  (req, res) => {
+
+    res.sendFile(
+      path.join(
+        __dirname,
+        'public',
+        'admin.html'
+      )
+    );
+
+  }
+);
+
+
+/* =========================
    REGISTER PAGE
 ========================= */
 
@@ -1025,7 +1416,7 @@ initDatabase()
       () => {
 
         console.log(
-          `LEO CONNECT PostgreSQL çalışıyor: ${PORT}`
+          `LEO CONNECT 3.1 PostgreSQL çalışıyor: ${PORT}`
         );
 
       }
