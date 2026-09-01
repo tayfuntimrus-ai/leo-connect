@@ -201,39 +201,22 @@ async function pub(id) {
       SELECT
 
         id,
-
         name,
-
         slug,
-
         email,
-
         category,
-
         description,
-
         phone,
-
         whatsapp,
-
         address,
-
         instagram,
-
         tiktok,
-
         google_review,
-
         website,
-
         menu,
-
         iban,
-
         iban_holder,
-
         hours,
-
         logo_url
 
       FROM businesses
@@ -418,7 +401,7 @@ app.get(
         ok: true,
 
         version:
-          '3.3-admin-create-business'
+          '3.4-admin-analytics'
 
       });
 
@@ -538,13 +521,11 @@ app.post(
         jwt.sign(
 
           {
-
             role:
               'admin',
 
             email:
               adminEmail
-
           },
 
           SECRET,
@@ -753,105 +734,67 @@ app.get(
           SELECT
 
             b.id,
-
             b.name,
-
             b.slug,
-
             b.email,
-
             b.category,
-
             b.phone,
-
             b.created_at,
 
-
             COALESCE((
-
               SELECT COUNT(*)
-
               FROM events e
-
               WHERE
                 e.business_id=b.id
-
               AND
                 e.type='profile_view'
-
             ),0)::int
             AS profile_views,
 
-
             COALESCE((
-
               SELECT COUNT(*)
-
               FROM events e
-
               WHERE
                 e.business_id=b.id
-
               AND
                 e.type IN(
                   'qr_scan',
                   'qr'
                 )
-
             ),0)::int
             AS qr_scans,
 
-
             COALESCE((
-
               SELECT COUNT(*)
-
               FROM events e
-
               WHERE
                 e.business_id=b.id
-
               AND
                 e.type='nfc'
-
             ),0)::int
             AS nfc_scans,
 
-
             COALESCE((
-
               SELECT COUNT(*)
-
               FROM events e
-
               WHERE
                 e.business_id=b.id
-
               AND
                 e.type='whatsapp'
-
             ),0)::int
             AS whatsapp_clicks,
 
-
             COALESCE((
-
               SELECT COUNT(*)
-
               FROM events e
-
               WHERE
                 e.business_id=b.id
-
               AND
                 e.type='phone'
-
             ),0)::int
             AS phone_clicks
 
-
           FROM businesses b
-
 
           ORDER BY
             b.id DESC
@@ -909,8 +852,6 @@ app.post(
       } = req.body;
 
 
-      /* VALIDATION */
-
       if (
         !name ||
         !email ||
@@ -951,8 +892,6 @@ app.post(
           .toLowerCase();
 
 
-      /* EMAIL CHECK */
-
       const existing =
         await pool.query(
           `
@@ -981,8 +920,6 @@ app.post(
 
       }
 
-
-      /* SLUG */
 
       const base =
         slug(
@@ -1024,7 +961,6 @@ app.post(
 
         number++;
 
-
         businessSlug =
           base +
           '-' +
@@ -1033,8 +969,6 @@ app.post(
       }
 
 
-      /* PASSWORD */
-
       const passwordHash =
         await bcrypt.hash(
           String(password),
@@ -1042,21 +976,15 @@ app.post(
         );
 
 
-      /* CREATE */
-
       const result =
         await pool.query(
           `
           INSERT INTO businesses(
 
             name,
-
             slug,
-
             email,
-
             password_hash,
-
             category
 
           )
@@ -1064,13 +992,9 @@ app.post(
           VALUES(
 
             $1,
-
             $2,
-
             $3,
-
             $4,
-
             $5
 
           )
@@ -1157,41 +1081,23 @@ app.get(
           SELECT
 
             id,
-
             name,
-
             slug,
-
             email,
-
             category,
-
             description,
-
             phone,
-
             whatsapp,
-
             address,
-
             instagram,
-
             tiktok,
-
             google_review,
-
             website,
-
             menu,
-
             iban,
-
             iban_holder,
-
             hours,
-
             logo_url,
-
             created_at
 
           FROM businesses
@@ -1268,15 +1174,9 @@ app.get(
         await pool.query(
           `
           SELECT
-
-            COUNT(*)::int
-            AS count
-
+            COUNT(*)::int AS count
           FROM events
-
-          WHERE
-            business_id=$1
-
+          WHERE business_id=$1
           `,
           [
             business.id
@@ -1309,6 +1209,549 @@ app.get(
 
           error:
             'İşletme detayları alınamadı'
+
+        });
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ADVANCED BUSINESS ANALYTICS
+========================= */
+
+app.get(
+  '/api/admin/business/:id/analytics',
+  adminAuth,
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      const businessId =
+        req.params.id;
+
+
+      const allowedPeriods = [
+        'today',
+        '7d',
+        '30d',
+        'all'
+      ];
+
+
+      const period =
+        allowedPeriods.includes(
+          String(
+            req.query.period || '30d'
+          )
+        )
+          ? String(
+              req.query.period || '30d'
+            )
+          : '30d';
+
+
+      /* BUSINESS */
+
+      const businessResult =
+        await pool.query(
+          `
+          SELECT
+
+            id,
+            name,
+            slug
+
+          FROM businesses
+
+          WHERE id=$1
+
+          `,
+          [
+            businessId
+          ]
+        );
+
+
+      const business =
+        businessResult.rows[0];
+
+
+      if (!business) {
+
+        return res
+          .status(404)
+          .json({
+
+            error:
+              'İşletme bulunamadı'
+
+          });
+
+      }
+
+
+      /* DATE CONDITION */
+
+      let dateCondition =
+        '';
+
+      if (
+        period === 'today'
+      ) {
+
+        dateCondition =
+          `
+          AND created_at >=
+            CURRENT_DATE
+          `;
+
+      }
+
+      if (
+        period === '7d'
+      ) {
+
+        dateCondition =
+          `
+          AND created_at >=
+            CURRENT_DATE - INTERVAL '6 days'
+          `;
+
+      }
+
+      if (
+        period === '30d'
+      ) {
+
+        dateCondition =
+          `
+          AND created_at >=
+            CURRENT_DATE - INTERVAL '29 days'
+          `;
+
+      }
+
+
+      /* TOTALS */
+
+      const totalResult =
+        await pool.query(
+          `
+          SELECT
+
+            type,
+
+            COUNT(*)::int
+            AS count
+
+          FROM events
+
+          WHERE
+            business_id=$1
+
+          ${dateCondition}
+
+          GROUP BY
+            type
+
+          ORDER BY
+            count DESC
+
+          `,
+          [
+            businessId
+          ]
+        );
+
+
+      const totals = {};
+
+
+      totalResult.rows.forEach(
+        item => {
+
+          totals[item.type] =
+            Number(
+              item.count
+            );
+
+        }
+      );
+
+
+      /* DAILY */
+
+      const dailyResult =
+        await pool.query(
+          `
+          SELECT
+
+            date_trunc(
+              'day',
+              created_at
+            ) AS day,
+
+            COUNT(*)::int
+              AS total,
+
+            COUNT(*) FILTER(
+              WHERE type='profile_view'
+            )::int
+              AS profile_views,
+
+            COUNT(*) FILTER(
+              WHERE type IN(
+                'qr_scan',
+                'qr'
+              )
+            )::int
+              AS qr_scans,
+
+            COUNT(*) FILTER(
+              WHERE type='nfc'
+            )::int
+              AS nfc_scans,
+
+            COUNT(*) FILTER(
+              WHERE type='whatsapp'
+            )::int
+              AS whatsapp,
+
+            COUNT(*) FILTER(
+              WHERE type='phone'
+            )::int
+              AS phone,
+
+            COUNT(*) FILTER(
+              WHERE type='location'
+            )::int
+              AS location,
+
+            COUNT(*) FILTER(
+              WHERE type='instagram'
+            )::int
+              AS instagram,
+
+            COUNT(*) FILTER(
+              WHERE type='tiktok'
+            )::int
+              AS tiktok,
+
+            COUNT(*) FILTER(
+              WHERE type='google_review'
+            )::int
+              AS google_review,
+
+            COUNT(*) FILTER(
+              WHERE type='website'
+            )::int
+              AS website,
+
+            COUNT(*) FILTER(
+              WHERE type='menu'
+            )::int
+              AS menu,
+
+            COUNT(*) FILTER(
+              WHERE type='iban'
+            )::int
+              AS iban
+
+          FROM events
+
+          WHERE
+            business_id=$1
+
+          ${dateCondition}
+
+          GROUP BY
+            date_trunc(
+              'day',
+              created_at
+            )
+
+          ORDER BY
+            day ASC
+
+          `,
+          [
+            businessId
+          ]
+        );
+
+
+      const daily =
+        dailyResult.rows.map(
+          item => ({
+
+            day:
+              item.day,
+
+            total:
+              Number(
+                item.total
+              ),
+
+            profile_views:
+              Number(
+                item.profile_views
+              ),
+
+            qr_scans:
+              Number(
+                item.qr_scans
+              ),
+
+            nfc_scans:
+              Number(
+                item.nfc_scans
+              ),
+
+            whatsapp:
+              Number(
+                item.whatsapp
+              ),
+
+            phone:
+              Number(
+                item.phone
+              ),
+
+            location:
+              Number(
+                item.location
+              ),
+
+            instagram:
+              Number(
+                item.instagram
+              ),
+
+            tiktok:
+              Number(
+                item.tiktok
+              ),
+
+            google_review:
+              Number(
+                item.google_review
+              ),
+
+            website:
+              Number(
+                item.website
+              ),
+
+            menu:
+              Number(
+                item.menu
+              ),
+
+            iban:
+              Number(
+                item.iban
+              )
+
+          })
+        );
+
+
+      /* CHANNELS */
+
+      const channels = [
+
+        {
+          key:
+            'profile_view',
+
+          label:
+            'Profil Görüntüleme',
+
+          value:
+            totals.profile_view || 0
+        },
+
+        {
+          key:
+            'whatsapp',
+
+          label:
+            'WhatsApp',
+
+          value:
+            totals.whatsapp || 0
+        },
+
+        {
+          key:
+            'phone',
+
+          label:
+            'Telefon',
+
+          value:
+            totals.phone || 0
+        },
+
+        {
+          key:
+            'location',
+
+          label:
+            'Konum',
+
+          value:
+            totals.location || 0
+        },
+
+        {
+          key:
+            'instagram',
+
+          label:
+            'Instagram',
+
+          value:
+            totals.instagram || 0
+        },
+
+        {
+          key:
+            'tiktok',
+
+          label:
+            'TikTok',
+
+          value:
+            totals.tiktok || 0
+        },
+
+        {
+          key:
+            'google_review',
+
+          label:
+            'Google Yorum',
+
+          value:
+            totals.google_review || 0
+        },
+
+        {
+          key:
+            'website',
+
+          label:
+            'Web Sitesi',
+
+          value:
+            totals.website || 0
+        },
+
+        {
+          key:
+            'menu',
+
+          label:
+            'Menü',
+
+          value:
+            totals.menu || 0
+        },
+
+        {
+          key:
+            'iban',
+
+          label:
+            'IBAN',
+
+          value:
+            totals.iban || 0
+        }
+
+      ];
+
+
+      /* QR / NFC */
+
+      const sources = {
+
+        qr:
+          (
+            totals.qr_scan || 0
+          )
+          +
+          (
+            totals.qr || 0
+          ),
+
+        nfc:
+          totals.nfc || 0
+
+      };
+
+
+      /* TOTAL */
+
+      const totalEvents =
+        Object.values(
+          totals
+        )
+          .reduce(
+            (
+              total,
+              value
+            ) =>
+              total +
+              Number(value || 0),
+            0
+          );
+
+
+      res.json({
+
+        ok:
+          true,
+
+        business,
+
+        period,
+
+        total_events:
+          totalEvents,
+
+        totals,
+
+        sources,
+
+        channels,
+
+        daily
+
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        'ANALYTICS ERROR:',
+        error
+      );
+
+
+      res
+        .status(500)
+        .json({
+
+          error:
+            'Detaylı analitik verileri alınamadı'
 
         });
 
@@ -1436,33 +1879,19 @@ app.put(
       const keys = [
 
         'name',
-
         'category',
-
         'description',
-
         'phone',
-
         'whatsapp',
-
         'address',
-
         'instagram',
-
         'tiktok',
-
         'google_review',
-
         'website',
-
         'menu',
-
         'iban',
-
         'iban_holder',
-
         'hours',
-
         'logo_url'
 
       ];
@@ -1782,13 +2211,9 @@ app.post(
           INSERT INTO businesses(
 
             name,
-
             slug,
-
             email,
-
             password_hash,
-
             category
 
           )
@@ -1796,13 +2221,9 @@ app.post(
           VALUES(
 
             $1,
-
             $2,
-
             $3,
-
             $4,
-
             $5
 
           )
@@ -1813,13 +2234,9 @@ app.post(
           [
 
             name,
-
             sl,
-
             normalizedEmail,
-
             passwordHash,
-
             category || ''
 
           ]
@@ -2112,33 +2529,19 @@ app.put(
       const keys = [
 
         'name',
-
         'category',
-
         'description',
-
         'phone',
-
         'whatsapp',
-
         'address',
-
         'instagram',
-
         'tiktok',
-
         'google_review',
-
         'website',
-
         'menu',
-
         'iban',
-
         'iban_holder',
-
         'hours',
-
         'logo_url'
 
       ];
@@ -2433,29 +2836,17 @@ app.post(
       const allowed = [
 
         'profile_view',
-
         'qr_scan',
-
         'qr',
-
         'nfc',
-
         'phone',
-
         'whatsapp',
-
         'location',
-
         'instagram',
-
         'tiktok',
-
         'google_review',
-
         'website',
-
         'menu',
-
         'iban'
 
       ];
@@ -2489,7 +2880,6 @@ app.post(
         INSERT INTO events(
 
           business_id,
-
           type
 
         )
@@ -2497,7 +2887,6 @@ app.post(
         VALUES(
 
           $1,
-
           $2
 
         )
@@ -2507,7 +2896,6 @@ app.post(
         [
 
           business.id,
-
           req.body.type
 
         ]
@@ -2564,39 +2952,22 @@ app.get(
           SELECT
 
             id,
-
             name,
-
             slug,
-
             category,
-
             description,
-
             phone,
-
             whatsapp,
-
             address,
-
             instagram,
-
             tiktok,
-
             google_review,
-
             website,
-
             menu,
-
             iban,
-
             iban_holder,
-
             hours,
-
             logo_url,
-
             created_at
 
           FROM businesses
@@ -2709,7 +3080,6 @@ app.get(
         INSERT INTO events(
 
           business_id,
-
           type
 
         )
@@ -2717,7 +3087,6 @@ app.get(
         VALUES(
 
           $1,
-
           $2
 
         )
@@ -2727,7 +3096,6 @@ app.get(
         [
 
           business.id,
-
           'profile_view'
 
         ]
@@ -2747,7 +3115,6 @@ app.get(
           INSERT INTO events(
 
             business_id,
-
             type
 
           )
@@ -2755,7 +3122,6 @@ app.get(
           VALUES(
 
             $1,
-
             $2
 
           )
@@ -2765,7 +3131,6 @@ app.get(
           [
 
             business.id,
-
             'qr_scan'
 
           ]
@@ -2787,7 +3152,6 @@ app.get(
           INSERT INTO events(
 
             business_id,
-
             type
 
           )
@@ -2795,7 +3159,6 @@ app.get(
           VALUES(
 
             $1,
-
             $2
 
           )
@@ -2805,7 +3168,6 @@ app.get(
           [
 
             business.id,
-
             'nfc'
 
           ]
@@ -2820,9 +3182,7 @@ app.get(
         path.join(
 
           __dirname,
-
           'public',
-
           'profile.html'
 
         )
@@ -2865,9 +3225,7 @@ app.get(
       path.join(
 
         __dirname,
-
         'public',
-
         'dashboard.html'
 
       )
@@ -2894,9 +3252,7 @@ app.get(
       path.join(
 
         __dirname,
-
         'public',
-
         'admin.html'
 
       )
@@ -2923,9 +3279,7 @@ app.get(
       path.join(
 
         __dirname,
-
         'public',
-
         'register.html'
 
       )
@@ -2952,9 +3306,7 @@ app.get(
       path.join(
 
         __dirname,
-
         'public',
-
         'login.html'
 
       )
@@ -2980,9 +3332,7 @@ app.use(
       path.join(
 
         __dirname,
-
         'public',
-
         'index.html'
 
       )
@@ -3012,7 +3362,7 @@ initDatabase()
 
           console.log(
 
-            `LEO CONNECT 3.3 çalışıyor: ${PORT}`
+            `LEO CONNECT 3.4 çalışıyor: ${PORT}`
 
           );
 
