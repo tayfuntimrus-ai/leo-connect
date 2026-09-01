@@ -4,206 +4,806 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const QR = require('qrcode');
+const QRCode = require('qrcode');
 const { Pool } = require('pg');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 
-const PORT =
-  process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
+const SECRET = process.env.JWT_SECRET || 'leo-connect-change-this-secret';
 
-const SECRET =
-  process.env.JWT_SECRET || 'change-me';
+app.use(cors());
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 
-/* =========================
-   DATABASE CHECK
-========================= */
+/* =========================================================
+   DATABASE
+========================================================= */
 
 if (!process.env.DATABASE_URL) {
-
-  console.error(
-    'DATABASE_URL bulunamadı!'
-  );
-
+  console.error('DATABASE_URL bulunamadı.');
   process.exit(1);
+}
 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl:
+    process.env.NODE_ENV === 'production'
+      ? { rejectUnauthorized: false }
+      : false
+});
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function slugify(value) {
+  return String(value || '')
+    .toLowerCase()
+    .trim()
+    .replace(/ğ/g, 'g')
+    .replace(/ü/g, 'u')
+    .replace(/ş/g, 's')
+    .replace(/ı/g, 'i')
+    .replace(/ö/g, 'o')
+    .replace(/ç/g, 'c')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 80);
 }
 
 
-/* =========================
-   DATABASE
-========================= */
-
-const pool =
-  new Pool({
-
-    connectionString:
-      process.env.DATABASE_URL,
-
-    ssl:
-      process.env.NODE_ENV === 'production'
-        ? {
-            rejectUnauthorized: false
-          }
-        : false
-
-  });
+function createNfcCode() {
+  return crypto.randomBytes(12).toString('hex');
+}
 
 
-/* =========================
-   APP
-========================= */
+function publicBusiness(row) {
+  if (!row) return null;
 
-app.use(cors());
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    email: row.email,
+    category: row.category || '',
+    description: row.description || '',
+    phone: row.phone || '',
+    whatsapp: row.whatsapp || '',
+    address: row.address || '',
+    instagram: row.instagram || '',
+    tiktok: row.tiktok || '',
+    google_review: row.google_review || '',
+    website: row.website || '',
+    menu: row.menu || '',
+    iban: row.iban || '',
+    iban_holder: row.iban_holder || '',
+    hours: row.hours || '',
+    logo_url: row.logo_url || '',
+    created_at: row.created_at
+  };
+}
 
-app.use(
-  express.json({
-    limit: '2mb'
-  })
-);
 
-app.use(
-  express.static(
-    path.join(
-      __dirname,
-      'public'
-    )
-  )
-);
+function nfcTagPublic(row) {
+  if (!row) return null;
+
+  const baseUrl =
+    process.env.PUBLIC_URL ||
+    process.env.RENDER_EXTERNAL_URL ||
+    '';
+
+  const url = baseUrl
+    ? `${baseUrl}/p/nfc/${row.code}`
+    : `/p/nfc/${row.code}`;
+
+  return {
+    id: row.id,
+    business_id: row.business_id,
+    name: row.name,
+    placement: row.placement || '',
+    code: row.code,
+    url,
+    is_active: row.is_active,
+    tap_count: Number(row.tap_count || 0),
+    last_tap: row.last_tap || null,
+    created_at: row.created_at,
+    updated_at: row.updated_at
+  };
+}
 
 
-/* =========================
-   DATABASE INITIALIZATION
-========================= */
+/* =========================================================
+   DATABASE INIT
+========================================================= */
 
 async function initDatabase() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS businesses (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      category TEXT DEFAULT '',
+      description TEXT DEFAULT '',
+      phone TEXT DEFAULT '',
+      whatsapp TEXT DEFAULT '',
+      address TEXT DEFAULT '',
+      instagram TEXT DEFAULT '',
+      tiktok TEXT DEFAULT '',
+      google_review TEXT DEFAULT '',
+      website TEXT DEFAULT '',
+      menu TEXT DEFAULT '',
+      iban TEXT DEFAULT '',
+      iban_holder TEXT DEFAULT '',
+      hours TEXT DEFAULT '',
+      logo_url TEXT DEFAULT '',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
 
   await pool.query(`
-
-    CREATE TABLE IF NOT EXISTS businesses(
-
+    CREATE TABLE IF NOT EXISTS events (
       id SERIAL PRIMARY KEY,
-
-      name TEXT NOT NULL,
-
-      slug TEXT UNIQUE,
-
-      email TEXT UNIQUE,
-
-      password_hash TEXT,
-
-      category TEXT,
-
-      description TEXT,
-
-      phone TEXT,
-
-      whatsapp TEXT,
-
-      address TEXT,
-
-      instagram TEXT,
-
-      tiktok TEXT,
-
-      google_review TEXT,
-
-      website TEXT,
-
-      menu TEXT,
-
-      iban TEXT,
-
-      iban_holder TEXT,
-
-      hours TEXT,
-
-      logo_url TEXT,
-
-      created_at
-        TIMESTAMP
-        DEFAULT CURRENT_TIMESTAMP
-
-    );
+      business_id INTEGER NOT NULL,
+      type TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
 
 
-    CREATE TABLE IF NOT EXISTS events(
+  /*
+    NFC TAGS
+  */
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS nfc_tags (
       id SERIAL PRIMARY KEY,
-
-      business_id
-        INTEGER
+      business_id INTEGER NOT NULL
         REFERENCES businesses(id)
         ON DELETE CASCADE,
 
-      type TEXT,
+      name TEXT NOT NULL,
+      placement TEXT DEFAULT '',
+      code TEXT UNIQUE NOT NULL,
 
-      created_at
-        TIMESTAMP
-        DEFAULT CURRENT_TIMESTAMP
+      is_active BOOLEAN NOT NULL DEFAULT TRUE,
 
-    );
-
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
   `);
 
+
+  /*
+    Eski events tablosuna NFC tag bağlantısı ekle.
+  */
+
+  await pool.query(`
+    ALTER TABLE events
+    ADD COLUMN IF NOT EXISTS nfc_tag_id INTEGER
+    REFERENCES nfc_tags(id)
+    ON DELETE SET NULL
+  `);
+
+
+  /*
+    Performans için indexler.
+  */
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_events_business_id
+    ON events(business_id)
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_events_type
+    ON events(type)
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_events_nfc_tag_id
+    ON events(nfc_tag_id)
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_nfc_tags_business_id
+    ON nfc_tags(business_id)
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_nfc_tags_code
+    ON nfc_tags(code)
+  `);
+
+  console.log('PostgreSQL + NFC Tag Management hazır.');
 }
 
 
-/* =========================
-   HELPERS
-========================= */
+/* =========================================================
+   AUTH
+========================================================= */
 
-function slug(value) {
+function auth(req, res, next) {
+  try {
+    const header = req.headers.authorization || '';
 
-  return String(value || '')
+    if (!header.startsWith('Bearer ')) {
+      return res.status(401).json({
+        error: 'Yetkilendirme gerekli'
+      });
+    }
 
-    .toLowerCase()
+    const token = header.substring(7);
 
-    .normalize('NFD')
+    const decoded = jwt.verify(token, SECRET);
 
-    .replace(
-      /[\u0300-\u036f]/g,
-      ''
-    )
+    if (!decoded || !decoded.id) {
+      return res.status(401).json({
+        error: 'Geçersiz token'
+      });
+    }
 
-    .replace(
-      /[^a-z0-9]+/g,
-      '-'
-    )
+    req.user = decoded;
 
-    .replace(
-      /^-|-$/g,
-      ''
-    )
+    next();
 
-    .slice(
-      0,
-      50
-    )
-
-    || 'isletme';
-
+  } catch (error) {
+    return res.status(401).json({
+      error: 'Oturum geçersiz veya süresi dolmuş'
+    });
+  }
 }
 
 
-/* =========================
-   PUBLIC BUSINESS DATA
-========================= */
+function adminAuth(req, res, next) {
+  try {
+    const header = req.headers.authorization || '';
 
-async function pub(id) {
+    if (!header.startsWith('Bearer ')) {
+      return res.status(401).json({
+        error: 'Admin yetkisi gerekli'
+      });
+    }
 
-  const result =
-    await pool.query(
-      `
+    const token = header.substring(7);
 
+    const decoded = jwt.verify(token, SECRET);
+
+    if (
+      !decoded ||
+      decoded.role !== 'admin'
+    ) {
+      return res.status(403).json({
+        error: 'Admin yetkisi gerekli'
+      });
+    }
+
+    req.admin = decoded;
+
+    next();
+
+  } catch (error) {
+    return res.status(401).json({
+      error: 'Admin oturumu geçersiz'
+    });
+  }
+}
+
+
+/* =========================================================
+   HEALTH
+========================================================= */
+
+app.get('/api/health', async (req, res) => {
+  try {
+
+    await pool.query('SELECT 1');
+
+    res.json({
+      ok: true,
+      version: '3.7-nfc-tags',
+      database: 'postgresql',
+      nfc_tags: true
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      ok: false,
+      error: 'Veritabanı bağlantı hatası'
+    });
+  }
+});
+
+
+/* =========================================================
+   ADMIN LOGIN
+========================================================= */
+
+app.post('/api/admin/login', async (req, res) => {
+
+  try {
+
+    const {
+      email,
+      password
+    } = req.body;
+
+    const adminEmail =
+      process.env.ADMIN_EMAIL || '';
+
+    const adminPassword =
+      process.env.ADMIN_PASSWORD || '';
+
+    if (!adminEmail || !adminPassword) {
+
+      return res.status(503).json({
+        error: 'Admin hesabı henüz yapılandırılmadı'
+      });
+
+    }
+
+    if (
+      String(email || '').trim().toLowerCase() !==
+      String(adminEmail).trim().toLowerCase() ||
+      String(password || '') !==
+      String(adminPassword)
+    ) {
+
+      return res.status(401).json({
+        error: 'Admin e-posta veya şifre hatalı'
+      });
+
+    }
+
+    const token = jwt.sign(
+      {
+        role: 'admin',
+        email: adminEmail
+      },
+      SECRET,
+      {
+        expiresIn: '7d'
+      }
+    );
+
+    res.json({
+      token,
+      admin: {
+        email: adminEmail
+      }
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Admin girişi sırasında hata oluştu'
+    });
+
+  }
+
+});
+
+
+/* =========================================================
+   ADMIN OVERVIEW
+========================================================= */
+
+app.get('/api/admin/overview', adminAuth, async (req, res) => {
+
+  try {
+
+    const businesses = await pool.query(`
+      SELECT COUNT(*)::int AS count
+      FROM businesses
+    `);
+
+    const events = await pool.query(`
+      SELECT COUNT(*)::int AS count
+      FROM events
+    `);
+
+    const profiles = await pool.query(`
+      SELECT COUNT(*)::int AS count
+      FROM events
+      WHERE type='profile_view'
+    `);
+
+    const qr = await pool.query(`
+      SELECT COUNT(*)::int AS count
+      FROM events
+      WHERE type IN ('qr_scan','qr')
+    `);
+
+    const nfc = await pool.query(`
+      SELECT COUNT(*)::int AS count
+      FROM events
+      WHERE type='nfc'
+    `);
+
+    const whatsapp = await pool.query(`
+      SELECT COUNT(*)::int AS count
+      FROM events
+      WHERE type='whatsapp'
+    `);
+
+    const phone = await pool.query(`
+      SELECT COUNT(*)::int AS count
+      FROM events
+      WHERE type='phone'
+    `);
+
+    const nfcTags = await pool.query(`
+      SELECT COUNT(*)::int AS count
+      FROM nfc_tags
+    `);
+
+    res.json({
+
+      businesses:
+        businesses.rows[0].count,
+
+      events:
+        events.rows[0].count,
+
+      profile_views:
+        profiles.rows[0].count,
+
+      qr_scans:
+        qr.rows[0].count,
+
+      nfc_scans:
+        nfc.rows[0].count,
+
+      whatsapp_clicks:
+        whatsapp.rows[0].count,
+
+      phone_clicks:
+        phone.rows[0].count,
+
+      nfc_tags:
+        nfcTags.rows[0].count
+
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Genel istatistikler alınamadı'
+    });
+
+  }
+
+});
+
+
+/* =========================================================
+   ADMIN BUSINESSES
+========================================================= */
+
+app.get('/api/admin/businesses', adminAuth, async (req, res) => {
+
+  try {
+
+    const result = await pool.query(`
       SELECT
 
-        id,
+        b.id,
+        b.name,
+        b.slug,
+        b.email,
+        b.category,
+        b.phone,
+        b.created_at,
+
+        COALESCE((
+          SELECT COUNT(*)
+          FROM events e
+          WHERE e.business_id = b.id
+          AND e.type = 'profile_view'
+        ),0)::int AS profile_views,
+
+        COALESCE((
+          SELECT COUNT(*)
+          FROM events e
+          WHERE e.business_id = b.id
+          AND e.type IN ('qr_scan','qr')
+        ),0)::int AS qr_scans,
+
+        COALESCE((
+          SELECT COUNT(*)
+          FROM events e
+          WHERE e.business_id = b.id
+          AND e.type = 'nfc'
+        ),0)::int AS nfc_scans,
+
+        COALESCE((
+          SELECT COUNT(*)
+          FROM events e
+          WHERE e.business_id = b.id
+          AND e.type = 'whatsapp'
+        ),0)::int AS whatsapp_clicks,
+
+        COALESCE((
+          SELECT COUNT(*)
+          FROM events e
+          WHERE e.business_id = b.id
+          AND e.type = 'phone'
+        ),0)::int AS phone_clicks,
+
+        COALESCE((
+          SELECT COUNT(*)
+          FROM nfc_tags t
+          WHERE t.business_id = b.id
+        ),0)::int AS nfc_tags
+
+      FROM businesses b
+
+      ORDER BY b.id DESC
+    `);
+
+    res.json(result.rows);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'İşletmeler alınamadı'
+    });
+
+  }
+
+});
+
+
+/* =========================================================
+   ADMIN BUSINESS DETAIL
+========================================================= */
+
+app.get(
+  '/api/admin/business/:id',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const id = Number(req.params.id);
+
+      const result = await pool.query(
+        `
+        SELECT *
+        FROM businesses
+        WHERE id=$1
+        `,
+        [id]
+      );
+
+      if (!result.rows.length) {
+
+        return res.status(404).json({
+          error: 'İşletme bulunamadı'
+        });
+
+      }
+
+      const business = result.rows[0];
+
+      const tags = await pool.query(`
+        SELECT
+          t.id,
+          t.name,
+          t.placement,
+          t.code,
+          t.is_active,
+          t.created_at,
+          t.updated_at,
+
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id = t.id
+            AND e.type='nfc'
+          ),0)::int AS tap_count,
+
+          (
+            SELECT MAX(e.created_at)
+            FROM events e
+            WHERE e.nfc_tag_id = t.id
+            AND e.type='nfc'
+          ) AS last_tap
+
+        FROM nfc_tags t
+
+        WHERE t.business_id=$1
+
+        ORDER BY t.id DESC
+      `, [id]);
+
+      res.json({
+        business: publicBusiness(business),
+        nfc_tags: tags.rows.map(nfcTagPublic)
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.status(500).json({
+        error: 'İşletme bilgileri alınamadı'
+      });
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   ADMIN BUSINESS ANALYTICS
+========================================================= */
+
+app.get(
+  '/api/admin/business/:id/analytics',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const businessId = Number(req.params.id);
+
+      const period =
+        req.query.period || 'all';
+
+      let where = `
+        business_id=$1
+      `;
+
+      let params = [businessId];
+
+      if (period === 'today') {
+
+        where += `
+          AND created_at >= CURRENT_DATE
+        `;
+
+      } else if (period === '7d') {
+
+        where += `
+          AND created_at >= CURRENT_TIMESTAMP - INTERVAL '7 days'
+        `;
+
+      } else if (period === '30d') {
+
+        where += `
+          AND created_at >= CURRENT_TIMESTAMP - INTERVAL '30 days'
+        `;
+
+      }
+
+      const result = await pool.query(`
+        SELECT
+          type,
+          COUNT(*)::int AS count
+        FROM events
+        WHERE ${where}
+        GROUP BY type
+        ORDER BY count DESC
+      `, params);
+
+      res.json({
+        period,
+        events: result.rows
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.status(500).json({
+        error: 'Analitik verileri alınamadı'
+      });
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   ADMIN BUSINESS QR
+========================================================= */
+
+app.get(
+  '/api/admin/business/:id/qr',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const id = Number(req.params.id);
+
+      const result = await pool.query(
+        `
+        SELECT slug
+        FROM businesses
+        WHERE id=$1
+        `,
+        [id]
+      );
+
+      if (!result.rows.length) {
+
+        return res.status(404).json({
+          error: 'İşletme bulunamadı'
+        });
+
+      }
+
+      const baseUrl =
+        process.env.PUBLIC_URL ||
+        process.env.RENDER_EXTERNAL_URL ||
+        `${req.protocol}://${req.get('host')}`;
+
+      const url =
+        `${baseUrl}/p/${result.rows[0].slug}?source=qr`;
+
+      const qr =
+        await QRCode.toDataURL(url, {
+          width: 900,
+          margin: 2,
+          errorCorrectionLevel: 'H'
+        });
+
+      res.json({
+        url,
+        qr
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.status(500).json({
+        error: 'QR oluşturulamadı'
+      });
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   ADMIN BUSINESS UPDATE
+========================================================= */
+
+app.put(
+  '/api/admin/business/:id',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const id = Number(req.params.id);
+
+      const {
         name,
-        slug,
-        email,
         category,
         description,
         phone,
@@ -218,999 +818,98 @@ async function pub(id) {
         iban_holder,
         hours,
         logo_url
+      } = req.body;
 
-      FROM businesses
+      if (!name) {
 
-      WHERE id=$1
-
-      `,
-      [id]
-    );
-
-
-  return (
-    result.rows[0]
-    || null
-  );
-
-}
-
-
-/* =========================
-   BUSINESS AUTH
-========================= */
-
-function auth(
-  req,
-  res,
-  next
-) {
-
-  try {
-
-    const token =
-      (
-        req.headers.authorization
-        || ''
-      )
-        .replace(
-          /^Bearer\s+/,
-          ''
-        );
-
-
-    const user =
-      jwt.verify(
-        token,
-        SECRET
-      );
-
-
-    if (
-      !user.id ||
-      (
-        user.role &&
-        user.role !== 'business'
-      )
-    ) {
-
-      return res
-        .status(403)
-        .json({
-
-          error:
-            'İşletme yetkisi gerekli'
-
+        return res.status(400).json({
+          error: 'İşletme adı gerekli'
         });
 
-    }
+      }
 
-
-    req.user =
-      user;
-
-
-    next();
-
-
-  } catch (error) {
-
-    res
-      .status(401)
-      .json({
-
-        error:
-          'Oturum gerekli'
-
-      });
-
-  }
-
-}
-
-
-/* =========================
-   ADMIN AUTH
-========================= */
-
-function adminAuth(
-  req,
-  res,
-  next
-) {
-
-  try {
-
-    const token =
-      (
-        req.headers.authorization
-        || ''
-      )
-        .replace(
-          /^Bearer\s+/,
-          ''
+      const current =
+        await pool.query(
+          `
+          SELECT slug
+          FROM businesses
+          WHERE id=$1
+          `,
+          [id]
         );
 
+      if (!current.rows.length) {
 
-    const user =
-      jwt.verify(
-        token,
-        SECRET
-      );
-
-
-    if (
-      user.role !== 'admin'
-    ) {
-
-      return res
-        .status(403)
-        .json({
-
-          error:
-            'Admin yetkisi gerekli'
-
+        return res.status(404).json({
+          error: 'İşletme bulunamadı'
         });
 
-    }
-
-
-    req.admin =
-      user;
-
-
-    next();
-
-
-  } catch (error) {
-
-    res
-      .status(401)
-      .json({
-
-        error:
-          'Admin oturumu gerekli'
-
-      });
-
-  }
-
-}
-
-
-/* =========================
-   HEALTH
-========================= */
-
-app.get(
-  '/api/health',
-  async (
-    req,
-    res
-  ) => {
-
-    try {
+      }
 
       await pool.query(
-        'SELECT 1'
+        `
+        UPDATE businesses
+
+        SET
+          name=$1,
+          category=$2,
+          description=$3,
+          phone=$4,
+          whatsapp=$5,
+          address=$6,
+          instagram=$7,
+          tiktok=$8,
+          google_review=$9,
+          website=$10,
+          menu=$11,
+          iban=$12,
+          iban_holder=$13,
+          hours=$14,
+          logo_url=$15
+
+        WHERE id=$16
+        `,
+        [
+          name,
+          category || '',
+          description || '',
+          phone || '',
+          whatsapp || '',
+          address || '',
+          instagram || '',
+          tiktok || '',
+          google_review || '',
+          website || '',
+          menu || '',
+          iban || '',
+          iban_holder || '',
+          hours || '',
+          logo_url || '',
+          id
+        ]
       );
 
-
-      res.json({
-
-        ok: true,
-
-        version:
-          '3.6-nfc-center'
-
-      });
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          ok: false,
-
-          error:
-            'Veritabanı bağlantı hatası'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN LOGIN
-========================= */
-
-app.post(
-  '/api/admin/login',
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const {
-        email,
-        password
-      } = req.body;
-
-
-      const adminEmail =
-        process.env.ADMIN_EMAIL
-        || '';
-
-
-      const adminPassword =
-        process.env.ADMIN_PASSWORD
-        || '';
-
-
-      if (
-        !adminEmail ||
-        !adminPassword
-      ) {
-
-        return res
-          .status(503)
-          .json({
-
-            error:
-              'Admin hesabı henüz yapılandırılmadı'
-
-          });
-
-      }
-
-
-      const emailMatch =
-        String(
-          email || ''
-        )
-          .trim()
-          .toLowerCase()
-        ===
-        String(
-          adminEmail
-        )
-          .trim()
-          .toLowerCase();
-
-
-      const passwordMatch =
-        String(
-          password || ''
-        )
-        ===
-        String(
-          adminPassword
-        );
-
-
-      if (
-        !emailMatch ||
-        !passwordMatch
-      ) {
-
-        return res
-          .status(401)
-          .json({
-
-            error:
-              'Admin e-posta veya şifre hatalı'
-
-          });
-
-      }
-
-
-      const token =
-        jwt.sign(
-
-          {
-            role:
-              'admin',
-
-            email:
-              adminEmail
-          },
-
-          SECRET,
-
-          {
-            expiresIn:
-              '7d'
-          }
-
-        );
-
-
-      res.json({
-
-        token,
-
-        admin: {
-
-          email:
-            adminEmail
-
-        }
-
-      });
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'Admin girişi sırasında hata oluştu'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN OVERVIEW
-========================= */
-
-app.get(
-  '/api/admin/overview',
-  adminAuth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const businesses =
+      const updated =
         await pool.query(
           `
-          SELECT
-            COUNT(*)::int AS count
+          SELECT *
           FROM businesses
-          `
-        );
-
-
-      const events =
-        await pool.query(
-          `
-          SELECT
-            COUNT(*)::int AS count
-          FROM events
-          `
-        );
-
-
-      const profiles =
-        await pool.query(
-          `
-          SELECT
-            COUNT(*)::int AS count
-          FROM events
-          WHERE type='profile_view'
-          `
-        );
-
-
-      const qr =
-        await pool.query(
-          `
-          SELECT
-            COUNT(*)::int AS count
-          FROM events
-          WHERE type IN(
-            'qr_scan',
-            'qr'
-          )
-          `
-        );
-
-
-      const nfc =
-        await pool.query(
-          `
-          SELECT
-            COUNT(*)::int AS count
-          FROM events
-          WHERE type='nfc'
-          `
-        );
-
-
-      const whatsapp =
-        await pool.query(
-          `
-          SELECT
-            COUNT(*)::int AS count
-          FROM events
-          WHERE type='whatsapp'
-          `
-        );
-
-
-      const phone =
-        await pool.query(
-          `
-          SELECT
-            COUNT(*)::int AS count
-          FROM events
-          WHERE type='phone'
-          `
-        );
-
-
-      res.json({
-
-        businesses:
-          businesses.rows[0].count,
-
-        events:
-          events.rows[0].count,
-
-        profile_views:
-          profiles.rows[0].count,
-
-        qr_scans:
-          qr.rows[0].count,
-
-        nfc_scans:
-          nfc.rows[0].count,
-
-        whatsapp_clicks:
-          whatsapp.rows[0].count,
-
-        phone_clicks:
-          phone.rows[0].count
-
-      });
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'Genel istatistikler alınamadı'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN BUSINESS LIST
-========================= */
-
-app.get(
-  '/api/admin/businesses',
-  adminAuth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-
-            b.id,
-            b.name,
-            b.slug,
-            b.email,
-            b.category,
-            b.phone,
-            b.created_at,
-
-            COALESCE((
-              SELECT COUNT(*)
-              FROM events e
-              WHERE
-                e.business_id=b.id
-              AND
-                e.type='profile_view'
-            ),0)::int
-            AS profile_views,
-
-            COALESCE((
-              SELECT COUNT(*)
-              FROM events e
-              WHERE
-                e.business_id=b.id
-              AND
-                e.type IN(
-                  'qr_scan',
-                  'qr'
-                )
-            ),0)::int
-            AS qr_scans,
-
-            COALESCE((
-              SELECT COUNT(*)
-              FROM events e
-              WHERE
-                e.business_id=b.id
-              AND
-                e.type='nfc'
-            ),0)::int
-            AS nfc_scans,
-
-            COALESCE((
-              SELECT COUNT(*)
-              FROM events e
-              WHERE
-                e.business_id=b.id
-              AND
-                e.type='whatsapp'
-            ),0)::int
-            AS whatsapp_clicks,
-
-            COALESCE((
-              SELECT COUNT(*)
-              FROM events e
-              WHERE
-                e.business_id=b.id
-              AND
-                e.type='phone'
-            ),0)::int
-            AS phone_clicks
-
-          FROM businesses b
-
-          ORDER BY
-            b.id DESC
-
-          `
-        );
-
-
-      res.json(
-        result.rows
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'İşletmeler alınamadı'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN CREATE BUSINESS
-========================= */
-
-app.post(
-  '/api/admin/business',
-  adminAuth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const {
-        name,
-        email,
-        password,
-        category
-      } = req.body;
-
-
-      if (
-        !name ||
-        !email ||
-        !password
-      ) {
-
-        return res
-          .status(400)
-          .json({
-
-            error:
-              'İşletme adı, e-posta ve şifre gerekli'
-
-          });
-
-      }
-
-
-      if (
-        String(password).length < 8
-      ) {
-
-        return res
-          .status(400)
-          .json({
-
-            error:
-              'Şifre en az 8 karakter olmalı'
-
-          });
-
-      }
-
-
-      const normalizedEmail =
-        String(email)
-          .trim()
-          .toLowerCase();
-
-
-      const existing =
-        await pool.query(
-          `
-          SELECT id
-          FROM businesses
-          WHERE email=$1
-          `,
-          [
-            normalizedEmail
-          ]
-        );
-
-
-      if (
-        existing.rows.length
-      ) {
-
-        return res
-          .status(409)
-          .json({
-
-            error:
-              'Bu e-posta adresi zaten kayıtlı'
-
-          });
-
-      }
-
-
-      const base =
-        slug(
-          name
-        );
-
-
-      let businessSlug =
-        base;
-
-
-      let number =
-        1;
-
-
-      while (true) {
-
-        const check =
-          await pool.query(
-            `
-            SELECT id
-            FROM businesses
-            WHERE slug=$1
-            `,
-            [
-              businessSlug
-            ]
-          );
-
-
-        if (
-          !check.rows.length
-        ) {
-
-          break;
-
-        }
-
-
-        number++;
-
-        businessSlug =
-          base +
-          '-' +
-          number;
-
-      }
-
-
-      const passwordHash =
-        await bcrypt.hash(
-          String(password),
-          12
-        );
-
-
-      const result =
-        await pool.query(
-          `
-          INSERT INTO businesses(
-
-            name,
-            slug,
-            email,
-            password_hash,
-            category
-
-          )
-
-          VALUES(
-
-            $1,
-            $2,
-            $3,
-            $4,
-            $5
-
-          )
-
-          RETURNING id
-
-          `,
-          [
-
-            String(name)
-              .trim(),
-
-            businessSlug,
-
-            normalizedEmail,
-
-            passwordHash,
-
-            String(
-              category || ''
-            ).trim()
-
-          ]
-        );
-
-
-      const business =
-        await pub(
-          result.rows[0].id
-        );
-
-
-      res
-        .status(201)
-        .json({
-
-          ok:
-            true,
-
-          business
-
-        });
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'Yeni işletme oluşturulamadı'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN BUSINESS DETAIL
-========================= */
-
-app.get(
-  '/api/admin/business/:id',
-  adminAuth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-
-            id,
-            name,
-            slug,
-            email,
-            category,
-            description,
-            phone,
-            whatsapp,
-            address,
-            instagram,
-            tiktok,
-            google_review,
-            website,
-            menu,
-            iban,
-            iban_holder,
-            hours,
-            logo_url,
-            created_at
-
-          FROM businesses
-
           WHERE id=$1
-
           `,
-          [
-            req.params.id
-          ]
+          [id]
         );
-
-
-      const business =
-        result.rows[0];
-
-
-      if (!business) {
-
-        return res
-          .status(404)
-          .json({
-
-            error:
-              'İşletme bulunamadı'
-
-          });
-
-      }
-
-
-      const statsResult =
-        await pool.query(
-          `
-          SELECT
-
-            type,
-
-            COUNT(*)::int
-            AS count
-
-          FROM events
-
-          WHERE
-            business_id=$1
-
-          GROUP BY
-            type
-
-          ORDER BY
-            type
-
-          `,
-          [
-            business.id
-          ]
-        );
-
-
-      const stats = {};
-
-
-      statsResult.rows.forEach(
-        item => {
-
-          stats[item.type] =
-            item.count;
-
-        }
-      );
-
-
-      const totalEvents =
-        await pool.query(
-          `
-          SELECT
-            COUNT(*)::int AS count
-          FROM events
-          WHERE business_id=$1
-          `,
-          [
-            business.id
-          ]
-        );
-
 
       res.json({
-
-        business,
-
-        stats,
-
-        total_events:
-          totalEvents.rows[0].count
-
+        business: publicBusiness(updated.rows[0])
       });
-
 
     } catch (error) {
 
-      console.error(
-        error
-      );
+      console.error(error);
 
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'İşletme detayları alınamadı'
-
-        });
+      res.status(500).json({
+        error: 'İşletme güncellenemedi'
+      });
 
     }
 
@@ -1218,841 +917,48 @@ app.get(
 );
 
 
-/* =========================
-   ADVANCED BUSINESS ANALYTICS
-========================= */
-
-app.get(
-  '/api/admin/business/:id/analytics',
-  adminAuth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const businessId =
-        req.params.id;
-
-
-      const allowedPeriods = [
-        'today',
-        '7d',
-        '30d',
-        'all'
-      ];
-
-
-      const period =
-        allowedPeriods.includes(
-          String(
-            req.query.period || '30d'
-          )
-        )
-          ? String(
-              req.query.period || '30d'
-            )
-          : '30d';
-
-
-      const businessResult =
-        await pool.query(
-          `
-          SELECT
-
-            id,
-            name,
-            slug
-
-          FROM businesses
-
-          WHERE id=$1
-
-          `,
-          [
-            businessId
-          ]
-        );
-
-
-      const business =
-        businessResult.rows[0];
-
-
-      if (!business) {
-
-        return res
-          .status(404)
-          .json({
-
-            error:
-              'İşletme bulunamadı'
-
-          });
-
-      }
-
-
-      let dateCondition =
-        '';
-
-      if (
-        period === 'today'
-      ) {
-
-        dateCondition =
-          `
-          AND created_at >=
-            CURRENT_DATE
-          `;
-
-      }
-
-      if (
-        period === '7d'
-      ) {
-
-        dateCondition =
-          `
-          AND created_at >=
-            CURRENT_DATE - INTERVAL '6 days'
-          `;
-
-      }
-
-      if (
-        period === '30d'
-      ) {
-
-        dateCondition =
-          `
-          AND created_at >=
-            CURRENT_DATE - INTERVAL '29 days'
-          `;
-
-      }
-
-
-      const totalResult =
-        await pool.query(
-          `
-          SELECT
-
-            type,
-
-            COUNT(*)::int
-            AS count
-
-          FROM events
-
-          WHERE
-            business_id=$1
-
-          ${dateCondition}
-
-          GROUP BY
-            type
-
-          ORDER BY
-            count DESC
-
-          `,
-          [
-            businessId
-          ]
-        );
-
-
-      const totals = {};
-
-
-      totalResult.rows.forEach(
-        item => {
-
-          totals[item.type] =
-            Number(
-              item.count
-            );
-
-        }
-      );
-
-
-      const dailyResult =
-        await pool.query(
-          `
-          SELECT
-
-            date_trunc(
-              'day',
-              created_at
-            ) AS day,
-
-            COUNT(*)::int
-              AS total,
-
-            COUNT(*) FILTER(
-              WHERE type='profile_view'
-            )::int
-              AS profile_views,
-
-            COUNT(*) FILTER(
-              WHERE type IN(
-                'qr_scan',
-                'qr'
-              )
-            )::int
-              AS qr_scans,
-
-            COUNT(*) FILTER(
-              WHERE type='nfc'
-            )::int
-              AS nfc_scans,
-
-            COUNT(*) FILTER(
-              WHERE type='whatsapp'
-            )::int
-              AS whatsapp,
-
-            COUNT(*) FILTER(
-              WHERE type='phone'
-            )::int
-              AS phone,
-
-            COUNT(*) FILTER(
-              WHERE type='location'
-            )::int
-              AS location,
-
-            COUNT(*) FILTER(
-              WHERE type='instagram'
-            )::int
-              AS instagram,
-
-            COUNT(*) FILTER(
-              WHERE type='tiktok'
-            )::int
-              AS tiktok,
-
-            COUNT(*) FILTER(
-              WHERE type='google_review'
-            )::int
-              AS google_review,
-
-            COUNT(*) FILTER(
-              WHERE type='website'
-            )::int
-              AS website,
-
-            COUNT(*) FILTER(
-              WHERE type='menu'
-            )::int
-              AS menu,
-
-            COUNT(*) FILTER(
-              WHERE type='iban'
-            )::int
-              AS iban
-
-          FROM events
-
-          WHERE
-            business_id=$1
-
-          ${dateCondition}
-
-          GROUP BY
-            date_trunc(
-              'day',
-              created_at
-            )
-
-          ORDER BY
-            day ASC
-
-          `,
-          [
-            businessId
-          ]
-        );
-
-
-      const daily =
-        dailyResult.rows.map(
-          item => ({
-
-            day:
-              item.day,
-
-            total:
-              Number(
-                item.total
-              ),
-
-            profile_views:
-              Number(
-                item.profile_views
-              ),
-
-            qr_scans:
-              Number(
-                item.qr_scans
-              ),
-
-            nfc_scans:
-              Number(
-                item.nfc_scans
-              ),
-
-            whatsapp:
-              Number(
-                item.whatsapp
-              ),
-
-            phone:
-              Number(
-                item.phone
-              ),
-
-            location:
-              Number(
-                item.location
-              ),
-
-            instagram:
-              Number(
-                item.instagram
-              ),
-
-            tiktok:
-              Number(
-                item.tiktok
-              ),
-
-            google_review:
-              Number(
-                item.google_review
-              ),
-
-            website:
-              Number(
-                item.website
-              ),
-
-            menu:
-              Number(
-                item.menu
-              ),
-
-            iban:
-              Number(
-                item.iban
-              )
-
-          })
-        );
-
-
-      const channels = [
-
-        {
-          key:
-            'profile_view',
-
-          label:
-            'Profil Görüntüleme',
-
-          value:
-            totals.profile_view || 0
-        },
-
-        {
-          key:
-            'whatsapp',
-
-          label:
-            'WhatsApp',
-
-          value:
-            totals.whatsapp || 0
-        },
-
-        {
-          key:
-            'phone',
-
-          label:
-            'Telefon',
-
-          value:
-            totals.phone || 0
-        },
-
-        {
-          key:
-            'location',
-
-          label:
-            'Konum',
-
-          value:
-            totals.location || 0
-        },
-
-        {
-          key:
-            'instagram',
-
-          label:
-            'Instagram',
-
-          value:
-            totals.instagram || 0
-        },
-
-        {
-          key:
-            'tiktok',
-
-          label:
-            'TikTok',
-
-          value:
-            totals.tiktok || 0
-        },
-
-        {
-          key:
-            'google_review',
-
-          label:
-            'Google Yorum',
-
-          value:
-            totals.google_review || 0
-        },
-
-        {
-          key:
-            'website',
-
-          label:
-            'Web Sitesi',
-
-          value:
-            totals.website || 0
-        },
-
-        {
-          key:
-            'menu',
-
-          label:
-            'Menü',
-
-          value:
-            totals.menu || 0
-        },
-
-        {
-          key:
-            'iban',
-
-          label:
-            'IBAN',
-
-          value:
-            totals.iban || 0
-        }
-
-      ];
-
-
-      const sources = {
-
-        qr:
-          (
-            totals.qr_scan || 0
-          )
-          +
-          (
-            totals.qr || 0
-          ),
-
-        nfc:
-          totals.nfc || 0
-
-      };
-
-
-      const totalEvents =
-        Object.values(
-          totals
-        )
-          .reduce(
-            (
-              total,
-              value
-            ) =>
-              total +
-              Number(value || 0),
-            0
-          );
-
-
-      res.json({
-
-        ok:
-          true,
-
-        business,
-
-        period,
-
-        total_events:
-          totalEvents,
-
-        totals,
-
-        sources,
-
-        channels,
-
-        daily
-
-      });
-
-
-    } catch (error) {
-
-      console.error(
-        'ANALYTICS ERROR:',
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'Detaylı analitik verileri alınamadı'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN BUSINESS QR
-========================= */
-
-app.get(
-  '/api/admin/business/:id/qr',
-  adminAuth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const business =
-        await pub(
-          req.params.id
-        );
-
-
-      if (!business) {
-
-        return res
-          .status(404)
-          .json({
-
-            error:
-              'İşletme bulunamadı'
-
-          });
-
-      }
-
-
-      const protocol =
-        req.get(
-          'x-forwarded-proto'
-        )
-        ||
-        req.protocol;
-
-
-      const host =
-        req.get(
-          'host'
-        );
-
-
-      const url =
-        `${protocol}://${host}/p/${business.slug}?source=qr`;
-
-
-      const dataUrl =
-        await QR.toDataURL(
-          url,
-          {
-
-            width:
-              900,
-
-            margin:
-              2,
-
-            errorCorrectionLevel:
-              'H'
-
-          }
-        );
-
-
-      res.json({
-
-        url,
-
-        dataUrl
-
-      });
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'QR kod oluşturulamadı'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN UPDATE BUSINESS
-========================= */
-
-app.put(
-  '/api/admin/business/:id',
-  adminAuth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const keys = [
-
-        'name',
-        'category',
-        'description',
-        'phone',
-        'whatsapp',
-        'address',
-        'instagram',
-        'tiktok',
-        'google_review',
-        'website',
-        'menu',
-        'iban',
-        'iban_holder',
-        'hours',
-        'logo_url'
-
-      ];
-
-
-      const values =
-        keys.map(
-          key =>
-            req.body[key]
-            ?? ''
-        );
-
-
-      const setClause =
-        keys
-          .map(
-            (
-              key,
-              index
-            ) =>
-              `${key}=$${index + 1}`
-          )
-          .join(',');
-
-
-      const result =
-        await pool.query(
-
-          `
-          UPDATE businesses
-
-          SET
-            ${setClause}
-
-          WHERE
-            id=$${keys.length + 1}
-
-          RETURNING id
-
-          `,
-
-          [
-
-            ...values,
-
-            req.params.id
-
-          ]
-
-        );
-
-
-      if (
-        !result.rows.length
-      ) {
-
-        return res
-          .status(404)
-          .json({
-
-            error:
-              'İşletme bulunamadı'
-
-          });
-
-      }
-
-
-      const business =
-        await pub(
-          req.params.id
-        );
-
-
-      res.json({
-
-        ok:
-          true,
-
-        business
-
-      });
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'İşletme güncellenemedi'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN DELETE BUSINESS
-========================= */
+/* =========================================================
+   ADMIN BUSINESS DELETE
+========================================================= */
 
 app.delete(
   '/api/admin/business/:id',
   adminAuth,
-  async (
-    req,
-    res
-  ) => {
+  async (req, res) => {
 
     try {
+
+      const id = Number(req.params.id);
 
       const result =
         await pool.query(
           `
           DELETE FROM businesses
-
           WHERE id=$1
-
           RETURNING id
-
           `,
-          [
-            req.params.id
-          ]
+          [id]
         );
 
+      if (!result.rows.length) {
 
-      if (
-        !result.rows.length
-      ) {
-
-        return res
-          .status(404)
-          .json({
-
-            error:
-              'İşletme bulunamadı'
-
-          });
+        return res.status(404).json({
+          error: 'İşletme bulunamadı'
+        });
 
       }
 
-
       res.json({
-
-        ok:
-          true
-
+        success: true
       });
-
 
     } catch (error) {
 
-      console.error(
-        error
-      );
+      console.error(error);
 
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'İşletme silinemedi'
-
-        });
+      res.status(500).json({
+        error: 'İşletme silinemedi'
+      });
 
     }
 
@@ -2060,231 +966,771 @@ app.delete(
 );
 
 
-/* =========================
+/* =========================================================
    REGISTER
-========================= */
+========================================================= */
 
-app.post(
-  '/api/register',
-  async (
-    req,
-    res
-  ) => {
+app.post('/api/register', async (req, res) => {
 
-    try {
+  try {
 
-      const {
-        name,
-        email,
-        password,
-        category
-      } = req.body;
+    const {
+      name,
+      email,
+      password,
+      category
+    } = req.body;
 
+    if (
+      !name ||
+      !email ||
+      !password ||
+      password.length < 8
+    ) {
 
-      if (
-        !name ||
-        !email ||
-        !password ||
-        password.length < 8
-      ) {
+      return res.status(400).json({
+        error:
+          'İşletme adı, e-posta ve 8+ karakter şifre gerekli'
+      });
 
-        return res
-          .status(400)
-          .json({
+    }
 
-            error:
-              'İşletme adı, e-posta ve 8+ karakter şifre gerekli'
+    const normalizedEmail =
+      String(email).trim().toLowerCase();
 
-          });
+    const existing =
+      await pool.query(
+        `
+        SELECT id
+        FROM businesses
+        WHERE email=$1
+        `,
+        [normalizedEmail]
+      );
 
-      }
+    if (existing.rows.length) {
 
+      return res.status(409).json({
+        error: 'E-posta zaten kayıtlı'
+      });
 
-      const normalizedEmail =
-        String(email)
-          .trim()
-          .toLowerCase();
+    }
 
+    const base =
+      slugify(name) || 'business';
 
-      const existing =
+    let sl = base;
+    let n = 1;
+
+    while (true) {
+
+      const check =
         await pool.query(
           `
           SELECT id
           FROM businesses
-          WHERE email=$1
+          WHERE slug=$1
           `,
-          [
-            normalizedEmail
-          ]
+          [sl]
         );
 
-
-      if (
-        existing.rows.length
-      ) {
-
-        return res
-          .status(409)
-          .json({
-
-            error:
-              'E-posta zaten kayıtlı'
-
-          });
-
+      if (!check.rows.length) {
+        break;
       }
 
+      n++;
 
-      const base =
-        slug(
-          name
-        );
+      sl =
+        `${base}-${n}`;
+    }
 
+    const passwordHash =
+      await bcrypt.hash(
+        password,
+        12
+      );
 
-      let sl =
-        base;
+    const result =
+      await pool.query(
+        `
+        INSERT INTO businesses(
+          name,
+          slug,
+          email,
+          password_hash,
+          category
+        )
 
+        VALUES(
+          $1,
+          $2,
+          $3,
+          $4,
+          $5
+        )
 
-      let n =
-        1;
+        RETURNING *
+        `,
+        [
+          name,
+          sl,
+          normalizedEmail,
+          passwordHash,
+          category || ''
+        ]
+      );
 
+    const business =
+      result.rows[0];
 
-      while (true) {
-
-        const check =
-          await pool.query(
-            `
-            SELECT id
-            FROM businesses
-            WHERE slug=$1
-            `,
-            [
-              sl
-            ]
-          );
-
-
-        if (
-          !check.rows.length
-        ) {
-
-          break;
-
+    const token =
+      jwt.sign(
+        {
+          id: business.id,
+          email: business.email,
+          role: 'business'
+        },
+        SECRET,
+        {
+          expiresIn: '30d'
         }
+      );
+
+    res.status(201).json({
+      token,
+      business: publicBusiness(business)
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Kayıt sırasında hata oluştu'
+    });
+
+  }
+
+});
 
 
-        n++;
+/* =========================================================
+   LOGIN
+========================================================= */
+
+app.post('/api/login', async (req, res) => {
+
+  try {
+
+    const {
+      email,
+      password
+    } = req.body;
+
+    if (!email || !password) {
+
+      return res.status(400).json({
+        error: 'E-posta ve şifre gerekli'
+      });
+
+    }
+
+    const normalizedEmail =
+      String(email).trim().toLowerCase();
+
+    const result =
+      await pool.query(
+        `
+        SELECT *
+        FROM businesses
+        WHERE email=$1
+        `,
+        [normalizedEmail]
+      );
+
+    if (!result.rows.length) {
+
+      return res.status(401).json({
+        error: 'E-posta veya şifre hatalı'
+      });
+
+    }
+
+    const business =
+      result.rows[0];
+
+    const valid =
+      await bcrypt.compare(
+        password,
+        business.password_hash
+      );
+
+    if (!valid) {
+
+      return res.status(401).json({
+        error: 'E-posta veya şifre hatalı'
+      });
+
+    }
+
+    const token =
+      jwt.sign(
+        {
+          id: business.id,
+          email: business.email,
+          role: 'business'
+        },
+        SECRET,
+        {
+          expiresIn: '30d'
+        }
+      );
+
+    res.json({
+      token,
+      business: publicBusiness(business)
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Giriş sırasında hata oluştu'
+    });
+
+  }
+
+});
 
 
-        sl =
-          base +
-          '-' +
-          n;
+/* =========================================================
+   ME
+========================================================= */
 
-      }
+app.get('/api/me', auth, async (req, res) => {
+
+  try {
+
+    const result =
+      await pool.query(
+        `
+        SELECT *
+        FROM businesses
+        WHERE id=$1
+        `,
+        [req.user.id]
+      );
+
+    if (!result.rows.length) {
+
+      return res.status(404).json({
+        error: 'İşletme bulunamadı'
+      });
+
+    }
+
+    res.json(
+      publicBusiness(result.rows[0])
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Profil alınamadı'
+    });
+
+  }
+
+});
 
 
-      const passwordHash =
-        await bcrypt.hash(
-          password,
-          12
-        );
+/* =========================================================
+   UPDATE ME
+========================================================= */
 
+app.put('/api/me', auth, async (req, res) => {
+
+  try {
+
+    const {
+      name,
+      category,
+      description,
+      phone,
+      whatsapp,
+      address,
+      instagram,
+      tiktok,
+      google_review,
+      website,
+      menu,
+      iban,
+      iban_holder,
+      hours,
+      logo_url
+    } = req.body;
+
+    if (!name) {
+
+      return res.status(400).json({
+        error: 'İşletme adı gerekli'
+      });
+
+    }
+
+    await pool.query(
+      `
+      UPDATE businesses
+
+      SET
+        name=$1,
+        category=$2,
+        description=$3,
+        phone=$4,
+        whatsapp=$5,
+        address=$6,
+        instagram=$7,
+        tiktok=$8,
+        google_review=$9,
+        website=$10,
+        menu=$11,
+        iban=$12,
+        iban_holder=$13,
+        hours=$14,
+        logo_url=$15
+
+      WHERE id=$16
+      `,
+      [
+        name,
+        category || '',
+        description || '',
+        phone || '',
+        whatsapp || '',
+        address || '',
+        instagram || '',
+        tiktok || '',
+        google_review || '',
+        website || '',
+        menu || '',
+        iban || '',
+        iban_holder || '',
+        hours || '',
+        logo_url || '',
+        req.user.id
+      ]
+    );
+
+    const result =
+      await pool.query(
+        `
+        SELECT *
+        FROM businesses
+        WHERE id=$1
+        `,
+        [req.user.id]
+      );
+
+    res.json({
+      business:
+        publicBusiness(result.rows[0])
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Profil güncellenemedi'
+    });
+
+  }
+
+});
+
+
+/* =========================================================
+   QR
+========================================================= */
+
+app.get('/api/qr', auth, async (req, res) => {
+
+  try {
+
+    const result =
+      await pool.query(
+        `
+        SELECT slug
+        FROM businesses
+        WHERE id=$1
+        `,
+        [req.user.id]
+      );
+
+    if (!result.rows.length) {
+
+      return res.status(404).json({
+        error: 'İşletme bulunamadı'
+      });
+
+    }
+
+    const baseUrl =
+      process.env.PUBLIC_URL ||
+      process.env.RENDER_EXTERNAL_URL ||
+      `${req.protocol}://${req.get('host')}`;
+
+    const url =
+      `${baseUrl}/p/${result.rows[0].slug}?source=qr`;
+
+    const qr =
+      await QRCode.toDataURL(
+        url,
+        {
+          width: 900,
+          margin: 2,
+          errorCorrectionLevel: 'H'
+        }
+      );
+
+    res.json({
+      url,
+      qr
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'QR oluşturulamadı'
+    });
+
+  }
+
+});
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+app.get('/api/stats', auth, async (req, res) => {
+
+  try {
+
+    const result =
+      await pool.query(
+        `
+        SELECT
+          COUNT(*)::int AS total_events,
+
+          COUNT(*) FILTER(
+            WHERE type='profile_view'
+          )::int AS profile_views,
+
+          COUNT(*) FILTER(
+            WHERE type IN ('qr_scan','qr')
+          )::int AS qr_scans,
+
+          COUNT(*) FILTER(
+            WHERE type='nfc'
+          )::int AS nfc_scans,
+
+          COUNT(*) FILTER(
+            WHERE type='whatsapp'
+          )::int AS whatsapp_clicks,
+
+          COUNT(*) FILTER(
+            WHERE type='phone'
+          )::int AS phone_clicks,
+
+          COUNT(*) FILTER(
+            WHERE type='instagram'
+          )::int AS instagram_clicks,
+
+          COUNT(*) FILTER(
+            WHERE type='tiktok'
+          )::int AS tiktok_clicks,
+
+          COUNT(*) FILTER(
+            WHERE type='website'
+          )::int AS website_clicks,
+
+          COUNT(*) FILTER(
+            WHERE type='menu'
+          )::int AS menu_clicks,
+
+          COUNT(*) FILTER(
+            WHERE type='google_review'
+          )::int AS google_review_clicks
+
+        FROM events
+
+        WHERE business_id=$1
+        `,
+        [req.user.id]
+      );
+
+    const tags =
+      await pool.query(
+        `
+        SELECT COUNT(*)::int AS count
+        FROM nfc_tags
+        WHERE business_id=$1
+        `,
+        [req.user.id]
+      );
+
+    res.json({
+      ...result.rows[0],
+      nfc_tags: tags.rows[0].count
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'İstatistikler alınamadı'
+    });
+
+  }
+
+});
+
+
+/* =========================================================
+   EVENT
+========================================================= */
+
+app.post('/api/event/:slug', async (req, res) => {
+
+  try {
+
+    const slug =
+      String(req.params.slug || '');
+
+    const type =
+      String(req.body.type || '');
+
+    const allowedTypes = [
+      'profile_view',
+      'qr_scan',
+      'qr',
+      'nfc',
+      'whatsapp',
+      'phone',
+      'instagram',
+      'tiktok',
+      'website',
+      'menu',
+      'google_review'
+    ];
+
+    if (!allowedTypes.includes(type)) {
+
+      return res.status(400).json({
+        error: 'Geçersiz event tipi'
+      });
+
+    }
+
+    const business =
+      await pool.query(
+        `
+        SELECT id
+        FROM businesses
+        WHERE slug=$1
+        `,
+        [slug]
+      );
+
+    if (!business.rows.length) {
+
+      return res.status(404).json({
+        error: 'İşletme bulunamadı'
+      });
+
+    }
+
+    await pool.query(
+      `
+      INSERT INTO events(
+        business_id,
+        type
+      )
+
+      VALUES(
+        $1,
+        $2
+      )
+      `,
+      [
+        business.rows[0].id,
+        type
+      ]
+    );
+
+    res.json({
+      success: true
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Event kaydedilemedi'
+    });
+
+  }
+
+});
+
+
+/* =========================================================
+   NFC TAG MANAGEMENT 2.0
+========================================================= */
+
+
+/*
+   GET ALL TAGS
+*/
+
+app.get('/api/nfc-tags', auth, async (req, res) => {
+
+  try {
+
+    const result =
+      await pool.query(
+        `
+        SELECT
+
+          t.id,
+          t.business_id,
+          t.name,
+          t.placement,
+          t.code,
+          t.is_active,
+          t.created_at,
+          t.updated_at,
+
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type='nfc'
+          ),0)::int AS tap_count,
+
+          (
+            SELECT MAX(e.created_at)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type='nfc'
+          ) AS last_tap
+
+        FROM nfc_tags t
+
+        WHERE t.business_id=$1
+
+        ORDER BY t.id DESC
+        `,
+        [req.user.id]
+      );
+
+    res.json(
+      result.rows.map(nfcTagPublic)
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'NFC etiketleri alınamadı'
+    });
+
+  }
+
+});
+
+
+/*
+   GET SINGLE TAG
+*/
+
+app.get(
+  '/api/nfc-tags/:id',
+  auth,
+  async (req, res) => {
+
+    try {
+
+      const id =
+        Number(req.params.id);
 
       const result =
         await pool.query(
           `
-          INSERT INTO businesses(
+          SELECT
 
-            name,
-            slug,
-            email,
-            password_hash,
-            category
+            t.id,
+            t.business_id,
+            t.name,
+            t.placement,
+            t.code,
+            t.is_active,
+            t.created_at,
+            t.updated_at,
 
-          )
+            COALESCE((
+              SELECT COUNT(*)
+              FROM events e
+              WHERE e.nfc_tag_id=t.id
+              AND e.type='nfc'
+            ),0)::int AS tap_count,
 
-          VALUES(
+            (
+              SELECT MAX(e.created_at)
+              FROM events e
+              WHERE e.nfc_tag_id=t.id
+              AND e.type='nfc'
+            ) AS last_tap
 
-            $1,
-            $2,
-            $3,
-            $4,
-            $5
+          FROM nfc_tags t
 
-          )
-
-          RETURNING id
-
+          WHERE t.id=$1
+          AND t.business_id=$2
           `,
           [
-
-            name,
-            sl,
-            normalizedEmail,
-            passwordHash,
-            category || ''
-
+            id,
+            req.user.id
           ]
-
         );
 
+      if (!result.rows.length) {
 
-      const business =
-        await pub(
-          result.rows[0].id
-        );
+        return res.status(404).json({
+          error: 'NFC etiketi bulunamadı'
+        });
 
+      }
 
-      const token =
-        jwt.sign(
-
-          {
-
-            id:
-              business.id,
-
-            role:
-              'business'
-
-          },
-
-          SECRET,
-
-          {
-
-            expiresIn:
-              '7d'
-
-          }
-
-        );
-
-
-      res.json({
-
-        token,
-
-        business
-
-      });
-
+      res.json(
+        nfcTagPublic(result.rows[0])
+      );
 
     } catch (error) {
 
-      console.error(
-        error
-      );
+      console.error(error);
 
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'Kayıt sırasında hata oluştu'
-
-        });
+      res.status(500).json({
+        error: 'NFC etiketi alınamadı'
+      });
 
     }
 
@@ -2292,1030 +1738,754 @@ app.post(
 );
 
 
-/* =========================
-   BUSINESS LOGIN
-========================= */
+/*
+   CREATE TAG
+*/
 
-app.post(
-  '/api/login',
-  async (
-    req,
-    res
-  ) => {
+app.post('/api/nfc-tags', auth, async (req, res) => {
+
+  try {
+
+    const {
+      name,
+      placement
+    } = req.body;
+
+    const tagName =
+      String(name || '').trim();
+
+    const tagPlacement =
+      String(placement || '').trim();
+
+    if (!tagName) {
+
+      return res.status(400).json({
+        error: 'NFC etiket adı gerekli'
+      });
+
+    }
+
+    let code = '';
+
+    /*
+      Benzersiz code üret.
+    */
+
+    for (let i = 0; i < 10; i++) {
+
+      const candidate =
+        createNfcCode();
+
+      const exists =
+        await pool.query(
+          `
+          SELECT id
+          FROM nfc_tags
+          WHERE code=$1
+          `,
+          [candidate]
+        );
+
+      if (!exists.rows.length) {
+
+        code = candidate;
+
+        break;
+      }
+
+    }
+
+    if (!code) {
+
+      return res.status(500).json({
+        error: 'NFC kodu oluşturulamadı'
+      });
+
+    }
+
+    const result =
+      await pool.query(
+        `
+        INSERT INTO nfc_tags(
+          business_id,
+          name,
+          placement,
+          code,
+          is_active
+        )
+
+        VALUES(
+          $1,
+          $2,
+          $3,
+          $4,
+          TRUE
+        )
+
+        RETURNING *
+        `,
+        [
+          req.user.id,
+          tagName,
+          tagPlacement,
+          code
+        ]
+      );
+
+    res.status(201).json({
+      tag:
+        nfcTagPublic(result.rows[0])
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'NFC etiketi oluşturulamadı'
+    });
+
+  }
+
+});
+
+
+/*
+   UPDATE TAG
+*/
+
+app.put(
+  '/api/nfc-tags/:id',
+  auth,
+  async (req, res) => {
 
     try {
 
-      const normalizedEmail =
-        String(
-          req.body.email
-          || ''
-        )
-          .trim()
-          .toLowerCase();
+      const id =
+        Number(req.params.id);
 
+      const {
+        name,
+        placement,
+        is_active
+      } = req.body;
+
+      const tagName =
+        String(name || '').trim();
+
+      const tagPlacement =
+        String(placement || '').trim();
+
+      if (!tagName) {
+
+        return res.status(400).json({
+          error: 'NFC etiket adı gerekli'
+        });
+
+      }
+
+      const active =
+        typeof is_active === 'boolean'
+          ? is_active
+          : true;
+
+      const result =
+        await pool.query(
+          `
+          UPDATE nfc_tags
+
+          SET
+            name=$1,
+            placement=$2,
+            is_active=$3,
+            updated_at=CURRENT_TIMESTAMP
+
+          WHERE id=$4
+          AND business_id=$5
+
+          RETURNING *
+          `,
+          [
+            tagName,
+            tagPlacement,
+            active,
+            id,
+            req.user.id
+          ]
+        );
+
+      if (!result.rows.length) {
+
+        return res.status(404).json({
+          error: 'NFC etiketi bulunamadı'
+        });
+
+      }
+
+      /*
+        İstatistikleri tekrar hesaplayarak döndür.
+      */
+
+      const stats =
+        await pool.query(
+          `
+          SELECT
+
+            COALESCE((
+              SELECT COUNT(*)
+              FROM events e
+              WHERE e.nfc_tag_id=t.id
+              AND e.type='nfc'
+            ),0)::int AS tap_count,
+
+            (
+              SELECT MAX(e.created_at)
+              FROM events e
+              WHERE e.nfc_tag_id=t.id
+              AND e.type='nfc'
+            ) AS last_tap
+
+          FROM nfc_tags t
+
+          WHERE t.id=$1
+          `,
+          [id]
+        );
+
+      const tag = {
+        ...result.rows[0],
+        tap_count:
+          stats.rows[0]?.tap_count || 0,
+        last_tap:
+          stats.rows[0]?.last_tap || null
+      };
+
+      res.json({
+        tag:
+          nfcTagPublic(tag)
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.status(500).json({
+        error: 'NFC etiketi güncellenemedi'
+      });
+
+    }
+
+  }
+);
+
+
+/*
+   DELETE TAG
+*/
+
+app.delete(
+  '/api/nfc-tags/:id',
+  auth,
+  async (req, res) => {
+
+    try {
+
+      const id =
+        Number(req.params.id);
+
+      const result =
+        await pool.query(
+          `
+          DELETE FROM nfc_tags
+
+          WHERE id=$1
+          AND business_id=$2
+
+          RETURNING id
+          `,
+          [
+            id,
+            req.user.id
+          ]
+        );
+
+      if (!result.rows.length) {
+
+        return res.status(404).json({
+          error: 'NFC etiketi bulunamadı'
+        });
+
+      }
+
+      res.json({
+        success: true,
+        id
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.status(500).json({
+        error: 'NFC etiketi silinemedi'
+      });
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   NFC TAG ANALYTICS
+========================================================= */
+
+app.get(
+  '/api/nfc-tags/:id/analytics',
+  auth,
+  async (req, res) => {
+
+    try {
+
+      const id =
+        Number(req.params.id);
+
+      const tag =
+        await pool.query(
+          `
+          SELECT id
+          FROM nfc_tags
+          WHERE id=$1
+          AND business_id=$2
+          `,
+          [
+            id,
+            req.user.id
+          ]
+        );
+
+      if (!tag.rows.length) {
+
+        return res.status(404).json({
+          error: 'NFC etiketi bulunamadı'
+        });
+
+      }
+
+      const total =
+        await pool.query(
+          `
+          SELECT
+            COUNT(*)::int AS total_taps,
+            MAX(created_at) AS last_tap
+          FROM events
+
+          WHERE nfc_tag_id=$1
+          AND type='nfc'
+          `,
+          [id]
+        );
+
+      const daily =
+        await pool.query(
+          `
+          SELECT
+
+            DATE(created_at) AS date,
+            COUNT(*)::int AS taps
+
+          FROM events
+
+          WHERE nfc_tag_id=$1
+          AND type='nfc'
+
+          GROUP BY DATE(created_at)
+
+          ORDER BY date DESC
+
+          LIMIT 90
+          `,
+          [id]
+        );
+
+      res.json({
+        total_taps:
+          total.rows[0].total_taps,
+
+        last_tap:
+          total.rows[0].last_tap,
+
+        daily:
+          daily.rows
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.status(500).json({
+        error: 'NFC analizleri alınamadı'
+      });
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   PUBLIC NFC TAG ROUTE
+========================================================= */
+
+/*
+   DİKKAT:
+
+   Bu route /p/:slug route'undan ÖNCE bulunuyor.
+
+   NFC TAG:
+   /p/nfc/CODE
+
+   -> tag bulunur
+   -> işletme bulunur
+   -> NFC event'i tag ID ile kaydedilir
+   -> profile.html açılır
+*/
+
+app.get(
+  '/p/nfc/:code',
+  async (req, res) => {
+
+    try {
+
+      const code =
+        String(req.params.code || '').trim();
+
+      if (!code) {
+
+        return res.status(404).send(
+          'NFC etiketi bulunamadı'
+        );
+
+      }
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            t.id AS tag_id,
+            t.business_id,
+            t.is_active,
+
+            b.slug
+
+          FROM nfc_tags t
+
+          INNER JOIN businesses b
+            ON b.id=t.business_id
+
+          WHERE t.code=$1
+
+          LIMIT 1
+          `,
+          [code]
+        );
+
+      if (!result.rows.length) {
+
+        return res.status(404).send(
+          'NFC etiketi bulunamadı'
+        );
+
+      }
+
+      const tag =
+        result.rows[0];
+
+      /*
+        Pasif tag çalışmaz.
+      */
+
+      if (!tag.is_active) {
+
+        return res.status(410).send(`
+          <!DOCTYPE html>
+          <html lang="tr">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport"
+              content="width=device-width,initial-scale=1">
+            <title>NFC Pasif</title>
+
+            <style>
+              body{
+                margin:0;
+                min-height:100vh;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                background:#050505;
+                color:#fff;
+                font-family:Arial,sans-serif;
+                text-align:center;
+                padding:30px;
+                box-sizing:border-box;
+              }
+
+              .box{
+                max-width:420px;
+                padding:35px;
+                border:1px solid rgba(212,175,55,.3);
+                border-radius:24px;
+                background:#0c0c0c;
+              }
+
+              .icon{
+                font-size:54px;
+                margin-bottom:20px;
+              }
+
+              h1{
+                margin:0 0 12px;
+                font-size:26px;
+              }
+
+              p{
+                color:#aaa;
+                line-height:1.6;
+                margin:0;
+              }
+            </style>
+          </head>
+
+          <body>
+
+            <div class="box">
+
+              <div class="icon">
+                📡
+              </div>
+
+              <h1>
+                NFC etiketi pasif
+              </h1>
+
+              <p>
+                Bu NFC bağlantısı şu anda aktif değil.
+              </p>
+
+            </div>
+
+          </body>
+          </html>
+        `);
+
+      }
+
+      /*
+        Önce profil görüntüleme.
+      */
+
+      await pool.query(
+        `
+        INSERT INTO events(
+          business_id,
+          type,
+          nfc_tag_id
+        )
+
+        VALUES(
+          $1,
+          'profile_view',
+          $2
+        )
+        `,
+        [
+          tag.business_id,
+          tag.tag_id
+        ]
+      );
+
+
+      /*
+        Sonra gerçek NFC tap.
+      */
+
+      await pool.query(
+        `
+        INSERT INTO events(
+          business_id,
+          type,
+          nfc_tag_id
+        )
+
+        VALUES(
+          $1,
+          'nfc',
+          $2
+        )
+        `,
+        [
+          tag.business_id,
+          tag.tag_id
+        ]
+      );
+
+
+      /*
+        Profile aç.
+      */
+
+      return res.sendFile(
+        path.join(
+          __dirname,
+          'public',
+          'profile.html'
+        )
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.status(500).send(
+        'NFC bağlantısı açılırken hata oluştu'
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   PUBLIC PROFILE
+========================================================= */
+
+app.get(
+  '/p/:slug',
+  async (req, res) => {
+
+    try {
+
+      const slug =
+        String(req.params.slug || '');
 
       const result =
         await pool.query(
           `
           SELECT *
-
           FROM businesses
-
-          WHERE
-            email=$1
-
+          WHERE slug=$1
           `,
-          [
-            normalizedEmail
-          ]
+          [slug]
         );
 
+      if (!result.rows.length) {
+
+        return res.status(404).send(
+          'İşletme bulunamadı'
+        );
+
+      }
 
       const business =
         result.rows[0];
 
-
-      if (
-        !business ||
-        !business.password_hash
-      ) {
-
-        return res
-          .status(401)
-          .json({
-
-            error:
-              'E-posta veya şifre hatalı'
-
-          });
-
-      }
-
-
-      const validPassword =
-        await bcrypt.compare(
-
-          req.body.password
-          || '',
-
-          business.password_hash
-
-        );
-
-
-      if (
-        !validPassword
-      ) {
-
-        return res
-          .status(401)
-          .json({
-
-            error:
-              'E-posta veya şifre hatalı'
-
-          });
-
-      }
-
-
-      const token =
-        jwt.sign(
-
-          {
-
-            id:
-              business.id,
-
-            role:
-              'business'
-
-          },
-
-          SECRET,
-
-          {
-
-            expiresIn:
-              '7d'
-
-          }
-
-        );
-
-
-      res.json({
-
-        token,
-
-        business:
-          await pub(
-            business.id
-          )
-
-      });
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'Giriş sırasında hata oluştu'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   CURRENT BUSINESS
-========================= */
-
-app.get(
-  '/api/me',
-  auth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const business =
-        await pub(
-          req.user.id
-        );
-
-
-      if (!business) {
-
-        return res
-          .status(404)
-          .json({
-
-            error:
-              'İşletme bulunamadı'
-
-          });
-
-      }
-
-
-      res.json(
-        business
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'İşletme bilgileri alınamadı'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   UPDATE CURRENT BUSINESS
-========================= */
-
-app.put(
-  '/api/me',
-  auth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const keys = [
-
-        'name',
-        'category',
-        'description',
-        'phone',
-        'whatsapp',
-        'address',
-        'instagram',
-        'tiktok',
-        'google_review',
-        'website',
-        'menu',
-        'iban',
-        'iban_holder',
-        'hours',
-        'logo_url'
-
-      ];
-
-
-      const values =
-        keys.map(
-          key =>
-            req.body[key]
-            ?? ''
-        );
-
-
-      const setClause =
-        keys
-          .map(
-            (
-              key,
-              index
-            ) =>
-              `${key}=$${index + 1}`
-          )
-          .join(',');
-
+      /*
+        Profile view
+      */
 
       await pool.query(
-
-        `
-        UPDATE businesses
-
-        SET
-          ${setClause}
-
-        WHERE
-          id=$${keys.length + 1}
-
-        `,
-
-        [
-
-          ...values,
-
-          req.user.id
-
-        ]
-
-      );
-
-
-      res.json(
-
-        await pub(
-          req.user.id
-        )
-
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'Bilgiler güncellenemedi'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   QR CODE
-========================= */
-
-app.get(
-  '/api/qr',
-  auth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const business =
-        await pub(
-          req.user.id
-        );
-
-
-      if (!business) {
-
-        return res
-          .status(404)
-          .json({
-
-            error:
-              'İşletme bulunamadı'
-
-          });
-
-      }
-
-
-      const protocol =
-        req.get(
-          'x-forwarded-proto'
-        )
-        ||
-        req.protocol;
-
-
-      const host =
-        req.get(
-          'host'
-        );
-
-
-      const base =
-        `${protocol}://${host}`;
-
-
-      const url =
-        `${base}/p/${business.slug}?source=qr`;
-
-
-      const dataUrl =
-        await QR.toDataURL(
-
-          url,
-
-          {
-
-            width:
-              900,
-
-            margin:
-              2,
-
-            errorCorrectionLevel:
-              'H'
-
-          }
-
-        );
-
-
-      res.json({
-
-        url,
-
-        dataUrl
-
-      });
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'QR kod oluşturulamadı'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   BUSINESS STATISTICS
-========================= */
-
-app.get(
-  '/api/stats',
-  auth,
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-
-            type,
-
-            COUNT(*)::int
-            AS count
-
-          FROM events
-
-          WHERE
-            business_id=$1
-
-          GROUP BY
-            type
-
-          ORDER BY
-            type
-
-          `,
-          [
-            req.user.id
-          ]
-        );
-
-
-      const rows =
-        result.rows;
-
-
-      const stats = {
-
-        total_events:
-          rows.reduce(
-            (
-              total,
-              item
-            ) =>
-              total +
-              Number(
-                item.count || 0
-              ),
-            0
-          ),
-
-        profile_views:
-          0,
-
-        qr_scans:
-          0,
-
-        nfc_scans:
-          0,
-
-        whatsapp_clicks:
-          0,
-
-        phone_clicks:
-          0
-
-      };
-
-
-      rows.forEach(
-        item => {
-
-          const count =
-            Number(
-              item.count || 0
-            );
-
-
-          if (
-            item.type ===
-            'profile_view'
-          ) {
-
-            stats.profile_views =
-              count;
-
-          }
-
-
-          if (
-            item.type ===
-            'qr_scan'
-          ) {
-
-            stats.qr_scans +=
-              count;
-
-          }
-
-
-          if (
-            item.type ===
-            'qr'
-          ) {
-
-            stats.qr_scans +=
-              count;
-
-          }
-
-
-          if (
-            item.type ===
-            'nfc'
-          ) {
-
-            stats.nfc_scans =
-              count;
-
-          }
-
-
-          if (
-            item.type ===
-            'whatsapp'
-          ) {
-
-            stats.whatsapp_clicks =
-              count;
-
-          }
-
-
-          if (
-            item.type ===
-            'phone'
-          ) {
-
-            stats.phone_clicks =
-              count;
-
-          }
-
-        }
-      );
-
-
-      rows.forEach(
-        item => {
-
-          stats[item.type] =
-            Number(
-              item.count || 0
-            );
-
-        }
-      );
-
-
-      res.json(
-        stats
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'İstatistikler alınamadı'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   EVENT TRACKING
-========================= */
-
-app.post(
-  '/api/event/:slug',
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          SELECT id
-
-          FROM businesses
-
-          WHERE
-            slug=$1
-
-          `,
-          [
-            req.params.slug
-          ]
-        );
-
-
-      const business =
-        result.rows[0];
-
-
-      const allowed = [
-
-        'profile_view',
-        'qr_scan',
-        'qr',
-        'nfc',
-        'phone',
-        'whatsapp',
-        'location',
-        'instagram',
-        'tiktok',
-        'google_review',
-        'website',
-        'menu',
-        'iban'
-
-      ];
-
-
-      if (
-
-        !business ||
-
-        !allowed.includes(
-          req.body.type
-        )
-
-      ) {
-
-        return res
-          .status(400)
-          .json({
-
-            error:
-              'Geçersiz etkinlik'
-
-          });
-
-      }
-
-
-      await pool.query(
-
         `
         INSERT INTO events(
-
           business_id,
           type
-
         )
 
         VALUES(
-
           $1,
-          $2
-
-        )
-
-        `,
-
-        [
-
-          business.id,
-          req.body.type
-
-        ]
-
-      );
-
-
-      res.json({
-
-        ok:
-          true
-
-      });
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'Etkinlik kaydedilemedi'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   PUBLIC PROFILE API
-========================= */
-
-app.get(
-  '/api/profile/:slug',
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-
-            id,
-            name,
-            slug,
-            category,
-            description,
-            phone,
-            whatsapp,
-            address,
-            instagram,
-            tiktok,
-            google_review,
-            website,
-            menu,
-            iban,
-            iban_holder,
-            hours,
-            logo_url,
-            created_at
-
-          FROM businesses
-
-          WHERE
-            slug=$1
-
-          `,
-          [
-            req.params.slug
-          ]
-        );
-
-
-      const business =
-        result.rows[0];
-
-
-      if (!business) {
-
-        return res
-          .status(404)
-          .json({
-
-            error:
-              'Profil bulunamadı'
-
-          });
-
-      }
-
-
-      res.json(
-        business
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      res
-        .status(500)
-        .json({
-
-          error:
-            'Profil alınamadı'
-
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   PUBLIC PROFILE
-========================= */
-
-app.get(
-  '/p/:slug',
-  async (
-    req,
-    res
-  ) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          SELECT id
-
-          FROM businesses
-
-          WHERE
-            slug=$1
-
-          `,
-          [
-            req.params.slug
-          ]
-        );
-
-
-      const business =
-        result.rows[0];
-
-
-      if (!business) {
-
-        return res
-          .status(404)
-          .send(
-            'Profil bulunamadı'
-          );
-
-      }
-
-
-      /* PROFILE VIEW */
-
-      await pool.query(
-
-        `
-        INSERT INTO events(
-
-          business_id,
-          type
-
-        )
-
-        VALUES(
-
-          $1,
-          $2
-
-        )
-
-        `,
-
-        [
-
-          business.id,
           'profile_view'
-
-        ]
-
+        )
+        `,
+        [business.id]
       );
 
 
-      /* QR */
+      /*
+        QR
+      */
 
       if (
         req.query.source === 'qr'
       ) {
 
         await pool.query(
-
           `
           INSERT INTO events(
-
             business_id,
             type
-
           )
 
           VALUES(
-
             $1,
-            $2
-
-          )
-
-          `,
-
-          [
-
-            business.id,
             'qr_scan'
-
-          ]
-
+          )
+          `,
+          [business.id]
         );
 
       }
 
 
-      /* NFC */
+      /*
+        Eski NFC bağlantıları:
+
+        /p/slug?source=nfc
+
+        Bunlar yeni tag sistemi kullanılmadan
+        oluşturulmuş NFC bağlantıları olabilir.
+
+        Backward compatibility korunuyor.
+      */
 
       if (
         req.query.source === 'nfc'
       ) {
 
         await pool.query(
-
           `
           INSERT INTO events(
-
             business_id,
             type
-
           )
 
           VALUES(
-
             $1,
-            $2
-
-          )
-
-          `,
-
-          [
-
-            business.id,
             'nfc'
-
-          ]
-
+          )
+          `,
+          [business.id]
         );
 
       }
 
 
       res.sendFile(
-
         path.join(
-
           __dirname,
           'public',
           'profile.html'
-
         )
-
       );
-
 
     } catch (error) {
 
-      console.error(
-        error
+      console.error(error);
+
+      res.status(500).send(
+        'Profil açılırken hata oluştu'
       );
-
-
-      res
-        .status(500)
-        .send(
-          'Profil açılırken hata oluştu'
-        );
 
     }
 
@@ -3323,238 +2493,192 @@ app.get(
 );
 
 
-/* =========================
-   DASHBOARD
-========================= */
+/* =========================================================
+   DASHBOARD PAGE
+========================================================= */
 
 app.get(
   '/dashboard',
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
 
     res.sendFile(
-
       path.join(
-
         __dirname,
         'public',
         'dashboard.html'
-
       )
-
     );
 
   }
 );
 
 
-/* =========================
+/* =========================================================
    QR CENTER
-========================= */
+========================================================= */
 
 app.get(
   '/qr-center',
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
 
     res.sendFile(
-
       path.join(
-
         __dirname,
         'public',
         'qr-center.html'
-
       )
-
     );
 
   }
 );
 
 
-/* =========================
+/* =========================================================
    NFC CENTER
-========================= */
+========================================================= */
 
 app.get(
   '/nfc-center',
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
 
     res.sendFile(
-
       path.join(
-
         __dirname,
         'public',
         'nfc-center.html'
-
       )
-
     );
 
   }
 );
 
 
-/* =========================
+/* =========================================================
    ADMIN PAGE
-========================= */
+========================================================= */
 
 app.get(
   '/admin',
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
 
     res.sendFile(
-
       path.join(
-
         __dirname,
         'public',
         'admin.html'
-
       )
-
     );
 
   }
 );
 
 
-/* =========================
+/* =========================================================
    REGISTER PAGE
-========================= */
+========================================================= */
 
 app.get(
   '/register',
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
 
     res.sendFile(
-
       path.join(
-
         __dirname,
         'public',
         'register.html'
-
       )
-
     );
 
   }
 );
 
 
-/* =========================
+/* =========================================================
    LOGIN PAGE
-========================= */
+========================================================= */
 
 app.get(
   '/login',
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
 
     res.sendFile(
-
       path.join(
-
         __dirname,
         'public',
         'login.html'
-
       )
-
     );
 
   }
 );
 
 
-/* =========================
+/* =========================================================
    MAIN PAGE
-========================= */
+========================================================= */
 
-app.use(
-  (
-    req,
-    res
-  ) => {
+app.get(
+  '/',
+  (req, res) => {
 
     res.sendFile(
-
       path.join(
-
         __dirname,
         'public',
         'index.html'
-
       )
-
     );
 
   }
 );
 
 
-/* =========================
+/* =========================================================
+   FALLBACK
+========================================================= */
+
+app.use(
+  (req, res) => {
+
+    res.sendFile(
+      path.join(
+        __dirname,
+        'public',
+        'index.html'
+      )
+    );
+
+  }
+);
+
+
+/* =========================================================
    START
-========================= */
+========================================================= */
 
 initDatabase()
+  .then(() => {
 
-  .then(
-    () => {
+    app.listen(
+      PORT,
+      '0.0.0.0',
+      () => {
 
-      app.listen(
+        console.log(
+          `LEO CONNECT 3.7 NFC TAGS çalışıyor: ${PORT}`
+        );
 
-        PORT,
+      }
+    );
 
-        '0.0.0.0',
+  })
+  .catch(error => {
 
-        () => {
+    console.error(
+      'DATABASE BAŞLATMA HATASI:',
+      error
+    );
 
-          console.log(
+    process.exit(1);
 
-            `LEO CONNECT 3.6 çalışıyor: ${PORT}`
-
-          );
-
-        }
-
-      );
-
-    }
-
-  )
-
-  .catch(
-    error => {
-
-      console.error(
-
-        'DATABASE BAŞLATMA HATASI:',
-
-        error
-
-      );
-
-
-      process.exit(1);
-
-    }
-  );
+  });
