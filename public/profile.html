@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/style.css">
 
   <style>
+
     .profile-wrap{
       width:min(520px,92%);
       margin:auto;
@@ -16,21 +17,34 @@
 
     .profile-box{
       background:#fff;
-      border-radius:22px;
+      border-radius:24px;
       padding:32px 24px;
       text-align:center;
       box-shadow:0 25px 80px #0005;
     }
 
     .profile-logo{
-      width:78px;
-      height:78px;
-      margin:0 auto 15px;
+      width:96px;
+      height:96px;
+      margin:0 auto 18px;
       border-radius:50%;
       background:#171717;
       display:grid;
       place-items:center;
-      font-size:42px;
+      overflow:hidden;
+      font-size:45px;
+    }
+
+    .profile-logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .profile-brand{
+      color:#b1843d;
+      font-size:14px;
+      letter-spacing:.08em;
     }
 
     .profile-name{
@@ -41,6 +55,7 @@
     .profile-category{
       color:#a17a3e;
       font-weight:700;
+      font-size:18px;
     }
 
     .profile-description{
@@ -56,8 +71,10 @@
       padding:16px;
       margin:10px 0;
       border:1px solid #e2ded5;
-      border-radius:10px;
+      border-radius:14px;
       background:#fff;
+      color:#171717;
+      text-decoration:none;
       transition:.2s;
     }
 
@@ -67,39 +84,50 @@
     }
 
     .profile-icon{
-      width:38px;
-      height:38px;
-      border-radius:8px;
+      width:42px;
+      height:42px;
+      min-width:42px;
+      border-radius:10px;
       background:#f3efe7;
       display:grid;
       place-items:center;
-      font-size:19px;
+      font-size:20px;
     }
 
     .profile-link-text{
       text-align:left;
       font-weight:800;
+      flex:1;
     }
 
-    .profile-footer{
-      margin-top:25px;
-      font-size:10px;
-      letter-spacing:.18em;
-      color:#a17a3e;
+    .profile-link-sub{
+      display:block;
+      font-size:11px;
+      color:#888;
+      font-weight:500;
+      margin-top:3px;
     }
 
     .copy-iban{
       border:0;
       background:#171717;
       color:#fff;
-      padding:6px 9px;
-      border-radius:5px;
-      font-size:10px;
-      margin-left:auto;
+      padding:9px 12px;
+      border-radius:7px;
+      font-size:11px;
       cursor:pointer;
     }
+
+    .profile-footer{
+      margin-top:28px;
+      font-size:10px;
+      letter-spacing:.18em;
+      color:#a17a3e;
+    }
+
   </style>
 </head>
+
 
 <body>
 
@@ -109,23 +137,36 @@
 
     <div class="profile-box" id="profileBox">
 
-      <div class="profile-logo">
+      <div class="profile-logo" id="logo">
         🦁
       </div>
 
-      <small>LEO CONNECT</small>
+      <div class="profile-brand">
+        LEO CONNECT
+      </div>
 
-      <h1 class="profile-name" id="businessName">
+      <h1
+        class="profile-name"
+        id="businessName"
+      >
         Yükleniyor...
       </h1>
 
-      <div class="profile-category" id="category"></div>
+      <div
+        class="profile-category"
+        id="category"
+      ></div>
 
-      <p class="profile-description" id="description"></p>
+      <p
+        class="profile-description"
+        id="description"
+      ></p>
 
       <div id="links"></div>
 
-      <div class="profile-footer">
+      <div
+        class="profile-footer"
+      >
         DOKUN • BAĞLAN • KEŞFET • BÜYÜT
       </div>
 
@@ -145,12 +186,41 @@ const slug =
     .pop();
 
 
+async function track(type){
+
+  try{
+
+    await fetch(
+      "/api/event/" + slug,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          type:type
+        })
+      }
+    );
+
+  }catch(e){
+
+    console.log("Tracking error:",e);
+
+  }
+
+}
+
+
 async function loadProfile(){
 
   try{
 
     const response =
-      await fetch("/api/profile/" + slug);
+      await fetch(
+        "/api/profile/" + slug
+      );
+
 
     const business =
       await response.json();
@@ -158,7 +228,9 @@ async function loadProfile(){
 
     if(!response.ok){
 
-      document.getElementById("profileBox").innerHTML =
+      document.getElementById(
+        "profileBox"
+      ).innerHTML =
         "<h2>Profil bulunamadı</h2>";
 
       return;
@@ -166,38 +238,106 @@ async function loadProfile(){
     }
 
 
-    document.getElementById("businessName").textContent =
+    document.getElementById(
+      "businessName"
+    ).textContent =
       business.name || "İşletme";
 
 
-    document.getElementById("category").textContent =
+    document.getElementById(
+      "category"
+    ).textContent =
       business.category || "";
 
 
-    document.getElementById("description").textContent =
+    document.getElementById(
+      "description"
+    ).textContent =
       business.description || "";
+
+
+    /* LOGO */
+
+    if(business.logo_url){
+
+      const logo =
+        document.getElementById("logo");
+
+      logo.innerHTML =
+        '<img src="' +
+        business.logo_url +
+        '" alt="İşletme logosu">';
+
+    }
 
 
     const links =
       document.getElementById("links");
 
 
-    function addLink(icon,title,url){
+    function addLink(
+      icon,
+      title,
+      url,
+      eventType,
+      subtitle
+    ){
 
-      if(!url || url === "#") return;
+      if(
+        !url ||
+        url === "#"
+      ) return;
 
 
       const a =
         document.createElement("a");
 
-      a.className="profile-link";
 
-      a.href=url;
+      a.className =
+        "profile-link";
+
+
+      a.href =
+        url;
+
+
+      if(
+        !url.startsWith("tel:")
+      ){
+
+        a.target="_blank";
+        a.rel="noopener noreferrer";
+
+      }
 
 
       a.innerHTML =
-        '<div class="profile-icon">'+icon+'</div>' +
-        '<div class="profile-link-text">'+title+'</div>';
+        '<div class="profile-icon">' +
+        icon +
+        '</div>' +
+
+        '<div class="profile-link-text">' +
+        title +
+
+        (
+          subtitle
+            ? '<span class="profile-link-sub">' +
+              subtitle +
+              '</span>'
+            : ''
+        ) +
+
+        '</div>';
+
+
+      a.addEventListener(
+        "click",
+        function(){
+
+          track(eventType);
+
+        }
+      );
 
 
       links.appendChild(a);
@@ -205,74 +345,189 @@ async function loadProfile(){
     }
 
 
+    /* TELEFON */
+
     if(business.phone){
 
       addLink(
         "📞",
         "Telefon",
-        "tel:" + business.phone
+        "tel:" + business.phone,
+        "phone"
       );
 
     }
 
+
+    /* WHATSAPP */
+
+    if(business.whatsapp){
+
+      let whatsapp =
+        business.whatsapp;
+
+
+      if(
+        !whatsapp.includes("http")
+      ){
+
+        let number =
+          whatsapp.replace(/\D/g,"");
+
+
+        if(
+          !number.startsWith("90")
+        ){
+
+          number =
+            "90" + number;
+
+        }
+
+
+        whatsapp =
+          "https://wa.me/" +
+          number;
+
+      }
+
+
+      addLink(
+        "💬",
+        "WhatsApp",
+        whatsapp,
+        "whatsapp",
+        "WhatsApp'tan mesaj gönder"
+      );
+
+    }
+
+
+    /* KONUM */
 
     if(business.address){
 
       addLink(
         "📍",
         "Konum / Yol Tarifi",
-        business.address
+        business.address,
+        "location"
       );
 
     }
 
+
+    /* INSTAGRAM */
 
     if(business.instagram){
 
       addLink(
         "◎",
         "Instagram",
-        business.instagram
+        business.instagram,
+        "instagram"
       );
 
     }
 
+
+    /* TIKTOK */
 
     if(business.tiktok){
 
       addLink(
         "♪",
         "TikTok",
-        business.tiktok
+        business.tiktok,
+        "tiktok"
       );
 
     }
 
+
+    /* GOOGLE YORUM */
+
+    if(business.google_review){
+
+      addLink(
+        "⭐",
+        "Google'da Değerlendir",
+        business.google_review,
+        "google_review",
+        "Bizi Google'da değerlendir"
+      );
+
+    }
+
+
+    /* WEB SİTESİ */
+
+    if(business.website){
+
+      addLink(
+        "🌐",
+        "Web Sitesi",
+        business.website,
+        "website"
+      );
+
+    }
+
+
+    /* MENÜ */
 
     if(business.menu){
 
       addLink(
         "🍽️",
         "Menüyü Gör",
-        business.menu
+        business.menu,
+        "menu"
       );
 
     }
 
+
+    /* IBAN */
 
     if(business.iban){
 
       const row =
         document.createElement("div");
 
-      row.className="profile-link";
+
+      row.className =
+        "profile-link";
+
+
+      const holder =
+        business.iban_holder
+          ? '<span class="profile-link-sub">' +
+            business.iban_holder +
+            '</span>'
+          : '';
+
 
       row.innerHTML =
-        '<div class="profile-icon">▣</div>' +
-        '<div class="profile-link-text">IBAN</div>' +
-        '<button class="copy-iban">Kopyala</button>';
+        '<div class="profile-icon">🏦</div>' +
 
-      row.querySelector("button").onclick =
+        '<div class="profile-link-text">' +
+        'IBAN' +
+        holder +
+        '</div>' +
+
+        '<button class="copy-iban">' +
+        'Kopyala' +
+        '</button>';
+
+
+      const button =
+        row.querySelector(
+          ".copy-iban"
+        );
+
+
+      button.onclick =
         async function(){
 
           try{
@@ -281,25 +536,73 @@ async function loadProfile(){
               business.iban
             );
 
-            this.textContent="Kopyalandı ✓";
+
+            this.textContent =
+              "Kopyalandı ✓";
+
+
+            track("iban");
 
           }catch(e){
 
-            alert("IBAN: " + business.iban);
+            alert(
+              "IBAN: " +
+              business.iban
+            );
 
           }
 
         };
 
+
       links.appendChild(row);
+
+    }
+
+
+    /* ÇALIŞMA SAATLERİ */
+
+    if(business.hours){
+
+      const hours =
+        document.createElement("div");
+
+
+      hours.className =
+        "profile-link";
+
+
+      hours.innerHTML =
+        '<div class="profile-icon">🕐</div>' +
+
+        '<div class="profile-link-text">' +
+        'Çalışma Saatleri' +
+
+        '<span class="profile-link-sub">' +
+        business.hours +
+        '</span>' +
+
+        '</div>';
+
+
+      links.appendChild(hours);
 
     }
 
   }catch(error){
 
-    document.getElementById("profileBox").innerHTML =
+    console.error(error);
+
+
+    document.getElementById(
+      "profileBox"
+    ).innerHTML =
+
       "<h2>Bir hata oluştu</h2>" +
-      "<p>Lütfen daha sonra tekrar deneyin.</p>";
+
+      "<p>" +
+      "Lütfen daha sonra tekrar deneyin." +
+      "</p>";
 
   }
 
