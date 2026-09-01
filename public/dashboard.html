@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LEO CONNECT — İşletme Paneli</title>
+
+  <title>LEO CONNECT — Panel</title>
+
   <link rel="stylesheet" href="/style.css">
 </head>
 
@@ -18,46 +20,99 @@
 
   <small>İŞLETME PANELİ</small>
 
-  <h1 id="title">İşletme Paneli</h1>
+  <h1 id="title">Panel</h1>
+
+
+  <!-- İŞLETME BİLGİLERİ -->
 
   <div class="box">
 
     <h2>İşletme Bilgileri</h2>
 
-    <input id="name" placeholder="İşletme adı">
+    <input
+      id="name"
+      placeholder="İşletme adı"
+    >
 
-    <input id="category" placeholder="Kategori">
+    <input
+      id="category"
+      placeholder="Kategori"
+    >
 
     <textarea
       id="description"
-      placeholder="İşletmenizi kısaca anlatın">
-    </textarea>
+      placeholder="İşletme açıklaması"
+    ></textarea>
 
-    <input id="phone" placeholder="Telefon">
+    <input
+      id="phone"
+      placeholder="Telefon"
+    >
+
+    <input
+      id="whatsapp"
+      placeholder="WhatsApp numarası veya bağlantısı"
+    >
+
+    <p class="hint">
+      Numara girersen otomatik olarak WhatsApp bağlantısına çevrilir.
+      Örn: 905401300626
+    </p>
 
     <input
       id="address"
-      placeholder="Google Maps / Konum bağlantısı">
+      placeholder="Google Maps / Konum bağlantısı"
+    >
 
     <input
       id="instagram"
-      placeholder="Instagram bağlantısı">
+      placeholder="Instagram bağlantısı"
+    >
 
     <input
       id="tiktok"
-      placeholder="TikTok bağlantısı">
+      placeholder="TikTok bağlantısı"
+    >
+
+    <input
+      id="google_review"
+      placeholder="Google yorum bağlantısı"
+    >
+
+    <input
+      id="website"
+      placeholder="Web sitesi bağlantısı"
+    >
 
     <input
       id="menu"
-      placeholder="Menü bağlantısı">
+      placeholder="Menü bağlantısı"
+    >
 
     <input
       id="iban"
-      placeholder="IBAN">
+      placeholder="IBAN"
+    >
+
+    <input
+      id="iban_holder"
+      placeholder="IBAN sahibi ad soyad"
+    >
 
     <input
       id="hours"
-      placeholder="Çalışma saatleri">
+      placeholder="Çalışma saatleri"
+    >
+
+    <input
+      id="logo_url"
+      placeholder="Logo görsel URL'si"
+    >
+
+    <p class="hint">
+      Logo URL'si ekleyebilirsin.
+      Kalıcı dosya yükleme sistemi sonraki aşamada bağlanacak.
+    </p>
 
     <button onclick="save()">
       Bilgileri Kaydet
@@ -67,6 +122,8 @@
 
   </div>
 
+
+  <!-- QR -->
 
   <div class="box">
 
@@ -78,13 +135,37 @@
 
     <img
       id="qr"
-      style="width:260px;max-width:100%;display:block;margin:25px auto"
-      alt="İşletme QR Kodu">
+      class="stand-qr"
+      alt="LEO CONNECT QR Kodu"
+    >
 
-    <p id="url"></p>
+    <p
+      id="url"
+      style="word-break:break-all;text-align:center"
+    ></p>
+
+    <div class="qr-actions">
+
+      <a
+        id="open"
+        target="_blank"
+      >
+        Profili Aç
+      </a>
+
+      <a
+        id="download"
+        download="leo-connect-qr.png"
+      >
+        QR'ı İndir
+      </a>
+
+    </div>
 
   </div>
 
+
+  <!-- İSTATİSTİKLER -->
 
   <div class="box">
 
@@ -93,18 +174,28 @@
     <div class="stats">
 
       <div class="stat">
-        <small>Profil Görüntüleme</small>
+        <small>Profil</small>
         <strong id="profileViews">0</strong>
       </div>
 
       <div class="stat">
-        <small>NFC</small>
-        <strong id="nfcViews">0</strong>
+        <small>WhatsApp</small>
+        <strong id="whatsappViews">0</strong>
+      </div>
+
+      <div class="stat">
+        <small>Telefon</small>
+        <strong id="phoneViews">0</strong>
       </div>
 
       <div class="stat">
         <small>QR</small>
         <strong id="qrViews">0</strong>
+      </div>
+
+      <div class="stat">
+        <small>NFC</small>
+        <strong id="nfcViews">0</strong>
       </div>
 
     </div>
@@ -123,6 +214,25 @@ if (!token) {
 }
 
 
+const fields = [
+  "name",
+  "category",
+  "description",
+  "phone",
+  "whatsapp",
+  "address",
+  "instagram",
+  "tiktok",
+  "google_review",
+  "website",
+  "menu",
+  "iban",
+  "iban_holder",
+  "hours",
+  "logo_url"
+];
+
+
 async function api(url, options = {}) {
 
   options.headers = {
@@ -131,84 +241,128 @@ async function api(url, options = {}) {
     "Content-Type": "application/json"
   };
 
-  const response = await fetch(url, options);
+  const response =
+    await fetch(url, options);
 
   if (response.status === 401) {
+
     localStorage.removeItem("token");
+
     window.location.href = "/login";
-    return;
+
+    return null;
   }
 
   return response.json();
+
 }
 
 
-async function loadDashboard() {
+async function load() {
 
-  const business = await api("/api/me");
+  const business =
+    await api("/api/me");
 
   if (!business) return;
+
 
   document.getElementById("title").textContent =
     business.name || "İşletme Paneli";
 
-  const fields = [
-    "name",
-    "category",
-    "description",
-    "phone",
-    "address",
-    "instagram",
-    "tiktok",
-    "menu",
-    "iban",
-    "hours"
-  ];
 
   fields.forEach(function(field) {
 
-    const element = document.getElementById(field);
+    const element =
+      document.getElementById(field);
 
     if (element) {
-      element.value = business[field] || "";
+
+      element.value =
+        business[field] || "";
+
     }
 
   });
 
 
-  const qr = await api("/api/qr");
+  const qr =
+    await api("/api/qr");
+
 
   if (qr) {
 
-    document.getElementById("qr").src = qr.dataUrl;
+    document.getElementById("qr").src =
+      qr.dataUrl;
 
     document.getElementById("url").innerHTML =
-      '<a href="' + qr.url + '" target="_blank">' +
+      '<a href="' +
+      qr.url +
+      '" target="_blank">' +
       qr.url +
       '</a>';
+
+    document.getElementById("open").href =
+      qr.url;
+
+    document.getElementById("download").href =
+      qr.dataUrl;
 
   }
 
 
-  const stats = await api("/api/stats");
+  const stats =
+    await api("/api/stats");
+
 
   if (Array.isArray(stats)) {
 
     stats.forEach(function(item) {
 
       if (item.type === "profile_view") {
-        document.getElementById("profileViews").textContent =
-          item.count;
+
+        document.getElementById(
+          "profileViews"
+        ).textContent = item.count;
+
       }
+
+
+      if (item.type === "whatsapp") {
+
+        document.getElementById(
+          "whatsappViews"
+        ).textContent = item.count;
+
+      }
+
+
+      if (item.type === "phone") {
+
+        document.getElementById(
+          "phoneViews"
+        ).textContent = item.count;
+
+      }
+
+
+      if (
+        item.type === "qr" ||
+        item.type === "qr_scan"
+      ) {
+
+        document.getElementById(
+          "qrViews"
+        ).textContent = item.count;
+
+      }
+
 
       if (item.type === "nfc") {
-        document.getElementById("nfcViews").textContent =
-          item.count;
-      }
 
-      if (item.type === "qr") {
-        document.getElementById("qrViews").textContent =
-          item.count;
+        document.getElementById(
+          "nfcViews"
+        ).textContent = item.count;
+
       }
 
     });
@@ -220,54 +374,110 @@ async function loadDashboard() {
 
 async function save() {
 
-  const fields = [
-    "name",
-    "category",
-    "description",
-    "phone",
-    "address",
-    "instagram",
-    "tiktok",
-    "menu",
-    "iban",
-    "hours"
-  ];
-
   const data = {};
+
 
   fields.forEach(function(field) {
 
+    const element =
+      document.getElementById(field);
+
     data[field] =
-      document.getElementById(field).value;
+      element ? element.value : "";
 
   });
 
 
-  const result = await api("/api/me", {
-    method: "PUT",
-    body: JSON.stringify(data)
-  });
+  /*
+    WhatsApp numarası girildiyse
+    otomatik wa.me bağlantısına çevir.
+  */
+
+  const whatsapp =
+    data.whatsapp.replace(/\D/g, "");
 
 
-  if (result && !result.error) {
+  if (
+    whatsapp &&
+    !data.whatsapp.includes("http")
+  ) {
 
-    document.getElementById("message").textContent =
+    data.whatsapp =
+      "https://wa.me/" +
+      (
+        whatsapp.startsWith("90")
+          ? whatsapp
+          : "90" + whatsapp
+      );
+
+  }
+
+
+  const result =
+    await api("/api/me", {
+
+      method: "PUT",
+
+      body:
+        JSON.stringify(data)
+
+    });
+
+
+  if (
+    result &&
+    !result.error
+  ) {
+
+    document.getElementById(
+      "message"
+    ).textContent =
       "✓ Bilgiler başarıyla kaydedildi.";
 
-    document.getElementById("title").textContent =
+    document.getElementById(
+      "title"
+    ).textContent =
       result.name;
+
+
+    const qr =
+      await api("/api/qr");
+
+
+    if (qr) {
+
+      document.getElementById("qr").src =
+        qr.dataUrl;
+
+      document.getElementById("url").innerHTML =
+        '<a href="' +
+        qr.url +
+        '" target="_blank">' +
+        qr.url +
+        '</a>';
+
+      document.getElementById("open").href =
+        qr.url;
+
+      document.getElementById("download").href =
+        qr.dataUrl;
+
+    }
 
   } else {
 
-    document.getElementById("message").textContent =
-      result?.error || "Bir hata oluştu.";
+    document.getElementById(
+      "message"
+    ).textContent =
+      result?.error ||
+      "Bir hata oluştu.";
 
   }
 
 }
 
 
-loadDashboard();
+load();
 
 </script>
 
