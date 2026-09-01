@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LEO CONNECT — Giriş</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<header>
+  <b>🦁 LEO <span>CONNECT</span></b>
+  <a href="/">Ana Sayfa</a>
+</header>
+
+<div class="box">
+
+  <small>LEO CONNECT</small>
+
+  <h1>Hoş geldin.</h1>
+
+  <p>
+    İşletme paneline giriş yap.
+  </p>
+
+  <form id="loginForm">
+
+    <input
+      id="email"
+      type="email"
+      placeholder="E-posta adresi"
+      required
+    >
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Şifre"
+      required
+    >
+
+    <button type="submit">
+      Giriş Yap →
+    </button>
+
+  </form>
+
+  <p id="message"></p>
+
+  <p>
+    Hesabın yok mu?
+    <a href="/register" class="gold">İşletmeni Oluştur</a>
+  </p>
+
+</div>
+
+<script>
+
+const form = document.getElementById("loginForm");
+const message = document.getElementById("message");
+
+form.addEventListener("submit", async function(e) {
+
+  e.preventDefault();
+
+  message.textContent = "Giriş yapılıyor...";
+
+  try {
+
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      message.textContent =
+        data.error || "E-posta veya şifre hatalı.";
+      return;
+    }
+
+    localStorage.setItem("token", data.token);
+
+    window.location.href = "/dashboard";
+
+  } catch (error) {
+
+    message.textContent =
+      "Sunucuya bağlanırken bir hata oluş.";
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
