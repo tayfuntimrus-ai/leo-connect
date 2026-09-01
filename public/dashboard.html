@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LEO CONNECT — İşletme Paneli</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<header>
+  <b>🦁 LEO <span>CONNECT</span></b>
+  <a href="/">Siteyi Gör</a>
+</header>
+
+<main class="dashboard">
+
+  <small>İŞLETME PANELİ</small>
+
+  <h1 id="title">İşletme Paneli</h1>
+
+  <div class="box">
+
+    <h2>İşletme Bilgileri</h2>
+
+    <input id="name" placeholder="İşletme adı">
+
+    <input id="category" placeholder="Kategori">
+
+    <textarea
+      id="description"
+      placeholder="İşletmenizi kısaca anlatın">
+    </textarea>
+
+    <input id="phone" placeholder="Telefon">
+
+    <input
+      id="address"
+      placeholder="Google Maps / Konum bağlantısı">
+
+    <input
+      id="instagram"
+      placeholder="Instagram bağlantısı">
+
+    <input
+      id="tiktok"
+      placeholder="TikTok bağlantısı">
+
+    <input
+      id="menu"
+      placeholder="Menü bağlantısı">
+
+    <input
+      id="iban"
+      placeholder="IBAN">
+
+    <input
+      id="hours"
+      placeholder="Çalışma saatleri">
+
+    <button onclick="save()">
+      Bilgileri Kaydet
+    </button>
+
+    <p id="message"></p>
+
+  </div>
+
+
+  <div class="box">
+
+    <h2>QR Kodun</h2>
+
+    <p>
+      Bu QR kod müşterilerini işletme profilinize yönlendirir.
+    </p>
+
+    <img
+      id="qr"
+      style="width:260px;max-width:100%;display:block;margin:25px auto"
+      alt="İşletme QR Kodu">
+
+    <p id="url"></p>
+
+  </div>
+
+
+  <div class="box">
+
+    <h2>İstatistikler</h2>
+
+    <div class="stats">
+
+      <div class="stat">
+        <small>Profil Görüntüleme</small>
+        <strong id="profileViews">0</strong>
+      </div>
+
+      <div class="stat">
+        <small>NFC</small>
+        <strong id="nfcViews">0</strong>
+      </div>
+
+      <div class="stat">
+        <small>QR</small>
+        <strong id="qrViews">0</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<script>
+
+const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "/login";
+}
+
+
+async function api(url, options = {}) {
+
+  options.headers = {
+    ...(options.headers || {}),
+    "Authorization": "Bearer " + token,
+    "Content-Type": "application/json"
+  };
+
+  const response = await fetch(url, options);
+
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+    return;
+  }
+
+  return response.json();
+}
+
+
+async function loadDashboard() {
+
+  const business = await api("/api/me");
+
+  if (!business) return;
+
+  document.getElementById("title").textContent =
+    business.name || "İşletme Paneli";
+
+  const fields = [
+    "name",
+    "category",
+    "description",
+    "phone",
+    "address",
+    "instagram",
+    "tiktok",
+    "menu",
+    "iban",
+    "hours"
+  ];
+
+  fields.forEach(function(field) {
+
+    const element = document.getElementById(field);
+
+    if (element) {
+      element.value = business[field] || "";
+    }
+
+  });
+
+
+  const qr = await api("/api/qr");
+
+  if (qr) {
+
+    document.getElementById("qr").src = qr.dataUrl;
+
+    document.getElementById("url").innerHTML =
+      '<a href="' + qr.url + '" target="_blank">' +
+      qr.url +
+      '</a>';
+
+  }
+
+
+  const stats = await api("/api/stats");
+
+  if (Array.isArray(stats)) {
+
+    stats.forEach(function(item) {
+
+      if (item.type === "profile_view") {
+        document.getElementById("profileViews").textContent =
+          item.count;
+      }
+
+      if (item.type === "nfc") {
+        document.getElementById("nfcViews").textContent =
+          item.count;
+      }
+
+      if (item.type === "qr") {
+        document.getElementById("qrViews").textContent =
+          item.count;
+      }
+
+    });
+
+  }
+
+}
+
+
+async function save() {
+
+  const fields = [
+    "name",
+    "category",
+    "description",
+    "phone",
+    "address",
+    "instagram",
+    "tiktok",
+    "menu",
+    "iban",
+    "hours"
+  ];
+
+  const data = {};
+
+  fields.forEach(function(field) {
+
+    data[field] =
+      document.getElementById(field).value;
+
+  });
+
+
+  const result = await api("/api/me", {
+    method: "PUT",
+    body: JSON.stringify(data)
+  });
+
+
+  if (result && !result.error) {
+
+    document.getElementById("message").textContent =
+      "✓ Bilgiler başarıyla kaydedildi.";
+
+    document.getElementById("title").textContent =
+      result.name;
+
+  } else {
+
+    document.getElementById("message").textContent =
+      result?.error || "Bir hata oluştu.";
+
+  }
+
+}
+
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>
