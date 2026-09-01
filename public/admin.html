@@ -1,0 +1,1695 @@
+<!doctype html>
+<html lang="tr">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>LEO CONNECT — Yönetim Merkezi</title>
+
+  <style>
+
+    :root{
+      --gold:#c59a52;
+      --gold-light:#e0bd7b;
+      --black:#0b0b0b;
+      --dark:#111;
+      --dark-2:#171717;
+      --dark-3:#202020;
+      --white:#fff;
+      --muted:#9a9a9a;
+      --border:#292929;
+      --green:#45c27a;
+    }
+
+
+    *{
+      box-sizing:border-box;
+    }
+
+
+    body{
+      margin:0;
+      background:#080808;
+      color:#fff;
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    }
+
+
+    button,
+    input{
+      font:inherit;
+    }
+
+
+    /* =========================
+       LOGIN
+    ========================= */
+
+    #loginScreen{
+
+      min-height:100vh;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      padding:24px;
+
+      background:
+
+        radial-gradient(
+          circle at 50% 20%,
+          #c59a5218,
+          transparent 35%
+        ),
+
+        #080808;
+    }
+
+
+    .login-card{
+
+      width:min(430px,100%);
+
+      background:
+        linear-gradient(
+          145deg,
+          #151515,
+          #0d0d0d
+        );
+
+      border:1px solid #c59a5233;
+
+      border-radius:28px;
+
+      padding:38px;
+
+      box-shadow:
+        0 30px 100px #000;
+    }
+
+
+    .lion{
+
+      width:74px;
+      height:74px;
+
+      margin:0 auto 22px;
+
+      border-radius:22px;
+
+      display:grid;
+      place-items:center;
+
+      background:#000;
+
+      border:1px solid #c59a5266;
+
+      font-size:38px;
+
+      box-shadow:
+        0 0 40px #c59a5215;
+    }
+
+
+    .brand{
+
+      text-align:center;
+
+      letter-spacing:.12em;
+
+      font-weight:800;
+
+      font-size:22px;
+    }
+
+
+    .brand span{
+      color:var(--gold-light);
+    }
+
+
+    .login-subtitle{
+
+      text-align:center;
+
+      color:var(--muted);
+
+      font-size:12px;
+
+      margin:9px 0 30px;
+
+      letter-spacing:.08em;
+    }
+
+
+    .login-card label{
+
+      display:block;
+
+      color:#aaa;
+
+      font-size:12px;
+
+      margin:0 0 7px;
+    }
+
+
+    .login-card input{
+
+      width:100%;
+
+      padding:15px;
+
+      margin-bottom:16px;
+
+      border-radius:12px;
+
+      border:1px solid var(--border);
+
+      background:#111;
+
+      color:#fff;
+
+      outline:none;
+    }
+
+
+    .login-card input:focus{
+
+      border-color:var(--gold);
+
+      box-shadow:
+        0 0 0 3px #c59a5215;
+    }
+
+
+    .login-button{
+
+      width:100%;
+
+      padding:15px;
+
+      border:0;
+
+      border-radius:12px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #c59a52,
+          #9e7738
+        );
+
+      color:#fff;
+
+      font-weight:800;
+
+      cursor:pointer;
+
+      margin-top:4px;
+    }
+
+
+    .login-button:hover{
+      opacity:.92;
+    }
+
+
+    #loginMessage{
+
+      min-height:18px;
+
+      color:#e06b6b;
+
+      font-size:12px;
+
+      text-align:center;
+
+      margin-top:15px;
+    }
+
+
+    /* =========================
+       ADMIN APP
+    ========================= */
+
+    #adminApp{
+      display:none;
+    }
+
+
+    header{
+
+      height:72px;
+
+      position:sticky;
+
+      top:0;
+
+      z-index:100;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:space-between;
+
+      padding:0 28px;
+
+      background:#0c0c0ceF;
+
+      backdrop-filter:blur(18px);
+
+      border-bottom:1px solid var(--border);
+    }
+
+
+    .header-brand{
+
+      display:flex;
+
+      align-items:center;
+
+      gap:12px;
+    }
+
+
+    .header-logo{
+
+      width:38px;
+      height:38px;
+
+      display:grid;
+      place-items:center;
+
+      border-radius:11px;
+
+      background:#000;
+
+      border:1px solid #c59a5255;
+
+      font-size:20px;
+    }
+
+
+    .header-brand strong{
+
+      letter-spacing:.1em;
+
+      font-size:15px;
+    }
+
+
+    .header-brand span{
+      color:var(--gold-light);
+    }
+
+
+    .admin-label{
+
+      color:#777;
+
+      font-size:10px;
+
+      letter-spacing:.15em;
+
+      margin-top:3px;
+    }
+
+
+    .logout{
+
+      border:1px solid #333;
+
+      background:#151515;
+
+      color:#ddd;
+
+      padding:10px 14px;
+
+      border-radius:10px;
+
+      cursor:pointer;
+
+      font-size:12px;
+
+      font-weight:700;
+    }
+
+
+    .logout:hover{
+
+      border-color:#c59a52;
+
+      color:#fff;
+    }
+
+
+    main{
+
+      width:min(1250px,94%);
+
+      margin:38px auto 80px;
+    }
+
+
+    .page-head{
+
+      display:flex;
+
+      align-items:flex-end;
+
+      justify-content:space-between;
+
+      gap:20px;
+
+      margin-bottom:30px;
+    }
+
+
+    .eyebrow{
+
+      color:var(--gold-light);
+
+      font-size:10px;
+
+      font-weight:800;
+
+      letter-spacing:.2em;
+    }
+
+
+    h1{
+
+      margin:8px 0 0;
+
+      font-size:36px;
+    }
+
+
+    .page-head p{
+
+      margin:7px 0 0;
+
+      color:#777;
+
+      font-size:13px;
+    }
+
+
+    .live{
+
+      display:flex;
+
+      align-items:center;
+
+      gap:8px;
+
+      color:#aaa;
+
+      font-size:11px;
+    }
+
+
+    .live-dot{
+
+      width:8px;
+      height:8px;
+
+      border-radius:50%;
+
+      background:var(--green);
+
+      box-shadow:
+        0 0 12px #45c27a88;
+    }
+
+
+    /* =========================
+       STATS
+    ========================= */
+
+    .stats{
+
+      display:grid;
+
+      grid-template-columns:
+        repeat(6,1fr);
+
+      gap:12px;
+
+      margin-bottom:22px;
+    }
+
+
+    .stat{
+
+      min-height:145px;
+
+      padding:20px;
+
+      border-radius:18px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #151515,
+          #0f0f0f
+        );
+
+      border:1px solid var(--border);
+
+      position:relative;
+
+      overflow:hidden;
+    }
+
+
+    .stat::after{
+
+      content:"";
+
+      position:absolute;
+
+      width:100px;
+      height:100px;
+
+      right:-45px;
+      bottom:-45px;
+
+      border-radius:50%;
+
+      background:#c59a5210;
+    }
+
+
+    .stat-icon{
+
+      font-size:21px;
+
+      margin-bottom:15px;
+    }
+
+
+    .stat small{
+
+      display:block;
+
+      color:#777;
+
+      font-size:9px;
+
+      letter-spacing:.14em;
+
+      margin-bottom:7px;
+    }
+
+
+    .stat strong{
+
+      font-size:30px;
+
+      color:#fff;
+    }
+
+
+    .stat.gold strong{
+      color:var(--gold-light);
+    }
+
+
+    /* =========================
+       PANELS
+    ========================= */
+
+    .panel{
+
+      background:
+        linear-gradient(
+          145deg,
+          #131313,
+          #0e0e0e
+        );
+
+      border:1px solid var(--border);
+
+      border-radius:22px;
+
+      overflow:hidden;
+
+      margin-top:22px;
+    }
+
+
+    .panel-head{
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:space-between;
+
+      gap:15px;
+
+      padding:23px 25px;
+
+      border-bottom:1px solid var(--border);
+    }
+
+
+    .panel-head h2{
+
+      margin:0;
+
+      font-size:19px;
+    }
+
+
+    .panel-head p{
+
+      margin:5px 0 0;
+
+      color:#777;
+
+      font-size:11px;
+    }
+
+
+    .refresh{
+
+      border:1px solid #333;
+
+      background:#181818;
+
+      color:#ddd;
+
+      padding:10px 14px;
+
+      border-radius:10px;
+
+      cursor:pointer;
+
+      font-size:11px;
+
+      font-weight:700;
+    }
+
+
+    .refresh:hover{
+
+      border-color:var(--gold);
+
+      color:#fff;
+    }
+
+
+    /* =========================
+       TABLE
+    ========================= */
+
+    .table-wrap{
+
+      overflow-x:auto;
+    }
+
+
+    table{
+
+      width:100%;
+
+      border-collapse:collapse;
+
+      min-width:900px;
+    }
+
+
+    th{
+
+      padding:15px 18px;
+
+      text-align:left;
+
+      color:#666;
+
+      font-size:9px;
+
+      letter-spacing:.13em;
+
+      border-bottom:1px solid var(--border);
+
+      white-space:nowrap;
+    }
+
+
+    td{
+
+      padding:17px 18px;
+
+      border-bottom:1px solid #1d1d1d;
+
+      font-size:12px;
+
+      color:#ccc;
+
+      white-space:nowrap;
+    }
+
+
+    tr:last-child td{
+      border-bottom:0;
+    }
+
+
+    tbody tr:hover{
+      background:#ffffff03;
+    }
+
+
+    .business-name{
+
+      color:#fff;
+
+      font-weight:700;
+
+      margin-bottom:4px;
+    }
+
+
+    .business-email{
+
+      color:#666;
+
+      font-size:10px;
+    }
+
+
+    .category{
+
+      display:inline-block;
+
+      padding:6px 9px;
+
+      border-radius:999px;
+
+      background:#c59a5212;
+
+      color:var(--gold-light);
+
+      border:1px solid #c59a5222;
+
+      font-size:9px;
+    }
+
+
+    .number{
+
+      font-weight:700;
+
+      color:#ddd;
+    }
+
+
+    .number.gold{
+      color:var(--gold-light);
+    }
+
+
+    .empty{
+
+      padding:55px 20px;
+
+      text-align:center;
+
+      color:#666;
+
+      font-size:13px;
+    }
+
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    .footer{
+
+      text-align:center;
+
+      color:#444;
+
+      font-size:10px;
+
+      letter-spacing:.12em;
+
+      margin-top:35px;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media(max-width:1000px){
+
+      .stats{
+
+        grid-template-columns:
+          repeat(3,1fr);
+      }
+
+    }
+
+
+    @media(max-width:650px){
+
+      header{
+
+        padding:0 17px;
+
+      }
+
+
+      .header-brand strong{
+        font-size:12px;
+      }
+
+
+      main{
+
+        width:92%;
+
+        margin-top:25px;
+      }
+
+
+      .page-head{
+
+        align-items:flex-start;
+
+        flex-direction:column;
+      }
+
+
+      h1{
+
+        font-size:29px;
+      }
+
+
+      .stats{
+
+        grid-template-columns:
+          1fr 1fr;
+      }
+
+
+      .stat{
+
+        min-height:125px;
+
+        padding:16px;
+      }
+
+
+      .stat strong{
+
+        font-size:26px;
+      }
+
+
+      .login-card{
+
+        padding:28px 22px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     LOGIN SCREEN
+========================= -->
+
+<section id="loginScreen">
+
+  <div class="login-card">
+
+    <div class="lion">
+      🦁
+    </div>
+
+    <div class="brand">
+      LEO <span>CONNECT</span>
+    </div>
+
+    <div class="login-subtitle">
+      PRIVATE ADMINISTRATION
+    </div>
+
+
+    <label for="adminEmail">
+      ADMIN E-POSTA
+    </label>
+
+    <input
+      id="adminEmail"
+      type="email"
+      autocomplete="username"
+      placeholder="Admin e-posta adresi"
+    >
+
+
+    <label for="adminPassword">
+      ADMIN ŞİFRE
+    </label>
+
+    <input
+      id="adminPassword"
+      type="password"
+      autocomplete="current-password"
+      placeholder="Admin şifresi"
+    >
+
+
+    <button
+      class="login-button"
+      onclick="adminLogin()"
+    >
+      YÖNETİM MERKEZİNE GİR
+    </button>
+
+
+    <div id="loginMessage"></div>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================
+     ADMIN APP
+========================= -->
+
+<section id="adminApp">
+
+
+<header>
+
+  <div class="header-brand">
+
+    <div class="header-logo">
+      🦁
+    </div>
+
+    <div>
+
+      <strong>
+        LEO <span>CONNECT</span>
+      </strong>
+
+      <div class="admin-label">
+        PRIVATE ADMIN
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <button
+    class="logout"
+    onclick="logout()"
+  >
+    Çıkış Yap
+  </button>
+
+</header>
+
+
+
+<main>
+
+
+  <!-- PAGE HEADER -->
+
+  <div class="page-head">
+
+    <div>
+
+      <div class="eyebrow">
+        LEO CONNECT • CONTROL CENTER
+      </div>
+
+      <h1>
+        Yönetim Merkezi
+      </h1>
+
+      <p>
+        Tüm işletmeleri, bağlantıları ve etkileşimleri tek merkezden yönet.
+      </p>
+
+    </div>
+
+
+    <div class="live">
+
+      <span class="live-dot"></span>
+
+      Sistem aktif
+
+    </div>
+
+  </div>
+
+
+
+  <!-- STATS -->
+
+  <div class="stats">
+
+
+    <div class="stat gold">
+
+      <div class="stat-icon">
+        🏢
+      </div>
+
+      <small>
+        İŞLETMELER
+      </small>
+
+      <strong id="businessCount">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-icon">
+        👁️
+      </div>
+
+      <small>
+        PROFİL GÖRÜNTÜLEME
+      </small>
+
+      <strong id="profileCount">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-icon">
+        ▣
+      </div>
+
+      <small>
+        QR TARAMA
+      </small>
+
+      <strong id="qrCount">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-icon">
+        📡
+      </div>
+
+      <small>
+        NFC DOKUNMA
+      </small>
+
+      <strong id="nfcCount">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-icon">
+        💬
+      </div>
+
+      <small>
+        WHATSAPP
+      </small>
+
+      <strong id="whatsappCount">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-icon">
+        📞
+      </div>
+
+      <small>
+        TELEFON
+      </small>
+
+      <strong id="phoneCount">
+        0
+      </strong>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- BUSINESSES -->
+
+  <section class="panel">
+
+    <div class="panel-head">
+
+      <div>
+
+        <h2>
+          İşletmeler
+        </h2>
+
+        <p>
+          Sistemde kayıtlı tüm işletmeler ve etkileşimleri.
+        </p>
+
+      </div>
+
+
+      <button
+        class="refresh"
+        onclick="loadAdmin()"
+      >
+        ↻ Yenile
+      </button>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              İŞLETME
+            </th>
+
+            <th>
+              KATEGORİ
+            </th>
+
+            <th>
+              PROFİL
+            </th>
+
+            <th>
+              QR
+            </th>
+
+            <th>
+              NFC
+            </th>
+
+            <th>
+              WHATSAPP
+            </th>
+
+            <th>
+              TELEFON
+            </th>
+
+            <th>
+              KAYIT
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="businessTable">
+
+          <tr>
+
+            <td
+              colspan="8"
+              class="empty"
+            >
+              İşletmeler yükleniyor...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+
+  <div class="footer">
+    LEO CONNECT • PREMIUM DIGITAL BUSINESS SYSTEM
+  </div>
+
+
+</main>
+
+</section>
+
+
+
+<script>
+
+
+/* =========================
+   TOKEN
+========================= */
+
+const ADMIN_TOKEN_KEY =
+  "leo_admin_token";
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function adminLogin(){
+
+  const email =
+    document
+      .getElementById("adminEmail")
+      .value
+      .trim();
+
+
+  const password =
+    document
+      .getElementById("adminPassword")
+      .value;
+
+
+  const message =
+    document.getElementById(
+      "loginMessage"
+    );
+
+
+  message.textContent = "";
+
+
+  if(!email || !password){
+
+    message.textContent =
+      "E-posta ve şifre gerekli.";
+
+    return;
+
+  }
+
+
+  try{
+
+    const response =
+      await fetch(
+        "/api/admin/login",
+        {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              email,
+              password
+            })
+
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok){
+
+      message.textContent =
+        data.error ||
+        "Admin girişi başarısız.";
+
+      return;
+
+    }
+
+
+    localStorage.setItem(
+      ADMIN_TOKEN_KEY,
+      data.token
+    );
+
+
+    showAdmin();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    message.textContent =
+      "Sunucuya bağlanılamadı.";
+
+  }
+
+}
+
+
+/* =========================
+   SHOW ADMIN
+========================= */
+
+function showAdmin(){
+
+  document
+    .getElementById("loginScreen")
+    .style.display =
+      "none";
+
+
+  document
+    .getElementById("adminApp")
+    .style.display =
+      "block";
+
+
+  loadAdmin();
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout(){
+
+  localStorage.removeItem(
+    ADMIN_TOKEN_KEY
+  );
+
+
+  document
+    .getElementById("adminApp")
+    .style.display =
+      "none";
+
+
+  document
+    .getElementById("loginScreen")
+    .style.display =
+      "flex";
+
+
+  document
+    .getElementById("adminPassword")
+    .value = "";
+
+}
+
+
+/* =========================
+   API
+========================= */
+
+async function adminApi(
+  url,
+  options={}
+){
+
+  const token =
+    localStorage.getItem(
+      ADMIN_TOKEN_KEY
+    );
+
+
+  options.headers = {
+
+    ...(options.headers || {}),
+
+    "Authorization":
+      "Bearer " + token,
+
+    "Content-Type":
+      "application/json"
+
+  };
+
+
+  const response =
+    await fetch(
+      url,
+      options
+    );
+
+
+  if(response.status === 401){
+
+    logout();
+
+    return null;
+
+  }
+
+
+  return response.json();
+
+}
+
+
+/* =========================
+   LOAD ADMIN
+========================= */
+
+async function loadAdmin(){
+
+  const overview =
+    await adminApi(
+      "/api/admin/overview"
+    );
+
+
+  if(!overview) return;
+
+
+  document
+    .getElementById(
+      "businessCount"
+    )
+    .textContent =
+      overview.businesses ?? 0;
+
+
+  document
+    .getElementById(
+      "profileCount"
+    )
+    .textContent =
+      overview.profile_views ?? 0;
+
+
+  document
+    .getElementById(
+      "qrCount"
+    )
+    .textContent =
+      overview.qr_scans ?? 0;
+
+
+  document
+    .getElementById(
+      "nfcCount"
+    )
+    .textContent =
+      overview.nfc_scans ?? 0;
+
+
+  document
+    .getElementById(
+      "whatsappCount"
+    )
+    .textContent =
+      overview.whatsapp_clicks ?? 0;
+
+
+  document
+    .getElementById(
+      "phoneCount"
+    )
+    .textContent =
+      overview.phone_clicks ?? 0;
+
+
+  const businesses =
+    await adminApi(
+      "/api/admin/businesses"
+    );
+
+
+  if(!businesses) return;
+
+
+  renderBusinesses(
+    businesses
+  );
+
+}
+
+
+/* =========================
+   RENDER BUSINESSES
+========================= */
+
+function renderBusinesses(
+  businesses
+){
+
+  const table =
+    document.getElementById(
+      "businessTable"
+    );
+
+
+  if(
+    !Array.isArray(businesses) ||
+    businesses.length === 0
+  ){
+
+    table.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="8"
+          class="empty"
+        >
+          Henüz kayıtlı işletme bulunmuyor.
+        </td>
+
+      </tr>
+
+    `;
+
+    return;
+
+  }
+
+
+  table.innerHTML =
+    businesses.map(
+      business => {
+
+        const date =
+          business.created_at
+            ? new Date(
+                business.created_at
+              ).toLocaleDateString(
+                "tr-TR"
+              )
+            : "-";
+
+
+        return `
+
+          <tr>
+
+            <td>
+
+              <div class="business-name">
+                ${escapeHtml(
+                  business.name || "-"
+                )}
+              </div>
+
+              <div class="business-email">
+                ${escapeHtml(
+                  business.email || "-"
+                )}
+              </div>
+
+            </td>
+
+
+            <td>
+
+              <span class="category">
+                ${escapeHtml(
+                  business.category || "Genel"
+                )}
+              </span>
+
+            </td>
+
+
+            <td class="number gold">
+              ${business.profile_views ?? 0}
+            </td>
+
+
+            <td class="number">
+              ${business.qr_scans ?? 0}
+            </td>
+
+
+            <td class="number">
+              ${business.nfc_scans ?? 0}
+            </td>
+
+
+            <td class="number">
+              ${business.whatsapp_clicks ?? 0}
+            </td>
+
+
+            <td class="number">
+              ${business.phone_clicks ?? 0}
+            </td>
+
+
+            <td>
+              ${date}
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    )
+    .join("");
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHtml(
+  value
+){
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =========================
+   ENTER KEY
+========================= */
+
+document
+  .getElementById(
+    "adminPassword"
+  )
+  .addEventListener(
+    "keydown",
+    function(event){
+
+      if(
+        event.key === "Enter"
+      ){
+
+        adminLogin();
+
+      }
+
+    }
+  );
+
+
+/* =========================
+   START
+========================= */
+
+const existingToken =
+  localStorage.getItem(
+    ADMIN_TOKEN_KEY
+  );
+
+
+if(existingToken){
+
+  showAdmin();
+
+}
+
+</script>
+
+
+</body>
+
+</html>
