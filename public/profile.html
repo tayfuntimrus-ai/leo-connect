@@ -2402,17 +2402,24 @@ function renderSmartCampaigns(){
 
   box.innerHTML='';
 
-  // Backend /api/profile/:slug kampanyaları `campaigns` alanında döndürür.
-  // Eski/veri uyumluluğu için profile_design.campaigns da desteklenir.
-  const rawCampaigns = Array.isArray(business?.campaigns)
-    ? business.campaigns
-    : (Array.isArray(business?.profile_design?.campaigns)
-      ? business.profile_design.campaigns
-      : []);
+  // Smart Campaigns: public API'den gelen ana kaynak.
+  // Eski profil_design kampanyası da geriye dönük uyumluluk için desteklenir.
+  const smart=Array.isArray(business?.campaigns) ? business.campaigns : [];
+  const d=business?.profile_design || {};
+  const campaigns=smart.length ? smart.slice(0,5) : (
+    d.campaign_enabled && (d.campaign_title || d.campaign_text || d.campaign_image_url)
+      ? [{
+          title:d.campaign_title || 'Kampanya',
+          text:d.campaign_text || '',
+          image_url:d.campaign_image_url || '',
+          button_text:d.campaign_button_text || '',
+          button_url:d.campaign_button_url || '',
+          enabled:true
+        }]
+      : []
+  );
 
-  const campaigns = rawCampaigns
-    .filter(c => c && typeof c === 'object')
-    .slice(0,5);
+  console.log('[LEO CONNECT] Public campaigns:', campaigns);
 
   if(!campaigns.length){
     box.style.display='none';
@@ -2470,14 +2477,7 @@ function renderSmartCampaigns(){
     box.appendChild(card);
   });
 
-  box.style.display=box.children.length ? 'block' : 'none';
-
-  // Kampanya alanı görünür olduğunda sayfanın yerleşimi bozulmasın.
-  if(box.children.length){
-    box.setAttribute('aria-label','Aktif kampanyalar');
-  }else{
-    box.removeAttribute('aria-label');
-  }
+  box.style.display=box.children.length ? 'block' : 'block';
 }
 
 
