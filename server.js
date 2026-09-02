@@ -2385,8 +2385,21 @@ app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'),
       WHERE ${where} GROUP BY type ORDER BY count DESC`,[req.user.id]);
 
     const tags = await pool.query(`
-      SELECT id,name,code,placement,tap_count,last_tap FROM nfc_tags
-      WHERE business_id=$1 ORDER BY tap_count DESC NULLS LAST, created_at DESC LIMIT 10`,[req.user.id]);
+      SELECT
+        n.id,
+        n.name,
+        n.code,
+        n.placement,
+        COUNT(e.id)::int AS tap_count,
+        MAX(e.created_at) AS last_tap
+      FROM nfc_tags n
+      LEFT JOIN events e
+        ON e.nfc_tag_id = n.id
+       AND e.type = 'nfc'
+      WHERE n.business_id=$1
+      GROUP BY n.id,n.name,n.code,n.placement,n.created_at
+      ORDER BY tap_count DESC, n.created_at DESC
+      LIMIT 10`,[req.user.id]);
 
     res.json({period, totals: totals.rows[0], daily: daily.rows, hourly: hourly.rows, actions: actions.rows, top_nfc: tags.rows});
   } catch(error) {
