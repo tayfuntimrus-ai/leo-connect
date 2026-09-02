@@ -1108,10 +1108,10 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
 
     const result = await pool.query(`
       UPDATE businesses
-      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7
-      WHERE id=$8
+      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7, dashboard_campaign=$8
+      WHERE id=$9
       RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign
-    `, [profile, qr, nfc, analytics, live, ai, review, id]);
+    `, [profile, qr, nfc, analytics, live, ai, review, campaign, id]);
 
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
     res.json({ success: true, permissions: businessPermissions(result.rows[0]) });
