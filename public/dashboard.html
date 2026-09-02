@@ -2486,11 +2486,27 @@ main{
 </style>
 </style>
 
+
+<style id="leo-v2-shell">
+:root{--v2-bg:#070707;--v2-card:#101010;--v2-line:#262626;--v2-gold:#d7b56d;--v2-text:#f5f1e8;--v2-muted:#8d8a83}
+body{background:var(--v2-bg)!important;color:var(--v2-text)}
+.v2-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:18px 0}.v2-nav button{border:1px solid var(--v2-line);background:#0d0d0d;color:#aaa;padding:12px 10px;border-radius:12px;font-weight:800;cursor:pointer}.v2-nav button.active,.v2-nav button:hover{color:#111;background:var(--v2-gold);border-color:var(--v2-gold)}
+.v2-section{scroll-margin-top:20px}.v2-connection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.v2-connection{display:flex;align-items:center;justify-content:space-between;padding:14px;border:1px solid var(--v2-line);border-radius:14px;background:#0d0d0d}.v2-connection small{display:block;color:var(--v2-muted);margin-top:3px}.v2-connection button{border:1px solid #3b3322;background:#17130c;color:var(--v2-gold);padding:8px 11px;border-radius:9px;font-weight:800}.v2-themes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.v2-theme{border:1px solid var(--v2-line);border-radius:14px;padding:14px;background:#0d0d0d;cursor:pointer}.v2-theme strong{display:block}.v2-theme span{font-size:11px;color:var(--v2-muted)}@media(max-width:760px){.v2-nav{grid-template-columns:repeat(2,1fr)}.v2-connection-grid,.v2-themes{grid-template-columns:1fr}}
+</style>
+<script>
+const LEO_V2_THEMES=[['midnight-gold','Midnight Gold','Siyah / altın premium'],['obsidian','Obsidian','Ultra dark / tech'],['champagne','Champagne','Sıcak lüks'],['pure-light','Pure Light','Aydınlık premium']];
+function leoV2Scroll(id,btn){document.querySelectorAll('.v2-nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});}
+function leoV2ThemeCard(key,name,desc){return `<button type="button" class="v2-theme" onclick="leoV2SelectTheme('${key}')"><strong>${name}</strong><span>${desc}</span></button>`}
+async function leoV2SelectTheme(theme){try{await api('/api/business-v2-settings',{method:'PUT',body:JSON.stringify({theme})});if(window.currentBusiness)currentBusiness.v2_settings={...(currentBusiness.v2_settings||{}),theme};document.body.dataset.theme=theme;if(typeof showToast==='function')showToast('Tema kaydedildi: '+theme); }catch(e){if(typeof showToast==='function')showToast(e.message||'Tema kaydedilemedi');}}
+function leoV2Connections(){const items=[['instagram','📸 Instagram'],['facebook','📘 Facebook'],['tiktok','🎵 TikTok'],['youtube','▶️ YouTube'],['linkedin','💼 LinkedIn'],['x','𝕏 X'],['whatsapp','💬 WhatsApp'],['google','⭐ Google'],['website','🌐 Website']];return `<div class="v2-connection-grid">${items.map(([k,n])=>`<div class="v2-connection"><div><strong>${n}</strong><small>Bağlantını yönet</small></div><button type="button" onclick="leoV2Connect('${k}')">Hesabı Bağla</button></div>`).join('')}</div><button type="button" class="btn" style="margin-top:12px" onclick="leoV2Connect('custom')">＋ Özel bağlantı ekle</button>`}
+function leoV2Connect(type){const label=type==='custom'?'Özel bağlantı':type;const value=prompt(label+' bağlantısını gir:');if(!value)return;api('/api/business-v2-connections',{method:'PUT',body:JSON.stringify({type,url:value,label})}).then(()=>{if(typeof showToast==='function')showToast('Bağlantı kaydedildi.')}).catch(e=>{if(typeof showToast==='function')showToast(e.message||'Bağlantı kaydedilemedi')});}
+</script>
 </head>
 
 
 
-<body>
+<body><nav class="v2-nav" aria-label="LEO CONNECT V2"><button class="active" onclick="leoV2Scroll('overview',this)">🏠 Genel Bakış</button><button onclick="leoV2Scroll('profile',this)">👤 Profil</button><button onclick="leoV2Scroll('qr',this)">📱 QR & NFC</button><button onclick="leoV2Scroll('campaigns',this)">🚀 Kampanyalar</button><button onclick="leoV2Scroll('analytics',this)">📊 İstatistikler</button></nav>
+
 
 
 
@@ -2571,6 +2587,7 @@ main{
 
 
 
+<section id="overview" class="box v2-section"><div class="box-head"><div><div class="eyebrow">LEO CONNECT V2</div><h2>Yeni Nesil İşletme Merkezi</h2><p>Profil, bağlantılar, kampanyalar ve performans tek panelde.</p></div><div class="design-badge">V2</div></div><div class="v2-themes"><button type="button" class="v2-theme" onclick="leoV2SelectTheme('midnight-gold')"><strong>Midnight Gold</strong><span>Siyah / altın premium</span></button><button type="button" class="v2-theme" onclick="leoV2SelectTheme('obsidian')"><strong>Obsidian</strong><span>Ultra dark / tech</span></button><button type="button" class="v2-theme" onclick="leoV2SelectTheme('champagne')"><strong>Champagne</strong><span>Sıcak lüks</span></button><button type="button" class="v2-theme" onclick="leoV2SelectTheme('pure-light')"><strong>Pure Light</strong><span>Aydınlık premium</span></button></div></section>
 <main>
 
 
