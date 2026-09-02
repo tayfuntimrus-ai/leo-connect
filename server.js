@@ -2700,6 +2700,9 @@ app.put('/api/me', auth, requireBusinessPermission('profile'), async (req, res) 
 
 app.get('/api/business-v2-settings', auth, requireBusinessPermission('profile'), async (req,res)=>{
   try{
+    res.set('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma','no-cache');
+    res.set('Expires','0');
     const r=await pool.query(`SELECT id,profile_theme_permission,social_links,custom_links,social_platform_permissions FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
     if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
     const d=await pool.query(`SELECT theme,accent_color FROM profile_designs WHERE business_id=$1 LIMIT 1`,[req.user.id]);
