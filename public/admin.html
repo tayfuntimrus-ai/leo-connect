@@ -146,6 +146,73 @@ a{color:inherit;text-decoration:none}
 .live-empty{padding:30px 15px;text-align:center;color:var(--muted);font-size:10px}
 @media(max-width:900px){.live-kpis{grid-template-columns:repeat(2,1fr)}.live-layout{grid-template-columns:1fr}}
 @media(max-width:520px){.live-kpis{grid-template-columns:1fr 1fr}.live-item{padding:11px 12px}}
+
+/* LEO CONNECT MOBILE FINAL UX V3 */
+@media (max-width:720px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  .app{display:block;width:100%;min-width:0}
+  .main{width:100%;min-width:0;overflow:hidden;padding-bottom:72px}
+  .topbar{width:100%;min-width:0;height:auto;min-height:64px;padding:10px 12px;gap:8px;overflow-x:auto}
+  .top-actions{width:100%;display:flex;justify-content:flex-end;gap:6px;flex-wrap:nowrap;min-width:max-content}
+  .topbar .mode{padding:6px 8px}
+  .topbar .tool{padding:9px 10px;font-size:11px;white-space:nowrap}
+  .colors{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+  .colors label{display:none}
+  .content{width:100%;max-width:none;margin:0;padding:20px 12px 40px}
+  .hero{width:100%;margin-bottom:18px}
+  .hero h1{font-size:29px;line-height:1.05;margin:5px 0 8px}
+  .hero p{max-width:100%;font-size:11px;line-height:1.5}
+  .cards{width:100%;grid-template-columns:1fr 1fr;gap:8px}
+  .stat{min-width:0;padding:13px;border-radius:14px;min-height:112px}
+  .stat-value{font-size:24px}
+  .stat-label{font-size:8px;white-space:normal}
+  .stat-note{font-size:8px}
+  .grid-main{width:100%;grid-template-columns:1fr;gap:10px}
+  .card{min-width:0;max-width:100%}
+  .section-head{padding:15px 14px 12px;align-items:flex-start}
+  .section-head h3{font-size:14px}
+  .search{width:100%}
+  .search input{width:100%;min-width:0}
+  .table-wrap,.table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .table{min-width:620px}
+  .summary-grid{grid-template-columns:1fr 1fr}
+  .summary-item{min-width:0}
+  .live-center{width:100%;margin-top:12px}
+  .live-head{align-items:flex-start}
+  .live-title{font-size:14px}
+  .live-sub{line-height:1.45}
+  .live-kpis{width:100%;grid-template-columns:1fr 1fr;gap:8px}
+  .live-kpi{min-width:0;padding:12px}
+  .live-kpi strong{font-size:22px}
+  .live-layout{width:100%;grid-template-columns:1fr;gap:10px}
+  .live-feed,.live-insight{min-width:0;width:100%}
+  .live-item{width:100%;min-width:0}
+  .analytics-toolbar{width:100%}
+  .analytics-grid{width:100%;grid-template-columns:1fr 1fr}
+  .analytics-two{width:100%;grid-template-columns:1fr}
+  .business-page,.global-page{width:100%;max-width:none;padding:18px 12px 70px}
+  .business-hero,.global-card,.analytics-box{width:100%;min-width:0}
+  .business-hero{padding:15px}
+  .business-hero-left{width:100%;min-width:0}
+  .business-hero h2{font-size:21px}
+  .hero-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .hero-actions .btn{width:100%}
+  .business-tabs{width:100%;padding-bottom:3px}
+  .permission-grid{grid-template-columns:1fr}
+  .permission-card{width:100%;min-width:0}
+  .modal{width:calc(100vw - 24px);max-width:calc(100vw - 24px)}
+}
+
+/* Extra-small phones */
+@media (max-width:390px){
+  .content{padding-left:10px;padding-right:10px}
+  .cards{grid-template-columns:1fr}
+  .analytics-grid{grid-template-columns:1fr 1fr}
+  .live-kpis{grid-template-columns:1fr 1fr}
+  .hero-actions{grid-template-columns:1fr}
+  .top-actions .colors{display:none}
+}
+
 </style>
 </head>
 <body data-accent="gold">
