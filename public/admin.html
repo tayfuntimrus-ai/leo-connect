@@ -147,6 +147,23 @@ a{color:inherit;text-decoration:none}
 @media(max-width:900px){.live-kpis{grid-template-columns:repeat(2,1fr)}.live-layout{grid-template-columns:1fr}}
 @media(max-width:520px){.live-kpis{grid-template-columns:1fr 1fr}.live-item{padding:11px 12px}}
 </style>
+<style id="leo-fit-fix">
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+.app,.main{min-width:0;width:100%;max-width:100%}
+.content,.business-page,.global-page{box-sizing:border-box;width:100%;max-width:1500px;min-width:0}
+.business-page.show,.global-page.show{overflow-x:hidden;overflow-y:auto}
+.cards,.grid-main,.biz-stat-grid,.biz-columns,.analytics-grid,.analytics-two,.analytics-cards,.permission-grid,.form-grid,.info-grid{min-width:0}
+.analytics-two{grid-template-columns:minmax(0,1.55fr) minmax(0,.95fr)}
+.analytics-box,.analytics-kpi,.analytics-card,.biz-section,.global-card,.permission-card{min-width:0;box-sizing:border-box}
+.analytics-box-head,.global-row,.business-hero,.section-head{min-width:0}
+.analytics-box-head>*,.global-row>*,.business-hero>*{min-width:0}
+.analytics-box-head span,.global-sub,.biz-mail,.section-sub{overflow-wrap:anywhere;word-break:break-word}
+.analytics-table,.global-table{width:100%;max-width:100%;table-layout:auto}
+.table-wrap{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:1200px){.analytics-two{grid-template-columns:1fr}.biz-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.content,.business-page,.global-page{width:100%;max-width:100%;padding-left:14px;padding-right:14px}.analytics-grid,.analytics-cards{grid-template-columns:1fr 1fr}.analytics-two{grid-template-columns:1fr}.biz-stat-grid{grid-template-columns:1fr 1fr}.global-row{flex-wrap:wrap}.business-hero{flex-wrap:wrap}.permission-card{width:100%}}
+@media(max-width:480px){.analytics-grid,.analytics-cards,.biz-stat-grid{grid-template-columns:1fr}.analytics-kpi strong,.analytics-card strong{font-size:22px}.analytics-box-head{padding:14px}.global-row{align-items:flex-start}.hero-actions{width:100%;flex-wrap:wrap}.hero-actions .btn{flex:1 1 auto}}
+</style>
 </head>
 <body data-accent="gold">
 
