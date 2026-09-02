@@ -5320,6 +5320,38 @@ async function shareProfile(){
 
 
 /* ==================================================
+   V2 — PROFILE DESIGN HARDENED LOADER
+   Bu global tanim, eski/cached dashboard build'lerinde
+   loadProfileDesign referansinin kaybolmasini engeller.
+================================================== */
+
+window.loadProfileDesign = async function(){
+  try{
+    const result = await api("/api/business-profile-design");
+
+    if(result && !result.error){
+      if(typeof loadDesignIntoForm === "function"){
+        loadDesignIntoForm(result);
+      }
+      return result;
+    }
+
+    if(result?.error){
+      const msg = document.getElementById("designMessage");
+      if(msg) msg.textContent = result.error;
+    }
+
+    return result || null;
+  }catch(error){
+    console.error("Profile design load error:", error);
+    const msg = document.getElementById("designMessage");
+    if(msg) msg.textContent = "Profil tasarımı şu an yüklenemedi.";
+    return null;
+  }
+};
+
+
+/* ==================================================
    LOAD
 ================================================== */
 
@@ -5340,7 +5372,11 @@ async function load(){
 
     currentBusiness = business;
 
-    await loadProfileDesign();
+    try{
+      await window.loadProfileDesign();
+    }catch(error){
+      console.error("Non-blocking profile design error:", error);
+    }
 
     document.getElementById("title").textContent = business.name || "İşletme Paneli";
     document.getElementById("heroName").textContent = business.name || "İşletme";
