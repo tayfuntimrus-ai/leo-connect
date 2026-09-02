@@ -1134,6 +1134,40 @@ body{
   .logo img,.logo-placeholder{border-radius:22px !important;}
 }
 
+
+
+/* REAL BRAND ICONS */
+.link-icon img.brand-icon-svg,
+.action-icon img.brand-icon-svg,
+.info-icon img.brand-icon-svg {
+  width:24px;
+  height:24px;
+  display:block;
+  object-fit:contain;
+}
+
+.action-icon img.brand-icon-svg {
+  width:20px;
+  height:20px;
+}
+
+.link-icon {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 46px;
+  width:46px;
+  height:46px;
+}
+
+@media(max-width:430px){
+  .link-icon {
+    flex-basis:42px;
+    width:42px;
+    height:42px;
+  }
+}
+
 </style>
 
 </head>
@@ -1228,7 +1262,7 @@ body{
       class="action gold"
       href="#"
     >
-      📞 Ara
+      <span class="action-icon">☎</span> Ara
     </a>
 
 
@@ -1239,7 +1273,7 @@ body{
       target="_blank"
       rel="noopener"
     >
-      💬 WhatsApp
+      <span class="action-icon"><img class="brand-icon-svg" src="https://cdn.simpleicons.org/whatsapp/FFFFFF" alt="WhatsApp" width="20" height="20"></span> WhatsApp
     </a>
 
   </div>
@@ -1398,7 +1432,14 @@ body{
     >
 
       <div class="link-icon">
-        📸
+        <img
+          class="brand-icon-svg"
+          src="https://cdn.simpleicons.org/instagram/FFFFFF"
+          alt="Instagram"
+          width="24"
+          height="24"
+          loading="lazy"
+        >
       </div>
 
       <div class="link-text">
@@ -1424,7 +1465,14 @@ body{
     >
 
       <div class="link-icon">
-        🎵
+        <img
+          class="brand-icon-svg"
+          src="https://cdn.simpleicons.org/tiktok/FFFFFF"
+          alt="TikTok"
+          width="24"
+          height="24"
+          loading="lazy"
+        >
       </div>
 
       <div class="link-text">
@@ -1450,7 +1498,14 @@ body{
     >
 
       <div class="link-icon">
-        ⭐
+        <img
+          class="brand-icon-svg"
+          src="https://cdn.simpleicons.org/google/FFFFFF"
+          alt="Google"
+          width="24"
+          height="24"
+          loading="lazy"
+        >
       </div>
 
       <div class="link-text">
@@ -1476,7 +1531,10 @@ body{
     >
 
       <div class="link-icon">
-        🌐
+        <svg class="brand-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9S14.4 18.5 12 21M12 3c-2.4 2.5-3.6 5.5-3.6 9S9.6 18.5 12 21" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
       </div>
 
       <div class="link-text">
@@ -1502,7 +1560,10 @@ body{
     >
 
       <div class="link-icon">
-        📋
+        <svg class="brand-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="4" width="14" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M9 4.5h6M9 9h6M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
       </div>
 
       <div class="link-text">
