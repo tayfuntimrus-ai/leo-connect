@@ -242,6 +242,17 @@ async function initDatabase() {
   `);
 
 
+  await pool.query(`
+    ALTER TABLE events
+    ADD COLUMN IF NOT EXISTS source TEXT DEFAULT ''
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_events_source
+    ON events(source)
+  `);
+
+
   /*
     Performans için indexler.
   */
@@ -2441,6 +2452,12 @@ app.post('/api/event/:slug', async (req, res) => {
     const type =
       String(req.body.type || '');
 
+    const source =
+      String(req.body.source || '').toLowerCase();
+
+    const nfcCode =
+      String(req.body.nfc_code || '').trim();
+
     const allowedTypes = [
       'profile_view',
       'qr_scan',
@@ -2452,8 +2469,13 @@ app.post('/api/event/:slug', async (req, res) => {
       'tiktok',
       'website',
       'menu',
-      'google_review'
+      'google_review',
+      'location',
+      'iban',
+      'share'
     ];
+
+    const allowedSources = ['', 'direct', 'qr', 'nfc'];
 
     if (!allowedTypes.includes(type)) {
 
@@ -2461,6 +2483,12 @@ app.post('/api/event/:slug', async (req, res) => {
         error: 'Geçersiz event tipi'
       });
 
+    }
+
+    if (!allowedSources.includes(source)) {
+      return res.status(400).json({
+        error: 'Geçersiz kaynak'
+      });
     }
 
     const business =
@@ -2481,21 +2509,57 @@ app.post('/api/event/:slug', async (req, res) => {
 
     }
 
+    let nfcTagId = null;
+
+    if (source === 'nfc') {
+      if (!nfcCode) {
+        return res.status(400).json({
+          error: 'NFC kodu gerekli'
+        });
+      }
+
+      const tag = await pool.query(
+        `
+        SELECT id
+        FROM nfc_tags
+        WHERE code=$1
+          AND business_id=$2
+          AND is_active=TRUE
+        LIMIT 1
+        `,
+        [nfcCode, business.rows[0].id]
+      );
+
+      if (!tag.rows.length) {
+        return res.status(400).json({
+          error: 'NFC etiketi doğrulanamadı'
+        });
+      }
+
+      nfcTagId = tag.rows[0].id;
+    }
+
     await pool.query(
       `
       INSERT INTO events(
         business_id,
-        type
+        type,
+        source,
+        nfc_tag_id
       )
 
       VALUES(
         $1,
-        $2
+        $2,
+        $3,
+        $4
       )
       `,
       [
         business.rows[0].id,
-        type
+        type,
+        source,
+        nfcTagId
       ]
     );
 
@@ -3380,12 +3444,14 @@ app.get(
         INSERT INTO events(
           business_id,
           type,
+          source,
           nfc_tag_id
         )
 
         VALUES(
           $1,
           'profile_view',
+          'nfc',
           $2
         )
         `,
@@ -3405,11 +3471,13 @@ app.get(
         INSERT INTO events(
           business_id,
           type,
+          source,
           nfc_tag_id
         )
 
         VALUES(
           $1,
+          'nfc',
           'nfc',
           $2
         )
@@ -3489,15 +3557,24 @@ app.get(
         `
         INSERT INTO events(
           business_id,
-          type
+          type,
+          source
         )
 
         VALUES(
           $1,
-          'profile_view'
+          'profile_view',
+          $2
         )
         `,
-        [business.id]
+        [
+          business.id,
+          req.query.source === 'qr'
+            ? 'qr'
+            : req.query.source === 'nfc'
+              ? 'nfc'
+              : 'direct'
+        ]
       );
 
 
@@ -3513,12 +3590,14 @@ app.get(
           `
           INSERT INTO events(
             business_id,
-            type
+            type,
+            source
           )
 
           VALUES(
             $1,
-            'qr_scan'
+            'qr_scan',
+            'qr'
           )
           `,
           [business.id]
@@ -3546,11 +3625,13 @@ app.get(
           `
           INSERT INTO events(
             business_id,
-            type
+            type,
+            source
           )
 
           VALUES(
             $1,
+            'nfc',
             'nfc'
           )
           `,
