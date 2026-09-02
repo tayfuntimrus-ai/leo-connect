@@ -905,6 +905,8 @@ async function createCardPerson(event){
     await api('/api/admin/card-people',{
       method:'POST',
       body:JSON.stringify({
+        person_name:name,
+        display_name:name,
         email,
         password,
         data:{person_name:name,display_name:name},
