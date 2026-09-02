@@ -2483,14 +2483,11 @@ main{
 
 
 <!-- ==================================================
-     BUSINESS ANALYTICS V3
+     BUSINESS ANALYTICS V4
 ================================================== -->
-<section id="businessAnalyticsV3" class="analytics-v3" style="display:none">
+<section id="businessAnalyticsV3" class="analytics-v4" style="display:none">
   <div class="analytics-head">
-    <div>
-      <h2>📊 Akıllı İşletme Analizi</h2>
-      <p>İşletmenizin dijital profil performansını tek ekranda takip edin.</p>
-    </div>
+    <div><h2>📊 Akıllı İşletme Analizi <span style="font-size:10px;color:#c59a52;letter-spacing:.12em">V4</span></h2><p>İşletmenizin dijital performansını, dönüşümünü ve müşteri davranışını tek ekranda görün.</p></div>
     <div class="analytics-periods">
       <button type="button" data-period="today" onclick="loadBusinessAnalytics('today')">Bugün</button>
       <button type="button" data-period="7d" class="active" onclick="loadBusinessAnalytics('7d')">7 Gün</button>
@@ -2500,14 +2497,24 @@ main{
   </div>
   <div class="analytics-kpis">
     <div class="analytics-kpi"><small>TOPLAM ETKİLEŞİM</small><strong id="baTotal">0</strong><span>tüm aksiyonlar</span></div>
-    <div class="analytics-kpi"><small>PROFİL</small><strong id="baProfile">0</strong><span>görüntülenme</span></div>
-    <div class="analytics-kpi"><small>QR + NFC</small><strong id="baDigital">0</strong><span>fiziksel temas</span></div>
+    <div class="analytics-kpi"><small>PROFİL GÖRÜNTÜLEME</small><strong id="baProfile">0</strong><span>profil trafiği</span></div>
+    <div class="analytics-kpi"><small>QR + NFC</small><strong id="baDigital">0</strong><span>dijital temas</span></div>
     <div class="analytics-kpi"><small>İLETİŞİM</small><strong id="baContact">0</strong><span>telefon + WhatsApp</span></div>
   </div>
-  <div class="analytics-grid">
-    <div class="analytics-box"><h3>Günlük Trafik</h3><div id="baTraffic" class="traffic-bars"></div><div id="baTrafficLabels" style="display:flex;gap:5px"></div></div>
-    <div class="analytics-box"><h3>Müşteri Aksiyonları</h3><div id="baActions"></div></div>
+  <div class="insight-grid">
+    <div class="insight-card"><small>EN GÜÇLÜ KANAL</small><strong id="baTopChannel">—</strong><span id="baTopChannelSub">Henüz yeterli veri yok</span></div>
+    <div class="insight-card"><small>EN YOĞUN SAAT</small><strong id="baPeakHour">—</strong><span id="baPeakHourSub">Henüz yeterli veri yok</span></div>
+    <div class="insight-card"><small>AKSİYON DÖNÜŞÜMÜ</small><strong id="baConversion">0%</strong><span>profil görüntüleyenlerin aksiyona dönüşümü</span></div>
   </div>
+  <div class="analytics-grid">
+    <div class="analytics-box"><h3>📈 Günlük Trafik</h3><div id="baTraffic" class="traffic-bars"></div><div id="baTrafficLabels" style="display:flex;gap:5px"></div></div>
+    <div class="analytics-box"><h3>🔥 Müşteri Aksiyonları</h3><div id="baActions"></div></div>
+  </div>
+  <div class="analytics-grid" style="margin-top:16px">
+    <div class="analytics-box"><h3>🧠 Dönüşüm Hunisi</h3><div id="baFunnel" class="funnel"></div><div class="micro">Oranlar seçilen dönemdeki gerçek event verilerinden hesaplanır.</div></div>
+    <div class="analytics-box"><h3>📱 QR vs NFC</h3><div id="baChannels" class="channel-grid"></div><div class="micro">QR ve NFC temaslarının toplam dijital trafikteki payı.</div></div>
+  </div>
+  <div class="analytics-box" style="margin-top:16px"><h3>💡 İşletme İçgörüsü</h3><div id="baInsight" class="score"></div></div>
 </section>
 
 <!-- ==================================================
@@ -4596,25 +4603,51 @@ function applyPermissions(business){
 
 
 /* ==================================================
-   BUSINESS CENTER ANALYTICS V3
+   BUSINESS CENTER ANALYTICS V4
 ================================================== */
 async function loadBusinessAnalytics(period='7d'){
   if(!currentBusiness?.permissions?.analytics) return;
   document.querySelectorAll('.analytics-periods button').forEach(b=>b.classList.toggle('active',b.dataset.period===period));
   const data=await api('/api/business-analytics?period='+encodeURIComponent(period));
   if(!data) return;
-  const t=data.totals||{};
-  const n=v=>Number(v||0);
-  document.getElementById('baTotal').textContent=n(t.total_events).toLocaleString('tr-TR');
-  document.getElementById('baProfile').textContent=n(t.profile_views).toLocaleString('tr-TR');
-  document.getElementById('baDigital').textContent=(n(t.qr_scans)+n(t.nfc_taps)).toLocaleString('tr-TR');
-  document.getElementById('baContact').textContent=(n(t.phone_clicks)+n(t.whatsapp_clicks)).toLocaleString('tr-TR');
-  const days=data.daily||[]; const max=Math.max(1,...days.map(x=>n(x.events)));
+  const t=data.totals||{}, n=v=>Number(v||0);
+  const profile=n(t.profile_views), total=n(t.total_events), qr=n(t.qr_scans), nfc=n(t.nfc_taps), phone=n(t.phone_clicks), wa=n(t.whatsapp_clicks);
+  document.getElementById('baTotal').textContent=total.toLocaleString('tr-TR');
+  document.getElementById('baProfile').textContent=profile.toLocaleString('tr-TR');
+  document.getElementById('baDigital').textContent=(qr+nfc).toLocaleString('tr-TR');
+  document.getElementById('baContact').textContent=(phone+wa).toLocaleString('tr-TR');
+
+  const days=data.daily||[], max=Math.max(1,...days.map(x=>n(x.events)));
   const traffic=document.getElementById('baTraffic'), labels=document.getElementById('baTrafficLabels'); traffic.innerHTML=''; labels.innerHTML='';
-  if(!days.length){traffic.innerHTML='<div class="analytics-empty">Henüz seçilen dönemde veri yok.</div>';return;}
-  days.slice(-30).forEach(x=>{const wrap=document.createElement('div');wrap.className='traffic-bar-wrap';wrap.title=x.day+': '+n(x.events)+' etkileşim';const bar=document.createElement('div');bar.className='traffic-bar';bar.style.height=(n(x.events)/max*100)+'%';wrap.appendChild(bar);traffic.appendChild(wrap);const l=document.createElement('span');l.className='traffic-label';l.style.flex='1';l.textContent=x.day.slice(5);labels.appendChild(l);});
-  const actions=(data.actions||[]).slice(0,6), actionMax=Math.max(1,...actions.map(x=>n(x.count))), names={profile_view:'Profil',qr_scan:'QR',qr:'QR',nfc:'NFC',phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google',website:'Website',menu:'Menü'};
+  if(days.length){ days.slice(-30).forEach(x=>{ const wrap=document.createElement('div'); wrap.className='traffic-bar-wrap'; wrap.title=x.day+': '+n(x.events)+' etkileşim'; const bar=document.createElement('div'); bar.className='traffic-bar'; bar.style.height=(n(x.events)/max*100)+'%'; wrap.appendChild(bar); traffic.appendChild(wrap); const l=document.createElement('span'); l.className='traffic-label'; l.style.flex='1'; l.textContent=x.day.slice(5); labels.appendChild(l); }); }
+  else traffic.innerHTML='<div class="analytics-empty">Henüz seçilen dönemde veri yok.</div>';
+
+  const actions=(data.actions||[]).slice(0,8), actionMax=Math.max(1,...actions.map(x=>n(x.count)));
+  const names={profile_view:'Profil',qr_scan:'QR Tarama',qr:'QR',nfc:'NFC',phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google',website:'Website',menu:'Menü',location:'Konum',iban:'IBAN',share:'Paylaş'};
   document.getElementById('baActions').innerHTML=actions.length?actions.map(x=>`<div class="action-row"><span>${names[x.type]||x.type}</span><div class="action-track"><div class="action-fill" style="width:${n(x.count)/actionMax*100}%"></div></div><strong>${n(x.count)}</strong></div>`).join(''):'<div class="analytics-empty">Henüz aksiyon yok.</div>';
+
+  const top=actions[0];
+  document.getElementById('baTopChannel').textContent=top?(names[top.type]||top.type):'—';
+  document.getElementById('baTopChannelSub').textContent=top?`${n(top.count).toLocaleString('tr-TR')} etkileşim ile lider`:'Henüz yeterli veri yok';
+
+  const hourly=data.hourly||[], peak=hourly.reduce((a,b)=>n(b.events)>n(a?.events)?b:a,null);
+  document.getElementById('baPeakHour').textContent=peak?`${String(n(peak.hour)).padStart(2,'0')}:00`:'—';
+  document.getElementById('baPeakHourSub').textContent=peak?`${n(peak.events).toLocaleString('tr-TR')} etkileşim`:'Henüz yeterli veri yok';
+
+  const actionEvents=Math.max(0,total-profile), conversion=profile?Math.min(100,(actionEvents/profile)*100):0;
+  document.getElementById('baConversion').textContent=conversion.toFixed(1)+'%';
+
+  const funnel=[['Profil',profile],['QR + NFC',qr+nfc],['İletişim',phone+wa],['Diğer aksiyonlar',Math.max(0,actionEvents-phone-wa)]];
+  const funnelMax=Math.max(1,profile,...funnel.map(x=>x[1]));
+  document.getElementById('baFunnel').innerHTML=funnel.map(x=>`<div class="funnel-row"><span>${x[0]}</span><div class="funnel-track"><div class="funnel-fill" style="width:${Math.min(100,x[1]/funnelMax*100)}%"></div></div><strong>${n(x[1]).toLocaleString('tr-TR')}</strong></div>`).join('');
+
+  const digital=qr+nfc, qrPct=digital?qr/digital*100:0, nfcPct=digital?nfc/digital*100:0;
+  document.getElementById('baChannels').innerHTML=`<div class="insight-card"><small>QR</small><strong>${qr.toLocaleString('tr-TR')}</strong><span>%${qrPct.toFixed(1)} dijital temas</span></div><div class="insight-card"><small>NFC</small><strong>${nfc.toLocaleString('tr-TR')}</strong><span>%${nfcPct.toFixed(1)} dijital temas</span></div>`;
+
+  let score=0; if(profile)score+=25; if(digital)score+=25; if(phone+wa)score+=25; if(actions.length>=3)score+=25;
+  let title=score>=75?'Güçlü performans':score>=50?'İyi gidiyor':score>=25?'Veri oluşuyor':'Henüz veri az';
+  let copy=score>=75?'Profiliniz aktif kullanılıyor ve birden fazla müşteri aksiyonu oluşuyor.':score>=50?'Dijital temaslarınız oluşmaya başlamış. En güçlü aksiyonları artırmaya odaklanın.':score>=25?'Daha fazla QR/NFC trafiği oluştukça analizler daha anlamlı hale gelecek.':'Profilinizi QR ve NFC noktalarınızda daha görünür hale getirerek veri toplamaya başlayın.';
+  document.getElementById('baInsight').innerHTML=`<div class="score-ring"><strong>${score}</strong></div><div class="score-copy"><strong>${title}</strong><span>${copy}</span></div>`;
 }
 
 
