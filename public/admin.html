@@ -6,7 +6,6 @@
 <title>LEO CONNECT • Command Center</title>
 <style>
 :root{
-  --topbar-h:82px;
   --bg:#070807;--sidebar:#0a0b0b;--panel:#0d0f0f;--panel2:#111414;--line:#252a28;
   --text:#f4f4ef;--muted:#8d9691;--gold:#d7a943;--gold2:#f2c968;
   --accent:#8de58d;--accent-rgb:141,229,141;--danger:#ff7272;
@@ -74,8 +73,8 @@ a{color:inherit;text-decoration:none}
 .mini-stat small{display:block;color:var(--muted);font-size:9px}.mini-stat strong{display:block;font-size:22px;color:var(--accent);margin-top:3px}
 @media(max-width:720px){.form-grid,.analytics-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.tag-row{grid-template-columns:1fr}}
 
-.business-page{display:none;padding:24px 28px 40px;max-width:1500px;width:100%;margin:auto;box-sizing:border-box}
-.business-page.show{display:block;position:fixed;top:var(--topbar-h);left:250px;width:calc(100vw - 250px);right:auto;bottom:0;height:auto;min-height:0;max-height:calc(100vh - var(--topbar-h));background:var(--bg);z-index:18;overflow-y:auto;overflow-x:hidden;border-left:1px solid var(--line);box-sizing:border-box}
+.business-page{display:none;padding:30px 34px 50px;max-width:1500px;margin:auto}
+.business-page.show{display:block;position:absolute;top:var(--topbar-h);left:0;right:0;min-height:calc(100vh - var(--topbar-h));background:var(--bg);z-index:10}
 .backbar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
 .back-btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;padding:10px 13px}
 .business-hero{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,var(--panel),var(--panel2));box-shadow:var(--shadow)}
@@ -105,7 +104,7 @@ a{color:inherit;text-decoration:none}
 @media(max-width:720px){.business-page{padding:20px 14px 80px}.business-hero{align-items:flex-start;flex-direction:column}.hero-actions{justify-content:flex-start}.business-hero-logo{width:62px;height:62px}.business-hero h2{font-size:23px}.biz-stat-grid{grid-template-columns:1fr 1fr}.profile-editor,.info-grid{grid-template-columns:1fr}.profile-editor .full{grid-column:auto}.analytics-cards{grid-template-columns:1fr}}
 
 
-.global-page{display:none;padding:30px 34px 55px;max-width:1500px;margin:auto}.global-page.show{display:block;position:fixed;top:var(--topbar-h);left:250px;right:0;bottom:0;min-height:0;background:var(--bg);z-index:18;overflow:auto;border-left:1px solid var(--line)}.global-head{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:18px}.global-head h2{margin:7px 0 5px;font-size:30px}.global-head p{margin:0;color:var(--muted);font-size:12px}.global-grid{display:grid;gap:12px}.global-card{border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));border-radius:16px;padding:16px}.global-row{display:flex;justify-content:space-between;align-items:center;gap:15px}.global-main{display:flex;align-items:center;gap:12px;min-width:0}.global-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(var(--accent-rgb),.10);border:1px solid rgba(var(--accent-rgb),.2);color:var(--accent);font-size:20px}.global-name{font-weight:800;font-size:13px}.global-sub{font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all}.permission-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}.permission-card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)}.permission-card strong{display:block;font-size:12px}.permission-card span{display:block;color:var(--muted);font-size:9px;margin-top:4px}.switch{position:relative;width:48px;height:27px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;border-radius:30px;background:var(--line);transition:.2s;cursor:pointer}.slider:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:2px;border-radius:50%;background:#777;transition:.2s}.switch input:checked+.slider{background:rgba(var(--accent-rgb),.25);border:1px solid rgba(var(--accent-rgb),.45)}.switch input:checked+.slider:before{transform:translateX(20px);background:var(--accent)}.global-table{width:100%;border-collapse:collapse;margin-top:12px}.global-table th{font-size:9px;color:var(--muted);letter-spacing:1px;text-align:left;padding:12px;border-bottom:1px solid var(--line)}.global-table td{padding:12px;border-bottom:1px solid var(--line);font-size:11px}.global-table tr:last-child td{border-bottom:0}@media(max-width:720px){.global-page{padding:20px 14px 80px}.permission-grid{grid-template-columns:1fr}.global-head{align-items:flex-start;flex-direction:column}}
+.global-page{display:none;padding:30px 34px 55px;max-width:1500px;margin:auto}.global-page.show{display:block;position:absolute;top:var(--topbar-h);left:0;right:0;min-height:calc(100vh - var(--topbar-h));background:var(--bg);z-index:10}.global-head{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:18px}.global-head h2{margin:7px 0 5px;font-size:30px}.global-head p{margin:0;color:var(--muted);font-size:12px}.global-grid{display:grid;gap:12px}.global-card{border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));border-radius:16px;padding:16px}.global-row{display:flex;justify-content:space-between;align-items:center;gap:15px}.global-main{display:flex;align-items:center;gap:12px;min-width:0}.global-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(var(--accent-rgb),.10);border:1px solid rgba(var(--accent-rgb),.2);color:var(--accent);font-size:20px}.global-name{font-weight:800;font-size:13px}.global-sub{font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all}.permission-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}.permission-card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)}.permission-card strong{display:block;font-size:12px}.permission-card span{display:block;color:var(--muted);font-size:9px;margin-top:4px}.switch{position:relative;width:48px;height:27px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;border-radius:30px;background:var(--line);transition:.2s;cursor:pointer}.slider:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:2px;border-radius:50%;background:#777;transition:.2s}.switch input:checked+.slider{background:rgba(var(--accent-rgb),.25);border:1px solid rgba(var(--accent-rgb),.45)}.switch input:checked+.slider:before{transform:translateX(20px);background:var(--accent)}.global-table{width:100%;border-collapse:collapse;margin-top:12px}.global-table th{font-size:9px;color:var(--muted);letter-spacing:1px;text-align:left;padding:12px;border-bottom:1px solid var(--line)}.global-table td{padding:12px;border-bottom:1px solid var(--line);font-size:11px}.global-table tr:last-child td{border-bottom:0}@media(max-width:720px){.global-page{padding:20px 14px 80px}.permission-grid{grid-template-columns:1fr}.global-head{align-items:flex-start;flex-direction:column}}
 
 
 .analytics-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}
@@ -118,16 +117,10 @@ a{color:inherit;text-decoration:none}
 @media(max-width:1000px){.analytics-grid{grid-template-columns:repeat(2,1fr)}.analytics-two{grid-template-columns:1fr}}
 @media(max-width:720px){.analytics-grid{grid-template-columns:1fr 1fr}.analytics-toolbar{align-items:flex-start}.analytics-periods{width:100%}.analytics-period{flex:1}.analytics-chart{min-height:230px;padding:12px}.analytics-bars{height:180px}}
 
-.profile-permission-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:20px 0 10px;padding:15px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}
-.profile-permission-head strong{display:block;font-size:12px}.profile-permission-head span{display:block;color:var(--muted);font-size:10px;margin-top:5px;line-height:1.5}
-.profile-permission-actions{display:flex;gap:8px;flex-wrap:wrap}.profile-field-permission-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.profile-field-card{min-height:70px}
-@media(max-width:720px){.profile-permission-head{display:block}.profile-permission-actions{margin-top:10px}.profile-field-permission-grid{grid-template-columns:1fr}}
-
 .toast{position:fixed;right:20px;bottom:20px;background:var(--panel);border:1px solid rgba(var(--accent-rgb),.4);box-shadow:var(--shadow);padding:12px 15px;border-radius:12px;font-size:11px;display:none;z-index:80}.toast.show{display:block}
 .login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 50% 10%,rgba(var(--accent-rgb),.10),transparent 38%),var(--bg)}.login-card{width:min(520px,100%);padding:35px;border:1px solid var(--line);background:var(--panel);border-radius:24px;box-shadow:var(--shadow)}.login-logo{text-align:center;font-size:45px}.login h2{text-align:center;letter-spacing:3px;margin:13px 0 4px}.login p{text-align:center;color:var(--muted);font-size:11px;margin:0 0 27px}.field{margin-bottom:13px}.field label{display:block;font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;margin-bottom:6px}.field input{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);outline:none}.field input:focus{border-color:rgba(var(--accent-rgb),.55)}.login .btn{width:100%;padding:13px;margin-top:4px}.error{color:var(--danger);font-size:11px;margin-top:10px;text-align:center;min-height:15px}
 @media(max-width:1100px){.app{grid-template-columns:78px 1fr}.sidebar{padding:18px 10px}.brand{justify-content:center}.brand div:last-child,.nav-title,.nav button span,.admin-card .admin-mail,.admin-card .online,.admin-card .admin-name{display:none}.nav button{justify-content:center}.admin-card{padding:10px}.admin-row{justify-content:center}.cards{grid-template-columns:repeat(2,1fr)}.grid-main{grid-template-columns:1fr}}
-@media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;border-right:0;border-top:1px solid var(--line);padding:7px 8px}.brand,.admin-card,.nav-title{display:none}.nav{display:flex;justify-content:space-around}.nav button{padding:9px;flex:1}.nav button span{display:none}.main{padding-bottom:62px;min-width:0;overflow-x:hidden}.topbar{--topbar-h:58px;height:var(--topbar-h);padding:12px 14px}.top-actions{margin-left:auto}.colors label{display:none}.content{padding:22px 14px}.hero{align-items:start}.hero h1{font-size:31px}.status{display:none}.cards{grid-template-columns:1fr 1fr;gap:9px}.stat{min-height:125px;padding:14px}.stat-value{font-size:26px}.grid-main{margin-top:10px}.section-head{display:block}.search{margin-top:12px}.search input{width:100%}.summary-grid{grid-template-columns:1fr 1fr}.summary-item{padding:10px 0;border-right:0;border-bottom:1px solid var(--line)}.detail-grid{grid-template-columns:1fr}.topbar .tool:first-child{display:none}}
+@media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;border-right:0;border-top:1px solid var(--line);padding:7px 8px}.brand,.admin-card,.nav-title{display:none}.nav{display:flex;justify-content:space-around}.nav button{padding:9px;flex:1}.nav button span{display:none}.main{padding-bottom:62px}.topbar{--topbar-h:58px;height:var(--topbar-h);padding:12px 14px}.top-actions{margin-left:auto}.colors label{display:none}.content{padding:22px 14px}.hero{align-items:start}.hero h1{font-size:31px}.status{display:none}.cards{grid-template-columns:1fr 1fr;gap:9px}.stat{min-height:125px;padding:14px}.stat-value{font-size:26px}.grid-main{margin-top:10px}.section-head{display:block}.search{margin-top:12px}.search input{width:100%}.summary-grid{grid-template-columns:1fr 1fr}.summary-item{padding:10px 0;border-right:0;border-bottom:1px solid var(--line)}.detail-grid{grid-template-columns:1fr}.topbar .tool:first-child{display:none}}
 
 .live-center{margin-top:16px}
 .live-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
@@ -153,53 +146,6 @@ a{color:inherit;text-decoration:none}
 .live-empty{padding:30px 15px;text-align:center;color:var(--muted);font-size:10px}
 @media(max-width:900px){.live-kpis{grid-template-columns:repeat(2,1fr)}.live-layout{grid-template-columns:1fr}}
 @media(max-width:520px){.live-kpis{grid-template-columns:1fr 1fr}.live-item{padding:11px 12px}}
-
-/* LEO CONNECT — workspace & responsive final */
-@media(max-width:1100px){
-  .business-page.show,.global-page.show{left:78px;width:calc(100vw - 78px)}
-  .analytics-two{grid-template-columns:1fr}
-}
-@media(max-width:720px){
-  .business-page.show,.global-page.show{
-    --topbar-h:58px;
-    top:var(--topbar-h);left:0;width:100vw;right:auto;bottom:62px;
-    border-left:0;
-    padding:20px 14px 80px;
-  }
-  .business-page.show .business-tabs{overflow-x:auto;white-space:nowrap;display:flex}
-  .business-page.show .business-tabs button{flex:0 0 auto}
-  .business-page.show .hero-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .business-page.show .hero-actions .btn:last-child{grid-column:1/-1}
-  .global-head h2{font-size:24px}
-  .global-row{align-items:flex-start;flex-direction:column}
-  .global-row .btn{width:100%}
-  .analytics-grid{grid-template-columns:1fr 1fr}
-  .analytics-two{grid-template-columns:1fr}
-  .analytics-toolbar{padding:10px}
-  .analytics-periods{display:grid;grid-template-columns:1fr 1fr;width:100%}
-  .analytics-period{width:100%}
-}
-@media(max-width:420px){
-  .analytics-grid{grid-template-columns:1fr}
-  .business-page.show .hero-actions{grid-template-columns:1fr}
-  .business-page.show .hero-actions .btn:last-child{grid-column:auto}
-}
-
-
-.business-page.show *{box-sizing:border-box}
-.business-page.show .business-hero,
-.business-page.show .biz-columns,
-.business-page.show .biz-stat-grid,
-.business-page.show .profile-editor,
-.business-page.show .info-grid{max-width:100%}
-@media(max-width:720px){
-  .business-page.show{padding:16px 12px 80px}
-  .business-page.show .business-hero{padding:14px}
-  .business-page.show .business-tabs{max-width:100%;overflow-x:auto}
-  .business-page.show .biz-columns{grid-template-columns:1fr}
-  .business-page.show .biz-stat-grid{grid-template-columns:1fr 1fr}
-}
-
 </style>
 </head>
 <body data-accent="gold">
@@ -221,7 +167,7 @@ a{color:inherit;text-decoration:none}
     <div class="brand"><div class="brand-mark">🦁</div><div><strong>LEO CONNECT</strong><small>COMMAND CENTER</small></div></div>
     <div class="nav-title">ANA MENÜ</div>
     <nav class="nav">
-      <button class="active" onclick="showOverview(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
+      <button class="active" onclick="setActive(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
       <button onclick="showBusinessesManager(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
       <button onclick="showNFCManager(this)"><span class="nav-icon">◉</span><span>NFC Etiketleri</span></button>
       <button onclick="showQRManager(this)"><span class="nav-icon">▣</span><span>QR Merkezi</span></button>
@@ -373,6 +319,7 @@ let adminToken=localStorage.getItem("admin_token")||"";
 let allBusinesses=[];
 let overview={};
 let currentBusiness=null;
+let currentBusinessV2Settings=null;
 
 let liveTimer=null;
 const liveLabels={profile_view:'Profil görüntülendi',qr_scan:'QR tarandı',qr:'QR etkileşimi',nfc:'NFC dokunuldu',phone:'Telefon tıklandı',whatsapp:'WhatsApp açıldı',instagram:'Instagram açıldı',tiktok:'TikTok açıldı',google_review:'Google yorum açıldı',website:'Website açıldı',menu:'Menü açıldı',location:'Konum açıldı',iban:'IBAN görüntülendi',share:'Profil paylaşıldı'};
@@ -523,50 +470,8 @@ async function showBusinessesManager(btn){
   }catch(e){document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
 }
 function focusBusinesses(){showBusinessesManager();}
-async function focusAnalytics(btn){
-  if(btn)setActive(btn);
-  showGlobalPage("Analytics","İşletme bazlı gerçek event verilerini merkezi alandan görüntüle.",'<div class="global-card"><div class="section-title">Analitik işletmeleri yükleniyor…</div></div>');
-  try{
-    if(!allBusinesses.length){
-      const d=await api("/api/admin/businesses");
-      allBusinesses=d.businesses||d||[];
-    }
-    const rows=allBusinesses.length?allBusinesses.map(b=>`
-      <div class="global-card">
-        <div class="global-row">
-          <div class="global-main">
-            <div class="global-icon">⌁</div>
-            <div>
-              <div class="global-name">${esc(b.name||"İsimsiz")}</div>
-              <div class="global-sub">${esc(b.category||"—")} • Profil ${n(b.profile_views)} • QR ${n(b.qr_scans)} • NFC ${n(b.nfc_scans)}</div>
-            </div>
-          </div>
-          <button class="btn primary" onclick="openBusinessAnalytics(${Number(b.id)})">Analytics Aç →</button>
-        </div>
-      </div>`).join("")
-      : '<div class="global-card"><div class="analytics-empty">Analiz edilecek işletme bulunamadı.</div></div>';
-    document.getElementById("globalContent").innerHTML=`<div class="global-grid">${rows}</div>`;
-  }catch(e){
-    document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="analytics-empty">'+esc(e.message||"Analytics verileri alınamadı")+'</div></div>';
-  }
-}
-function openBusinessAnalytics(id){
-  openBusiness(id).then(()=>{
-    switchBizTab("analytics",document.querySelector('[data-tab=analytics]'));
-  });
-}
-function showOverview(btn){
-  setActive(btn);
-  currentBusiness=null;
-  document.getElementById("businessPage").classList.remove("show");
-  document.getElementById("globalPage").classList.remove("show");
-  document.querySelector(".content").style.display="";
-  loadAll();
-}
-function setActive(btn){
-  document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
-  if(btn)btn.classList.add("active");
-}
+function focusAnalytics(){showGlobalPage("Analytics","Merkezi analiz alanı.",'<div class="global-card"><div class="empty">Bir işletme seçerek detaylı Analytics ekranını açabilirsin.</div></div>');}
+function setActive(btn){document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}
 function openModal(){document.getElementById("modalBg").classList.add("show")}
 function closeModal(){document.getElementById("modalBg").classList.remove("show")}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2800)}
@@ -576,19 +481,20 @@ async function copyText(text){try{await navigator.clipboard.writeText(text);show
 async function openBusiness(id){
   try{
     const d=await api("/api/admin/business/"+id);
+    try{currentBusinessV2Settings=await api("/api/admin/business/"+id+"/v2-settings")}catch(e){currentBusinessV2Settings=null}
     currentBusiness={...d.business,permissions:d.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:d.nfc_tags||[]};
     document.querySelector(".content").style.display="none";
     document.getElementById("globalPage").classList.remove("show");
     document.getElementById("businessPage").classList.add("show");
     renderBusinessPage();
-    
+    window.scrollTo({top:0,behavior:"smooth"});
   }catch(e){showToast(e.message)}
 }
 function closeBusinessPage(){
   currentBusiness=null;
   document.getElementById("businessPage").classList.remove("show");
   document.querySelector(".content").style.display="";
-  
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 function renderBusinessPage(){
   const b=currentBusiness,tags=b.nfc_tags||[];
@@ -626,13 +532,10 @@ function switchBizTab(name,btn){
   const panel=document.getElementById(panelMap[name]);
   if(!panel){showToast("Panel bulunamadı: "+name);return;}
   panel.classList.add("active");
-  const workspace=document.getElementById("businessPage");
-  if(workspace){workspace.scrollTop=0;workspace.scrollLeft=0}
   if(name==="nfc")renderBizNFC();
   if(name==="analytics")renderBizAnalytics();
   if(name==="permissions")renderBizPermissions();
   if(name==="qr")renderBizQR();
-  requestAnimationFrame(()=>{if(workspace){workspace.scrollTop=0;workspace.scrollLeft=0}});
 }
 function renderBizOverview(){
   const b=currentBusiness,tags=b.nfc_tags||[];
@@ -703,6 +606,7 @@ async function saveBusinessPage(){
     showToast("İşletme profili güncellendi.");
     await loadAll();
     const d=await api("/api/admin/business/"+id);
+    try{currentBusinessV2Settings=await api("/api/admin/business/"+id+"/v2-settings")}catch(e){currentBusinessV2Settings=null}
     currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:d.nfc_tags||[]};
     renderBusinessPage();
   }catch(e){showToast(e.message)}
@@ -857,24 +761,6 @@ async function loadBizAnalytics(){
 
 function renderBizPermissions(){
   const b=currentBusiness, p=b.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false};
-  const pf={name:true,category:true,description:true,phone:true,whatsapp:true,address:true,instagram:true,tiktok:true,google_review:true,website:true,menu:true,iban:true,iban_holder:true,hours:true,logo_url:true,...(p.profile_fields||{})};
-  const profileFields=[
-    ["name","İşletme Adı","İşletmenin adını değiştirebilsin"],
-    ["category","Kategori","Kategori bilgisini değiştirebilsin"],
-    ["description","İşletme Açıklaması","Tanıtım metnini değiştirebilsin"],
-    ["phone","Telefon","Telefon numarasını değiştirebilsin"],
-    ["whatsapp","WhatsApp","WhatsApp bağlantısını değiştirebilsin"],
-    ["address","Konum / Google Maps","Konum bağlantısını değiştirebilsin"],
-    ["instagram","Instagram","Instagram bağlantısını değiştirebilsin"],
-    ["tiktok","TikTok","TikTok bağlantısını değiştirebilsin"],
-    ["google_review","Google Yorum","Google yorum bağlantısını değiştirebilsin"],
-    ["website","Web Sitesi","Web sitesi bağlantısını değiştirebilsin"],
-    ["menu","Menü","Menü bağlantısını değiştirebilsin"],
-    ["hours","Çalışma Saatleri","Çalışma saatlerini değiştirebilsin"],
-    ["iban","IBAN","IBAN bilgisini değiştirebilsin"],
-    ["iban_holder","IBAN Sahibi","IBAN sahibini değiştirebilsin"],
-    ["logo_url","Logo Görseli","Logo URL'sini değiştirebilsin"]
-  ];
   document.getElementById("bizPermissions").innerHTML=`
     <section class="card biz-section">
       <h3>Erişim İzinleri</h3>
@@ -890,59 +776,61 @@ function renderBizPermissions(){
         <div class="permission-card"><div><strong>🚀 Smart Campaigns</strong><span>Kampanya oluşturma, zamanlama ve müşteri profilinde yayınlama</span></div><label class="switch"><input id="perm_campaign" type="checkbox" ${p.campaign?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>💳 Digital Business Card</strong><span>İşletmenin dijital kartvizit modülünü kullanabilsin</span></div><label class="switch"><input id="perm_card" type="checkbox" ${p.card?'checked':''}><span class="slider"></span></label></div>
       </div>
-
-      <div class="profile-permission-head">
-        <div>
-          <strong>🔐 Profil Alan Yetkileri</strong>
-          <span>İşletme panelindeki her alanı tek tek açıp kapatabilirsin. Kapalı alan işletme tarafından düzenlenemez; sunucu tarafında da değişiklik engellenir.</span>
-        </div>
-        <div class="profile-permission-actions">
-          <button class="btn" type="button" onclick="setAllProfileFieldPermissions(true)">Tümünü Aç</button>
-          <button class="btn" type="button" onclick="setAllProfileFieldPermissions(false)">Tümünü Kapat</button>
-        </div>
-      </div>
-
-      <div class="permission-grid profile-field-permission-grid">
-        ${profileFields.map(([key,label,desc])=>`
-          <div class="permission-card profile-field-card">
-            <div><strong>${label}</strong><span>${desc}</span></div>
-            <label class="switch"><input class="profile-field-perm" data-field="${key}" type="checkbox" ${pf[key]?'checked':''}><span class="slider"></span></label>
-          </div>
-        `).join('')}
-      </div>
-
       <div class="modal-actions"><button class="btn primary" onclick="saveBusinessPermissions()">İzinleri Kaydet</button></div>
-      <div class="section-sub" style="margin-top:10px">🔒 Modül izinleri ve profil alan izinleri ayrı çalışır. Örneğin Profil açıkken sadece Instagram ve Telefon yetkisini kapatabilirsin.</div>
+      <div class="section-sub" style="margin-top:10px">🔒 QR ve NFC varsayılan olarak kapalıdır. Sen açmadıkça işletme panelinde görünmez ve ilgili API'lere erişemez.</div>
+    </section>
+    <section class="card biz-section" style="margin-top:14px">
+      <h3>🎨 Profil Görünümü & Bağlantı Yetkileri</h3>
+      <div class="sub">İşletmenin tema değiştirme hakkını ve hangi dijital bağlantı türlerinin kullanılabileceğini buradan belirle.</div>
+      <div class="permission-grid" style="margin-top:14px">
+        <div class="permission-card"><div><strong>Tema Değiştirme</strong><span>İşletme panelinde 4 tema arasından seçim yapabilsin</span></div><label class="switch"><input id="perm_profile_theme" type="checkbox" ${currentBusinessV2Settings?.theme_permission!==false?'checked':''}><span class="slider"></span></label></div>
+        ${[['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['youtube','YouTube'],['linkedin','LinkedIn'],['x','X'],['whatsapp','WhatsApp'],['google','Google'],['website','Website']].map(([k,l])=>`<div class="permission-card"><div><strong>${l}</strong><span>Profil bağlantısı olarak kullanılabilsin</span></div><label class="switch"><input id="perm_social_${k}" type="checkbox" ${currentBusinessV2Settings?.allowed_platforms?.[k]!==false?'checked':''}><span class="slider"></span></label></div>`).join('')}
+      </div>
+      <div style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)">
+        <div style="font-size:11px;font-weight:800">İşletmenin Aktif Teması</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px">Admin buradan işletmenin müşteriye görünen profil temasını doğrudan seçebilir.</div>
+        <div class="permission-grid" style="margin-top:10px">
+          ${[['midnight-gold','Midnight Gold','Siyah / altın'],['obsidian','Obsidian','Ultra dark / tech'],['champagne','Champagne','Sıcak / lüks'],['pure-light','Pure Light','Aydınlık / premium']].map(([k,l,d])=>`<button type="button" class="btn ${currentBusinessV2Settings?.theme===k?'primary':''}" onclick="adminSetBusinessTheme('${k}')">${l}<span style="display:block;font-size:8px;opacity:.7;margin-top:3px">${d}</span></button>`).join('')}
+        </div>
+      </div>
+      <div class="modal-actions"><button class="btn primary" onclick="saveBusinessV2ProfilePermissions()">Profil Yetkilerini Kaydet</button></div>
     </section>`;
 }
-function setAllProfileFieldPermissions(value){
-  document.querySelectorAll('.profile-field-perm').forEach(el=>el.checked=!!value);
-}
-
 async function saveBusinessPermissions(){
   const id=currentBusiness.id;
-  const permissions={
-    profile:document.getElementById("perm_profile").checked,
-    qr:document.getElementById("perm_qr").checked,
-    nfc:document.getElementById("perm_nfc").checked,
-    analytics:document.getElementById("perm_analytics").checked,
-    live:document.getElementById("perm_live").checked,
-    ai:document.getElementById("perm_ai").checked,
-    review:document.getElementById("perm_review").checked,
-    campaign:document.getElementById("perm_campaign").checked,
-    card:document.getElementById("perm_card").checked,
-    profile_fields:{}
-  };
-  document.querySelectorAll('.profile-field-perm').forEach(el=>{
-    permissions.profile_fields[el.dataset.field]=el.checked;
-  });
-
+  const permissions={profile:document.getElementById("perm_profile").checked,qr:document.getElementById("perm_qr").checked,nfc:document.getElementById("perm_nfc").checked,analytics:document.getElementById("perm_analytics").checked,live:document.getElementById("perm_live").checked,ai:document.getElementById("perm_ai").checked,review:document.getElementById("perm_review").checked,campaign:document.getElementById("perm_campaign").checked,card:document.getElementById("perm_card").checked};
   try{
     const d=await api("/api/admin/business/"+id+"/permissions",{method:"PUT",body:JSON.stringify(permissions)});
     currentBusiness.permissions=d.permissions||permissions;
-    showToast("Erişim ve profil alan izinleri güncellendi.");
+    showToast("Erişim izinleri güncellendi.");
     renderBusinessPage();
     switchBizTab("permissions",document.querySelector('[data-tab=permissions]'));
+  }catch(e){showToast(e.message)}
+}
+
+
+
+async function adminSetBusinessTheme(theme){
+  if(!currentBusiness)return;
+  try{
+    const d=await api("/api/admin/business/"+currentBusiness.id+"/theme",{method:"PUT",body:JSON.stringify({theme,accent_color:"#D4AF37"})});
+    currentBusinessV2Settings={...(currentBusinessV2Settings||{}),theme:d.theme||theme,accent_color:d.accent_color||"#D4AF37"};
+    showToast((d.theme_name||theme)+" teması işletmeye uygulandı.");
+    renderBizPermissions();
+  }catch(e){showToast(e.message)}
+}
+
+async function saveBusinessV2ProfilePermissions(){
+  if(!currentBusiness)return;
+  try{
+    const allowed={};
+    ['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google','website'].forEach(k=>allowed[k]=document.getElementById('perm_social_'+k)?.checked!==false);
+    const themeAllowed=document.getElementById('perm_profile_theme')?.checked!==false;
+    const d=await api("/api/admin/business/"+currentBusiness.id+"/theme-permission",{method:"PUT",body:JSON.stringify({allowed:themeAllowed})});
+    const s=await api("/api/admin/business/"+currentBusiness.id+"/social-platform-permissions",{method:"PUT",body:JSON.stringify({allowed_platforms:allowed})});
+    currentBusinessV2Settings={...(currentBusinessV2Settings||{}),theme_permission:d.theme_permission!==false,allowed_platforms:s.allowed_platforms||allowed};
+    showToast("Profil görünüm ve bağlantı yetkileri kaydedildi.");
+    renderBizPermissions();
   }catch(e){showToast(e.message)}
 }
 
@@ -976,7 +864,7 @@ async function showQR(id){
 function closeGlobalPage(){
   document.getElementById("globalPage").classList.remove("show");
   document.querySelector(".content").style.display="";
-  
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 function showGlobalPage(title,subtitle,html){
   document.querySelector(".content").style.display="none";
@@ -986,7 +874,7 @@ function showGlobalPage(title,subtitle,html){
   document.getElementById("globalSubtitle").textContent=subtitle;
   document.getElementById("globalContent").innerHTML=html;
   document.getElementById("globalPage").classList.add("show");
-  
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 async function showNFCManager(btn){
   if(btn)setActive(btn);
