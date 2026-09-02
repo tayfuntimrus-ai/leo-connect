@@ -96,7 +96,9 @@ function businessPermissions(row) {
     profile: row?.dashboard_profile !== false,
     qr: row?.dashboard_qr === true,
     nfc: row?.dashboard_nfc === true,
-    analytics: row?.dashboard_analytics === true
+    analytics: row?.dashboard_analytics === true,
+    live: row?.dashboard_live === true,
+    ai: row?.dashboard_ai === true
   };
 }
 
@@ -105,7 +107,7 @@ function requireBusinessPermission(permission) {
     try {
       if (req.user?.role === 'admin') return next();
       const result = await pool.query(
-        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics
+        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai
          FROM businesses WHERE id=$1 LIMIT 1`,
         [req.user.id]
       );
@@ -193,7 +195,9 @@ async function initDatabase() {
       ADD COLUMN IF NOT EXISTS dashboard_profile BOOLEAN NOT NULL DEFAULT TRUE,
       ADD COLUMN IF NOT EXISTS dashboard_qr BOOLEAN NOT NULL DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS dashboard_nfc BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS dashboard_analytics BOOLEAN NOT NULL DEFAULT FALSE
+      ADD COLUMN IF NOT EXISTS dashboard_analytics BOOLEAN NOT NULL DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS dashboard_live BOOLEAN NOT NULL DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS dashboard_ai BOOLEAN NOT NULL DEFAULT FALSE
   `);
 
 
@@ -732,9 +736,11 @@ app.post('/api/admin/businesses', adminAuth, async (req, res) => {
         dashboard_profile,
         dashboard_qr,
         dashboard_nfc,
-        dashboard_analytics
+        dashboard_analytics,
+        dashboard_live,
+        dashboard_ai
       )
-      VALUES($1,$2,$3,$4,$5,TRUE,FALSE,FALSE,FALSE)
+      VALUES($1,$2,$3,$4,$5,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE)
       RETURNING *
     `, [
       businessName,
@@ -853,7 +859,7 @@ app.get(
 app.get('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics
+      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai
       FROM businesses WHERE id=$1 LIMIT 1
     `, [Number(req.params.id)]);
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
@@ -872,13 +878,15 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
     const qr = body.qr === true;
     const nfc = body.nfc === true;
     const analytics = body.analytics === true;
+    const live = body.live === true;
+    const ai = body.ai === true;
 
     const result = await pool.query(`
       UPDATE businesses
-      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4
-      WHERE id=$5
-      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics
-    `, [profile, qr, nfc, analytics, id]);
+      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6
+      WHERE id=$7
+      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai
+    `, [profile, qr, nfc, analytics, live, ai, id]);
 
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
     res.json({ success: true, permissions: businessPermissions(result.rows[0]) });
@@ -2384,6 +2392,102 @@ app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'),
   } catch(error) {
     console.error('BUSINESS ANALYTICS V3 ERROR:', error);
     res.status(500).json({error:'Analiz verileri alınamadı'});
+  }
+});
+
+
+/* =========================================================
+   BUSINESS LIVE ACTIVITY — PERMISSION CONTROLLED
+========================================================= */
+app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), async (req, res) => {
+  try {
+    const limit = Math.min(Math.max(Number(req.query.limit) || 20, 5), 50);
+    const result = await pool.query(`
+      SELECT e.id, e.type, e.source, e.nfc_tag_id, e.created_at,
+             t.name AS nfc_name, t.placement AS nfc_placement
+      FROM events e
+      LEFT JOIN nfc_tags t ON t.id=e.nfc_tag_id
+      WHERE e.business_id=$1
+      ORDER BY e.created_at DESC
+      LIMIT $2
+    `, [req.user.id, limit]);
+    const stats = await pool.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '15 minutes')::int AS last_15m,
+        COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '60 minutes')::int AS last_60m,
+        COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE)::int AS today
+      FROM events WHERE business_id=$1
+    `, [req.user.id]);
+    res.json({activities: result.rows, stats: stats.rows[0] || {last_15m:0,last_60m:0,today:0}});
+  } catch(error) {
+    console.error('BUSINESS LIVE ERROR:', error);
+    res.status(500).json({error:'Canlı aktivite alınamadı'});
+  }
+});
+
+/* =========================================================
+   LEO AI INSIGHTS V1 — DATA-DRIVEN BUSINESS REPORTING
+   Rule-based insight engine; no external AI API required.
+========================================================= */
+app.get('/api/business-ai-insights', auth, requireBusinessPermission('ai'), async (req, res) => {
+  try {
+    const period = ['today','7d','30d','all'].includes(req.query.period) ? req.query.period : '7d';
+    let where = 'business_id=$1';
+    if (period === 'today') where += " AND created_at >= CURRENT_DATE";
+    if (period === '7d') where += " AND created_at >= NOW() - INTERVAL '7 days'";
+    if (period === '30d') where += " AND created_at >= NOW() - INTERVAL '30 days'";
+    const params=[req.user.id];
+    const totalsQ=await pool.query(`SELECT
+      COUNT(*)::int total_events,
+      COUNT(*) FILTER(WHERE type='profile_view')::int profile_views,
+      COUNT(*) FILTER(WHERE type IN ('qr_scan','qr'))::int qr,
+      COUNT(*) FILTER(WHERE type='nfc')::int nfc,
+      COUNT(*) FILTER(WHERE type='whatsapp')::int whatsapp,
+      COUNT(*) FILTER(WHERE type='phone')::int phone,
+      COUNT(*) FILTER(WHERE type='instagram')::int instagram,
+      COUNT(*) FILTER(WHERE type='tiktok')::int tiktok,
+      COUNT(*) FILTER(WHERE type='google_review')::int google_review,
+      COUNT(*) FILTER(WHERE type='website')::int website,
+      COUNT(*) FILTER(WHERE type='menu')::int menu,
+      COUNT(*) FILTER(WHERE type='location')::int location,
+      COUNT(*) FILTER(WHERE type='share')::int share
+      FROM events WHERE ${where}`,params);
+    const hourlyQ=await pool.query(`SELECT EXTRACT(HOUR FROM created_at)::int hour, COUNT(*)::int events FROM events WHERE ${where} GROUP BY 1 ORDER BY events DESC LIMIT 1`,params);
+    const actionsQ=await pool.query(`SELECT type, COUNT(*)::int count FROM events WHERE ${where} GROUP BY type ORDER BY count DESC LIMIT 5`,params);
+    const sourceQ=await pool.query(`SELECT COALESCE(NULLIF(source,''),'direct') source, COUNT(*)::int count FROM events WHERE ${where} GROUP BY 1 ORDER BY count DESC`,params);
+    const t=totalsQ.rows[0]||{};
+    const n=k=>Number(t[k]||0);
+    const profile=n('profile_views'), total=n('total_events'), digital=n('qr')+n('nfc'), contact=n('whatsapp')+n('phone');
+    const actionTotal=Math.max(0,total-profile);
+    const conversion=profile?Math.min(100,actionTotal/profile*100):0;
+    let score=0;
+    if(profile>=20) score+=20; else if(profile>0) score+=10;
+    if(digital>=10) score+=20; else if(digital>0) score+=10;
+    if(contact>=5) score+=20; else if(contact>0) score+=10;
+    if(actionTotal>=20) score+=20; else if(actionTotal>0) score+=10;
+    if((n('whatsapp')+n('phone')+n('instagram')+n('google_review'))>0) score+=20;
+    const peak=hourlyQ.rows[0]||null;
+    const top=actionsQ.rows[0]||null;
+    const strongestSource=sourceQ.rows[0]||null;
+    const insights=[]; const recommendations=[];
+    if(!total){ insights.push('Henüz yeterli etkileşim verisi oluşmadı.'); recommendations.push('Profil bağlantısını QR ve NFC noktalarında daha görünür hale getir.'); }
+    else {
+      if(n('nfc')>n('qr') && digital>0) insights.push(`NFC, QR'a göre daha güçlü dijital temas kanalı olmuş (${n('nfc')} vs ${n('qr')}).`);
+      else if(n('qr')>n('nfc') && digital>0) insights.push(`QR, NFC'ye göre daha fazla dijital temas üretmiş (${n('qr')} vs ${n('nfc')}).`);
+      if(contact>0) insights.push(`Müşteriler ${contact} kez doğrudan iletişim aksiyonu gerçekleştirmiş.`);
+      if(peak) insights.push(`En yoğun saat ${String(Number(peak.hour)).padStart(2,'0')}:00 civarı; ${peak.events} etkileşim kaydedilmiş.`);
+      if(top) insights.push(`En sık kullanılan aksiyon: ${top.type} (${top.count}).`);
+      if(conversion<10 && profile>=10) recommendations.push('Profil ziyaretinden iletişime geçişi artırmak için WhatsApp ve telefon CTA\'larını daha görünür konumlandır.');
+      if(n('nfc')===0 && n('qr')>0) recommendations.push('NFC noktaları eklemek, QR dışında fiziksel temas kanalı oluşturabilir.');
+      if(n('qr')===0 && n('nfc')>0) recommendations.push('QR kodu menü, masa, vitrin veya kartvizitte görünür hale getir.');
+      if(n('google_review')===0 && profile>=20) recommendations.push('Google yorum bağlantısını görünür bir aksiyon olarak öne çıkar.');
+      if(!recommendations.length) recommendations.push('Mevcut en güçlü kanalı koru ve yoğun saatlerde görünürlüğü artır.');
+    }
+    const title=score>=80?'Mükemmel performans':score>=60?'Güçlü performans':score>=40?'Gelişen performans':score>=20?'Veri oluşuyor':'Başlangıç aşaması';
+    res.json({period, generated_at:new Date().toISOString(), score, title, totals:t, conversion:Math.round(conversion*10)/10, peak_hour:peak, strongest_action:top, strongest_source:strongestSource, insights, recommendations});
+  } catch(error) {
+    console.error('BUSINESS AI INSIGHTS ERROR:', error);
+    res.status(500).json({error:'AI içgörü raporu oluşturulamadı'});
   }
 });
 
