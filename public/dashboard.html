@@ -5359,7 +5359,30 @@ load();
 
 /* BUSINESS CENTER EXTRA MODULES */
 function esc(value){return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
-function formatEventType(type){return ({profile_view:"Profil görüntüleme",qr:"QR tarama",qr_scan:"QR tarama",nfc:"NFC dokunuşu",whatsapp:"WhatsApp",phone:"Telefon",instagram:"Instagram",tiktok:"TikTok",google_review:"Google yorum",website:"Website",menu:"Menü",location:"Konum",share:"Paylaşım"}[type]||type||"Etkileşim");}
+function formatEventType(type){
+  const events={
+    profile_view:{icon:"👤",label:"Profil görüntülendi"},
+    qr:{icon:"📱",label:"QR kod tarandı"},
+    qr_scan:{icon:"📱",label:"QR kod tarandı"},
+    nfc:{icon:"📡",label:"NFC dokunuldu"},
+    whatsapp:{icon:"💬",label:"WhatsApp'a tıklandı"},
+    phone:{icon:"☎️",label:"Telefon numarasına tıklandı"},
+    instagram:{icon:"📸",label:"Instagram'a tıklandı"},
+    tiktok:{icon:"🎵",label:"TikTok'a tıklandı"},
+    google_review:{icon:"⭐",label:"Google yorumlarına gidildi"},
+    review_open:{icon:"⭐",label:"Yorum sayfası açıldı"},
+    review_positive:{icon:"👍",label:"Olumlu yorum seçildi"},
+    review_feedback:{icon:"💬",label:"Yorum geri bildirimi gönderildi"},
+    website:{icon:"🌐",label:"Web sitesine tıklandı"},
+    menu:{icon:"📋",label:"Menü açıldı"},
+    location:{icon:"📍",label:"Konum açıldı"},
+    share:{icon:"↗️",label:"Profil paylaşıldı"},
+    campaign_view:{icon:"🚀",label:"Kampanya görüntülendi"},
+    campaign_click:{icon:"🚀",label:"Kampanyaya tıklandı"}
+  };
+  const e=events[type];
+  return e ? `${e.icon} ${e.label}` : `🔔 ${type||"Yeni etkileşim"}`;
+}
 async function loadBusinessLive(){if(!currentBusiness?.permissions?.live)return;const data=await api("/api/business-live-activity?limit=20");if(!data||data.error)return;const s=data.stats||{};document.getElementById("live15").textContent=Number(s.last_15m||0);document.getElementById("live60").textContent=Number(s.last_60m||0);document.getElementById("liveToday").textContent=Number(s.today||0);const rows=data.activities||[];document.getElementById("liveActivityList").innerHTML=rows.length?rows.map(x=>{const time=x.created_at?new Date(x.created_at).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";const extra=x.nfc_name?` • ${esc(x.nfc_name)}`:"";return `<div class="feature-item"><strong>${esc(formatEventType(x.type))}</strong>${extra}<span style="float:right;color:#666">${esc(time)}</span></div>`}).join(""):'<div class="feature-empty">Henüz aktivite yok.</div>';}
 async function loadAIInsights(period="7d",button=null){if(!currentBusiness?.permissions?.ai)return;if(button){document.querySelectorAll(".feature-periods button").forEach(b=>b.classList.remove("active"));button.classList.add("active");}const data=await api("/api/business-ai-insights?period="+encodeURIComponent(period));if(!data||data.error)return;document.getElementById("aiScore").textContent=Number(data.score||0);document.getElementById("aiTitle").textContent=data.title||"Analiz";document.getElementById("aiConversion").textContent="%"+Number(data.conversion||0).toLocaleString("tr-TR");document.getElementById("aiPeak").textContent=data.peak_hour?String(data.peak_hour.hour).padStart(2,"0")+":00":"—";document.getElementById("aiSource").textContent=data.strongest_source?.source||"—";const renderList=(id,items,icon)=>document.getElementById(id).innerHTML=(items||[]).length?items.map(x=>`<div class="feature-item">${icon} ${esc(x)}</div>`).join(""):'<div class="feature-empty">Henüz veri yok.</div>';renderList("aiInsights",data.insights,"💡");renderList("aiRecommendations",data.recommendations,"→");}
 async function loadReviewBooster(){if(!currentBusiness?.permissions?.review)return;const data=await api("/api/business-review-booster");if(!data||data.error)return;const status=document.getElementById("reviewStatus");status.textContent=data.enabled?"AKTİF":"KAPALI";status.className="feature-status "+(data.enabled?"on":"off");document.getElementById("reviewTitle").textContent=data.title||"—";document.getElementById("reviewText").textContent=data.text||"—";document.getElementById("reviewThreshold").textContent=Number(data.threshold||4)+"★";const link=document.getElementById("reviewGoogle");if(currentBusiness.google_review){link.href=currentBusiness.google_review;link.textContent="Bağlantıyı Aç →";}else{link.removeAttribute("href");link.textContent="Google bağlantısı eklenmemiş";}}
