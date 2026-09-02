@@ -747,7 +747,7 @@ async function loadBizAnalytics(){
 }
 
 function renderBizPermissions(){
-  const b=currentBusiness, p=b.permissions||{profile:true,qr:false,nfc:false,analytics:false};
+  const b=currentBusiness, p=b.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false};
   document.getElementById("bizPermissions").innerHTML=`
     <section class="card biz-section">
       <h3>Erişim İzinleri</h3>
@@ -757,6 +757,8 @@ function renderBizPermissions(){
         <div class="permission-card"><div><strong>QR Merkezi</strong><span>QR kodunu görüntüleme ve kullanma</span></div><label class="switch"><input id="perm_qr" type="checkbox" ${p.qr?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>NFC Merkezi</strong><span>NFC etiketlerini görüntüleme ve yönetme</span></div><label class="switch"><input id="perm_nfc" type="checkbox" ${p.nfc?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>Analytics</strong><span>İşletme istatistiklerini görüntüleme</span></div><label class="switch"><input id="perm_analytics" type="checkbox" ${p.analytics?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>🟢 Canlı Takip</strong><span>Son müşteri hareketlerini canlı olarak görüntüleme</span></div><label class="switch"><input id="perm_live" type="checkbox" ${p.live?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>🧠 LEO AI Insights</strong><span>Yapay zekâ destekli işletme raporlarını görüntüleme</span></div><label class="switch"><input id="perm_ai" type="checkbox" ${p.ai?'checked':''}><span class="slider"></span></label></div>
       </div>
       <div class="modal-actions"><button class="btn primary" onclick="saveBusinessPermissions()">İzinleri Kaydet</button></div>
       <div class="section-sub" style="margin-top:10px">🔒 QR ve NFC varsayılan olarak kapalıdır. Sen açmadıkça işletme panelinde görünmez ve ilgili API'lere erişemez.</div>
@@ -764,7 +766,7 @@ function renderBizPermissions(){
 }
 async function saveBusinessPermissions(){
   const id=currentBusiness.id;
-  const permissions={profile:document.getElementById("perm_profile").checked,qr:document.getElementById("perm_qr").checked,nfc:document.getElementById("perm_nfc").checked,analytics:document.getElementById("perm_analytics").checked};
+  const permissions={profile:document.getElementById("perm_profile").checked,qr:document.getElementById("perm_qr").checked,nfc:document.getElementById("perm_nfc").checked,analytics:document.getElementById("perm_analytics").checked,live:document.getElementById("perm_live").checked,ai:document.getElementById("perm_ai").checked};
   try{
     const d=await api("/api/admin/business/"+id+"/permissions",{method:"PUT",body:JSON.stringify(permissions)});
     currentBusiness.permissions=d.permissions||permissions;
