@@ -2751,6 +2751,16 @@ async function saveProfileDesign(){
       Site
     </a>
 
+    <button
+      id="logoutButton"
+      type="button"
+      class="header-button"
+      onclick="logout()"
+      style="cursor:pointer"
+    >
+      Çıkış
+    </button>
+
   </div>
 
 </header>
@@ -4308,6 +4318,11 @@ async function saveProfileDesign(){
 ================================================== -->
 
 <div
+  id="sessionDebug"
+  style="display:none;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:10001;width:min(620px,calc(100% - 28px));padding:16px 18px;border-radius:16px;background:#151515;border:1px solid #c59a5266;color:#ddd;font-size:12px;line-height:1.6;box-shadow:0 20px 60px #000;"
+></div>
+
+<div
   id="toast"
   class="toast"
 ></div>
@@ -4322,18 +4337,32 @@ async function saveProfileDesign(){
    AUTH
 ================================================== */
 
-const token =
-  localStorage.getItem(
-    "token"
+function getStoredToken(){
+  return (
+    localStorage.getItem("token") ||
+    localStorage.getItem("leo_token") ||
+    sessionStorage.getItem("token") ||
+    ""
   );
+}
 
+const token = getStoredToken();
 
+function decodeJwtPayload(value){
+  try{
+    const part = String(value || '').split('.')[1];
+    if(!part) return null;
+    const normalized = part.replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(atob(normalized));
+  }catch(error){
+    return null;
+  }
+}
+
+const tokenPayload = decodeJwtPayload(token);
 
 if(!token){
-
-  window.location.href =
-    "/login";
-
+  window.location.href = "/login";
 }
 
 
@@ -5297,6 +5326,10 @@ async function shareProfile(){
 async function load(){
 
   try{
+    if(tokenPayload && tokenPayload.role && tokenPayload.role !== "business"){
+      throw new Error("Business Center için işletme hesabıyla giriş yapılmalı. Mevcut oturum: " + tokenPayload.role);
+    }
+
     const rawBusiness = await api("/api/me");
     const business = normalizeBusinessResponse(rawBusiness);
 
@@ -5367,6 +5400,17 @@ async function load(){
     if(logoutButton){
       logoutButton.textContent = "Oturumu Sıfırla";
       logoutButton.style.borderColor = "#c59a52";
+    }
+    const debugBox = document.getElementById("sessionDebug");
+    if(debugBox){
+      const role = tokenPayload?.role || "okunamadı";
+      const email = tokenPayload?.email || "okunamadı";
+      debugBox.innerHTML =
+        "<strong>Oturum teşhisi</strong><br>" +
+        "Rol: " + esc(role) + "<br>" +
+        "E-posta: " + esc(email) + "<br>" +
+        "Hata: " + esc(error?.message || "Bilinmeyen hata");
+      debugBox.style.display = "block";
     }
   }finally{
     hideLoading();
