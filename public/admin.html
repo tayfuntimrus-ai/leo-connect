@@ -73,8 +73,8 @@ a{color:inherit;text-decoration:none}
 .mini-stat small{display:block;color:var(--muted);font-size:9px}.mini-stat strong{display:block;font-size:22px;color:var(--accent);margin-top:3px}
 @media(max-width:720px){.form-grid,.analytics-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.tag-row{grid-template-columns:1fr}}
 
-.business-page{display:none;padding:30px 34px 50px;max-width:1500px;margin:auto}
-.business-page.show{display:block;position:fixed;top:var(--topbar-h);left:250px;right:0;bottom:0;min-height:0;background:var(--bg);z-index:18;overflow:auto;border-left:1px solid var(--line)}
+.business-page{display:none;padding:24px 28px 40px;max-width:1500px;width:100%;margin:auto;box-sizing:border-box}
+.business-page.show{display:block;position:fixed;top:var(--topbar-h);left:250px;right:0;bottom:0;height:auto;min-height:0;max-height:calc(100vh - var(--topbar-h));background:var(--bg);z-index:18;overflow-y:auto;overflow-x:hidden;border-left:1px solid var(--line);box-sizing:border-box}
 .backbar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
 .back-btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;padding:10px 13px}
 .business-hero{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,var(--panel),var(--panel2));box-shadow:var(--shadow)}
@@ -175,6 +175,21 @@ a{color:inherit;text-decoration:none}
   .analytics-grid{grid-template-columns:1fr}
   .business-page.show .hero-actions{grid-template-columns:1fr}
   .business-page.show .hero-actions .btn:last-child{grid-column:auto}
+}
+
+
+.business-page.show *{box-sizing:border-box}
+.business-page.show .business-hero,
+.business-page.show .biz-columns,
+.business-page.show .biz-stat-grid,
+.business-page.show .profile-editor,
+.business-page.show .info-grid{max-width:100%}
+@media(max-width:720px){
+  .business-page.show{padding:16px 12px 80px}
+  .business-page.show .business-hero{padding:14px}
+  .business-page.show .business-tabs{max-width:100%;overflow-x:auto}
+  .business-page.show .biz-columns{grid-template-columns:1fr}
+  .business-page.show .biz-stat-grid{grid-template-columns:1fr 1fr}
 }
 
 </style>
