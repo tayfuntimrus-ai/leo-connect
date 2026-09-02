@@ -182,7 +182,7 @@ a{color:inherit;text-decoration:none}
         <section id="businessSection" class="card section">
           <div class="section-head">
             <div><div class="section-title">İşletmeler</div><div class="section-sub">İşletme detaylarına ve performansına buradan ulaş.</div></div>
-            <div class="search"><input id="businessSearch" placeholder="İşletme ara..." oninput="filterBusinesses()"><button class="btn primary" onclick="showToast('İşletme oluşturma API\'si henüz mevcut değil. Mevcut işletmeler tam yönetilebilir.')">＋ İşletme Ekle</button></div>
+            <div class="search"><input id="businessSearch" placeholder="İşletme ara..." oninput="filterBusinesses()"><button class="btn primary" onclick="newBusiness()">＋ İşletme Ekle</button></div>
           </div>
           <div class="table-wrap"><table class="table"><thead><tr><th>İŞLETME</th><th>KATEGORİ</th><th>PROFİL</th><th>QR</th><th>NFC</th><th>ETİKET</th><th>İŞLEM</th></tr></thead><tbody id="businessRows"><tr><td colspan="7"><div class="empty">Yükleniyor…</div></td></tr></tbody></table></div>
         </section>
@@ -334,6 +334,34 @@ function renderBusinesses(list=allBusinesses){
       <td><span class="badge">${n(b.nfc_tags)} NFC</span></td>
       <td><button class="btn primary" onclick="openBusiness(${Number(b.id)})">Detay ›</button></td>
     </tr>`).join("");
+}
+function newBusiness(){
+  document.getElementById("modalTitle").textContent="Yeni İşletme Oluştur";
+  document.getElementById("modalBody").innerHTML=`
+    <div class="form-grid">
+      <div class="form-field full"><label>İŞLETME ADI</label><input id="nb_name" placeholder="Örn. Zelo Bowl Waffle"></div>
+      <div class="form-field"><label>GİRİŞ E-POSTASI</label><input id="nb_email" type="email" placeholder="ornek@isletme.com"></div>
+      <div class="form-field"><label>GEÇİCİ ŞİFRE</label><input id="nb_password" type="password" minlength="8" placeholder="En az 8 karakter"></div>
+      <div class="form-field full"><label>KATEGORİ</label><input id="nb_category" placeholder="Örn. Restoran, Diş Kliniği, Kafe"></div>
+    </div>
+    <div class="section-sub" style="margin-top:12px">Yeni işletmenin mevcut başlangıç yetkileri: Profil açık, QR / NFC / Analytics kapalı. Yetkileri işletme oluşturulduktan sonra admin panelinden açabilirsin.</div>
+    <div class="modal-actions"><button class="btn primary" onclick="createBusiness()">İşletmeyi Oluştur</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;
+  openModal();
+  setTimeout(()=>document.getElementById("nb_name")?.focus(),50);
+}
+async function createBusiness(){
+  const name=document.getElementById("nb_name")?.value.trim();
+  const email=document.getElementById("nb_email")?.value.trim();
+  const password=document.getElementById("nb_password")?.value||"";
+  const category=document.getElementById("nb_category")?.value.trim();
+  if(!name||!email||password.length<8){showToast("İşletme adı, e-posta ve en az 8 karakter şifre gerekli.");return}
+  try{
+    const d=await api("/api/admin/businesses",{method:"POST",body:JSON.stringify({name,email,password,category})});
+    closeModal();
+    showToast("İşletme oluşturuldu.");
+    await loadAll();
+    if(d.business?.id) await openBusiness(d.business.id);
+  }catch(e){showToast(e.message)}
 }
 function filterBusinesses(){
   const q=document.getElementById("businessSearch").value.toLowerCase().trim();
