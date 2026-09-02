@@ -1329,11 +1329,6 @@ body{
 
 </style>
 
-<style id="leo-brand-icons-public">
-.link-icon{display:grid;place-items:center}
-.link-icon svg{width:30px;height:30px;display:block}
-.link-icon .fallback-link-icon{font-size:24px;line-height:1}
-</style>
 </head>
 
 
@@ -1457,12 +1452,9 @@ body{
   <span id="dynamicAnnouncementText"></span>
 </div>
 
-<div id="dynamicCampaign" class="dynamic-campaign">
-  <strong id="dynamicCampaignTitle"></strong>
-  <span id="dynamicCampaignText"></span>
-  <img id="dynamicCampaignImage" class="dynamic-media" alt="Kampanya görseli">
-  <a id="dynamicCampaignButton" class="dynamic-button" target="_blank" rel="noopener"></a>
-</div>
+<!-- LEGACY CAMPAIGN SLOT DISABLED
+     Smart Campaigns is the single public campaign renderer. -->
+<div id="dynamicCampaign" class="dynamic-campaign" style="display:none!important" aria-hidden="true"></div>
 
 <div id="smartCampaigns" class="smart-campaigns"></div>
 
@@ -2407,22 +2399,12 @@ function renderSmartCampaigns(){
 
   box.innerHTML='';
 
-  // Smart Campaigns: public API'den gelen ana kaynak.
-  // Eski profil_design kampanyası da geriye dönük uyumluluk için desteklenir.
-  const smart=Array.isArray(business?.campaigns) ? business.campaigns : [];
-  const d=business?.profile_design || {};
-  const campaigns=smart.length ? smart.slice(0,5) : (
-    d.campaign_enabled && (d.campaign_title || d.campaign_text || d.campaign_image_url)
-      ? [{
-          title:d.campaign_title || 'Kampanya',
-          text:d.campaign_text || '',
-          image_url:d.campaign_image_url || '',
-          button_text:d.campaign_button_text || '',
-          button_url:d.campaign_button_url || '',
-          enabled:true
-        }]
-      : []
-  );
+  // Smart Campaigns is the SINGLE public campaign renderer.
+  // Legacy profile_design campaign is intentionally not rendered here,
+  // so the same campaign cannot appear twice.
+  const campaigns=Array.isArray(business?.campaigns)
+    ? business.campaigns.slice(0,5)
+    : [];
 
   console.log('[LEO CONNECT] Public campaigns:', campaigns);
 
@@ -2492,29 +2474,7 @@ function renderV2DigitalChannels(){
   const custom=Array.isArray(business?.custom_links) ? business.custom_links : [];
   const allowed=business?.social_platform_permissions && typeof business.social_platform_permissions==='object' ? business.social_platform_permissions : {};
   const labels={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website',yemeksepeti:'Yemeksepeti',getir:'Getir','trendyol-yemek':'Trendyol Yemek','migros-yemek':'Migros Yemek',rezervasyon:'Rezervasyon',bilet:'Bilet / Etkinlik',menu:'Online Menü',location:'Konum',tripadvisor:'Tripadvisor',booking:'Booking',telegram:'Telegram',email:'E-posta'};
-  const icons={
-    instagram:'<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ig" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#F58529"/><stop offset=".35" stop-color="#DD2A7B"/><stop offset=".7" stop-color="#8134AF"/><stop offset="1" stop-color="#515BD4"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="5" fill="url(#ig)"/><circle cx="12" cy="12" r="4.1" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.4" cy="6.7" r="1.2" fill="#fff"/></svg>',
-    facebook:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#1877F2"/><path d="M13.5 20v-7h2.4l.4-2.8h-2.8V8.4c0-.8.2-1.4 1.5-1.4h1.5V4.5c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v1.9H8v2.8h2.4v7h3.1z" fill="#fff"/></svg>',
-    tiktok:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3c.3 2.1 1.5 3.5 3.7 3.7V10c-1.4-.1-2.7-.6-3.7-1.4v6.1a5.1 5.1 0 1 1-4.4-5.1v3.4a1.8 1.8 0 1 0 1.2 1.7V3H15z" fill="#111"/><path d="M14 3c.3 2.1 1.5 3.5 3.7 3.7V9c-1.4-.1-2.7-.6-3.7-1.4" fill="none" stroke="#25F4EE" stroke-width="1.5"/><path d="M12.1 9.8v3.3a1.8 1.8 0 1 0 1.2 1.7V5.8" fill="none" stroke="#FE2C55" stroke-width="1.5"/></svg>',
-    youtube:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.2" y="5" width="19.6" height="14" rx="4" fill="#FF0000"/><path d="M10 8.7l5.2 3.3-5.2 3.3V8.7z" fill="#fff"/></svg>',
-    linkedin:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3" fill="#0A66C2"/><circle cx="8" cy="9" r="1.2" fill="#fff"/><path d="M7 11h2v6H7zm4 0h2v.9c.6-.8 1.4-1.2 2.6-1.2 2 0 3.4 1.2 3.4 3.7V17h-2v-2.3c0-1.2-.4-2-1.5-2-1 0-1.5.7-1.5 2V17h-2v-6z" fill="#fff"/></svg>',
-    x:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#000"/><path d="M7 6.5h3.1l2.4 3.2 2.8-3.2H18l-4.1 4.7 4.6 6.3h-3.1l-2.8-3.8-3.4 3.8H6.9l4.7-5.3L7 6.5zm2.2 1.8l5.2 7.4h1.4l-5.2-7.4H9.2z" fill="#fff"/></svg>',
-    whatsapp:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#25D366"/><path d="M7.5 17l.8-2.4a6 6 0 1 1 2.1 2l-2.9.4z" fill="#fff"/><path d="M9.7 8.8c.2-.2.5-.2.7.1l.8 1.2c.2.3.1.6-.1.8l-.5.4c.4.8 1 1.4 1.8 1.8l.4-.5c.2-.3.5-.3.8-.1l1.2.8c.3.2.3.5.1.7l-.5.6c-.3.4-.8.6-1.3.4-2.2-.7-4-2.5-4.7-4.7-.2-.5 0-1 .4-1.3l.9-.2z" fill="#25D366"/></svg>',
-    google:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.2c0-.7-.1-1.4-.2-2H12v3.8h5c-.2 1.2-.9 2.2-2 2.9v2.4h3.2c1.8-1.7 2.8-4.1 2.8-7.1z" fill="#4285F4"/><path d="M12 21c2.6 0 4.8-.9 6.4-2.5l-3.2-2.4c-.9.6-2 .9-3.2.9-2.5 0-4.6-1.7-5.3-4H3.4v2.5A9.7 9.7 0 0 0 12 21z" fill="#34A853"/><path d="M6.7 13c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V6.5H3.4A9.7 9.7 0 0 0 2.3 11c0 1.6.4 3.2 1.1 4.5L6.7 13z" fill="#FBBC05"/><path d="M12 5c1.4 0 2.7.5 3.7 1.5l2.8-2.8C16.8 2.2 14.6 1.3 12 1.3a9.7 9.7 0 0 0-8.6 5.2L6.7 9C7.4 6.7 9.5 5 12 5z" fill="#EA4335"/></svg>',
-    website:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#2563EB"/><path d="M2.8 12h18.4M12 2.5c2.2 2.5 3.2 5.7 3.2 9.5S14.2 19 12 21.5C9.8 19 8.8 15.8 8.8 12S9.8 5 12 2.5z" fill="none" stroke="#fff" stroke-width="1.5"/></svg>',
-    yemeksepeti:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="5" fill="#EA004B"/><path d="M6.5 8.2h11M7.5 11h9M8.5 13.8h7M9.5 16.6h5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>',
-    getir:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" fill="#5D2A86"/><path d="M7 7h10v3H9v2h6v3H9v2H7V7z" fill="#FFD100"/></svg>',
-    'trendyol-yemek':'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#F27A1A"/><path d="M7 8h10v2H9.5l2.7 2.2c.8.7 1.3 1.5 1.3 2.6 0 1.8-1.4 3.2-3.5 3.2-1.7 0-3-.8-3.8-1.9l1.7-1.4c.5.7 1.2 1.1 2 1.1.9 0 1.5-.4 1.5-1 0-.4-.2-.7-.7-1.1L7 11V8z" fill="#fff"/></svg>',
-    'migros-yemek':'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#F58220"/><path d="M6.5 9h11l-1 8h-9l-1-8zM8 9V7.5A4 4 0 0 1 16 7.5V9" fill="none" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/></svg>',
-    rezervasyon:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="17" rx="3" fill="#7C3AED"/><path d="M7 2.8v4M17 2.8v4M3 9h18" stroke="#fff" stroke-width="1.7"/><path d="M7 13h3v3H7zm5 0h3v3h-3z" fill="#fff"/></svg>',
-    bilet:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5a2.5 2.5 0 0 0 0 5v4h16v-4a2.5 2.5 0 0 0 0-5v-4H4v4z" fill="#F59E0B"/><path d="M12 5v2m0 2v2m0 2v2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>',
-    menu:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" fill="#92400E"/><path d="M8 7h8M8 10h8M8 13h6M8 16h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>',
-    location:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12A7 7 0 0 0 5 9c0 5.8 7 12 7 12z" fill="#EF4444"/><circle cx="12" cy="9" r="2.4" fill="#fff"/></svg>',
-    tripadvisor:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#34A853"/><path d="M5 10h14l-2-2H7l-2 2z" fill="#fff"/><circle cx="9" cy="12.5" r="2.6" fill="#fff"/><circle cx="15" cy="12.5" r="2.6" fill="#fff"/><circle cx="9" cy="12.5" r="1.1" fill="#34A853"/><circle cx="15" cy="12.5" r="1.1" fill="#34A853"/></svg>',
-    booking:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" fill="#003580"/><path d="M7 6h5.5c2.7 0 4.2 1.5 4.2 3.5 0 1.2-.6 2.2-1.6 2.8 1.3.5 2 1.5 2 2.8 0 2.1-1.7 3.9-4.7 3.9H7V6zm3 2.7v4h2.1c1 0 1.6-.7 1.6-2s-.6-2-1.6-2H10zm0 6.4v1.2h2.3c1 0 1.6-.4 1.6-1.1s-.6-1.1-1.6-1.1H10z" fill="#fff"/></svg>',
-    telegram:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#229ED9"/><path d="M5.5 11.8l12.8-5c.6-.2 1.1.2.9.9l-2.3 10.1c-.1.6-.8.8-1.3.5l-3.7-2.7-1.8 1.7c-.2.2-.6.1-.6-.3l.3-2.8 5.8-5.2c.3-.3-.1-.4-.4-.2l-7.2 4.5-2.3-.7c-.5-.2-.6-.7-.2-.8z" fill="#fff"/></svg>',
-    email:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="3" fill="#EA4335"/><path d="M4 7l8 6 8-6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-  };
+  const icons={instagram:'📸',facebook:'f',tiktok:'🎵',youtube:'▶',linkedin:'in',x:'𝕏',whatsapp:'💬',google:'G',website:'🌐',yemeksepeti:'🍴',getir:'🟡','trendyol-yemek':'🟠','migros-yemek':'🛒',rezervasyon:'📅',bilet:'🎟️',menu:'📖',location:'📍',tripadvisor:'🦉',booking:'🏨',telegram:'✈️',email:'✉️'};
   const entries=Object.keys(labels).filter(k=>allowed[k]!==false).map(k=>({type:k,title:labels[k],url:String(social[k]?.url||'').trim(),icon:icons[k]||'🔗'})).filter(x=>x.url);
   const customEntries=custom.filter(x=>x&&x.url&&x.enabled!==false).map(x=>({type:'custom',title:String(x.title||'Bağlantı'),url:String(x.url),icon:x.icon||'🔗'}));
   const all=entries.concat(customEntries);
@@ -2523,7 +2483,7 @@ function renderV2DigitalChannels(){
   if(!all.length){section.classList.add('hidden');section.innerHTML='';return;}
   section.classList.remove('hidden');
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  section.innerHTML='<div class="section-title"><div class="section-icon">✨</div><div><strong>Dijital Kanallar</strong><span>İşletmeyle bağlantı kur</span></div></div><div class="link-grid">'+all.map(x=>'<a class="link" target="_blank" rel="noopener" href="'+(dynamicSafeUrl(x.url)||'#')+'" data-digital-type="'+esc(String(x.type).replace(/[^a-z0-9_-]/gi,''))+'"><div class="link-icon">'+(x.icon||'<span class="fallback-link-icon">↗</span>')+'</div><div class="link-text"><strong>'+esc(x.title)+'</strong><span>Bağlantıyı aç</span></div></a>').join('')+'</div>';
+  section.innerHTML='<div class="section-title"><div class="section-icon">✨</div><div><strong>Dijital Kanallar</strong><span>İşletmeyle bağlantı kur</span></div></div><div class="link-grid">'+all.map(x=>'<a class="link" target="_blank" rel="noopener" href="'+(dynamicSafeUrl(x.url)||'#')+'" data-digital-type="'+esc(String(x.type).replace(/[^a-z0-9_-]/gi,''))+'"><div class="link-icon">'+esc(x.icon)+'</div><div class="link-text"><strong>'+esc(x.title)+'</strong><span>Bağlantıyı aç</span></div></a>').join('')+'</div>';
   section.querySelectorAll('a[data-digital-type]').forEach(a=>a.addEventListener('click',()=>track('digital_'+a.dataset.digitalType)));
 }
 
@@ -2555,20 +2515,10 @@ function renderDynamicProfile(){
     announcementText.textContent=String(d.announcement_text||'');
   }
 
+  // Legacy profile_design campaign slot is intentionally disabled.
+  // Smart Campaigns below is the only public campaign renderer.
   const campaign=document.getElementById('dynamicCampaign');
-  if(campaign){
-    const show=d.campaign_enabled && (d.campaign_title || d.campaign_text || d.campaign_image_url);
-    campaign.style.display=show?'block':'none';
-    document.getElementById('dynamicCampaignTitle').textContent=d.campaign_title||'Kampanya';
-    document.getElementById('dynamicCampaignText').textContent=d.campaign_text||'';
-    const img=document.getElementById('dynamicCampaignImage');
-    const imgUrl=dynamicSafeUrl(d.campaign_image_url);
-    if(imgUrl){img.src=imgUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}else img.style.display='none';
-    const btn=document.getElementById('dynamicCampaignButton');
-    const btnUrl=dynamicSafeUrl(d.campaign_button_url);
-    if(btnUrl && d.campaign_button_text){btn.href=btnUrl;btn.textContent=d.campaign_button_text;btn.classList.add('show');}else btn.classList.remove('show');
-    btn.onclick=()=>{ if(btnUrl) track('campaign'); };
-  }
+  if(campaign) campaign.style.display='none';
 
   const featured=document.getElementById('dynamicFeatured');
   if(featured){
