@@ -1172,6 +1172,278 @@ main{
 
 
 
+
+
+/* ==================================================
+   V2 — DYNAMIC PROFILE DESIGN
+================================================== */
+
+const designFields = [
+  "design_theme",
+  "design_accent",
+  "design_cover_url",
+  "design_cover_position",
+  "design_announcement_text",
+  "design_campaign_title",
+  "design_campaign_text",
+  "design_campaign_image_url",
+  "design_campaign_button_text",
+  "design_campaign_button_url",
+  "design_featured_title",
+  "design_featured_text",
+  "design_featured_image_url",
+  "design_featured_button_text",
+  "design_featured_button_url",
+  "design_gallery",
+  "design_video_url"
+];
+
+let profileDesign = {
+  theme:"midnight-gold",
+  accent_color:"#D4AF37",
+  cover_url:"",
+  cover_position:"center",
+  announcement_text:"",
+  announcement_enabled:false,
+  campaign_title:"",
+  campaign_text:"",
+  campaign_image_url:"",
+  campaign_button_text:"",
+  campaign_button_url:"",
+  campaign_enabled:false,
+  featured_title:"",
+  featured_text:"",
+  featured_image_url:"",
+  featured_button_text:"",
+  featured_button_url:"",
+  featured_enabled:false,
+  gallery:[],
+  video_url:"",
+  video_enabled:false
+};
+
+function safeDesignColor(value){
+  const v = String(value || "").trim();
+  return /^#[0-9a-fA-F]{6}$/.test(v) ? v : "#D4AF37";
+}
+
+function syncDesignColor(source){
+  const text = document.getElementById("design_accent");
+  const picker = document.getElementById("design_accent_picker");
+  if(!text || !picker) return;
+
+  if(source === "picker"){
+    text.value = picker.value.toUpperCase();
+  }else{
+    const value = text.value.trim();
+    if(/^#[0-9a-fA-F]{6}$/.test(value)) picker.value = value;
+  }
+  updateDesignPreview();
+}
+
+function getDesignForm(){
+  const val = id => document.getElementById(id)?.value?.trim() || "";
+  const checked = id => document.getElementById(id)?.checked === true;
+  const gallery = val("design_gallery")
+    .split(/\r?\n/)
+    .map(x => x.trim())
+    .filter(Boolean)
+    .slice(0,30)
+    .map(url => ({url}));
+
+  return {
+    theme: val("design_theme") || "midnight-gold",
+    accent_color: safeDesignColor(val("design_accent")),
+    cover_url: val("design_cover_url"),
+    cover_position: val("design_cover_position") || "center",
+    announcement_text: val("design_announcement_text"),
+    announcement_enabled: checked("design_announcement_enabled"),
+    campaign_title: val("design_campaign_title"),
+    campaign_text: val("design_campaign_text"),
+    campaign_image_url: val("design_campaign_image_url"),
+    campaign_button_text: val("design_campaign_button_text"),
+    campaign_button_url: val("design_campaign_button_url"),
+    campaign_enabled: checked("design_campaign_enabled"),
+    featured_title: val("design_featured_title"),
+    featured_text: val("design_featured_text"),
+    featured_image_url: val("design_featured_image_url"),
+    featured_button_text: val("design_featured_button_text"),
+    featured_button_url: val("design_featured_button_url"),
+    featured_enabled: checked("design_featured_enabled"),
+    gallery,
+    video_url: val("design_video_url"),
+    video_enabled: checked("design_video_enabled")
+  };
+}
+
+function setDesignField(id, value){
+  const el = document.getElementById(id);
+  if(el) el.value = value ?? "";
+}
+
+function loadDesignIntoForm(data){
+  profileDesign = {
+    ...profileDesign,
+    ...(data || {})
+  };
+
+  setDesignField("design_theme", profileDesign.theme || "midnight-gold");
+  setDesignField("design_accent", safeDesignColor(profileDesign.accent_color));
+  setDesignField("design_cover_url", profileDesign.cover_url);
+  setDesignField("design_cover_position", profileDesign.cover_position || "center");
+  setDesignField("design_announcement_text", profileDesign.announcement_text);
+  setDesignField("design_campaign_title", profileDesign.campaign_title);
+  setDesignField("design_campaign_text", profileDesign.campaign_text);
+  setDesignField("design_campaign_image_url", profileDesign.campaign_image_url);
+  setDesignField("design_campaign_button_text", profileDesign.campaign_button_text);
+  setDesignField("design_campaign_button_url", profileDesign.campaign_button_url);
+  setDesignField("design_featured_title", profileDesign.featured_title);
+  setDesignField("design_featured_text", profileDesign.featured_text);
+  setDesignField("design_featured_image_url", profileDesign.featured_image_url);
+  setDesignField("design_featured_button_text", profileDesign.featured_button_text);
+  setDesignField("design_featured_button_url", profileDesign.featured_button_url);
+  setDesignField("design_video_url", profileDesign.video_url);
+
+  const gallery = Array.isArray(profileDesign.gallery) ? profileDesign.gallery : [];
+  setDesignField("design_gallery", gallery.map(item => typeof item === "string" ? item : item?.url || "").filter(Boolean).join("\n"));
+
+  const checks = [
+    ["design_announcement_enabled", profileDesign.announcement_enabled],
+    ["design_campaign_enabled", profileDesign.campaign_enabled],
+    ["design_featured_enabled", profileDesign.featured_enabled],
+    ["design_video_enabled", profileDesign.video_enabled]
+  ];
+  checks.forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if(el) el.checked = value === true;
+  });
+
+  const picker = document.getElementById("design_accent_picker");
+  if(picker) picker.value = safeDesignColor(profileDesign.accent_color);
+
+  updateDesignPreview();
+}
+
+function updateDesignPreview(){
+  const data = getDesignForm();
+  const root = document.getElementById("designPreview");
+  if(!root) return;
+
+  root.className = "preview-frame theme-" + (data.theme || "midnight-gold");
+  root.style.setProperty("--preview-accent", data.accent_color);
+
+  const cover = document.getElementById("previewCover");
+  if(cover){
+    cover.style.backgroundPosition = data.cover_position || "center";
+    cover.style.backgroundImage = data.cover_url
+      ? `linear-gradient(180deg,transparent 25%,#070707 100%), url("${data.cover_url.replace(/"/g,'\\"')}")`
+      : "radial-gradient(circle at 80% 20%,#c59a5230,transparent 35%),linear-gradient(145deg,#1d1d1d,#090909)";
+  }
+
+  document.documentElement.style.setProperty("--gold-light", data.accent_color);
+
+  const name = document.getElementById("previewName");
+  const category = document.getElementById("previewCategory");
+  if(name) name.textContent = currentBusiness?.name || "İşletme";
+  if(category) category.textContent = (currentBusiness?.category || "İŞLETME").toUpperCase();
+
+  const logo = document.getElementById("previewLogo");
+  if(logo){
+    const logoUrl = currentBusiness?.logo_url || "";
+    logo.innerHTML = logoUrl
+      ? `<img src="${esc(logoUrl)}" alt="">`
+      : "🦁";
+  }
+
+  const announcement = document.getElementById("previewAnnouncement");
+  const announcementText = document.getElementById("previewAnnouncementText");
+  if(announcement && announcementText){
+    announcement.style.display = data.announcement_enabled && data.announcement_text ? "block" : "none";
+    announcementText.textContent = data.announcement_text;
+  }
+
+  const campaign = document.getElementById("previewCampaign");
+  if(campaign){
+    const show = data.campaign_enabled && (data.campaign_title || data.campaign_text);
+    campaign.style.display = show ? "block" : "none";
+    if(data.campaign_image_url){
+      campaign.style.backgroundImage = `url("${data.campaign_image_url.replace(/"/g,'\\"')}")`;
+    }else{
+      campaign.style.backgroundImage = "none";
+    }
+    document.getElementById("previewCampaignTitle").textContent = data.campaign_title || "Kampanya";
+    document.getElementById("previewCampaignText").textContent = data.campaign_text || "Kampanya detayları";
+    const cb = document.getElementById("previewCampaignButton");
+    cb.style.display = data.campaign_button_text ? "inline-flex" : "none";
+    cb.textContent = data.campaign_button_text;
+  }
+
+  const featured = document.getElementById("previewFeatured");
+  if(featured){
+    const show = data.featured_enabled && (data.featured_title || data.featured_text);
+    featured.style.display = show ? "block" : "none";
+    document.getElementById("previewFeaturedTitle").textContent = data.featured_title || "Öne Çıkan";
+    document.getElementById("previewFeaturedText").textContent = data.featured_text || "Öne çıkan içerik";
+    const fb = document.getElementById("previewFeaturedButton");
+    fb.style.display = data.featured_button_text ? "inline-flex" : "none";
+    fb.textContent = data.featured_button_text;
+  }
+
+  const galleryBox = document.getElementById("previewGallery");
+  if(galleryBox){
+    const gallery = Array.isArray(data.gallery) ? data.gallery : [];
+    galleryBox.innerHTML = gallery.slice(0,6).map(item => {
+      const url = typeof item === "string" ? item : item?.url || "";
+      return url ? `<div><img src="${esc(url)}" alt=""></div>` : "";
+    }).join("");
+  }
+
+  const video = document.getElementById("previewVideo");
+  if(video) video.style.display = data.video_enabled && data.video_url ? "block" : "none";
+}
+
+async function loadProfileDesign(){
+  const result = await api("/api/business-profile-design");
+  if(result && !result.error){
+    loadDesignIntoForm(result);
+  }else if(result?.error){
+    const msg = document.getElementById("designMessage");
+    if(msg) msg.textContent = result.error;
+  }
+}
+
+async function saveProfileDesign(){
+  const button = document.getElementById("designSaveButton");
+  const message = document.getElementById("designMessage");
+  const data = getDesignForm();
+
+  if(!button || !message) return;
+
+  button.disabled = true;
+  button.textContent = "Kaydediliyor...";
+  message.textContent = "";
+
+  const result = await api("/api/business-profile-design", {
+    method:"PUT",
+    body:JSON.stringify(data)
+  });
+
+  if(result && !result.error){
+    profileDesign = result;
+    loadDesignIntoForm(result);
+    message.textContent = "✓ Profil tasarımı kaydedildi.";
+    showToast("Profil tasarımı güncellendi.");
+  }else{
+    message.textContent = result?.error || "Tasarım kaydedilemedi.";
+    showToast("Tasarım kaydedilirken hata oluştu.");
+  }
+
+  button.disabled = false;
+  button.textContent = "✓ Tasarımı Kaydet";
+  setTimeout(() => { message.textContent = ""; }, 3500);
+}
+
+
 /* ==================================================
    SAVE
 ================================================== */
@@ -2051,49 +2323,343 @@ main{
 }
 
 
+
 /* ==================================================
-   BUSINESS CENTER V2 — COMMAND BAR
+   V2 — PROFILE DESIGN CENTER
 ================================================== */
-.command-bar{
+.profile-design-shell{
+  display:grid;
+  grid-template-columns:minmax(0,1.12fr) minmax(320px,.88fr);
+  gap:15px;
+  margin-bottom:15px;
+}
+.design-editor,
+.design-preview-box{
+  min-width:0;
+  padding:22px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:linear-gradient(145deg,#151515,#0d0d0d);
+}
+.design-preview-box{
+  position:sticky;
+  top:92px;
+  height:max-content;
+}
+.design-section-title{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+.design-section-title h3{
+  margin:0;
+  font-size:16px;
+}
+.design-section-title p{
+  margin:6px 0 0;
+  color:#666;
+  font-size:9px;
+  line-height:1.5;
+}
+.design-badge{
+  flex:none;
+  padding:6px 9px;
+  border-radius:999px;
+  border:1px solid #c59a5230;
+  background:#c59a5210;
+  color:var(--gold-light);
+  font-size:8px;
+  font-weight:900;
+}
+.design-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:11px;
+}
+.design-field{
+  min-width:0;
+}
+.design-field.full{
+  grid-column:1/-1;
+}
+.design-field label{
+  display:block;
+  margin-bottom:6px;
+  color:#777;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.13em;
+}
+.design-field input,
+.design-field select,
+.design-field textarea{
+  width:100%;
+  border:1px solid #2d2d2d;
+  border-radius:10px;
+  outline:none;
+  background:#0d0d0d;
+  color:#eee;
+  padding:10px 11px;
+  font-size:10px;
+}
+.design-field textarea{
+  min-height:76px;
+  resize:vertical;
+  line-height:1.5;
+}
+.design-field input:focus,
+.design-field select:focus,
+.design-field textarea:focus{
+  border-color:#c59a5266;
+  box-shadow:0 0 0 3px #c59a5210;
+}
+.design-toggle{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:16px;
-  margin:0 0 22px;
-  padding:14px 16px;
-  border:1px solid #c59a5230;
-  border-radius:18px;
-  background:linear-gradient(135deg,#15120d,#101010 55%,#171717);
-  box-shadow:0 18px 50px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
+  gap:12px;
+  min-height:42px;
+  padding:9px 11px;
+  border-radius:10px;
+  border:1px solid #2d2d2d;
+  background:#0d0d0d;
 }
-.command-left{display:flex;align-items:center;gap:12px;min-width:0}
-.command-badge{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#c59a5218;border:1px solid #c59a5245;font-size:18px}
-.command-copy{min-width:0}
-.command-copy strong{display:block;font-size:13px;letter-spacing:.02em}
-.command-copy span{display:block;color:#8d8d8d;font-size:12px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.command-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.command-btn{border:1px solid #303030;background:#121212;color:#eee;border-radius:11px;padding:9px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}
-.command-btn.gold{border-color:#c59a5260;background:#c59a5214;color:#e0bd7b}
-.command-btn:hover{border-color:#c59a5280;transform:translateY(-1px)}
-.access-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 22px}
-.access-item{padding:12px 13px;border:1px solid #292929;border-radius:14px;background:#101010;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.access-item span:first-child{font-size:12px;color:#8f8f8f}
-.access-state{font-size:11px;font-weight:800;letter-spacing:.05em}
-.access-state.on{color:#62d992}.access-state.off{color:#666}
-@media(max-width:760px){.command-bar{align-items:flex-start;flex-direction:column}.command-actions{width:100%;justify-content:flex-start}.command-btn{flex:1;text-align:center}.access-strip{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:430px){.access-strip{grid-template-columns:1fr 1fr}.command-btn{font-size:11px;padding:9px 8px}}
-
-
-/* ==================================================
-   BUSINESS CENTER V3 ANALYTICS
-================================================== */
-.analytics-v3{margin:24px 0;background:linear-gradient(145deg,#111,#0b0b0b);border:1px solid #292929;border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.28)}
-.analytics-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
-.analytics-head h2{margin:0;font-size:20px}.analytics-head p{margin:6px 0 0;color:#888;font-size:13px}
-.analytics-periods{display:flex;gap:7px;flex-wrap:wrap}.analytics-periods button{border:1px solid #303030;background:#151515;color:#999;border-radius:999px;padding:8px 13px;cursor:pointer}.analytics-periods button.active{background:#c59a52;color:#080808;border-color:#c59a52;font-weight:800}
-.analytics-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.analytics-kpi{padding:17px;border:1px solid #292929;border-radius:18px;background:#121212}.analytics-kpi small{display:block;color:#777;font-size:10px;letter-spacing:.12em}.analytics-kpi strong{display:block;font-size:28px;margin-top:8px}.analytics-kpi span{color:#888;font-size:12px}
-.analytics-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}.analytics-box{border:1px solid #292929;border-radius:20px;background:#101010;padding:18px}.analytics-box h3{margin:0 0 15px;font-size:14px}.traffic-bars{height:180px;display:flex;align-items:end;gap:5px;overflow:hidden}.traffic-bar-wrap{height:100%;flex:1;min-width:8px;display:flex;align-items:end;justify-content:center}.traffic-bar{width:100%;max-width:22px;border-radius:7px 7px 2px 2px;background:linear-gradient(to top,#8d6b32,#e0bd7b);min-height:3px}.traffic-label{font-size:9px;color:#666;margin-top:7px;text-align:center}.action-row{display:grid;grid-template-columns:100px 1fr 45px;gap:8px;align-items:center;margin:11px 0;font-size:12px}.action-track{height:7px;background:#202020;border-radius:99px;overflow:hidden}.action-fill{height:100%;background:#c59a52;border-radius:99px}.analytics-empty{padding:35px;text-align:center;color:#777}.analytics-locked{padding:20px;border:1px dashed #3a3a3a;border-radius:16px;color:#888;text-align:center}
-@media(max-width:800px){.analytics-kpis{grid-template-columns:repeat(2,1fr)}.analytics-grid{grid-template-columns:1fr}.analytics-head{flex-direction:column}}
+.design-toggle span{
+  color:#aaa;
+  font-size:9px;
+  font-weight:800;
+}
+.switch{
+  position:relative;
+  width:38px;
+  height:21px;
+  flex:none;
+}
+.switch input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.switch-track{
+  position:absolute;
+  inset:0;
+  border-radius:999px;
+  background:#292929;
+  border:1px solid #3a3a3a;
+  transition:.2s;
+}
+.switch-track::after{
+  content:"";
+  position:absolute;
+  width:15px;
+  height:15px;
+  left:2px;
+  top:2px;
+  border-radius:50%;
+  background:#777;
+  transition:.2s;
+}
+.switch input:checked + .switch-track{
+  background:#c59a5230;
+  border-color:#c59a5270;
+}
+.switch input:checked + .switch-track::after{
+  transform:translateX(17px);
+  background:var(--gold-light);
+}
+.design-color-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.design-color-row input[type=color]{
+  width:42px;
+  height:38px;
+  padding:3px;
+  border-radius:9px;
+  cursor:pointer;
+}
+.design-color-row input[type=text]{
+  flex:1;
+}
+.design-help{
+  margin-top:6px;
+  color:#555;
+  font-size:8px;
+  line-height:1.5;
+}
+.design-save-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:17px;
+}
+.design-save-button{
+  min-height:42px;
+  padding:10px 15px;
+  border:1px solid #c59a52;
+  border-radius:10px;
+  background:linear-gradient(135deg,#c59a52,#9e7738);
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+.design-save-button:active{transform:scale(.98)}
+#designMessage{
+  color:#777;
+  font-size:9px;
+}
+.preview-frame{
+  overflow:hidden;
+  border-radius:18px;
+  border:1px solid #333;
+  background:#070707;
+  box-shadow:0 20px 55px #000;
+}
+.preview-cover{
+  position:relative;
+  height:150px;
+  background:
+    radial-gradient(circle at 80% 20%,#c59a5230,transparent 35%),
+    linear-gradient(145deg,#1d1d1d,#090909);
+  background-size:cover;
+  background-position:center;
+}
+.preview-cover::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 25%,#070707 100%);
+}
+.preview-body{
+  position:relative;
+  margin-top:-35px;
+  padding:0 16px 18px;
+  z-index:2;
+}
+.preview-logo{
+  width:68px;
+  height:68px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border-radius:18px;
+  border:2px solid #c59a5280;
+  background:#050505;
+  box-shadow:0 12px 30px #000;
+  font-size:26px;
+}
+.preview-logo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.preview-name{
+  margin-top:11px;
+  font-size:18px;
+  font-weight:900;
+}
+.preview-category{
+  display:inline-block;
+  margin-top:5px;
+  color:var(--gold-light);
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.preview-announcement,
+.preview-campaign,
+.preview-featured{
+  margin-top:11px;
+  padding:11px;
+  border-radius:12px;
+  border:1px solid #c59a5230;
+  background:#c59a520c;
+}
+.preview-announcement strong,
+.preview-campaign strong,
+.preview-featured strong{
+  display:block;
+  margin-bottom:4px;
+  font-size:9px;
+}
+.preview-announcement span,
+.preview-campaign span,
+.preview-featured span{
+  display:block;
+  color:#888;
+  font-size:8px;
+  line-height:1.5;
+}
+.preview-campaign{
+  background-size:cover;
+  background-position:center;
+  min-height:82px;
+  position:relative;
+  overflow:hidden;
+}
+.preview-campaign::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,#080808e8,#08080872,transparent);
+}
+.preview-campaign > *{position:relative;z-index:1}
+.preview-button{
+  display:inline-flex;
+  margin-top:8px;
+  padding:6px 9px;
+  border-radius:7px;
+  background:linear-gradient(135deg,#c59a52,#9e7738);
+  color:#fff;
+  font-size:7px;
+  font-weight:900;
+}
+.preview-gallery{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:5px;
+  margin-top:11px;
+}
+.preview-gallery div{
+  aspect-ratio:1;
+  overflow:hidden;
+  border-radius:8px;
+  background:#171717;
+  border:1px solid #292929;
+}
+.preview-gallery img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.preview-video{
+  margin-top:11px;
+  padding:10px;
+  border-radius:10px;
+  background:#111;
+  border:1px solid #292929;
+  color:#777;
+  font-size:8px;
+}
+.theme-pure-light .preview-frame{background:#f5f2eb;color:#151515}
+.theme-pure-light .preview-body{color:#151515}
+.theme-pure-light .preview-category{color:#8f6c29}
+.theme-pure-light .preview-announcement,.theme-pure-light .preview-campaign,.theme-pure-light .preview-featured{background:#fff;border-color:#d7c6a1}
+.theme-obsidian .preview-frame{background:#050505}
+.theme-champagne .preview-frame{background:#17120b}
+@media(max-width:820px){
+  .profile-design-shell{grid-template-columns:1fr}
+  .design-preview-box{position:static}
+}
+@media(max-width:520px){
+  .design-editor,.design-preview-box{padding:16px}
+  .design-grid{grid-template-columns:1fr}
+  .design-field.full{grid-column:auto}
+}
 
 </style>
 
@@ -2222,41 +2788,6 @@ main{
 
 
 
-
-
-<!-- ==================================================
-     BUSINESS CENTER V2 — COMMAND BAR
-================================================== -->
-<div class="command-bar">
-  <div class="command-left">
-    <div class="command-badge">🦁</div>
-    <div class="command-copy">
-      <strong>LEO CONNECT COMMAND CENTER</strong>
-      <span id="commandStatus">İşletme dijital varlıkların hazır.</span>
-    </div>
-  </div>
-  <div class="command-actions">
-    <a id="commandProfile" class="command-btn gold" target="_blank" rel="noopener">👁 Profili Gör</a>
-    <button class="command-btn" type="button" onclick="copyProfileLink()">🔗 Linki Kopyala</button>
-    <button class="command-btn" type="button" onclick="shareProfile()">↗ Paylaş</button>
-  </div>
-</div>
-
-<div class="access-strip" id="accessStrip">
-  <div class="access-item"><span>Profil</span><span id="accessProfile" class="access-state on">AKTİF</span></div>
-  <div class="access-item"><span>QR Merkezi</span><span id="accessQR" class="access-state off">KİLİTLİ</span></div>
-  <div class="access-item"><span>NFC Merkezi</span><span id="accessNFC" class="access-state off">KİLİTLİ</span></div>
-  <div class="access-item"><span>Analiz</span><span id="accessAnalytics" class="access-state off">KİLİTLİ</span></div>
-  <div class="access-item"><span>Canlı Takip</span><span id="accessLive" class="access-state off">KİLİTLİ</span></div>
-  <div class="access-item"><span>LEO AI</span><span id="accessAI" class="access-state off">KİLİTLİ</span></div>
-</div>
-
-
-<style>
-.live-v4,.ai-v4{margin:24px 0;background:linear-gradient(145deg,#111,#090909);border:1px solid #292929;border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.24)}
-.live-head,.ai-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}.live-head h2,.ai-head h2{margin:0;font-size:20px}.live-head p,.ai-head p{margin:6px 0 0;color:#888;font-size:12px}.live-pulse{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid #2e2e2e;border-radius:999px;color:#aaa;font-size:10px}.live-pulse i{width:7px;height:7px;border-radius:50%;background:#57d68b;box-shadow:0 0 12px #57d68b}.live-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.live-kpi,.ai-box{padding:16px;border:1px solid #292929;border-radius:17px;background:#101010}.live-kpi small,.ai-box small{display:block;color:#777;font-size:9px;letter-spacing:.1em}.live-kpi strong{display:block;font-size:25px;margin-top:6px}.live-feed{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto}.live-item{display:flex;gap:12px;align-items:center;padding:12px 13px;border:1px solid #252525;border-radius:14px;background:#0d0d0d}.live-icon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:#171717;border:1px solid #292929}.live-item strong{font-size:11px}.live-item span{display:block;color:#777;font-size:9px;margin-top:3px}.ai-score{display:flex;align-items:center;gap:18px;padding:18px;border:1px solid #292929;border-radius:18px;background:#101010;margin-bottom:14px}.ai-ring{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;border:5px solid #c59a52;font-size:22px;font-weight:800;flex:none}.ai-copy strong{display:block;font-size:16px}.ai-copy span{display:block;color:#888;font-size:11px;margin-top:5px}.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ai-box ul{margin:10px 0 0;padding-left:18px;color:#aaa;font-size:11px;line-height:1.7}.ai-box li{margin-bottom:5px}.ai-toolbar{display:flex;gap:7px;flex-wrap:wrap}.ai-toolbar button{border:1px solid #303030;background:#151515;color:#999;border-radius:999px;padding:8px 13px;cursor:pointer}.ai-toolbar button.active{background:#c59a52;color:#080808;border-color:#c59a52;font-weight:800}.locked-v4{padding:22px;border:1px dashed #3a3a3a;border-radius:17px;text-align:center;color:#777;font-size:11px}
-@media(max-width:800px){.live-kpis,.ai-grid{grid-template-columns:1fr}.live-head,.ai-head{flex-direction:column}}
-</style>
 <!-- ==================================================
      PROFILE HERO
 ================================================== -->
@@ -2491,51 +3022,6 @@ main{
 
 
 <!-- ==================================================
-     BUSINESS ANALYTICS V4
-================================================== -->
-
-<section id="businessLiveV4" class="live-v4" style="display:none">
-  <div class="live-head"><div><h2>🟢 Canlı Takip</h2><p>İşletmenizin son müşteri hareketleri.</p></div><div class="live-pulse"><i></i> CANLI • 10 SN</div></div>
-  <div class="live-kpis"><div class="live-kpi"><small>SON 15 DK</small><strong id="bl15">0</strong></div><div class="live-kpi"><small>SON 60 DK</small><strong id="bl60">0</strong></div><div class="live-kpi"><small>BUGÜN</small><strong id="blToday">0</strong></div></div>
-  <div id="businessLiveFeed" class="live-feed"><div class="locked-v4">Canlı veriler yükleniyor…</div></div>
-</section>
-<section id="businessAIV4" class="ai-v4" style="display:none">
-  <div class="ai-head"><div><h2>🧠 LEO AI Insights</h2><p>Gerçek etkileşim verilerinden oluşturulan akıllı işletme raporu.</p></div><div class="ai-toolbar"><button data-aiperiod="today" onclick="loadAIInsights('today')">Bugün</button><button data-aiperiod="7d" class="active" onclick="loadAIInsights('7d')">7 Gün</button><button data-aiperiod="30d" onclick="loadAIInsights('30d')">30 Gün</button><button data-aiperiod="all" onclick="loadAIInsights('all')">Tümü</button></div></div>
-  <div id="aiInsightContent"><div class="locked-v4">AI raporu hazırlanıyor…</div></div>
-</section>
-<section id="businessAnalyticsV3" class="analytics-v4" style="display:none">
-  <div class="analytics-head">
-    <div><h2>📊 Akıllı İşletme Analizi <span style="font-size:10px;color:#c59a52;letter-spacing:.12em">V4</span></h2><p>İşletmenizin dijital performansını, dönüşümünü ve müşteri davranışını tek ekranda görün.</p></div>
-    <div class="analytics-periods">
-      <button type="button" data-period="today" onclick="loadBusinessAnalytics('today')">Bugün</button>
-      <button type="button" data-period="7d" class="active" onclick="loadBusinessAnalytics('7d')">7 Gün</button>
-      <button type="button" data-period="30d" onclick="loadBusinessAnalytics('30d')">30 Gün</button>
-      <button type="button" data-period="all" onclick="loadBusinessAnalytics('all')">Tümü</button>
-    </div>
-  </div>
-  <div class="analytics-kpis">
-    <div class="analytics-kpi"><small>TOPLAM ETKİLEŞİM</small><strong id="baTotal">0</strong><span>tüm aksiyonlar</span></div>
-    <div class="analytics-kpi"><small>PROFİL GÖRÜNTÜLEME</small><strong id="baProfile">0</strong><span>profil trafiği</span></div>
-    <div class="analytics-kpi"><small>QR + NFC</small><strong id="baDigital">0</strong><span>dijital temas</span></div>
-    <div class="analytics-kpi"><small>İLETİŞİM</small><strong id="baContact">0</strong><span>telefon + WhatsApp</span></div>
-  </div>
-  <div class="insight-grid">
-    <div class="insight-card"><small>EN GÜÇLÜ KANAL</small><strong id="baTopChannel">—</strong><span id="baTopChannelSub">Henüz yeterli veri yok</span></div>
-    <div class="insight-card"><small>EN YOĞUN SAAT</small><strong id="baPeakHour">—</strong><span id="baPeakHourSub">Henüz yeterli veri yok</span></div>
-    <div class="insight-card"><small>AKSİYON DÖNÜŞÜMÜ</small><strong id="baConversion">0%</strong><span>profil görüntüleyenlerin aksiyona dönüşümü</span></div>
-  </div>
-  <div class="analytics-grid">
-    <div class="analytics-box"><h3>📈 Günlük Trafik</h3><div id="baTraffic" class="traffic-bars"></div><div id="baTrafficLabels" style="display:flex;gap:5px"></div></div>
-    <div class="analytics-box"><h3>🔥 Müşteri Aksiyonları</h3><div id="baActions"></div></div>
-  </div>
-  <div class="analytics-grid" style="margin-top:16px">
-    <div class="analytics-box"><h3>🧠 Dönüşüm Hunisi</h3><div id="baFunnel" class="funnel"></div><div class="micro">Oranlar seçilen dönemdeki gerçek event verilerinden hesaplanır.</div></div>
-    <div class="analytics-box"><h3>📱 QR vs NFC</h3><div id="baChannels" class="channel-grid"></div><div class="micro">QR ve NFC temaslarının toplam dijital trafikteki payı.</div></div>
-  </div>
-  <div class="analytics-box" style="margin-top:16px"><h3>💡 İşletme İçgörüsü</h3><div id="baInsight" class="score"></div></div>
-</section>
-
-<!-- ==================================================
      QUICK ACTIONS
 ================================================== -->
 
@@ -2586,8 +3072,7 @@ main{
 
 
   <a
-    id="quickQR"
-    href="/qr-center"
+    href="#digital"
     class="quick"
   >
 
@@ -2608,7 +3093,6 @@ main{
 
 
   <a
-    id="quickNFC"
     href="#digital"
     class="quick"
   >
@@ -2945,6 +3429,219 @@ main{
 
 
 
+
+
+<!-- ==================================================
+     V2 — PROFILE DESIGN CENTER
+================================================== -->
+<section id="profileDesign" class="box">
+  <div class="box-head">
+    <div>
+      <div class="eyebrow">V2 • PROFILE DESIGN</div>
+      <h2>Profil Tasarım Merkezi</h2>
+      <p>Profilinin müşteriye görünen vitrinini tek merkezden tasarla ve canlı önizlemede kontrol et.</p>
+    </div>
+    <div class="design-badge">V2 ACTIVE</div>
+  </div>
+
+  <div class="profile-design-shell">
+    <div class="design-editor">
+      <div class="design-section-title">
+        <div>
+          <h3>Görünüm ve içerik</h3>
+          <p>Değişiklikler kaydedilene kadar mevcut profilin etkilenmez.</p>
+        </div>
+      </div>
+
+      <div class="design-grid">
+        <div class="design-field">
+          <label>TEMA</label>
+          <select id="design_theme" oninput="updateDesignPreview()" onchange="updateDesignPreview()">
+            <option value="midnight-gold">Midnight Gold</option>
+            <option value="obsidian">Obsidian</option>
+            <option value="champagne">Champagne</option>
+            <option value="pure-light">Pure Light</option>
+          </select>
+        </div>
+
+        <div class="design-field">
+          <label>VURGU RENGİ</label>
+          <div class="design-color-row">
+            <input id="design_accent_picker" type="color" value="#D4AF37" oninput="syncDesignColor('picker')">
+            <input id="design_accent" type="text" value="#D4AF37" maxlength="7" oninput="syncDesignColor('text')">
+          </div>
+        </div>
+
+        <div class="design-field full">
+          <label>KAPAK GÖRSEL URL</label>
+          <input id="design_cover_url" placeholder="https://..." oninput="updateDesignPreview()">
+          <div class="design-help">Profilin üst bölümünde premium kapak alanı olarak kullanılır.</div>
+        </div>
+
+        <div class="design-field">
+          <label>KAPAK POZİSYONU</label>
+          <select id="design_cover_position" oninput="updateDesignPreview()">
+            <option value="center">Merkez</option>
+            <option value="top">Üst</option>
+            <option value="bottom">Alt</option>
+            <option value="left">Sol</option>
+            <option value="right">Sağ</option>
+          </select>
+        </div>
+
+        <div class="design-field">
+          <label>DUYURU DURUMU</label>
+          <div class="design-toggle">
+            <span>Duyuruyu göster</span>
+            <label class="switch">
+              <input id="design_announcement_enabled" type="checkbox" onchange="updateDesignPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="design-field full">
+          <label>DUYURU METNİ</label>
+          <input id="design_announcement_text" maxlength="180" placeholder="Bugün 23:00'e kadar açığız..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>KAMPANYA BAŞLIĞI</label>
+          <input id="design_campaign_title" maxlength="90" placeholder="Bu haftanın özel fırsatı" oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>KAMPANYA METNİ</label>
+          <textarea id="design_campaign_text" maxlength="240" placeholder="Müşterilerine özel kampanyanı burada duyur..." oninput="updateDesignPreview()"></textarea>
+        </div>
+
+        <div class="design-field">
+          <label>KAMPANYA GÖRSEL URL</label>
+          <input id="design_campaign_image_url" placeholder="https://..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field">
+          <label>KAMPANYA DURUMU</label>
+          <div class="design-toggle">
+            <span>Kampanyayı göster</span>
+            <label class="switch">
+              <input id="design_campaign_enabled" type="checkbox" onchange="updateDesignPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="design-field">
+          <label>BUTTON METNİ</label>
+          <input id="design_campaign_button_text" maxlength="40" placeholder="Detayları Gör" oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field">
+          <label>BUTTON URL</label>
+          <input id="design_campaign_button_url" placeholder="https://..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>ÖNE ÇIKAN BAŞLIK</label>
+          <input id="design_featured_title" maxlength="90" placeholder="Öne çıkan ürünün veya hizmetin" oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>ÖNE ÇIKAN AÇIKLAMA</label>
+          <textarea id="design_featured_text" maxlength="240" placeholder="Müşterinin ilk görmesini istediğin içeriği anlat..." oninput="updateDesignPreview()"></textarea>
+        </div>
+
+        <div class="design-field">
+          <label>ÖNE ÇIKAN GÖRSEL URL</label>
+          <input id="design_featured_image_url" placeholder="https://..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field">
+          <label>ÖNE ÇIKAN DURUMU</label>
+          <div class="design-toggle">
+            <span>İçeriği göster</span>
+            <label class="switch">
+              <input id="design_featured_enabled" type="checkbox" onchange="updateDesignPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="design-field">
+          <label>BUTTON METNİ</label>
+          <input id="design_featured_button_text" maxlength="40" placeholder="İncele" oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field">
+          <label>BUTTON URL</label>
+          <input id="design_featured_button_url" placeholder="https://..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>GALERİ GÖRSELLERİ</label>
+          <textarea id="design_gallery" placeholder="Her satıra bir görsel URL'si yaz.&#10;https://...&#10;https://..." oninput="updateDesignPreview()"></textarea>
+          <div class="design-help">İlk aşamada URL tabanlı galeri kullanıyoruz. En fazla 30 görsel kaydedilir.</div>
+        </div>
+
+        <div class="design-field">
+          <label>VİDEO URL</label>
+          <input id="design_video_url" placeholder="https://youtube.com/..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field">
+          <label>VİDEO DURUMU</label>
+          <div class="design-toggle">
+            <span>Videoyu göster</span>
+            <label class="switch">
+              <input id="design_video_enabled" type="checkbox" onchange="updateDesignPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="design-save-row">
+        <button id="designSaveButton" class="design-save-button" type="button" onclick="saveProfileDesign()">✓ Tasarımı Kaydet</button>
+        <div id="designMessage"></div>
+      </div>
+    </div>
+
+    <div class="design-preview-box">
+      <div class="design-section-title">
+        <div>
+          <h3>Canlı önizleme</h3>
+          <p>Müşterinin göreceği yeni vitrin yapısının hızlı önizlemesi.</p>
+        </div>
+      </div>
+
+      <div id="designPreview" class="preview-frame">
+        <div id="previewCover" class="preview-cover"></div>
+        <div class="preview-body">
+          <div id="previewLogo" class="preview-logo">🦁</div>
+          <div id="previewName" class="preview-name">İşletme</div>
+          <div id="previewCategory" class="preview-category">İŞLETME</div>
+          <div id="previewAnnouncement" class="preview-announcement" style="display:none">
+            <strong>📢 Duyuru</strong>
+            <span id="previewAnnouncementText"></span>
+          </div>
+          <div id="previewCampaign" class="preview-campaign" style="display:none">
+            <strong id="previewCampaignTitle"></strong>
+            <span id="previewCampaignText"></span>
+            <span id="previewCampaignButton" class="preview-button" style="display:none"></span>
+          </div>
+          <div id="previewFeatured" class="preview-featured" style="display:none">
+            <strong id="previewFeaturedTitle"></strong>
+            <span id="previewFeaturedText"></span>
+            <span id="previewFeaturedButton" class="preview-button" style="display:none"></span>
+          </div>
+          <div id="previewGallery" class="preview-gallery"></div>
+          <div id="previewVideo" class="preview-video" style="display:none">🎬 Video içeriği eklendi</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ==================================================
      DIGITAL
 ================================================== -->
@@ -2982,7 +3679,7 @@ main{
 
     <!-- QR -->
 
-    <div id="qrCard" class="digital-card">
+    <div class="digital-card">
 
       <div class="digital-icon">
         ▣
@@ -3044,7 +3741,7 @@ main{
 
     <!-- NFC -->
 
-    <div id="nfcCard" class="digital-card">
+    <div class="digital-card">
 
       <div class="nfc-symbol">
         📡
@@ -3615,15 +4312,6 @@ main{
 /* ==================================================
    AUTH
 ================================================== */
-
-function esc(value){
-  return String(value ?? '')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#039;');
-}
 
 const token =
   localStorage.getItem(
@@ -4486,18 +5174,6 @@ function renderPerformance(
 
 
 
-async function copyProfileLink(){
-  if(!currentBusiness?.slug) return;
-  const url=window.location.origin+"/p/"+currentBusiness.slug;
-  try{
-    await navigator.clipboard.writeText(url);
-    showToast("Profil bağlantısı kopyalandı.");
-  }catch(error){
-    showToast("Profil bağlantısı: "+url);
-  }
-}
-
-
 /* ==================================================
    SHARE
 ================================================== */
@@ -4587,134 +5263,6 @@ async function shareProfile(){
 
 
 /* ==================================================
-   PANEL PERMISSIONS
-================================================== */
-
-function applyPermissions(business){
-  const p=business?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false};
-  const setAccess=(id,on)=>{const el=document.getElementById(id);if(!el)return;el.textContent=on?"AKTİF":"KİLİTLİ";el.className="access-state "+(on?"on":"off")};
-  setAccess("accessProfile",p.profile);
-  setAccess("accessQR",p.qr);
-  setAccess("accessNFC",p.nfc);
-  setAccess("accessAnalytics",p.analytics);
-  setAccess("accessLive",p.live);
-  setAccess("accessAI",p.ai);
-  const hide=id=>{const el=document.getElementById(id);if(el)el.style.display="none"};
-  const show=id=>{const el=document.getElementById(id);if(el)el.style.display=""};
-
-  const qrStat=document.getElementById("qrViews")?.closest(".stat");
-  const nfcStat=document.getElementById("nfcViews")?.closest(".stat");
-  if(qrStat)qrStat.style.display=p.qr?"":"none";
-  if(nfcStat)nfcStat.style.display=p.nfc?"":"none";
-
-  if(p.qr)show("quickQR");else hide("quickQR");
-  const liveCard=document.getElementById("businessLiveV4"); if(liveCard){liveCard.style.display=p.live?"":"none";}
-  const aiCard=document.getElementById("businessAIV4"); if(aiCard){aiCard.style.display=p.ai?"":"none";}
-  if(p.live) loadBusinessLive();
-  if(p.ai) loadAIInsights("7d");
-  if(p.nfc)show("quickNFC");else hide("quickNFC");
-
-  if(p.qr)show("qrCard");else hide("qrCard");
-  if(p.nfc)show("nfcCard");else hide("nfcCard");
-
-  const digital=document.getElementById("digital");
-  if(digital)digital.style.display=(p.qr||p.nfc)?"":"none";
-
-  const profile=document.getElementById("profile");
-  if(profile)profile.style.display=p.profile?"":"none";
-
-  document.querySelectorAll('a[href="#profile"]').forEach(el=>{el.style.display=p.profile?"":"none"});
-  const save=document.getElementById("saveButton");
-  if(save)save.style.display=p.profile?"":"none";
-
-  if(!p.analytics){
-    const summary=document.querySelector(".summary");
-    if(summary)summary.style.display="none";
-  }
-}
-
-
-
-/* ==================================================
-   BUSINESS CENTER ANALYTICS V4
-================================================== */
-async function loadBusinessAnalytics(period='7d'){
-  if(!currentBusiness?.permissions?.analytics) return;
-  document.querySelectorAll('.analytics-periods button').forEach(b=>b.classList.toggle('active',b.dataset.period===period));
-  const data=await api('/api/business-analytics?period='+encodeURIComponent(period));
-  if(!data) return;
-  const t=data.totals||{}, n=v=>Number(v||0);
-  const profile=n(t.profile_views), total=n(t.total_events), qr=n(t.qr_scans), nfc=n(t.nfc_taps), phone=n(t.phone_clicks), wa=n(t.whatsapp_clicks);
-  document.getElementById('baTotal').textContent=total.toLocaleString('tr-TR');
-  document.getElementById('baProfile').textContent=profile.toLocaleString('tr-TR');
-  document.getElementById('baDigital').textContent=(qr+nfc).toLocaleString('tr-TR');
-  document.getElementById('baContact').textContent=(phone+wa).toLocaleString('tr-TR');
-
-  const days=data.daily||[], max=Math.max(1,...days.map(x=>n(x.events)));
-  const traffic=document.getElementById('baTraffic'), labels=document.getElementById('baTrafficLabels'); traffic.innerHTML=''; labels.innerHTML='';
-  if(days.length){ days.slice(-30).forEach(x=>{ const wrap=document.createElement('div'); wrap.className='traffic-bar-wrap'; wrap.title=x.day+': '+n(x.events)+' etkileşim'; const bar=document.createElement('div'); bar.className='traffic-bar'; bar.style.height=(n(x.events)/max*100)+'%'; wrap.appendChild(bar); traffic.appendChild(wrap); const l=document.createElement('span'); l.className='traffic-label'; l.style.flex='1'; l.textContent=x.day.slice(5); labels.appendChild(l); }); }
-  else traffic.innerHTML='<div class="analytics-empty">Henüz seçilen dönemde veri yok.</div>';
-
-  const actions=(data.actions||[]).slice(0,8), actionMax=Math.max(1,...actions.map(x=>n(x.count)));
-  const names={profile_view:'Profil',qr_scan:'QR Tarama',qr:'QR',nfc:'NFC',phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google',website:'Website',menu:'Menü',location:'Konum',iban:'IBAN',share:'Paylaş'};
-  document.getElementById('baActions').innerHTML=actions.length?actions.map(x=>`<div class="action-row"><span>${names[x.type]||x.type}</span><div class="action-track"><div class="action-fill" style="width:${n(x.count)/actionMax*100}%"></div></div><strong>${n(x.count)}</strong></div>`).join(''):'<div class="analytics-empty">Henüz aksiyon yok.</div>';
-
-  const top=actions[0];
-  document.getElementById('baTopChannel').textContent=top?(names[top.type]||top.type):'—';
-  document.getElementById('baTopChannelSub').textContent=top?`${n(top.count).toLocaleString('tr-TR')} etkileşim ile lider`:'Henüz yeterli veri yok';
-
-  const hourly=data.hourly||[], peak=hourly.reduce((a,b)=>n(b.events)>n(a?.events)?b:a,null);
-  document.getElementById('baPeakHour').textContent=peak?`${String(n(peak.hour)).padStart(2,'0')}:00`:'—';
-  document.getElementById('baPeakHourSub').textContent=peak?`${n(peak.events).toLocaleString('tr-TR')} etkileşim`:'Henüz yeterli veri yok';
-
-  const actionEvents=Math.max(0,total-profile), conversion=profile?Math.min(100,(actionEvents/profile)*100):0;
-  document.getElementById('baConversion').textContent=conversion.toFixed(1)+'%';
-
-  const funnel=[['Profil',profile],['QR + NFC',qr+nfc],['İletişim',phone+wa],['Diğer aksiyonlar',Math.max(0,actionEvents-phone-wa)]];
-  const funnelMax=Math.max(1,profile,...funnel.map(x=>x[1]));
-  document.getElementById('baFunnel').innerHTML=funnel.map(x=>`<div class="funnel-row"><span>${x[0]}</span><div class="funnel-track"><div class="funnel-fill" style="width:${Math.min(100,x[1]/funnelMax*100)}%"></div></div><strong>${n(x[1]).toLocaleString('tr-TR')}</strong></div>`).join('');
-
-  const digital=qr+nfc, qrPct=digital?qr/digital*100:0, nfcPct=digital?nfc/digital*100:0;
-  document.getElementById('baChannels').innerHTML=`<div class="insight-card"><small>QR</small><strong>${qr.toLocaleString('tr-TR')}</strong><span>%${qrPct.toFixed(1)} dijital temas</span></div><div class="insight-card"><small>NFC</small><strong>${nfc.toLocaleString('tr-TR')}</strong><span>%${nfcPct.toFixed(1)} dijital temas</span></div>`;
-
-  let score=0; if(profile)score+=25; if(digital)score+=25; if(phone+wa)score+=25; if(actions.length>=3)score+=25;
-  let title=score>=75?'Güçlü performans':score>=50?'İyi gidiyor':score>=25?'Veri oluşuyor':'Henüz veri az';
-  let copy=score>=75?'Profiliniz aktif kullanılıyor ve birden fazla müşteri aksiyonu oluşuyor.':score>=50?'Dijital temaslarınız oluşmaya başlamış. En güçlü aksiyonları artırmaya odaklanın.':score>=25?'Daha fazla QR/NFC trafiği oluştukça analizler daha anlamlı hale gelecek.':'Profilinizi QR ve NFC noktalarınızda daha görünür hale getirerek veri toplamaya başlayın.';
-  document.getElementById('baInsight').innerHTML=`<div class="score-ring"><strong>${score}</strong></div><div class="score-copy"><strong>${title}</strong><span>${copy}</span></div>`;
-}
-
-
-
-/* ==================================================
-   BUSINESS LIVE TRACKING V1
-================================================== */
-function liveLabel(type){const m={profile_view:'Profil görüntüleme',qr_scan:'QR tarama',qr:'QR',nfc:'NFC dokunuşu',phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google yorum',website:'Website',menu:'Menü',location:'Konum',iban:'IBAN',share:'Paylaş'};return m[type]||type}
-function liveIcon(type){const m={profile_view:'👁️',qr_scan:'📱',qr:'📱',nfc:'🦁',phone:'📞',whatsapp:'💬',instagram:'📸',tiktok:'♪',google_review:'⭐',website:'🌐',menu:'📋',location:'📍',iban:'💳',share:'↗'};return m[type]||'•'}
-function liveTime(v){try{return new Date(v).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch{return '—'}}
-async function loadBusinessLive(){
- if(!currentBusiness?.permissions?.live)return;
- try{const d=await api('/api/business-live-activity?limit=30'); if(!d)return;
-  document.getElementById('bl15').textContent=Number(d.stats?.last_15m||0).toLocaleString('tr-TR');document.getElementById('bl60').textContent=Number(d.stats?.last_60m||0).toLocaleString('tr-TR');document.getElementById('blToday').textContent=Number(d.stats?.today||0).toLocaleString('tr-TR');
-  const feed=document.getElementById('businessLiveFeed'); const rows=d.activities||[];
-  feed.innerHTML=rows.length?rows.map(x=>`<div class="live-item"><div class="live-icon">${liveIcon(x.type)}</div><div><strong>${liveLabel(x.type)}</strong><span>${x.source==='nfc'?'NFC'+(x.nfc_name?' • '+esc(x.nfc_name):''):(x.source==='qr'?'QR':'Direct')} • ${liveTime(x.created_at)}</span></div></div>`).join(''):'<div class="locked-v4">Henüz canlı aktivite yok.</div>';
- }catch(e){const f=document.getElementById('businessLiveFeed');if(f)f.innerHTML='<div class="locked-v4">'+esc(e.message||'Canlı aktivite alınamadı')+'</div>'}
-}
-setInterval(()=>{if(currentBusiness?.permissions?.live)loadBusinessLive()},10000);
-
-/* ==================================================
-   LEO AI INSIGHTS V1
-================================================== */
-async function loadAIInsights(period='7d'){
- if(!currentBusiness?.permissions?.ai)return;
- document.querySelectorAll('[data-aiperiod]').forEach(b=>b.classList.toggle('active',b.dataset.aiperiod===period));
- const box=document.getElementById('aiInsightContent');if(!box)return;box.innerHTML='<div class="locked-v4">🧠 Rapor analiz ediliyor…</div>';
- try{const d=await api('/api/business-ai-insights?period='+encodeURIComponent(period));
-  const score=Number(d.score||0);const insights=d.insights||[];const recs=d.recommendations||[];
-  box.innerHTML=`<div class="ai-score"><div class="ai-ring">${score}</div><div class="ai-copy"><strong>${esc(d.title||'LEO AI Raporu')}</strong><span>Seçilen dönemdeki gerçek işletme verilerinin analizi • Dönüşüm: %${Number(d.conversion||0).toFixed(1)}</span></div></div><div class="ai-grid"><div class="ai-box"><small>🧠 LEO'NUN TESPİTLERİ</small><ul>${insights.length?insights.map(x=>`<li>${esc(x)}</li>`).join(''):'<li>Henüz yeterli veri oluşmadı.</li>'}</ul></div><div class="ai-box"><small>💡 ÖNERİLER</small><ul>${recs.length?recs.map(x=>`<li>${esc(x)}</li>`).join(''):'<li>Yeni veriler oluştukça öneriler burada görünecek.</li>'}</ul></div></div>`;
- }catch(e){box.innerHTML='<div class="locked-v4">'+esc(e.message||'AI raporu alınamadı')+'</div>'}
-}
-
-/* ==================================================
    LOAD
 ================================================== */
 
@@ -4735,13 +5283,10 @@ async function load(){
   currentBusiness =
     business;
 
-  applyPermissions(business);
 
-  const analyticsCard=document.getElementById('businessAnalyticsV3');
-  if(analyticsCard){
-    analyticsCard.style.display=business?.permissions?.analytics?'':'none';
-    if(business?.permissions?.analytics) loadBusinessAnalytics('7d');
-  }
+  /* V2 PROFILE DESIGN */
+
+  await loadProfileDesign();
 
 
 
@@ -4836,11 +5381,6 @@ async function load(){
     "heroProfile"
   ).href =
     profileUrl;
-
-  const commandProfile = document.getElementById("commandProfile");
-  if(commandProfile) commandProfile.href = profileUrl;
-  const commandStatus = document.getElementById("commandStatus");
-  if(commandStatus) commandStatus.textContent = (business.name || "İşletme") + " dijital varlıkların tek merkezden yönetiliyor.";
 
 
 
