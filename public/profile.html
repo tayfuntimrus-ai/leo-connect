@@ -2485,21 +2485,18 @@ function renderSmartCampaigns(){
 function renderV2DigitalChannels(){
   const social=business?.social_links && typeof business.social_links==='object' ? business.social_links : {};
   const custom=Array.isArray(business?.custom_links) ? business.custom_links : [];
+  const allowed=business?.social_platform_permissions && typeof business.social_platform_permissions==='object' ? business.social_platform_permissions : {};
   const labels={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website',yemeksepeti:'Yemeksepeti',getir:'Getir','trendyol-yemek':'Trendyol Yemek','migros-yemek':'Migros Yemek',rezervasyon:'Rezervasyon',bilet:'Bilet / Etkinlik',menu:'Online Menü',location:'Konum',tripadvisor:'Tripadvisor',booking:'Booking',telegram:'Telegram',email:'E-posta'};
   const icons={instagram:'📸',facebook:'f',tiktok:'🎵',youtube:'▶',linkedin:'in',x:'𝕏',whatsapp:'💬',google:'G',website:'🌐',yemeksepeti:'🍴',getir:'🟡','trendyol-yemek':'🟠','migros-yemek':'🛒',rezervasyon:'📅',bilet:'🎟️',menu:'📖',location:'📍',tripadvisor:'🦉',booking:'🏨',telegram:'✈️',email:'✉️'};
-  let section=document.getElementById('v2DigitalLinksSection');
-  if(!section){
-    section=document.createElement('section'); section.id='v2DigitalLinksSection'; section.className='section hidden';
-    const socialSection=document.getElementById('socialSection');
-    if(socialSection && socialSection.parentNode) socialSection.parentNode.insertBefore(section,socialSection.nextSibling);
-    else document.body.appendChild(section);
-  }
-  const entries=Object.keys(labels).map(k=>({type:k,...(social[k]||{})})).filter(x=>x.url && x.enabled!==false);
-  const customEntries=custom.filter(x=>x && x.url && x.enabled!==false).map(x=>({type:'custom',title:x.title,url:x.url,icon:x.icon||'🔗'}));
-  const all=entries.map(x=>({type:x.type,title:labels[x.type],url:x.url,icon:icons[x.type]||'🔗'})).concat(customEntries);
+  const entries=Object.keys(labels).filter(k=>allowed[k]!==false).map(k=>({type:k,title:labels[k],url:String(social[k]?.url||'').trim(),icon:icons[k]||'🔗'})).filter(x=>x.url);
+  const customEntries=custom.filter(x=>x&&x.url&&x.enabled!==false).map(x=>({type:'custom',title:String(x.title||'Bağlantı'),url:String(x.url),icon:x.icon||'🔗'}));
+  const all=entries.concat(customEntries);
+  const section=document.getElementById('socialSection');
+  if(!section)return;
   if(!all.length){section.classList.add('hidden');section.innerHTML='';return;}
   section.classList.remove('hidden');
-  section.innerHTML='<div class="section-title"><div class="section-icon">✨</div><div><strong>Dijital Kanallar</strong><span>İşletmeyle bağlantı kur</span></div></div><div class="link-grid">'+all.map(x=>`<a class="link" target="_blank" rel="noopener" href="${dynamicSafeUrl(x.url)||'#'}" data-digital-type="${String(x.type).replace(/[^a-z0-9_-]/gi,'')}"><div class="link-icon">${x.icon}</div><div class="link-text"><strong>${x.title}</strong><span>${x.type==='custom'?'Bağlantıyı aç':x.title+' bağlantısını aç'}</span></div></a>`).join('')+'</div>';
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  section.innerHTML='<div class="section-title"><div class="section-icon">✨</div><div><strong>Dijital Kanallar</strong><span>İşletmeyle bağlantı kur</span></div></div><div class="link-grid">'+all.map(x=>'<a class="link" target="_blank" rel="noopener" href="'+(dynamicSafeUrl(x.url)||'#')+'" data-digital-type="'+esc(String(x.type).replace(/[^a-z0-9_-]/gi,''))+'"><div class="link-icon">'+esc(x.icon)+'</div><div class="link-text"><strong>'+esc(x.title)+'</strong><span>Bağlantıyı aç</span></div></a>').join('')+'</div>';
   section.querySelectorAll('a[data-digital-type]').forEach(a=>a.addEventListener('click',()=>track('digital_'+a.dataset.digitalType)));
 }
 
@@ -2598,7 +2595,7 @@ function renderDynamicProfile(){
 
 function render(){
 
-  renderDynamicProfile();
+  try{ renderDynamicProfile(); }catch(error){ console.error("Legacy profile render error:",error); }
   renderV2DigitalChannels();
   renderSmartCampaigns();
 
