@@ -1189,6 +1189,86 @@ body{
   font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.1);
 }
 .dynamic-button.show{display:inline-flex!important;}
+
+/* ==================================================
+   SMART CAMPAIGNS
+================================================== */
+.smart-campaigns{
+  display:none;
+  margin-top:16px;
+}
+.smart-campaign{
+  position:relative;
+  overflow:hidden;
+  margin-top:12px;
+  padding:16px;
+  border:1px solid rgba(214,173,85,.24);
+  border-radius:16px;
+  background:
+    linear-gradient(145deg,rgba(214,173,85,.13),rgba(255,255,255,.025));
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
+  text-align:left;
+}
+.smart-campaign:first-child{
+  margin-top:0;
+}
+.smart-campaign-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-bottom:9px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:rgba(214,173,85,.12);
+  border:1px solid rgba(214,173,85,.2);
+  color:var(--lc-gold-soft);
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.7px;
+  text-transform:uppercase;
+}
+.smart-campaign-title{
+  display:block;
+  margin:0 0 7px;
+  color:#fff;
+  font-size:14px;
+  line-height:1.35;
+  font-weight:900;
+}
+.smart-campaign-text{
+  display:block;
+  color:#d0d0d0;
+  font-size:11px;
+  line-height:1.6;
+  white-space:pre-wrap;
+}
+.smart-campaign-image{
+  display:block;
+  width:100%;
+  max-height:280px;
+  object-fit:cover;
+  margin-top:12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.07);
+  background:#080808;
+}
+.smart-campaign-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:12px;
+  padding:10px 14px;
+  border-radius:11px;
+  background:linear-gradient(135deg,var(--lc-gold),#9e7738);
+  color:#fff;
+  text-decoration:none;
+  font-size:9px;
+  font-weight:900;
+  border:1px solid rgba(255,255,255,.1);
+}
+.smart-campaign-button:hover{
+  filter:brightness(1.08);
+}
 .dynamic-gallery{
   display:none;margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;
 }
@@ -1246,20 +1326,6 @@ body{
   .review-star{width:35px;height:35px}
   .review-whatsapp-button{margin-left:0}
 }
-
-
-/* ==================================================
-   V2 — SMART CAMPAIGN PUBLIC LAYER
-================================================== */
-.smart-campaigns{display:grid;gap:14px;margin:18px 0}
-.smart-campaign{overflow:hidden;border:1px solid #c59a5245;border-radius:18px;background:linear-gradient(145deg,#151515,#090909);box-shadow:0 18px 45px #0008}
-.smart-campaign-media{width:100%;max-height:260px;object-fit:cover;display:none}
-.smart-campaign-body{padding:20px}
-.smart-campaign-kicker{font-size:9px;letter-spacing:.18em;color:#e0bd7b;font-weight:900}
-.smart-campaign-title{margin-top:7px;font-size:20px;font-weight:900}
-.smart-campaign-text{margin-top:8px;color:#9a9a9a;font-size:11px;line-height:1.65;white-space:pre-line}
-.smart-campaign-button{display:none;margin-top:14px;min-height:40px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,#c59a52,#9e7738);color:#fff;font-size:10px;font-weight:900;text-decoration:none}
-.smart-campaign-button.show{display:inline-flex;align-items:center;justify-content:center}
 
 </style>
 
@@ -1393,7 +1459,7 @@ body{
   <a id="dynamicCampaignButton" class="dynamic-button" target="_blank" rel="noopener"></a>
 </div>
 
-<div id="smartCampaignsPublic" class="smart-campaigns"></div>
+<div id="smartCampaigns" class="smart-campaigns"></div>
 
 <div id="dynamicFeatured" class="dynamic-featured">
   <strong id="dynamicFeaturedTitle"></strong>
@@ -1686,13 +1752,6 @@ body{
 
 </section>
 
-
-
-
-<div id="v2DigitalLinksSection" class="section hidden">
-  <div class="section-title"><div class="section-icon">🔗</div><div><strong>Diğer Dijital Kanallar</strong><span>İşletmenin diğer bağlantıları</span></div></div>
-  <div id="v2DigitalLinksGrid" class="link-grid"></div>
-</div>
 
 
 <!-- ==================================================
@@ -2337,6 +2396,113 @@ function dynamicYoutubeEmbed(value){
   }catch(e){ return ''; }
 }
 
+function renderSmartCampaigns(){
+  const box=document.getElementById('smartCampaigns');
+  if(!box) return;
+
+  box.innerHTML='';
+
+  // Smart Campaigns: public API'den gelen ana kaynak.
+  // Eski profil_design kampanyası da geriye dönük uyumluluk için desteklenir.
+  const smart=Array.isArray(business?.campaigns) ? business.campaigns : [];
+  const d=business?.profile_design || {};
+  const campaigns=smart.length ? smart.slice(0,5) : (
+    d.campaign_enabled && (d.campaign_title || d.campaign_text || d.campaign_image_url)
+      ? [{
+          title:d.campaign_title || 'Kampanya',
+          text:d.campaign_text || '',
+          image_url:d.campaign_image_url || '',
+          button_text:d.campaign_button_text || '',
+          button_url:d.campaign_button_url || '',
+          enabled:true
+        }]
+      : []
+  );
+
+  console.log('[LEO CONNECT] Public campaigns:', campaigns);
+
+  if(!campaigns.length){
+    box.style.display='none';
+    return;
+  }
+
+  campaigns.forEach(c=>{
+    const card=document.createElement('div');
+    card.className='smart-campaign';
+
+    const badge=document.createElement('div');
+    badge.className='smart-campaign-badge';
+    badge.textContent='🔥 AKTİF KAMPANYA';
+    card.appendChild(badge);
+
+    if(String(c.title||'').trim()){
+      const title=document.createElement('strong');
+      title.className='smart-campaign-title';
+      title.textContent=String(c.title||'');
+      card.appendChild(title);
+    }
+
+    if(String(c.text||'').trim()){
+      const body=document.createElement('span');
+      body.className='smart-campaign-text';
+      body.textContent=String(c.text||'');
+      card.appendChild(body);
+    }
+
+    const imageUrl=dynamicSafeUrl(c.image_url);
+    if(imageUrl){
+      const img=document.createElement('img');
+      img.className='smart-campaign-image';
+      img.src=imageUrl;
+      img.alt=String(c.title||'Kampanya görseli');
+      img.loading='lazy';
+      img.onerror=()=>img.remove();
+      card.appendChild(img);
+    }
+
+    const buttonUrl=dynamicSafeUrl(c.button_url);
+    const buttonText=String(c.button_text||'').trim();
+
+    if(buttonUrl && buttonText){
+      const btn=document.createElement('a');
+      btn.className='smart-campaign-button';
+      btn.href=buttonUrl;
+      btn.textContent=buttonText;
+      btn.target='_blank';
+      btn.rel='noopener';
+      btn.addEventListener('click',()=>track('campaign'));
+      card.appendChild(btn);
+    }
+
+    box.appendChild(card);
+  });
+
+  box.style.display=box.children.length ? 'block' : 'block';
+}
+
+
+
+function renderV2DigitalChannels(){
+  const social=business?.social_links && typeof business.social_links==='object' ? business.social_links : {};
+  const custom=Array.isArray(business?.custom_links) ? business.custom_links : [];
+  const labels={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website',yemeksepeti:'Yemeksepeti',getir:'Getir','trendyol-yemek':'Trendyol Yemek','migros-yemek':'Migros Yemek',rezervasyon:'Rezervasyon',bilet:'Bilet / Etkinlik',menu:'Online Menü',location:'Konum',tripadvisor:'Tripadvisor',booking:'Booking',telegram:'Telegram',email:'E-posta'};
+  const icons={instagram:'📸',facebook:'f',tiktok:'🎵',youtube:'▶',linkedin:'in',x:'𝕏',whatsapp:'💬',google:'G',website:'🌐',yemeksepeti:'🍴',getir:'🟡','trendyol-yemek':'🟠','migros-yemek':'🛒',rezervasyon:'📅',bilet:'🎟️',menu:'📖',location:'📍',tripadvisor:'🦉',booking:'🏨',telegram:'✈️',email:'✉️'};
+  let section=document.getElementById('v2DigitalLinksSection');
+  if(!section){
+    section=document.createElement('section'); section.id='v2DigitalLinksSection'; section.className='section hidden';
+    const socialSection=document.getElementById('socialSection');
+    if(socialSection && socialSection.parentNode) socialSection.parentNode.insertBefore(section,socialSection.nextSibling);
+    else document.body.appendChild(section);
+  }
+  const entries=Object.keys(labels).map(k=>({type:k,...(social[k]||{})})).filter(x=>x.url && x.enabled!==false);
+  const customEntries=custom.filter(x=>x && x.url && x.enabled!==false).map(x=>({type:'custom',title:x.title,url:x.url,icon:x.icon||'🔗'}));
+  const all=entries.map(x=>({type:x.type,title:labels[x.type],url:x.url,icon:icons[x.type]||'🔗'})).concat(customEntries);
+  if(!all.length){section.classList.add('hidden');section.innerHTML='';return;}
+  section.classList.remove('hidden');
+  section.innerHTML='<div class="section-title"><div class="section-icon">✨</div><div><strong>Dijital Kanallar</strong><span>İşletmeyle bağlantı kur</span></div></div><div class="link-grid">'+all.map(x=>`<a class="link" target="_blank" rel="noopener" href="${dynamicSafeUrl(x.url)||'#'}" data-digital-type="${String(x.type).replace(/[^a-z0-9_-]/gi,'')}"><div class="link-icon">${x.icon}</div><div class="link-text"><strong>${x.title}</strong><span>${x.type==='custom'?'Bağlantıyı aç':x.title+' bağlantısını aç'}</span></div></a>`).join('')+'</div>';
+  section.querySelectorAll('a[data-digital-type]').forEach(a=>a.addEventListener('click',()=>track('digital_'+a.dataset.digitalType)));
+}
+
 function renderDynamicProfile(){
   const d=business?.profile_design || {};
   const theme=String(d.theme||'midnight-gold');
@@ -2378,31 +2544,6 @@ function renderDynamicProfile(){
     const btnUrl=dynamicSafeUrl(d.campaign_button_url);
     if(btnUrl && d.campaign_button_text){btn.href=btnUrl;btn.textContent=d.campaign_button_text;btn.classList.add('show');}else btn.classList.remove('show');
     btn.onclick=()=>{ if(btnUrl) track('campaign'); };
-  }
-
-  /* V2 SMART CAMPAIGNS — scheduled campaigns take priority over legacy single campaign */
-  const smartBox=document.getElementById('smartCampaignsPublic');
-  const smartCampaigns=Array.isArray(business?.campaigns)?business.campaigns:[];
-  if(smartBox){
-    smartBox.innerHTML='';
-    if(smartCampaigns.length){
-      if(campaign) campaign.style.display='none';
-      smartCampaigns.slice(0,5).forEach(c=>{
-        const wrap=document.createElement('article');
-        wrap.className='smart-campaign';
-        const imageUrl=dynamicSafeUrl(c.image_url);
-        const buttonUrl=dynamicSafeUrl(c.button_url);
-        wrap.innerHTML=`<img class="smart-campaign-media" alt="Kampanya görseli"><div class="smart-campaign-body"><div class="smart-campaign-kicker">LEO CONNECT • ÖZEL FIRSAT</div><div class="smart-campaign-title"></div><div class="smart-campaign-text"></div><a class="smart-campaign-button" target="_blank" rel="noopener"></a></div>`;
-        const img=wrap.querySelector('.smart-campaign-media');
-        if(imageUrl){img.src=imageUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}
-        wrap.querySelector('.smart-campaign-title').textContent=String(c.title||'Kampanya');
-        wrap.querySelector('.smart-campaign-text').textContent=String(c.text||'');
-        const btn=wrap.querySelector('.smart-campaign-button');
-        if(buttonUrl && c.button_text){btn.href=buttonUrl;btn.textContent=String(c.button_text);btn.classList.add('show');btn.addEventListener('click',()=>track('campaign_click'));}
-        smartBox.appendChild(wrap);
-        track('campaign_view');
-      });
-    }
   }
 
   const featured=document.getElementById('dynamicFeatured');
@@ -2458,6 +2599,8 @@ function renderDynamicProfile(){
 function render(){
 
   renderDynamicProfile();
+  renderV2DigitalChannels();
+  renderSmartCampaigns();
 
   /* V2 REVIEW BOOSTER */
   try{
@@ -3080,34 +3223,6 @@ getBusiness();
 
 
 
-
-
-<script id="leo-public-v2-links">
-(function(){
-  const names={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website'};
-  const icons={instagram:'📸',facebook:'f',tiktok:'🎵',youtube:'▶',linkedin:'in',x:'𝕏',whatsapp:'💬',google:'G',website:'🌐'};
-  function safe(u){try{const x=new URL(u,location.href);return /^https?:$/i.test(x.protocol)?x.href:''}catch(e){return ''}}
-  function renderV2Links(){
-    const wrap=document.getElementById('v2DigitalLinksSection'),grid=document.getElementById('v2DigitalLinksGrid');
-    if(!wrap||!grid||!window.business)return;
-    const links=business.social_links||{}, custom=Array.isArray(business.custom_links)?business.custom_links:[];
-    const items=[];
-    Object.keys(names).forEach(k=>{const u=safe(links?.[k]?.url||'');if(u)items.push({name:names[k],icon:icons[k],url:u});});
-    custom.filter(x=>x&&x.enabled!==false).forEach(x=>{const u=safe(x.url);if(u)items.push({name:x.title,icon:x.icon||'🔗',url:u});});
-    if(!items.length){wrap.classList.add('hidden');return;}
-    grid.innerHTML=items.map(x=>`<a class="link" target="_blank" rel="noopener" href="${uEsc(x.url)}"><div class="link-icon">${x.icon}</div><div class="link-text"><strong>${eEsc(x.name)}</strong><span>Bağlantıyı aç</span></div></a>`).join('');
-    wrap.classList.remove('hidden');
-  }
-  function eEsc(v){return String(v??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-  function uEsc(v){return eEsc(v)}
-  const oldRender=window.renderDynamicProfile;
-  if(typeof oldRender==='function'){
-    window.renderDynamicProfile=function(){oldRender.apply(this,arguments);renderV2Links();}
-  }else{
-    document.addEventListener('DOMContentLoaded',renderV2Links);
-  }
-})();
-</script>
 
 </body>
 
