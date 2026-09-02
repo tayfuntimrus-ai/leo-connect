@@ -1325,81 +1325,259 @@ function loadDesignIntoForm(data){
 }
 
 function updateDesignPreview(){
-  const data = getDesignForm();
-  const root = document.getElementById("designPreview");
-  if(!root) return;
+  try{
+    const data = getDesignForm();
+    const root = document.getElementById("designPreview");
+    if(!root) return;
 
-  root.className = "preview-frame theme-" + (data.theme || "midnight-gold");
-  root.style.setProperty("--preview-accent", data.accent_color);
+    const theme = data.theme || "midnight-gold";
+    root.className = "preview-frame theme-" + theme;
+    root.style.setProperty("--preview-accent", data.accent_color);
+    root.style.setProperty("--lc-gold", data.accent_color);
+    root.style.setProperty("--gold-light", data.accent_color);
 
-  const cover = document.getElementById("previewCover");
-  if(cover){
-    cover.style.backgroundPosition = data.cover_position || "center";
-    cover.style.backgroundImage = data.cover_url
-      ? `linear-gradient(180deg,transparent 25%,#070707 100%), url("${data.cover_url.replace(/"/g,'\\"')}")`
-      : "radial-gradient(circle at 80% 20%,#c59a5230,transparent 35%),linear-gradient(145deg,#1d1d1d,#090909)";
-  }
-
-  document.documentElement.style.setProperty("--gold-light", data.accent_color);
-
-  const name = document.getElementById("previewName");
-  const category = document.getElementById("previewCategory");
-  if(name) name.textContent = currentBusiness?.name || "İşletme";
-  if(category) category.textContent = (currentBusiness?.category || "İŞLETME").toUpperCase();
-
-  const logo = document.getElementById("previewLogo");
-  if(logo){
-    const logoUrl = currentBusiness?.logo_url || "";
-    logo.innerHTML = logoUrl
-      ? `<img src="${esc(logoUrl)}" alt="">`
-      : "🦁";
-  }
-
-  const announcement = document.getElementById("previewAnnouncement");
-  const announcementText = document.getElementById("previewAnnouncementText");
-  if(announcement && announcementText){
-    announcement.style.display = data.announcement_enabled && data.announcement_text ? "block" : "none";
-    announcementText.textContent = data.announcement_text;
-  }
-
-  const campaign = document.getElementById("previewCampaign");
-  if(campaign){
-    const show = data.campaign_enabled && (data.campaign_title || data.campaign_text);
-    campaign.style.display = show ? "block" : "none";
-    if(data.campaign_image_url){
-      campaign.style.backgroundImage = `url("${data.campaign_image_url.replace(/"/g,'\\"')}")`;
-    }else{
-      campaign.style.backgroundImage = "none";
+    /* COVER */
+    const cover = document.getElementById("previewCover");
+    if(cover){
+      cover.style.backgroundPosition = data.cover_position || "center";
+      cover.style.backgroundImage = data.cover_url
+        ? `linear-gradient(180deg,transparent 20%,rgba(0,0,0,.82) 100%), url("${String(data.cover_url).replace(/"/g,'\\"')}")`
+        : "radial-gradient(circle at 80% 20%,#c59a5230,transparent 35%),linear-gradient(145deg,#1d1d1d,#090909)";
     }
-    document.getElementById("previewCampaignTitle").textContent = data.campaign_title || "Kampanya";
-    document.getElementById("previewCampaignText").textContent = data.campaign_text || "Kampanya detayları";
-    const cb = document.getElementById("previewCampaignButton");
-    cb.style.display = data.campaign_button_text ? "inline-flex" : "none";
-    cb.textContent = data.campaign_button_text;
-  }
 
-  const featured = document.getElementById("previewFeatured");
-  if(featured){
-    const show = data.featured_enabled && (data.featured_title || data.featured_text);
-    featured.style.display = show ? "block" : "none";
-    document.getElementById("previewFeaturedTitle").textContent = data.featured_title || "Öne Çıkan";
-    document.getElementById("previewFeaturedText").textContent = data.featured_text || "Öne çıkan içerik";
-    const fb = document.getElementById("previewFeaturedButton");
-    fb.style.display = data.featured_button_text ? "inline-flex" : "none";
-    fb.textContent = data.featured_button_text;
-  }
+    /* BUSINESS */
+    const name = document.getElementById("previewName");
+    const category = document.getElementById("previewCategory");
 
-  const galleryBox = document.getElementById("previewGallery");
-  if(galleryBox){
-    const gallery = Array.isArray(data.gallery) ? data.gallery : [];
-    galleryBox.innerHTML = gallery.slice(0,6).map(item => {
-      const url = typeof item === "string" ? item : item?.url || "";
-      return url ? `<div><img src="${esc(url)}" alt=""></div>` : "";
-    }).join("");
-  }
+    if(name){
+      name.textContent = currentBusiness?.name || "İşletme";
+    }
 
-  const video = document.getElementById("previewVideo");
-  if(video) video.style.display = data.video_enabled && data.video_url ? "block" : "none";
+    if(category){
+      category.textContent =
+        (currentBusiness?.category || "İŞLETME").toUpperCase();
+    }
+
+    /* LOGO */
+    const logo = document.getElementById("previewLogo");
+
+    if(logo){
+      const logoUrl = currentBusiness?.logo_url || "";
+
+      logo.innerHTML = logoUrl
+        ? `<img src="${esc(logoUrl)}" alt="">`
+        : "🦁";
+    }
+
+    /* ANNOUNCEMENT */
+    const announcement =
+      document.getElementById("previewAnnouncement");
+
+    const announcementText =
+      document.getElementById("previewAnnouncementText");
+
+    if(announcement && announcementText){
+      const enabled =
+        data.announcement_enabled === true &&
+        !!data.announcement_text;
+
+      announcement.style.display =
+        enabled ? "block" : "none";
+
+      announcementText.textContent =
+        data.announcement_text || "";
+    }
+
+    /* CAMPAIGN */
+    const campaign =
+      document.getElementById("previewCampaign");
+
+    if(campaign){
+      const show =
+        data.campaign_enabled === true &&
+        !!(data.campaign_title || data.campaign_text);
+
+      campaign.style.display =
+        show ? "block" : "none";
+
+      if(data.campaign_image_url){
+        campaign.style.backgroundImage =
+          `linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.72)), url("${String(data.campaign_image_url).replace(/"/g,'\\"')}")`;
+        campaign.style.backgroundSize = "cover";
+        campaign.style.backgroundPosition = "center";
+      }else{
+        campaign.style.backgroundImage = "none";
+      }
+
+      const title =
+        document.getElementById("previewCampaignTitle");
+
+      const text =
+        document.getElementById("previewCampaignText");
+
+      const button =
+        document.getElementById("previewCampaignButton");
+
+      if(title){
+        title.textContent =
+          data.campaign_title || "Kampanya";
+      }
+
+      if(text){
+        text.textContent =
+          data.campaign_text || "Kampanya detayları";
+      }
+
+      if(button){
+        button.style.display =
+          data.campaign_button_text
+            ? "inline-flex"
+            : "none";
+
+        button.textContent =
+          data.campaign_button_text || "";
+      }
+    }
+
+    /* FEATURED */
+    const featured =
+      document.getElementById("previewFeatured");
+
+    if(featured){
+      const show =
+        data.featured_enabled === true &&
+        !!(data.featured_title || data.featured_text);
+
+      featured.style.display =
+        show ? "block" : "none";
+
+      if(data.featured_image_url){
+        featured.style.backgroundImage =
+          `linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.68)), url("${String(data.featured_image_url).replace(/"/g,'\\"')}")`;
+        featured.style.backgroundSize = "cover";
+        featured.style.backgroundPosition = "center";
+      }else{
+        featured.style.backgroundImage = "none";
+      }
+
+      const title =
+        document.getElementById("previewFeaturedTitle");
+
+      const text =
+        document.getElementById("previewFeaturedText");
+
+      const button =
+        document.getElementById("previewFeaturedButton");
+
+      if(title){
+        title.textContent =
+          data.featured_title || "Öne Çıkan";
+      }
+
+      if(text){
+        text.textContent =
+          data.featured_text || "Öne çıkan içerik";
+      }
+
+      if(button){
+        button.style.display =
+          data.featured_button_text
+            ? "inline-flex"
+            : "none";
+
+        button.textContent =
+          data.featured_button_text || "";
+      }
+    }
+
+    /* GALLERY */
+    const galleryBox =
+      document.getElementById("previewGallery");
+
+    if(galleryBox){
+      const gallery =
+        Array.isArray(data.gallery)
+          ? data.gallery
+          : [];
+
+      galleryBox.innerHTML =
+        gallery
+          .slice(0,6)
+          .map(item => {
+            const url =
+              typeof item === "string"
+                ? item
+                : item?.url || "";
+
+            return url
+              ? `<div><img src="${esc(url)}" alt=""></div>`
+              : "";
+          })
+          .join("");
+    }
+
+    /* VIDEO */
+    const video =
+      document.getElementById("previewVideo");
+
+    if(video){
+      video.style.display =
+        data.video_enabled && data.video_url
+          ? "block"
+          : "none";
+    }
+
+    /* LIVE INDICATOR */
+    const live =
+      document.getElementById("previewLiveStatus");
+
+    if(live){
+      live.textContent = "● CANLI";
+    }
+
+  }catch(error){
+    console.error("LEO CONNECT preview error:", error);
+
+    const message =
+      document.getElementById("designMessage");
+
+    if(message && !message.textContent){
+      message.textContent =
+        "Önizleme güncellenemedi.";
+    }
+  }
+}
+
+/* Gerçek canlı önizleme: inline handler'a ek olarak
+   tüm tasarım alanlarını merkezi olarak dinle. */
+function initLiveDesignPreview(){
+  const container =
+    document.getElementById("profileDesign");
+
+  if(!container) return;
+
+  const refresh = function(){
+    window.requestAnimationFrame(updateDesignPreview);
+  };
+
+  container.addEventListener("input", function(event){
+    if(event.target && event.target.matches(
+      "input, textarea, select"
+    )){
+      refresh();
+    }
+  });
+
+  container.addEventListener("change", function(event){
+    if(event.target && event.target.matches(
+      "input, textarea, select"
+    )){
+      refresh();
+    }
+  });
+
+  /* Sayfa açıldığında ilk render */
+  refresh();
 }
 
 async function loadProfileDesign(){
@@ -2735,31 +2913,12 @@ async function saveProfileDesign(){
       👤 Profilim
     </a>
 
-    <button
-      id="logoutButton"
-      class="header-button"
-      type="button"
-      onclick="logout()"
-    >
-      Çıkış
-    </button>
-
     <a
       href="/"
       class="header-button"
     >
       Site
     </a>
-
-    <button
-      id="logoutButton"
-      type="button"
-      class="header-button"
-      onclick="logout()"
-      style="cursor:pointer"
-    >
-      Çıkış
-    </button>
 
   </div>
 
@@ -3628,7 +3787,7 @@ async function saveProfileDesign(){
     <div class="design-preview-box">
       <div class="design-section-title">
         <div>
-          <h3>Canlı önizleme</h3>
+          <h3>Canlı önizleme <span id="previewLiveStatus" style="display:inline-block;margin-left:7px;font-size:9px;letter-spacing:.08em;color:#6fd08a;font-weight:900;">● CANLI</span></h3>
           <p>Müşterinin göreceği yeni vitrin yapısının hızlı önizlemesi.</p>
         </div>
       </div>
@@ -4318,11 +4477,6 @@ async function saveProfileDesign(){
 ================================================== -->
 
 <div
-  id="sessionDebug"
-  style="display:none;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:10001;width:min(620px,calc(100% - 28px));padding:16px 18px;border-radius:16px;background:#151515;border:1px solid #c59a5266;color:#ddd;font-size:12px;line-height:1.6;box-shadow:0 20px 60px #000;"
-></div>
-
-<div
   id="toast"
   class="toast"
 ></div>
@@ -4337,32 +4491,18 @@ async function saveProfileDesign(){
    AUTH
 ================================================== */
 
-function getStoredToken(){
-  return (
-    localStorage.getItem("token") ||
-    localStorage.getItem("leo_token") ||
-    sessionStorage.getItem("token") ||
-    ""
+const token =
+  localStorage.getItem(
+    "token"
   );
-}
 
-const token = getStoredToken();
 
-function decodeJwtPayload(value){
-  try{
-    const part = String(value || '').split('.')[1];
-    if(!part) return null;
-    const normalized = part.replace(/-/g,'+').replace(/_/g,'/');
-    return JSON.parse(atob(normalized));
-  }catch(error){
-    return null;
-  }
-}
-
-const tokenPayload = decodeJwtPayload(token);
 
 if(!token){
-  window.location.href = "/login";
+
+  window.location.href =
+    "/login";
+
 }
 
 
@@ -4430,23 +4570,6 @@ function esc(value){
 
 
 /* ==================================================
-   SESSION / LOGOUT
-================================================== */
-
-function logout(){
-  localStorage.removeItem("token");
-  localStorage.removeItem("leo_token");
-  sessionStorage.clear();
-  window.location.href = "/login";
-}
-
-function recoverSession(){
-  localStorage.removeItem("token");
-  localStorage.removeItem("leo_token");
-  window.location.href = "/login?reason=session";
-}
-
-/* ==================================================
    API
 ================================================== */
 
@@ -4456,46 +4579,61 @@ async function api(
 ){
 
   options.headers = {
+
     ...(options.headers || {}),
-    "Authorization": "Bearer " + token,
-    "Content-Type": "application/json"
+
+    "Authorization":
+      "Bearer " + token,
+
+    "Content-Type":
+      "application/json"
+
   };
 
+
+
   try{
-    const response = await fetch(url, options);
-    const raw = await response.text();
 
-    let data = null;
-    try{
-      data = raw ? JSON.parse(raw) : null;
-    }catch(parseError){
-      console.error("API non-JSON response:", url, response.status, raw.slice(0,500));
-      return { error: "Sunucudan geçersiz yanıt geldi (" + response.status + ")." };
-    }
+    const response =
+      await fetch(
+        url,
+        options
+      );
 
-    if(response.status === 401){
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+
+
+    if(
+      response.status === 401
+    ){
+
+      localStorage.removeItem(
+        "token"
+      );
+
+      window.location.href =
+        "/login";
+
       return null;
+
     }
 
-    if(!response.ok){
-      console.error("API HTTP error:", url, response.status, data);
-      return data || { error: "İstek başarısız (" + response.status + ")." };
-    }
 
-    return data;
+
+    return await response.json();
+
   }catch(error){
-    console.error("API error:", url, error);
-    return { error: "Sunucuya bağlanılamadı." };
+
+    console.error(
+      "API error:",
+      error
+    );
+
+    return null;
+
   }
+
 }
 
-function normalizeBusinessResponse(data){
-  if(!data) return null;
-  if(data.business && data.business.id) return { ...data.business, permissions:data.permissions || data.business.permissions };
-  return data;
-}
 
 
 /* ==================================================
@@ -5320,138 +5458,261 @@ async function shareProfile(){
 
 
 /* ==================================================
-   V2 — PROFILE DESIGN HARDENED LOADER
-   Bu global tanim, eski/cached dashboard build'lerinde
-   loadProfileDesign referansinin kaybolmasini engeller.
-================================================== */
-
-window.loadProfileDesign = async function(){
-  try{
-    const result = await api("/api/business-profile-design");
-
-    if(result && !result.error){
-      if(typeof loadDesignIntoForm === "function"){
-        loadDesignIntoForm(result);
-      }
-      return result;
-    }
-
-    if(result?.error){
-      const msg = document.getElementById("designMessage");
-      if(msg) msg.textContent = result.error;
-    }
-
-    return result || null;
-  }catch(error){
-    console.error("Profile design load error:", error);
-    const msg = document.getElementById("designMessage");
-    if(msg) msg.textContent = "Profil tasarımı şu an yüklenemedi.";
-    return null;
-  }
-};
-
-
-/* ==================================================
    LOAD
 ================================================== */
 
 async function load(){
 
-  try{
-    if(tokenPayload && tokenPayload.role && tokenPayload.role !== "business"){
-      throw new Error("Business Center için işletme hesabıyla giriş yapılmalı. Mevcut oturum: " + tokenPayload.role);
+  const business =
+    await api(
+      "/api/me"
+    );
+
+
+
+  if(!business)
+    return;
+
+
+
+  currentBusiness =
+    business;
+
+
+  /* V2 PROFILE DESIGN */
+
+  await loadProfileDesign();
+
+
+
+  /* TITLE */
+
+  document.getElementById(
+    "title"
+  ).textContent =
+    business.name ||
+    "İşletme Paneli";
+
+
+
+  document.getElementById(
+    "heroName"
+  ).textContent =
+    business.name ||
+    "İşletme";
+
+
+
+  document.getElementById(
+    "heroCategory"
+  ).textContent =
+    business.category ||
+    "İşletme";
+
+
+
+  document.getElementById(
+    "heroDescription"
+  ).textContent =
+    business.description ||
+    "Dijital işletme profilini yönet.";
+
+
+
+  /* FIELDS */
+
+  fields.forEach(
+    field => {
+
+      const element =
+        document.getElementById(
+          field
+        );
+
+
+
+      if(element){
+
+        element.value =
+          business[field] ||
+          "";
+
+      }
+
     }
+  );
 
-    const rawBusiness = await api("/api/me");
-    const business = normalizeBusinessResponse(rawBusiness);
 
-    if(!business || business.error || !business.id){
-      const detail = business?.error || "İşletme oturumu doğrulanamadı.";
-      throw new Error(detail);
-    }
 
-    currentBusiness = business;
+  previewLogo();
 
-    try{
-      await window.loadProfileDesign();
-    }catch(error){
-      console.error("Non-blocking profile design error:", error);
-    }
 
-    document.getElementById("title").textContent = business.name || "İşletme Paneli";
-    document.getElementById("heroName").textContent = business.name || "İşletme";
-    document.getElementById("heroCategory").textContent = business.category || "İşletme";
-    document.getElementById("heroDescription").textContent = business.description || "Dijital işletme profilini yönet.";
 
-    fields.forEach(field => {
-      const element = document.getElementById(field);
-      if(element) element.value = business[field] || "";
-    });
+  /* HEALTH */
 
-    previewLogo();
-    renderHealth(business);
+  renderHealth(
+    business
+  );
 
-    const profileUrl = window.location.origin + "/p/" + business.slug;
-    ["headerProfile","heroProfile","quickProfile"].forEach(id => {
-      const el = document.getElementById(id);
-      if(el) el.href = profileUrl;
-    });
 
-    nfcUrl = createNFCUrl(business);
-    const nfcEl = document.getElementById("nfcUrl");
-    if(nfcEl) nfcEl.textContent = nfcUrl;
 
-    const qr = await api("/api/qr");
-    if(qr && !qr.error){
-      const qrEl = document.getElementById("qr");
-      if(qrEl) qrEl.src = qr.dataUrl || "";
-      const urlEl = document.getElementById("url");
-      if(urlEl) urlEl.textContent = qr.url || "";
-      const openEl = document.getElementById("open");
-      if(openEl) openEl.href = qr.url || "#";
-      const downloadEl = document.getElementById("download");
-      if(downloadEl) downloadEl.href = qr.dataUrl || "#";
-    }
+  /* PROFILE URL */
 
-    const stats = await api("/api/stats");
-    if(Array.isArray(stats)){
-      statsData = stats;
-      renderStats();
-    }
+  const profileUrl =
+    window.location.origin +
+    "/p/" +
+    business.slug;
 
-    setInfo("infoPhone", business.phone);
-    setInfo("infoWhatsapp", business.whatsapp);
-    setInfo("infoAddress", business.address);
-    setInfo("infoInstagram", business.instagram);
-    setInfo("infoGoogle", business.google_review);
-    setInfo("infoHours", business.hours);
 
-  }catch(error){
-    console.error("BUSINESS CENTER LOAD ERROR:", error);
-    const message = document.getElementById("designMessage");
-    if(message) message.textContent = "⚠ " + (error?.message || "Panel yüklenirken bir hata oluştu.");
-    const loadingText = document.querySelector(".loading-text");
-    if(loadingText) loadingText.textContent = "OTURUM KONTROLÜ GEREKLİ";
-    const logoutButton = document.getElementById("logoutButton");
-    if(logoutButton){
-      logoutButton.textContent = "Oturumu Sıfırla";
-      logoutButton.style.borderColor = "#c59a52";
-    }
-    const debugBox = document.getElementById("sessionDebug");
-    if(debugBox){
-      const role = tokenPayload?.role || "okunamadı";
-      const email = tokenPayload?.email || "okunamadı";
-      debugBox.innerHTML =
-        "<strong>Oturum teşhisi</strong><br>" +
-        "Rol: " + esc(role) + "<br>" +
-        "E-posta: " + esc(email) + "<br>" +
-        "Hata: " + esc(error?.message || "Bilinmeyen hata");
-      debugBox.style.display = "block";
-    }
-  }finally{
-    hideLoading();
+
+  document.getElementById(
+    "headerProfile"
+  ).href =
+    profileUrl;
+
+
+
+  document.getElementById(
+    "heroProfile"
+  ).href =
+    profileUrl;
+
+
+
+  document.getElementById(
+    "quickProfile"
+  ).href =
+    profileUrl;
+
+
+
+  /* NFC */
+
+  nfcUrl =
+    createNFCUrl(
+      business
+    );
+
+
+
+  document.getElementById(
+    "nfcUrl"
+  ).textContent =
+    nfcUrl;
+
+
+
+  /* QR */
+
+  const qr =
+    await api(
+      "/api/qr"
+    );
+
+
+
+  if(qr){
+
+    document.getElementById(
+      "qr"
+    ).src =
+      qr.dataUrl;
+
+
+
+    document.getElementById(
+      "url"
+    ).textContent =
+      qr.url;
+
+
+
+    document.getElementById(
+      "open"
+    ).href =
+      qr.url;
+
+
+
+    document.getElementById(
+      "download"
+    ).href =
+      qr.dataUrl;
+
   }
+
+
+
+  /* STATS */
+
+  const stats =
+    await api(
+      "/api/stats"
+    );
+
+
+
+  if(
+    Array.isArray(stats)
+  ){
+
+    statsData =
+      stats;
+
+    renderStats();
+
+  }
+
+
+
+  /* INFO */
+
+  setInfo(
+    "infoPhone",
+    business.phone
+  );
+
+
+
+  setInfo(
+    "infoWhatsapp",
+    business.whatsapp
+  );
+
+
+
+  setInfo(
+    "infoAddress",
+    business.address
+  );
+
+
+
+  setInfo(
+    "infoInstagram",
+    business.instagram
+  );
+
+
+
+  setInfo(
+    "infoGoogle",
+    business.google_review
+  );
+
+
+
+  setInfo(
+    "infoHours",
+    business.hours
+  );
+
+
+
+  hideLoading();
+
 }
+
 
 
 /* ==================================================
@@ -5549,7 +5810,7 @@ async function save(){
 
 
 
-  const rawResult =
+  const result =
     await api(
 
       "/api/me",
@@ -5567,16 +5828,15 @@ async function save(){
 
     );
 
-  const result = normalizeBusinessResponse(rawResult);
+
 
   if(
     result &&
-    !result.error &&
-    result.id
+    !result.error
   ){
 
     currentBusiness =
-      normalizeBusinessResponse(result);
+      result;
 
 
 
