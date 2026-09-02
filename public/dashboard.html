@@ -1583,7 +1583,11 @@ function initLiveDesignPreview(){
 async function loadProfileDesign(){
   const result = await api("/api/business-profile-design");
   if(result && !result.error){
-    loadDesignIntoForm(result);
+    const design = result.design && typeof result.design === "object"
+      ? result.design
+      : result;
+    loadDesignIntoForm(design);
+    updateDesignPreview();
   }else if(result?.error){
     const msg = document.getElementById("designMessage");
     if(msg) msg.textContent = result.error;
@@ -1607,8 +1611,12 @@ async function saveProfileDesign(){
   });
 
   if(result && !result.error){
-    profileDesign = result;
-    loadDesignIntoForm(result);
+    const savedDesign = result.design && typeof result.design === "object"
+      ? result.design
+      : result;
+    profileDesign = savedDesign;
+    loadDesignIntoForm(savedDesign);
+    updateDesignPreview();
     message.textContent = "✓ Profil tasarımı kaydedildi.";
     showToast("Profil tasarımı güncellendi.");
   }else{
@@ -6211,6 +6219,15 @@ function hideLoading(){
 /* ==================================================
    START
 ================================================== */
+
+/* V2.3 — live preview bootstrap
+   Event delegation must be attached after the dashboard DOM exists. */
+try{
+  initLiveDesignPreview();
+  console.log("LEO CONNECT: Live Profile Preview initialized");
+}catch(error){
+  console.error("LEO CONNECT preview init error:", error);
+}
 
 load();
 
