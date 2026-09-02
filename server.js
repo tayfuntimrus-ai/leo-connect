@@ -215,7 +215,8 @@ function businessPermissions(row) {
     analytics: row?.dashboard_analytics === true,
     live: row?.dashboard_live === true,
     ai: row?.dashboard_ai === true,
-    review: row?.dashboard_review === true
+    review: row?.dashboard_review === true,
+    campaign: row?.dashboard_campaign === true
   };
 }
 
@@ -224,7 +225,7 @@ function requireBusinessPermission(permission) {
     try {
       if (req.user?.role === 'admin') return next();
       const result = await pool.query(
-        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review
+        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign
          FROM businesses WHERE id=$1 LIMIT 1`,
         [req.user.id]
       );
@@ -426,7 +427,8 @@ async function initDatabase() {
   /* V2 — REVIEW BOOSTER */
   await pool.query(`
     ALTER TABLE businesses
-      ADD COLUMN IF NOT EXISTS dashboard_review BOOLEAN NOT NULL DEFAULT FALSE
+      ADD COLUMN IF NOT EXISTS dashboard_review BOOLEAN NOT NULL DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS dashboard_campaign BOOLEAN NOT NULL DEFAULT FALSE
   `);
 
   await pool.query(`
@@ -450,6 +452,27 @@ async function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_review_boosters_business_id
     ON review_boosters(business_id)
   `);
+
+  /* V2 — SMART CAMPAIGNS */
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS campaigns (
+      id SERIAL PRIMARY KEY,
+      business_id INTEGER NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      text TEXT DEFAULT '',
+      image_url TEXT DEFAULT '',
+      button_text TEXT DEFAULT '',
+      button_url TEXT DEFAULT '',
+      starts_at TIMESTAMP NULL,
+      ends_at TIMESTAMP NULL,
+      enabled BOOLEAN NOT NULL DEFAULT TRUE,
+      priority INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_campaigns_business_id ON campaigns(business_id)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_campaigns_active_window ON campaigns(enabled,starts_at,ends_at)`);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS profile_designs (
@@ -1059,7 +1082,7 @@ app.get(
 app.get('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review
+      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign
       FROM businesses WHERE id=$1 LIMIT 1
     `, [Number(req.params.id)]);
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
@@ -1081,12 +1104,13 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
     const live = body.live === true;
     const ai = body.ai === true;
     const review = body.review === true;
+    const campaign = body.campaign === true;
 
     const result = await pool.query(`
       UPDATE businesses
       SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7
       WHERE id=$8
-      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review
+      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign
     `, [profile, qr, nfc, analytics, live, ai, review, id]);
 
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
@@ -2934,6 +2958,8 @@ app.post('/api/event/:slug', async (req, res) => {
       'review_open',
       'review_positive',
       'review_feedback',
+      'campaign_view',
+      'campaign_click',
       'location',
       'iban',
       'share'
@@ -3153,6 +3179,100 @@ app.put('/api/business-profile-design', auth, requireBusinessPermission('profile
 
 
 /* =========================================================
+   V2 — SMART CAMPAIGNS API
+========================================================= */
+function normalizeCampaign(row){
+  if(!row) return null;
+  return {
+    id:row.id,
+    business_id:row.business_id,
+    title:String(row.title||''),
+    text:String(row.text||''),
+    image_url:String(row.image_url||''),
+    button_text:String(row.button_text||''),
+    button_url:String(row.button_url||''),
+    starts_at:row.starts_at||null,
+    ends_at:row.ends_at||null,
+    enabled:row.enabled===true,
+    priority:Number(row.priority||0),
+    created_at:row.created_at||null,
+    updated_at:row.updated_at||null
+  };
+}
+
+async function getActiveCampaigns(businessId){
+  const r=await pool.query(`
+    SELECT * FROM campaigns
+    WHERE business_id=$1
+      AND enabled=TRUE
+      AND (starts_at IS NULL OR starts_at<=CURRENT_TIMESTAMP)
+      AND (ends_at IS NULL OR ends_at>=CURRENT_TIMESTAMP)
+    ORDER BY priority DESC, created_at DESC
+    LIMIT 5
+  `,[businessId]);
+  return r.rows.map(normalizeCampaign);
+}
+
+app.get('/api/business-campaigns', auth, requireBusinessPermission('campaign'), async (req,res)=>{
+  try{
+    const r=await pool.query(`SELECT * FROM campaigns WHERE business_id=$1 ORDER BY enabled DESC, priority DESC, created_at DESC`,[req.user.id]);
+    res.json({campaigns:r.rows.map(normalizeCampaign)});
+  }catch(e){console.error('CAMPAIGNS LIST ERROR:',e);res.status(500).json({error:'Kampanyalar alınamadı'});}
+});
+
+app.post('/api/business-campaigns', auth, requireBusinessPermission('campaign'), async (req,res)=>{
+  try{
+    const b=req.body||{};
+    const title=String(b.title||'').trim().slice(0,120);
+    if(!title)return res.status(400).json({error:'Kampanya başlığı gerekli'});
+    const text=String(b.text||'').trim().slice(0,500);
+    const image_url=String(b.image_url||'').trim().slice(0,1000);
+    const button_text=String(b.button_text||'').trim().slice(0,60);
+    const button_url=String(b.button_url||'').trim().slice(0,1000);
+    const starts_at=b.starts_at?new Date(b.starts_at):null;
+    const ends_at=b.ends_at?new Date(b.ends_at):null;
+    if(starts_at && Number.isNaN(starts_at.getTime()))return res.status(400).json({error:'Başlangıç tarihi geçersiz'});
+    if(ends_at && Number.isNaN(ends_at.getTime()))return res.status(400).json({error:'Bitiş tarihi geçersiz'});
+    if(starts_at && ends_at && starts_at>ends_at)return res.status(400).json({error:'Bitiş tarihi başlangıçtan önce olamaz'});
+    const priority=Math.max(-100,Math.min(100,Number(b.priority)||0));
+    const r=await pool.query(`INSERT INTO campaigns(business_id,title,text,image_url,button_text,button_url,starts_at,ends_at,enabled,priority,updated_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,CURRENT_TIMESTAMP) RETURNING *`,[req.user.id,title,text,image_url,button_text,button_url,starts_at,ends_at,b.enabled!==false,priority]);
+    res.status(201).json({campaign:normalizeCampaign(r.rows[0])});
+  }catch(e){console.error('CAMPAIGN CREATE ERROR:',e);res.status(500).json({error:'Kampanya oluşturulamadı'});}
+});
+
+app.put('/api/business-campaigns/:id', auth, requireBusinessPermission('campaign'), async (req,res)=>{
+  try{
+    const id=Number(req.params.id), b=req.body||{};
+    const existing=await pool.query(`SELECT * FROM campaigns WHERE id=$1 AND business_id=$2 LIMIT 1`,[id,req.user.id]);
+    if(!existing.rows.length)return res.status(404).json({error:'Kampanya bulunamadı'});
+    const current=existing.rows[0];
+    const title=String(b.title??current.title).trim().slice(0,120);
+    if(!title)return res.status(400).json({error:'Kampanya başlığı gerekli'});
+    const text=String(b.text??current.text).trim().slice(0,500);
+    const image_url=String(b.image_url??current.image_url).trim().slice(0,1000);
+    const button_text=String(b.button_text??current.button_text).trim().slice(0,60);
+    const button_url=String(b.button_url??current.button_url).trim().slice(0,1000);
+    const starts_at=b.starts_at===null||b.starts_at===''?null:(b.starts_at!==undefined?new Date(b.starts_at):current.starts_at);
+    const ends_at=b.ends_at===null||b.ends_at===''?null:(b.ends_at!==undefined?new Date(b.ends_at):current.ends_at);
+    if(starts_at && Number.isNaN(new Date(starts_at).getTime()))return res.status(400).json({error:'Başlangıç tarihi geçersiz'});
+    if(ends_at && Number.isNaN(new Date(ends_at).getTime()))return res.status(400).json({error:'Bitiş tarihi geçersiz'});
+    if(starts_at && ends_at && new Date(starts_at)>new Date(ends_at))return res.status(400).json({error:'Bitiş tarihi başlangıçtan önce olamaz'});
+    const priority=b.priority!==undefined?Math.max(-100,Math.min(100,Number(b.priority)||0)):Number(current.priority||0);
+    const enabled=b.enabled!==undefined?b.enabled===true:current.enabled===true;
+    const r=await pool.query(`UPDATE campaigns SET title=$1,text=$2,image_url=$3,button_text=$4,button_url=$5,starts_at=$6,ends_at=$7,enabled=$8,priority=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND business_id=$11 RETURNING *`,[title,text,image_url,button_text,button_url,starts_at?new Date(starts_at):null,ends_at?new Date(ends_at):null,enabled,priority,id,req.user.id]);
+    res.json({campaign:normalizeCampaign(r.rows[0])});
+  }catch(e){console.error('CAMPAIGN UPDATE ERROR:',e);res.status(500).json({error:'Kampanya güncellenemedi'});}
+});
+
+app.delete('/api/business-campaigns/:id', auth, requireBusinessPermission('campaign'), async (req,res)=>{
+  try{
+    const r=await pool.query(`DELETE FROM campaigns WHERE id=$1 AND business_id=$2 RETURNING id`,[Number(req.params.id),req.user.id]);
+    if(!r.rows.length)return res.status(404).json({error:'Kampanya bulunamadı'});
+    res.json({success:true});
+  }catch(e){console.error('CAMPAIGN DELETE ERROR:',e);res.status(500).json({error:'Kampanya silinemedi'});}
+});
+
+/* =========================================================
    V2 — REVIEW BOOSTER API
 ========================================================= */
 
@@ -3284,11 +3404,13 @@ app.get(
       const profile = publicBusiness(result.rows[0]);
       const profile_design = await getPublicProfileDesign(result.rows[0].id);
       const review_booster = await getReviewBooster(result.rows[0].id);
+      const campaigns = await getActiveCampaigns(result.rows[0].id);
 
       return res.json({
         ...profile,
         profile_design,
-        review_booster
+        review_booster,
+        campaigns
       });
 
     } catch (error) {
@@ -3367,11 +3489,13 @@ app.get(
       const profile = publicBusiness(result.rows[0]);
       const profile_design = await getPublicProfileDesign(result.rows[0].id);
       const review_booster = await getReviewBooster(result.rows[0].id);
+      const campaigns = await getActiveCampaigns(result.rows[0].id);
 
       return res.json({
         ...profile,
         profile_design,
-        review_booster
+        review_booster,
+        campaigns
       });
 
     } catch (error) {
