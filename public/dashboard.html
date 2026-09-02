@@ -4491,17 +4491,66 @@ async function saveProfileDesign(){
    AUTH
 ================================================== */
 
-const token =
-  localStorage.getItem(
-    "token"
-  );
+function decodeJwtPayload(value){
 
+  try{
+
+    const parts = String(value || "").split(".");
+
+    if(parts.length !== 3) return null;
+
+    const base64 =
+      parts[1]
+        .replace(/-/g,"+")
+        .replace(/_/g,"/");
+
+    const padded =
+      base64 + "=".repeat((4 - base64.length % 4) % 4);
+
+    return JSON.parse(atob(padded));
+
+  }catch(error){
+
+    return null;
+
+  }
+
+}
+
+
+function getBusinessToken(){
+
+  const candidates = [
+    localStorage.getItem("token"),
+    localStorage.getItem("leo_token"),
+    sessionStorage.getItem("token"),
+    sessionStorage.getItem("leo_token")
+  ].filter(Boolean);
+
+  for(const candidate of candidates){
+
+    const payload =
+      decodeJwtPayload(candidate);
+
+    if(payload && payload.role === "business"){
+      return candidate;
+    }
+
+  }
+
+  /* Fallback: use the first token so /api/me can return the real auth error. */
+  return candidates[0] || null;
+
+}
+
+
+const token =
+  getBusinessToken();
 
 
 if(!token){
 
-  window.location.href =
-    "/login";
+  window.location.replace("/login");
 
 }
 
@@ -4606,12 +4655,12 @@ async function api(
       response.status === 401
     ){
 
-      localStorage.removeItem(
-        "token"
-      );
+      localStorage.removeItem("token");
+      localStorage.removeItem("leo_token");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("leo_token");
 
-      window.location.href =
-        "/login";
+      window.location.replace("/login");
 
       return null;
 
@@ -5470,8 +5519,16 @@ async function load(){
 
 
 
-  if(!business)
+  if(!business){
+    const title = document.getElementById("heroName");
+    const description = document.getElementById("heroDescription");
+
+    if(title) title.textContent = "Oturum kontrolü gerekli";
+    if(description) description.textContent = "İşletme hesabı oturumu bulunamadı. Çıkış yapıp tekrar giriş yapın.";
+
+    hideLoading();
     return;
+  }
 
 
 
@@ -5479,9 +5536,13 @@ async function load(){
     business;
 
 
-  /* V2 PROFILE DESIGN */
+  /* V2 PROFILE DESIGN — non-blocking */
 
-  await loadProfileDesign();
+  try{
+    await loadProfileDesign();
+  }catch(error){
+    console.error("Profile design load error:", error);
+  }
 
 
 
