@@ -160,6 +160,30 @@ function nfcTagPublic(row) {
 
 
 /* =========================================================
+   V2 — DYNAMIC PROFILE DESIGN
+========================================================= */
+
+const DYNAMIC_PROFILE_DEFAULTS = {
+  theme: 'midnight-gold', accent_color: '#D4AF37', cover_url: '', cover_position: 'center',
+  announcement_text: '', announcement_enabled: false,
+  campaign_title: '', campaign_text: '', campaign_image_url: '', campaign_button_text: '', campaign_button_url: '', campaign_enabled: false,
+  featured_title: '', featured_text: '', featured_image_url: '', featured_button_text: '', featured_button_url: '', featured_enabled: false,
+  gallery: [], video_url: '', video_enabled: false
+};
+
+function normalizeProfileDesign(row) {
+  return {
+    theme: row?.theme || DYNAMIC_PROFILE_DEFAULTS.theme,
+    accent_color: row?.accent_color || DYNAMIC_PROFILE_DEFAULTS.accent_color,
+    cover_url: row?.cover_url || '', cover_position: row?.cover_position || 'center',
+    announcement_text: row?.announcement_text || '', announcement_enabled: row?.announcement_enabled === true,
+    campaign_title: row?.campaign_title || '', campaign_text: row?.campaign_text || '', campaign_image_url: row?.campaign_image_url || '', campaign_button_text: row?.campaign_button_text || '', campaign_button_url: row?.campaign_button_url || '', campaign_enabled: row?.campaign_enabled === true,
+    featured_title: row?.featured_title || '', featured_text: row?.featured_text || '', featured_image_url: row?.featured_image_url || '', featured_button_text: row?.featured_button_text || '', featured_button_url: row?.featured_button_url || '', featured_enabled: row?.featured_enabled === true,
+    gallery: Array.isArray(row?.gallery) ? row.gallery : [], video_url: row?.video_url || '', video_enabled: row?.video_enabled === true
+  };
+}
+
+/* =========================================================
    DATABASE INIT
 ========================================================= */
 
@@ -286,6 +310,22 @@ async function initDatabase() {
     ON nfc_tags(code)
   `);
 
+  /* V2 — DYNAMIC PROFILE DESIGN */
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS profile_designs (
+      id SERIAL PRIMARY KEY,
+      business_id INTEGER NOT NULL UNIQUE REFERENCES businesses(id) ON DELETE CASCADE,
+      theme TEXT NOT NULL DEFAULT 'midnight-gold',
+      accent_color TEXT NOT NULL DEFAULT '#D4AF37',
+      cover_url TEXT DEFAULT '', cover_position TEXT DEFAULT 'center',
+      announcement_text TEXT DEFAULT '', announcement_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      campaign_title TEXT DEFAULT '', campaign_text TEXT DEFAULT '', campaign_image_url TEXT DEFAULT '', campaign_button_text TEXT DEFAULT '', campaign_button_url TEXT DEFAULT '', campaign_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      featured_title TEXT DEFAULT '', featured_text TEXT DEFAULT '', featured_image_url TEXT DEFAULT '', featured_button_text TEXT DEFAULT '', featured_button_url TEXT DEFAULT '', featured_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      gallery JSONB NOT NULL DEFAULT '[]'::jsonb, video_url TEXT DEFAULT '', video_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_profile_designs_business_id ON profile_designs(business_id)`);
   console.log('PostgreSQL + NFC Tag Management hazır.');
 }
 
@@ -2734,6 +2774,37 @@ app.post('/api/event/:slug', async (req, res) => {
 
 });
 
+
+/* =========================================================
+   V2 — DYNAMIC PROFILE DESIGN API
+========================================================= */
+
+app.get('/api/business-profile-design', auth, requireBusinessPermission('profile'), async (req,res) => {
+  try {
+    let result=await pool.query(`SELECT * FROM profile_designs WHERE business_id=$1 LIMIT 1`,[req.user.id]);
+    if(!result.rows.length) result=await pool.query(`INSERT INTO profile_designs(business_id) VALUES($1) RETURNING *`,[req.user.id]);
+    res.json({success:true,design:normalizeProfileDesign(result.rows[0])});
+  } catch(error) { console.error('BUSINESS PROFILE DESIGN GET ERROR:',error); res.status(500).json({error:'Profil tasarım ayarları alınamadı'}); }
+});
+
+app.put('/api/business-profile-design', auth, requireBusinessPermission('profile'), async (req,res) => {
+  try {
+    const b=req.body||{};
+    const s=(v,max)=>String(v??'').trim().slice(0,max);
+    const gallery=Array.isArray(b.gallery)?b.gallery.slice(0,30).map(x=>typeof x==='string'?s(x,2000):x&&typeof x==='object'?{url:s(x.url,2000),title:s(x.title,200)}:'').filter(Boolean):[];
+    const r=await pool.query(`
+      INSERT INTO profile_designs(business_id,theme,accent_color,cover_url,cover_position,announcement_text,announcement_enabled,campaign_title,campaign_text,campaign_image_url,campaign_button_text,campaign_button_url,campaign_enabled,featured_title,featured_text,featured_image_url,featured_button_text,featured_button_url,featured_enabled,gallery,video_url,video_enabled,updated_at)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,CURRENT_TIMESTAMP)
+      ON CONFLICT(business_id) DO UPDATE SET theme=EXCLUDED.theme,accent_color=EXCLUDED.accent_color,cover_url=EXCLUDED.cover_url,cover_position=EXCLUDED.cover_position,announcement_text=EXCLUDED.announcement_text,announcement_enabled=EXCLUDED.announcement_enabled,campaign_title=EXCLUDED.campaign_title,campaign_text=EXCLUDED.campaign_text,campaign_image_url=EXCLUDED.campaign_image_url,campaign_button_text=EXCLUDED.campaign_button_text,campaign_button_url=EXCLUDED.campaign_button_url,campaign_enabled=EXCLUDED.campaign_enabled,featured_title=EXCLUDED.featured_title,featured_text=EXCLUDED.featured_text,featured_image_url=EXCLUDED.featured_image_url,featured_button_text=EXCLUDED.featured_button_text,featured_button_url=EXCLUDED.featured_button_url,featured_enabled=EXCLUDED.featured_enabled,gallery=EXCLUDED.gallery,video_url=EXCLUDED.video_url,video_enabled=EXCLUDED.video_enabled,updated_at=CURRENT_TIMESTAMP
+      RETURNING *`,[req.user.id,s(b.theme,80)||DYNAMIC_PROFILE_DEFAULTS.theme,s(b.accent_color,30)||DYNAMIC_PROFILE_DEFAULTS.accent_color,s(b.cover_url,2000),s(b.cover_position||'center',50),s(b.announcement_text,1000),b.announcement_enabled===true,s(b.campaign_title,200),s(b.campaign_text,2000),s(b.campaign_image_url,2000),s(b.campaign_button_text,100),s(b.campaign_button_url,2000),b.campaign_enabled===true,s(b.featured_title,200),s(b.featured_text,2000),s(b.featured_image_url,2000),s(b.featured_button_text,100),s(b.featured_button_url,2000),b.featured_enabled===true,JSON.stringify(gallery),s(b.video_url,2000),b.video_enabled===true]);
+    res.json({success:true,design:normalizeProfileDesign(r.rows[0])});
+  } catch(error) { console.error('BUSINESS PROFILE DESIGN UPDATE ERROR:',error); res.status(500).json({error:'Profil tasarım ayarları kaydedilemedi'}); }
+});
+
+async function getPublicProfileDesign(businessId) {
+  const r=await pool.query(`SELECT theme,accent_color,cover_url,cover_position,announcement_text,announcement_enabled,campaign_title,campaign_text,campaign_image_url,campaign_button_text,campaign_button_url,campaign_enabled,featured_title,featured_text,featured_image_url,featured_button_text,featured_button_url,featured_enabled,gallery,video_url,video_enabled FROM profile_designs WHERE business_id=$1 LIMIT 1`,[businessId]);
+  return normalizeProfileDesign(r.rows[0]);
+}
 
 /* =========================================================
    PUBLIC PROFILE API
