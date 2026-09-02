@@ -140,6 +140,37 @@ async function getPublicProfileDesign(businessId) {
   return normalizeProfileDesign(result.rows[0]);
 }
 
+
+const REVIEW_BOOSTER_DEFAULTS = {
+  enabled: false,
+  title: 'Deneyimini bizimle paylaş',
+  text: 'Memnun kaldıysan Google’da bizi değerlendir. Bir sorun yaşadıysan doğrudan bize ulaş.',
+  threshold: 4,
+  low_title: 'Bunu duymak isteriz',
+  low_text: 'Yaşadığın sorunu bize ilet, seninle ilgilenelim.',
+  success_title: 'Teşekkürler!',
+  success_text: 'Değerlendirmen bizim için çok değerli.'
+};
+
+function normalizeReviewBooster(row) {
+  if (!row) return { ...REVIEW_BOOSTER_DEFAULTS };
+  return {
+    ...REVIEW_BOOSTER_DEFAULTS,
+    ...row,
+    enabled: row.enabled === true,
+    threshold: Math.min(5, Math.max(1, Number(row.threshold) || 4))
+  };
+}
+
+async function getReviewBooster(businessId) {
+  const result = await pool.query(
+    `SELECT enabled,title,text,threshold,low_title,low_text,success_title,success_text
+     FROM review_boosters WHERE business_id=$1 LIMIT 1`,
+    [businessId]
+  );
+  return normalizeReviewBooster(result.rows[0]);
+}
+
 function businessPermissions(row) {
   return {
     profile: row?.dashboard_profile !== false,
@@ -147,7 +178,8 @@ function businessPermissions(row) {
     nfc: row?.dashboard_nfc === true,
     analytics: row?.dashboard_analytics === true,
     live: row?.dashboard_live === true,
-    ai: row?.dashboard_ai === true
+    ai: row?.dashboard_ai === true,
+    review: row?.dashboard_review === true
   };
 }
 
@@ -156,7 +188,7 @@ function requireBusinessPermission(permission) {
     try {
       if (req.user?.role === 'admin') return next();
       const result = await pool.query(
-        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai
+        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review
          FROM businesses WHERE id=$1 LIMIT 1`,
         [req.user.id]
       );
@@ -337,6 +369,35 @@ async function initDatabase() {
 
 
   /* V2 — DYNAMIC PROFILE DESIGN */
+
+  /* V2 — REVIEW BOOSTER */
+  await pool.query(`
+    ALTER TABLE businesses
+      ADD COLUMN IF NOT EXISTS dashboard_review BOOLEAN NOT NULL DEFAULT FALSE
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS review_boosters (
+      id SERIAL PRIMARY KEY,
+      business_id INTEGER NOT NULL UNIQUE REFERENCES businesses(id) ON DELETE CASCADE,
+      enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      title TEXT NOT NULL DEFAULT 'Deneyimini bizimle paylaş',
+      text TEXT NOT NULL DEFAULT 'Memnun kaldıysan Google’da bizi değerlendir. Bir sorun yaşadıysan doğrudan bize ulaş.',
+      threshold INTEGER NOT NULL DEFAULT 4,
+      low_title TEXT NOT NULL DEFAULT 'Bunu duymak isteriz',
+      low_text TEXT NOT NULL DEFAULT 'Yaşadığın sorunu bize ilet, seninle ilgilenelim.',
+      success_title TEXT NOT NULL DEFAULT 'Teşekkürler!',
+      success_text TEXT NOT NULL DEFAULT 'Değerlendirmen bizim için çok değerli.',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_review_boosters_business_id
+    ON review_boosters(business_id)
+  `);
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS profile_designs (
       id SERIAL PRIMARY KEY,
@@ -945,7 +1006,7 @@ app.get(
 app.get('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai
+      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review
       FROM businesses WHERE id=$1 LIMIT 1
     `, [Number(req.params.id)]);
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
@@ -966,13 +1027,14 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
     const analytics = body.analytics === true;
     const live = body.live === true;
     const ai = body.ai === true;
+    const review = body.review === true;
 
     const result = await pool.query(`
       UPDATE businesses
-      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6
-      WHERE id=$7
-      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai
-    `, [profile, qr, nfc, analytics, live, ai, id]);
+      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7
+      WHERE id=$8
+      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review
+    `, [profile, qr, nfc, analytics, live, ai, review, id]);
 
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
     res.json({ success: true, permissions: businessPermissions(result.rows[0]) });
@@ -2724,6 +2786,9 @@ app.post('/api/event/:slug', async (req, res) => {
       'website',
       'menu',
       'google_review',
+      'review_open',
+      'review_positive',
+      'review_feedback',
       'location',
       'iban',
       'share'
@@ -2941,6 +3006,72 @@ app.put('/api/business-profile-design', auth, requireBusinessPermission('profile
   }
 });
 
+
+/* =========================================================
+   V2 — REVIEW BOOSTER API
+========================================================= */
+
+app.get('/api/business-review-booster', auth, requireBusinessPermission('review'), async (req, res) => {
+  try {
+    let result = await pool.query(
+      `SELECT * FROM review_boosters WHERE business_id=$1 LIMIT 1`,
+      [req.user.id]
+    );
+    if (!result.rows.length) {
+      result = await pool.query(
+        `INSERT INTO review_boosters(business_id) VALUES($1) RETURNING *`,
+        [req.user.id]
+      );
+    }
+    res.json(normalizeReviewBooster(result.rows[0]));
+  } catch (error) {
+    console.error('REVIEW BOOSTER GET ERROR:', error);
+    res.status(500).json({ error: 'Review Booster ayarları alınamadı' });
+  }
+});
+
+app.put('/api/business-review-booster', auth, requireBusinessPermission('review'), async (req, res) => {
+  try {
+    const body = req.body || {};
+    const str = (v, max) => String(v ?? '').trim().slice(0, max);
+    const threshold = Math.min(5, Math.max(1, Number(body.threshold) || 4));
+
+    const result = await pool.query(`
+      INSERT INTO review_boosters(
+        business_id,enabled,title,text,threshold,
+        low_title,low_text,success_title,success_text,updated_at
+      )
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,CURRENT_TIMESTAMP)
+      ON CONFLICT(business_id) DO UPDATE SET
+        enabled=EXCLUDED.enabled,
+        title=EXCLUDED.title,
+        text=EXCLUDED.text,
+        threshold=EXCLUDED.threshold,
+        low_title=EXCLUDED.low_title,
+        low_text=EXCLUDED.low_text,
+        success_title=EXCLUDED.success_title,
+        success_text=EXCLUDED.success_text,
+        updated_at=CURRENT_TIMESTAMP
+      RETURNING *
+    `, [
+      req.user.id,
+      body.enabled === true,
+      str(body.title, 160) || REVIEW_BOOSTER_DEFAULTS.title,
+      str(body.text, 500) || REVIEW_BOOSTER_DEFAULTS.text,
+      threshold,
+      str(body.low_title, 160) || REVIEW_BOOSTER_DEFAULTS.low_title,
+      str(body.low_text, 500) || REVIEW_BOOSTER_DEFAULTS.low_text,
+      str(body.success_title, 160) || REVIEW_BOOSTER_DEFAULTS.success_title,
+      str(body.success_text, 500) || REVIEW_BOOSTER_DEFAULTS.success_text
+    ]);
+
+    res.json(normalizeReviewBooster(result.rows[0]));
+  } catch (error) {
+    console.error('REVIEW BOOSTER UPDATE ERROR:', error);
+    res.status(500).json({ error: 'Review Booster ayarları kaydedilemedi' });
+  }
+});
+
 /* =========================================================
    PUBLIC PROFILE API
 ========================================================= */
@@ -3007,10 +3138,12 @@ app.get(
 
       const profile = publicBusiness(result.rows[0]);
       const profile_design = await getPublicProfileDesign(result.rows[0].id);
+      const review_booster = await getReviewBooster(result.rows[0].id);
 
       return res.json({
         ...profile,
-        profile_design
+        profile_design,
+        review_booster
       });
 
     } catch (error) {
@@ -3088,10 +3221,12 @@ app.get(
 
       const profile = publicBusiness(result.rows[0]);
       const profile_design = await getPublicProfileDesign(result.rows[0].id);
+      const review_booster = await getReviewBooster(result.rows[0].id);
 
       return res.json({
         ...profile,
-        profile_design
+        profile_design,
+        review_booster
       });
 
     } catch (error) {
