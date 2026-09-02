@@ -456,6 +456,44 @@ app.post('/api/admin/login', async (req, res) => {
 });
 
 
+
+/* =========================================================
+   ADMIN LIVE ACTIVITY
+========================================================= */
+app.get('/api/admin/live-activity', adminAuth, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        e.id,
+        e.type,
+        e.source,
+        e.nfc_tag_id,
+        e.created_at,
+        b.id AS business_id,
+        b.name AS business_name,
+        b.slug AS business_slug,
+        t.name AS nfc_name,
+        t.placement AS nfc_placement
+      FROM events e
+      LEFT JOIN businesses b ON b.id = e.business_id
+      LEFT JOIN nfc_tags t ON t.id = e.nfc_tag_id
+      ORDER BY e.created_at DESC
+      LIMIT 30
+    `);
+    const stats = await pool.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '24 hours')::int AS last_24h,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '15 minutes')::int AS last_15m,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '60 minutes')::int AS last_60m
+      FROM events
+    `);
+    res.json({activities: result.rows, stats: stats.rows[0] || {last_24h:0,last_15m:0,last_60m:0}});
+  } catch (error) {
+    console.error('LIVE ACTIVITY ERROR:', error);
+    res.status(500).json({error:'Canlı aktiviteler alınamadı'});
+  }
+});
+
 /* =========================================================
    ADMIN OVERVIEW
 ========================================================= */
