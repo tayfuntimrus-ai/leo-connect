@@ -2497,15 +2497,68 @@ body{background:var(--v2-bg)!important;color:var(--v2-text)}
 const LEO_V2_THEMES=[['midnight-gold','Midnight Gold','Siyah / altın premium'],['obsidian','Obsidian','Ultra dark / tech'],['champagne','Champagne','Sıcak lüks'],['pure-light','Pure Light','Aydınlık premium']];
 function leoV2Scroll(id,btn){document.querySelectorAll('.v2-nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});}
 function leoV2ThemeCard(key,name,desc){return `<button type="button" class="v2-theme" onclick="leoV2SelectTheme('${key}')"><strong>${name}</strong><span>${desc}</span></button>`}
-async function leoV2SelectTheme(theme){try{await api('/api/business-v2-settings',{method:'PUT',body:JSON.stringify({theme})});if(window.currentBusiness)currentBusiness.v2_settings={...(currentBusiness.v2_settings||{}),theme};document.body.dataset.theme=theme;if(typeof showToast==='function')showToast('Tema kaydedildi: '+theme); }catch(e){if(typeof showToast==='function')showToast(e.message||'Tema kaydedilemedi');}}
+async function leoV2SelectTheme(theme){try{await api('/api/business-theme',{method:'PUT',body:JSON.stringify({theme})});if(window.currentBusiness)currentBusiness.v2_settings={...(currentBusiness.v2_settings||{}),theme};document.body.dataset.theme=theme;if(typeof showToast==='function')showToast('Tema kaydedildi: '+theme); }catch(e){if(typeof showToast==='function')showToast(e.message||'Tema kaydedilemedi');}}
 function leoV2Connections(){const items=[['instagram','📸 Instagram'],['facebook','📘 Facebook'],['tiktok','🎵 TikTok'],['youtube','▶️ YouTube'],['linkedin','💼 LinkedIn'],['x','𝕏 X'],['whatsapp','💬 WhatsApp'],['google','⭐ Google'],['website','🌐 Website']];return `<div class="v2-connection-grid">${items.map(([k,n])=>`<div class="v2-connection"><div><strong>${n}</strong><small>Bağlantını yönet</small></div><button type="button" onclick="leoV2Connect('${k}')">Hesabı Bağla</button></div>`).join('')}</div><button type="button" class="btn" style="margin-top:12px" onclick="leoV2Connect('custom')">＋ Özel bağlantı ekle</button>`}
-function leoV2Connect(type){const label=type==='custom'?'Özel bağlantı':type;const value=prompt(label+' bağlantısını gir:');if(!value)return;api('/api/business-v2-connections',{method:'PUT',body:JSON.stringify({type,url:value,label})}).then(()=>{if(typeof showToast==='function')showToast('Bağlantı kaydedildi.')}).catch(e=>{if(typeof showToast==='function')showToast(e.message||'Bağlantı kaydedilemedi')});}
+async function leoV2Connect(type){
+  const names={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website'};
+  const label=type==='custom'?'Özel bağlantı':(names[type]||type);
+  const value=prompt(label+' bağlantısını gir:');
+  if(!value||!value.trim()) return;
+  try{
+    if(type==='custom'){
+      const current=window.leoV2Settings?.custom_links||[];
+      const next=[...current,{label:'Özel bağlantı',url:value.trim(),enabled:true}].slice(0,20);
+      const r=await api('/api/business-custom-links',{method:'PUT',body:JSON.stringify({custom_links:next})});
+      if(r?.error) throw new Error(r.error);
+      if(window.leoV2Settings) window.leoV2Settings.custom_links=r.custom_links||next;
+    }else{
+      const current={...(window.leoV2Settings?.social_links||{})};
+      current[type]={url:value.trim(),enabled:true,label:names[type]||type};
+      const r=await api('/api/business-social-links',{method:'PUT',body:JSON.stringify({social_links:current})});
+      if(r?.error) throw new Error(r.error);
+      if(window.leoV2Settings) window.leoV2Settings.social_links=r.social_links||current;
+    }
+    const mount=document.getElementById('leoV2ConnectionsMount'); if(mount && !mount.innerHTML) mount.innerHTML=leoV2Connections(); renderLeoV2Connections();
+    showToast(label+' bağlantısı kaydedildi.');
+  }catch(e){showToast(e.message||'Bağlantı kaydedilemedi');}
+}
+
+<script>
+async function loadLeoV2Settings(){
+  try{
+    const data=await api('/api/business-v2-settings');
+    if(!data||data.error) return;
+    window.leoV2Settings=data;
+    const theme=data.theme||'midnight-gold';
+    document.body.dataset.theme=theme;
+    const themePermission=data.theme_permission!==false;
+    document.querySelectorAll('.v2-theme').forEach(btn=>{
+      btn.disabled=!themePermission;
+      btn.classList.toggle('disabled',!themePermission);
+    });
+    renderLeoV2Connections();
+  }catch(e){console.error('LEO V2 settings load error',e);}
+}
 </script>
+</script>
+
+<style id="leo-v2-theme-fix">
+.v2-theme.disabled{opacity:.45;cursor:not-allowed}
+body[data-theme="obsidian"]{--v2-bg:#030405;--v2-card:#080a0c;--v2-line:#1b2026;--v2-gold:#7dd3fc;--v2-text:#edf6ff}
+body[data-theme="champagne"]{--v2-bg:#18130e;--v2-card:#211a13;--v2-line:#3a2c20;--v2-gold:#e3bd7a;--v2-text:#fff7ea}
+body[data-theme="pure-light"]{--v2-bg:#f5f3ee;--v2-card:#ffffff;--v2-line:#ded8cc;--v2-gold:#9a742d;--v2-text:#191816;--v2-muted:#6d675e}
+body[data-theme="pure-light"] .v2-nav button,
+body[data-theme="pure-light"] .v2-connection,
+body[data-theme="pure-light"] .v2-theme{background:#fff;color:#444}
+body[data-theme="pure-light"] .v2-nav button.active,
+body[data-theme="pure-light"] .v2-nav button:hover{color:#fff;background:var(--v2-gold)}
+</style>
+
 </head>
 
 
 
-<body><nav class="v2-nav" aria-label="LEO CONNECT V2"><button class="active" onclick="leoV2Scroll('overview',this)">🏠 Genel Bakış</button><button onclick="leoV2Scroll('profile',this)">👤 Profil</button><button onclick="leoV2Scroll('qr',this)">📱 QR & NFC</button><button onclick="leoV2Scroll('campaigns',this)">🚀 Kampanyalar</button><button onclick="leoV2Scroll('analytics',this)">📊 İstatistikler</button></nav>
+<body><nav class="v2-nav" aria-label="LEO CONNECT V2"><button class="active" onclick="leoV2Scroll('performanceSection',this)">🏠 Genel Bakış</button><button onclick="leoV2Scroll('profile',this)">👤 Profil</button><button onclick="leoV2Scroll('digital',this)">📱 QR & NFC</button><button onclick="leoV2Scroll('campaignSection',this)">🚀 Kampanyalar</button><button onclick="leoV2Scroll('businessAnalyticsV3',this)">📊 İstatistikler</button></nav>
 
 
 
@@ -4404,7 +4457,12 @@ async function api(
 
 
 
-    return await response.json();
+    const data=await response.json().catch(()=>({error:'Sunucudan geçersiz yanıt alındı'}));
+    if(!response.ok){
+      console.error('API',response.status,url,data);
+      return {error:data?.error||('İstek başarısız: '+response.status)};
+    }
+    return data;
 
   }catch(error){
 
@@ -4413,7 +4471,7 @@ async function api(
       error
     );
 
-    return null;
+    return {error:error?.message||'Sunucuya bağlanılamadı'};
 
   }
 
@@ -5798,6 +5856,7 @@ async function load(){
     business;
 
   applyPermissions(business);
+  try{ await loadLeoV2Settings(); }catch(error){ console.error('V2 settings load error:',error); }
 
   try{
     await loadProfileDesign();
