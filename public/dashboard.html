@@ -2050,6 +2050,68 @@ main{
 
 }
 
+
+/* ==================================================
+   BUSINESS CENTER V2 — COMMAND BAR
+================================================== */
+.command-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:0 0 22px;
+  padding:14px 16px;
+  border:1px solid #c59a5230;
+  border-radius:18px;
+  background:linear-gradient(135deg,#15120d,#101010 55%,#171717);
+  box-shadow:0 18px 50px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
+}
+.command-left{display:flex;align-items:center;gap:12px;min-width:0}
+.command-badge{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#c59a5218;border:1px solid #c59a5245;font-size:18px}
+.command-copy{min-width:0}
+.command-copy strong{display:block;font-size:13px;letter-spacing:.02em}
+.command-copy span{display:block;color:#8d8d8d;font-size:12px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.command-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.command-btn{border:1px solid #303030;background:#121212;color:#eee;border-radius:11px;padding:9px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}
+.command-btn.gold{border-color:#c59a5260;background:#c59a5214;color:#e0bd7b}
+.command-btn:hover{border-color:#c59a5280;transform:translateY(-1px)}
+.access-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 22px}
+.access-item{padding:12px 13px;border:1px solid #292929;border-radius:14px;background:#101010;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.access-item span:first-child{font-size:12px;color:#8f8f8f}
+.access-state{font-size:11px;font-weight:800;letter-spacing:.05em}
+.access-state.on{color:#62d992}.access-state.off{color:#666}
+@media(max-width:760px){.command-bar{align-items:flex-start;flex-direction:column}.command-actions{width:100%;justify-content:flex-start}.command-btn{flex:1;text-align:center}.access-strip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:430px){.access-strip{grid-template-columns:1fr 1fr}.command-btn{font-size:11px;padding:9px 8px}}
+
+
+/* ==================================================
+   BUSINESS CENTER V3 ANALYTICS
+================================================== */
+.analytics-v3{margin:24px 0;background:linear-gradient(145deg,#111,#0b0b0b);border:1px solid #292929;border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.analytics-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+.analytics-head h2{margin:0;font-size:20px}.analytics-head p{margin:6px 0 0;color:#888;font-size:13px}
+.analytics-periods{display:flex;gap:7px;flex-wrap:wrap}.analytics-periods button{border:1px solid #303030;background:#151515;color:#999;border-radius:999px;padding:8px 13px;cursor:pointer}.analytics-periods button.active{background:#c59a52;color:#080808;border-color:#c59a52;font-weight:800}
+.analytics-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.analytics-kpi{padding:17px;border:1px solid #292929;border-radius:18px;background:#121212}.analytics-kpi small{display:block;color:#777;font-size:10px;letter-spacing:.12em}.analytics-kpi strong{display:block;font-size:28px;margin-top:8px}.analytics-kpi span{color:#888;font-size:12px}
+.analytics-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}.analytics-box{border:1px solid #292929;border-radius:20px;background:#101010;padding:18px}.analytics-box h3{margin:0 0 15px;font-size:14px}.traffic-bars{height:180px;display:flex;align-items:end;gap:5px;overflow:hidden}.traffic-bar-wrap{height:100%;flex:1;min-width:8px;display:flex;align-items:end;justify-content:center}.traffic-bar{width:100%;max-width:22px;border-radius:7px 7px 2px 2px;background:linear-gradient(to top,#8d6b32,#e0bd7b);min-height:3px}.traffic-label{font-size:9px;color:#666;margin-top:7px;text-align:center}.action-row{display:grid;grid-template-columns:100px 1fr 45px;gap:8px;align-items:center;margin:11px 0;font-size:12px}.action-track{height:7px;background:#202020;border-radius:99px;overflow:hidden}.action-fill{height:100%;background:#c59a52;border-radius:99px}.analytics-empty{padding:35px;text-align:center;color:#777}.analytics-locked{padding:20px;border:1px dashed #3a3a3a;border-radius:16px;color:#888;text-align:center}
+@media(max-width:800px){.analytics-kpis{grid-template-columns:repeat(2,1fr)}.analytics-grid{grid-template-columns:1fr}.analytics-head{flex-direction:column}}
+
+/* BUSINESS CENTER FEATURE MODULES */
+.feature-box{margin:0 0 18px;padding:22px;border:1px solid var(--border);border-radius:18px;background:#101010;box-sizing:border-box}
+.feature-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
+.feature-head h2{margin:3px 0 0;font-size:19px}.feature-head p{margin:5px 0 0;color:#777;font-size:10px;line-height:1.6}
+.feature-btn,.feature-periods button{border:1px solid #303030;background:#151515;color:#aaa;border-radius:9px;padding:8px 11px;font-size:10px;font-weight:800;cursor:pointer}
+.feature-periods{display:flex;gap:6px;flex-wrap:wrap}.feature-periods button.active{background:var(--gold);color:#090909;border-color:var(--gold)}
+.feature-status{padding:7px 10px;border-radius:999px;font-size:9px;font-weight:900;white-space:nowrap}.feature-status.on{background:#18351f;color:#8fe0a0;border:1px solid #285b35}.feature-status.off{background:#211616;color:#d88f8f;border:1px solid #4d2929}
+.live-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.live-kpis>div,.ai-mini,.ai-score{padding:14px;border:1px solid #292929;border-radius:13px;background:#0c0c0c}
+.live-kpis small,.ai-mini span,.ai-score span,.review-card small{display:block;color:#666;font-size:8px;letter-spacing:.1em;font-weight:900}.live-kpis strong{display:block;font-size:22px;margin-top:5px}
+.feature-list{display:grid;gap:8px}.feature-item{padding:11px 13px;border:1px solid #252525;border-radius:11px;background:#0b0b0b;color:#aaa;font-size:10px;line-height:1.55}.feature-empty{padding:18px;text-align:center;color:#666;font-size:10px;border:1px dashed #292929;border-radius:11px}
+.ai-score-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px}.ai-score strong{font-size:30px;display:inline-block;margin-right:9px;color:var(--gold-light)}.ai-mini strong{display:block;font-size:15px;margin-top:6px;color:#eee}
+.ai-columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}.ai-columns h3{font-size:12px;margin:0 0 8px}
+.review-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px}.review-card{padding:14px;border:1px solid #292929;border-radius:13px;background:#0c0c0c}.review-card strong,.review-card span,.review-card a{display:block;margin-top:6px;color:#ddd;font-size:11px;line-height:1.5}.review-card span{color:#777}.review-card a{color:var(--gold-light);text-decoration:none;font-weight:800}
+.campaign-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.campaign-card{padding:15px;border:1px solid #292929;border-radius:13px;background:#0c0c0c}.campaign-card h3{margin:0;font-size:14px}.campaign-card p{margin:7px 0;color:#888;font-size:10px;line-height:1.5}.campaign-meta{display:flex;justify-content:space-between;gap:8px;color:#666;font-size:8px;margin-top:9px}.campaign-badge{color:#8fe0a0;font-weight:900}
+@media(max-width:800px){.ai-score-row{grid-template-columns:1fr 1fr}.ai-columns,.review-grid,.campaign-list{grid-template-columns:1fr}}
+@media(max-width:560px){.feature-box{padding:16px}.feature-head{flex-direction:column}.live-kpis strong{font-size:18px}}
+
 </style>
 
 </head>
@@ -2176,6 +2238,33 @@ main{
 </div>
 
 
+
+
+
+<!-- ==================================================
+     BUSINESS CENTER V2 — COMMAND BAR
+================================================== -->
+<div class="command-bar">
+  <div class="command-left">
+    <div class="command-badge">🦁</div>
+    <div class="command-copy">
+      <strong>LEO CONNECT COMMAND CENTER</strong>
+      <span id="commandStatus">İşletme dijital varlıkların hazır.</span>
+    </div>
+  </div>
+  <div class="command-actions">
+    <a id="commandProfile" class="command-btn gold" target="_blank" rel="noopener">👁 Profili Gör</a>
+    <button class="command-btn" type="button" onclick="copyProfileLink()">🔗 Linki Kopyala</button>
+    <button class="command-btn" type="button" onclick="shareProfile()">↗ Paylaş</button>
+  </div>
+</div>
+
+<div class="access-strip" id="accessStrip">
+  <div class="access-item"><span>Profil</span><span id="accessProfile" class="access-state on">AKTİF</span></div>
+  <div class="access-item"><span>QR Merkezi</span><span id="accessQR" class="access-state off">KİLİTLİ</span></div>
+  <div class="access-item"><span>NFC Merkezi</span><span id="accessNFC" class="access-state off">KİLİTLİ</span></div>
+  <div class="access-item"><span>Analiz</span><span id="accessAnalytics" class="access-state off">KİLİTLİ</span></div>
+</div>
 
 <!-- ==================================================
      PROFILE HERO
@@ -2409,6 +2498,34 @@ main{
 </section>
 
 
+
+<!-- ==================================================
+     BUSINESS ANALYTICS V3
+================================================== -->
+<section id="businessAnalyticsV3" class="analytics-v3" style="display:none">
+  <div class="analytics-head">
+    <div>
+      <h2>📊 Akıllı İşletme Analizi</h2>
+      <p>İşletmenizin dijital profil performansını tek ekranda takip edin.</p>
+    </div>
+    <div class="analytics-periods">
+      <button type="button" data-period="today" onclick="loadBusinessAnalytics('today')">Bugün</button>
+      <button type="button" data-period="7d" class="active" onclick="loadBusinessAnalytics('7d')">7 Gün</button>
+      <button type="button" data-period="30d" onclick="loadBusinessAnalytics('30d')">30 Gün</button>
+      <button type="button" data-period="all" onclick="loadBusinessAnalytics('all')">Tümü</button>
+    </div>
+  </div>
+  <div class="analytics-kpis">
+    <div class="analytics-kpi"><small>TOPLAM ETKİLEŞİM</small><strong id="baTotal">0</strong><span>tüm aksiyonlar</span></div>
+    <div class="analytics-kpi"><small>PROFİL</small><strong id="baProfile">0</strong><span>görüntülenme</span></div>
+    <div class="analytics-kpi"><small>QR + NFC</small><strong id="baDigital">0</strong><span>fiziksel temas</span></div>
+    <div class="analytics-kpi"><small>İLETİŞİM</small><strong id="baContact">0</strong><span>telefon + WhatsApp</span></div>
+  </div>
+  <div class="analytics-grid">
+    <div class="analytics-box"><h3>Günlük Trafik</h3><div id="baTraffic" class="traffic-bars"></div><div id="baTrafficLabels" style="display:flex;gap:5px"></div></div>
+    <div class="analytics-box"><h3>Müşteri Aksiyonları</h3><div id="baActions"></div></div>
+  </div>
+</section>
 
 <!-- ==================================================
      QUICK ACTIONS
@@ -2996,7 +3113,7 @@ main{
      PERFORMANCE
 ================================================== -->
 
-<section class="box">
+<section id="performanceSection" class="box">
 
   <div class="box-head">
 
@@ -3313,6 +3430,63 @@ main{
 </section>
 
 
+
+<!-- ==================================================
+     LEO CONNECT BUSINESS CENTER MODULES
+================================================== -->
+<section id="liveSection" class="feature-box">
+  <div class="feature-head">
+    <div><div class="eyebrow">LIVE</div><h2>🔴 Canlı Takip</h2><p>İşletmenin son müşteri etkileşimlerini görüntüle.</p></div>
+    <button class="feature-btn" type="button" onclick="loadBusinessLive()">↻ Yenile</button>
+  </div>
+  <div class="live-kpis">
+    <div><small>SON 15 DK</small><strong id="live15">0</strong></div>
+    <div><small>SON 60 DK</small><strong id="live60">0</strong></div>
+    <div><small>BUGÜN</small><strong id="liveToday">0</strong></div>
+  </div>
+  <div id="liveActivityList" class="feature-list"><div class="feature-empty">Aktiviteler yükleniyor...</div></div>
+</section>
+
+<section id="aiSection" class="feature-box">
+  <div class="feature-head">
+    <div><div class="eyebrow">INTELLIGENCE</div><h2>🧠 LEO AI Insights</h2><p>Etkileşim verilerinden otomatik performans içgörüleri üretir.</p></div>
+    <div class="feature-periods">
+      <button type="button" class="active" onclick="loadAIInsights('7d',this)">7 Gün</button>
+      <button type="button" onclick="loadAIInsights('30d',this)">30 Gün</button>
+      <button type="button" onclick="loadAIInsights('all',this)">Tümü</button>
+    </div>
+  </div>
+  <div class="ai-score-row">
+    <div class="ai-score"><strong id="aiScore">0</strong><span id="aiTitle">Analiz hazırlanıyor</span></div>
+    <div class="ai-mini"><span>Dönüşüm</span><strong id="aiConversion">%0</strong></div>
+    <div class="ai-mini"><span>Yoğun saat</span><strong id="aiPeak">—</strong></div>
+    <div class="ai-mini"><span>Güçlü kaynak</span><strong id="aiSource">—</strong></div>
+  </div>
+  <div class="ai-columns">
+    <div><h3>İçgörüler</h3><div id="aiInsights" class="feature-list"><div class="feature-empty">Yükleniyor...</div></div></div>
+    <div><h3>Öneriler</h3><div id="aiRecommendations" class="feature-list"><div class="feature-empty">Yükleniyor...</div></div></div>
+  </div>
+</section>
+
+<section id="reviewSection" class="feature-box">
+  <div class="feature-head">
+    <div><div class="eyebrow">REPUTATION</div><h2>⭐ Review Booster</h2><p>Memnun müşteriyi Google yorumuna yönlendiren sistem.</p></div>
+    <span id="reviewStatus" class="feature-status off">KAPALI</span>
+  </div>
+  <div class="review-grid">
+    <div class="review-card"><small>BAŞLIK</small><strong id="reviewTitle">—</strong><span id="reviewText">—</span></div>
+    <div class="review-card"><small>PUAN EŞİĞİ</small><strong id="reviewThreshold">—</strong><span>ve üzeri Google yönlendirmesi</span></div>
+    <div class="review-card"><small>GOOGLE</small><a id="reviewGoogle" target="_blank" rel="noopener">Bağlantıyı Aç →</a></div>
+  </div>
+</section>
+
+<section id="campaignSection" class="feature-box">
+  <div class="feature-head">
+    <div><div class="eyebrow">SMART CAMPAIGNS</div><h2>🚀 Smart Campaigns</h2><p>Aktif ve planlanmış kampanyalarını takip et.</p></div>
+    <button class="feature-btn" type="button" onclick="loadBusinessCampaigns()">↻ Yenile</button>
+  </div>
+  <div id="campaignList" class="campaign-list"><div class="feature-empty">Kampanyalar yükleniyor...</div></div>
+</section>
 
 <!-- ==================================================
      QUICK INFO
@@ -4352,6 +4526,18 @@ function renderPerformance(
 
 
 
+async function copyProfileLink(){
+  if(!currentBusiness?.slug) return;
+  const url=window.location.origin+"/p/"+currentBusiness.slug;
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast("Profil bağlantısı kopyalandı.");
+  }catch(error){
+    showToast("Profil bağlantısı: "+url);
+  }
+}
+
+
 /* ==================================================
    SHARE
 ================================================== */
@@ -4445,94 +4631,47 @@ async function shareProfile(){
 ================================================== */
 
 function applyPermissions(business){
-  const p={
-    profile:true,
-    qr:false,
-    nfc:false,
-    analytics:false,
-    live:false,
-    ai:false,
-    review:false,
-    campaign:false,
-    ...(business?.permissions||{})
-  };
+  const p={profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,...(business?.permissions||{})};
+  const setDisplay=(id,on)=>{const el=document.getElementById(id);if(el)el.style.display=on?"":"none";};
 
-  const hide=id=>{
-    const el=document.getElementById(id);
-    if(el)el.style.display="none";
-  };
-  const show=id=>{
-    const el=document.getElementById(id);
-    if(el)el.style.display="";
-  };
-
-  /*
-   * Admin'deki izinler sadece API'yi değil, Business Center arayüzünü de
-   * kontrol eder. /api/me her yüklemede güncel permissions döndürür.
-   */
+  setDisplay("quickQR",p.qr);setDisplay("quickNFC",p.nfc);
+  setDisplay("qrCard",p.qr);setDisplay("nfcCard",p.nfc);setDisplay("digital",p.qr||p.nfc);
+  setDisplay("profile",p.profile);setDisplay("saveButton",p.profile);
+  document.querySelectorAll('a[href="#profile"]').forEach(el=>el.style.display=p.profile?"":"none");
 
   const qrStat=document.getElementById("qrViews")?.closest(".stat");
   const nfcStat=document.getElementById("nfcViews")?.closest(".stat");
   if(qrStat)qrStat.style.display=p.qr?"":"none";
   if(nfcStat)nfcStat.style.display=p.nfc?"":"none";
 
-  if(p.qr)show("quickQR");else hide("quickQR");
-  if(p.nfc)show("quickNFC");else hide("quickNFC");
+  setDisplay("performanceSection",p.analytics);
+  setDisplay("businessAnalyticsV3",p.analytics);
+  setDisplay("liveSection",p.live);
+  setDisplay("aiSection",p.ai);
+  setDisplay("reviewSection",p.review);
+  setDisplay("campaignSection",p.campaign);
+}
 
-  if(p.qr)show("qrCard");else hide("qrCard");
-  if(p.nfc)show("nfcCard");else hide("nfcCard");
-
-  const digital=document.getElementById("digital");
-  if(digital)digital.style.display=(p.qr||p.nfc)?"":"none";
-
-  const profile=document.getElementById("profile");
-  if(profile)profile.style.display=p.profile?"":"none";
-
-  document.querySelectorAll('a[href="#profile"]').forEach(el=>{
-    el.style.display=p.profile?"":"none";
-  });
-
-  const save=document.getElementById("saveButton");
-  if(save)save.style.display=p.profile?"":"none";
-
-  /* Analytics: özet + V3 analytics bloğu */
-  document.querySelectorAll(".summary").forEach(el=>{
-    el.style.display=p.analytics?"":"none";
-  });
-  const analyticsBlocks=[
-    "businessAnalyticsV3",
-    "analytics",
-    "analyticsSection",
-    "analyticsCard"
-  ];
-  analyticsBlocks.forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.style.display=p.analytics?"":"none";
-  });
-
-  /* Canlı takip */
-  ["live","liveCenter","liveCommandCenter","liveSection"].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.style.display=p.live?"":"none";
-  });
-
-  /* Review Booster / Smart Campaigns varsa izinle birlikte gizle */
-  ["review","reviewBooster","reviewSection","campaign","campaigns","campaignSection"].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el){
-      const allowed=id.toLowerCase().includes("campaign")?p.campaign:p.review;
-      el.style.display=allowed?"":"none";
-    }
-  });
-
-  /*
-   * Yetki kapatılmışken hash ile gizli bir bölüme gidilmesini de önle.
-   * Sayfayı yenilediğinde /api/me tekrar okunacağı için eski UI state'i kalmaz.
-   */
-  if(!p.profile && location.hash==="#profile"){
-    history.replaceState(null,"",location.pathname);
-    window.scrollTo({top:0,behavior:"instant"});
-  }
+/* ==================================================
+   BUSINESS CENTER ANALYTICS V3
+================================================== */
+async function loadBusinessAnalytics(period='7d'){
+  if(!currentBusiness?.permissions?.analytics) return;
+  document.querySelectorAll('.analytics-periods button').forEach(b=>b.classList.toggle('active',b.dataset.period===period));
+  const data=await api('/api/business-analytics?period='+encodeURIComponent(period));
+  if(!data) return;
+  const t=data.totals||{};
+  const n=v=>Number(v||0);
+  document.getElementById('baTotal').textContent=n(t.total_events).toLocaleString('tr-TR');
+  document.getElementById('baProfile').textContent=n(t.profile_views).toLocaleString('tr-TR');
+  document.getElementById('baDigital').textContent=(n(t.qr_scans)+n(t.nfc_taps)).toLocaleString('tr-TR');
+  document.getElementById('baContact').textContent=(n(t.phone_clicks)+n(t.whatsapp_clicks)).toLocaleString('tr-TR');
+  const days=data.daily||[]; const max=Math.max(1,...days.map(x=>n(x.events)));
+  const traffic=document.getElementById('baTraffic'), labels=document.getElementById('baTrafficLabels'); traffic.innerHTML=''; labels.innerHTML='';
+  if(!days.length){traffic.innerHTML='<div class="analytics-empty">Henüz seçilen dönemde veri yok.</div>';return;}
+  days.slice(-30).forEach(x=>{const wrap=document.createElement('div');wrap.className='traffic-bar-wrap';wrap.title=x.day+': '+n(x.events)+' etkileşim';const bar=document.createElement('div');bar.className='traffic-bar';bar.style.height=(n(x.events)/max*100)+'%';wrap.appendChild(bar);traffic.appendChild(wrap);const l=document.createElement('span');l.className='traffic-label';l.style.flex='1';l.textContent=x.day.slice(5);labels.appendChild(l);});
+  const actions=(data.actions||[]).slice(0,6), actionMax=Math.max(1,...actions.map(x=>n(x.count))), names={profile_view:'Profil',qr_scan:'QR',qr:'QR',nfc:'NFC',phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google',website:'Website',menu:'Menü'};
+  document.getElementById('baActions').innerHTML=actions.length?actions.map(x=>`<div class="action-row"><span>${names[x.type]||x.type}</span><div class="action-track"><div class="action-fill" style="width:${n(x.count)/actionMax*100}%"></div></div><strong>${n(x.count)}</strong></div>`).join(''):'<div class="analytics-empty">Henüz aksiyon yok.</div>';
 }
 
 
@@ -4544,7 +4683,7 @@ async function load(){
 
   const business =
     await api(
-      "/api/me?_="+Date.now()
+      "/api/me"
     );
 
 
@@ -4558,6 +4697,12 @@ async function load(){
     business;
 
   applyPermissions(business);
+
+  const analyticsCard=document.getElementById('businessAnalyticsV3');
+  if(analyticsCard){
+    analyticsCard.style.display=business?.permissions?.analytics?'':'none';
+    if(business?.permissions?.analytics) loadBusinessAnalytics('7d');
+  }
 
 
 
@@ -4653,6 +4798,11 @@ async function load(){
   ).href =
     profileUrl;
 
+  const commandProfile = document.getElementById("commandProfile");
+  if(commandProfile) commandProfile.href = profileUrl;
+  const commandStatus = document.getElementById("commandStatus");
+  if(commandStatus) commandStatus.textContent = (business.name || "İşletme") + " dijital varlıkların tek merkezden yönetiliyor.";
+
 
 
   document.getElementById(
@@ -4679,45 +4829,19 @@ async function load(){
 
 
   /* QR */
-
-  const qr =
-    await api(
-      "/api/qr"
-    );
-
-
-
-  if(qr){
-
-    document.getElementById(
-      "qr"
-    ).src =
-      qr.dataUrl;
-
-
-
-    document.getElementById(
-      "url"
-    ).textContent =
-      qr.url;
-
-
-
-    document.getElementById(
-      "open"
-    ).href =
-      qr.url;
-
-
-
-    document.getElementById(
-      "download"
-    ).href =
-      qr.dataUrl;
-
+  const qr = await api("/api/qr");
+  if(qr && qr.qr){
+    const qrImage=document.getElementById("qr");
+    qrImage.src=qr.qr;
+    qrImage.style.display="block";
+    document.getElementById("url").textContent=qr.url||"";
+    document.getElementById("open").href=qr.url||"#";
+    document.getElementById("download").href=qr.qr;
+  }else{
+    const qrImage=document.getElementById("qr");
+    if(qrImage){qrImage.removeAttribute("src");qrImage.style.display="none";}
+    document.getElementById("url").textContent=qr?.error||"QR kodu oluşturulamadı.";
   }
-
-
 
   /* STATS */
 
@@ -4784,6 +4908,8 @@ async function load(){
   );
 
 
+
+  await loadExtraModules();
 
   hideLoading();
 
@@ -5230,6 +5356,15 @@ function hideLoading(){
 load();
 
 
+
+/* BUSINESS CENTER EXTRA MODULES */
+function esc(value){return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function formatEventType(type){return ({profile_view:"Profil görüntüleme",qr:"QR tarama",qr_scan:"QR tarama",nfc:"NFC dokunuşu",whatsapp:"WhatsApp",phone:"Telefon",instagram:"Instagram",tiktok:"TikTok",google_review:"Google yorum",website:"Website",menu:"Menü",location:"Konum",share:"Paylaşım"}[type]||type||"Etkileşim");}
+async function loadBusinessLive(){if(!currentBusiness?.permissions?.live)return;const data=await api("/api/business-live-activity?limit=20");if(!data||data.error)return;const s=data.stats||{};document.getElementById("live15").textContent=Number(s.last_15m||0);document.getElementById("live60").textContent=Number(s.last_60m||0);document.getElementById("liveToday").textContent=Number(s.today||0);const rows=data.activities||[];document.getElementById("liveActivityList").innerHTML=rows.length?rows.map(x=>{const time=x.created_at?new Date(x.created_at).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";const extra=x.nfc_name?` • ${esc(x.nfc_name)}`:"";return `<div class="feature-item"><strong>${esc(formatEventType(x.type))}</strong>${extra}<span style="float:right;color:#666">${esc(time)}</span></div>`}).join(""):'<div class="feature-empty">Henüz aktivite yok.</div>';}
+async function loadAIInsights(period="7d",button=null){if(!currentBusiness?.permissions?.ai)return;if(button){document.querySelectorAll(".feature-periods button").forEach(b=>b.classList.remove("active"));button.classList.add("active");}const data=await api("/api/business-ai-insights?period="+encodeURIComponent(period));if(!data||data.error)return;document.getElementById("aiScore").textContent=Number(data.score||0);document.getElementById("aiTitle").textContent=data.title||"Analiz";document.getElementById("aiConversion").textContent="%"+Number(data.conversion||0).toLocaleString("tr-TR");document.getElementById("aiPeak").textContent=data.peak_hour?String(data.peak_hour.hour).padStart(2,"0")+":00":"—";document.getElementById("aiSource").textContent=data.strongest_source?.source||"—";const renderList=(id,items,icon)=>document.getElementById(id).innerHTML=(items||[]).length?items.map(x=>`<div class="feature-item">${icon} ${esc(x)}</div>`).join(""):'<div class="feature-empty">Henüz veri yok.</div>';renderList("aiInsights",data.insights,"💡");renderList("aiRecommendations",data.recommendations,"→");}
+async function loadReviewBooster(){if(!currentBusiness?.permissions?.review)return;const data=await api("/api/business-review-booster");if(!data||data.error)return;const status=document.getElementById("reviewStatus");status.textContent=data.enabled?"AKTİF":"KAPALI";status.className="feature-status "+(data.enabled?"on":"off");document.getElementById("reviewTitle").textContent=data.title||"—";document.getElementById("reviewText").textContent=data.text||"—";document.getElementById("reviewThreshold").textContent=Number(data.threshold||4)+"★";const link=document.getElementById("reviewGoogle");if(currentBusiness.google_review){link.href=currentBusiness.google_review;link.textContent="Bağlantıyı Aç →";}else{link.removeAttribute("href");link.textContent="Google bağlantısı eklenmemiş";}}
+async function loadBusinessCampaigns(){if(!currentBusiness?.permissions?.campaign)return;const data=await api("/api/business-campaigns");if(!data||data.error)return;const rows=data.campaigns||[];document.getElementById("campaignList").innerHTML=rows.length?rows.map(c=>{const start=c.starts_at?new Date(c.starts_at).toLocaleDateString("tr-TR"):"Başlangıç yok";const end=c.ends_at?new Date(c.ends_at).toLocaleDateString("tr-TR"):"Süresiz";return `<div class="campaign-card"><h3>${esc(c.title||"Kampanya")}</h3><p>${esc(c.text||"")}</p><div class="campaign-meta"><span>${esc(start)} → ${esc(end)}</span><span class="campaign-badge">${c.enabled?"AKTİF":"PASİF"}</span></div></div>`}).join(""):'<div class="feature-empty" style="grid-column:1/-1">Henüz kampanya oluşturulmamış.</div>';}
+async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.permissions?.live)loadBusinessLive();if(currentBusiness.permissions?.ai)loadAIInsights("7d");if(currentBusiness.permissions?.review)loadReviewBooster();if(currentBusiness.permissions?.campaign)loadBusinessCampaigns();}
 
 </script>
 
