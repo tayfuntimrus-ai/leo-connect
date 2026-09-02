@@ -875,22 +875,46 @@ async function showBusinessCardManager(btn){
 }
 function newCardPerson(){
   document.getElementById('modalTitle').textContent='💳 Yeni Business Card Kişisi';
-  document.getElementById('modalBody').innerHTML=`<div class="form-grid"><div class="form-field full"><label>AD SOYAD</label><input id="cp_name" name="card_person_name" autocomplete="name" required placeholder="Örn. Tayfun Timrus"></div><div class="form-field"><label>GİRİŞ E-POSTASI (OPSİYONEL)</label><input id="cp_email" name="card_person_email" type="email" autocomplete="email" placeholder="kart sahibi giriş yapacaksa"></div><div class="form-field"><label>GEÇİCİ ŞİFRE (OPSİYONEL)</label><input id="cp_password" name="card_person_password" type="password" autocomplete="new-password" placeholder="En az 8 karakter"></div></div><div class="section-sub" style="margin-top:12px">Kişi oluşturulduktan sonra hangi alanları düzenleyebileceğini ayrıca belirleyebilirsin.</div><div class="modal-actions"><button type="button" class="btn primary" onclick="createCardPerson(this)">Kişiyi Oluştur</button><button type="button" class="btn" onclick="closeModal()">Vazgeç</button></div>`;
+  document.getElementById('modalBody').innerHTML=`<div class="form-grid"><div class="form-field full"><label>AD SOYAD</label><input id="cp_name" name="card_person_name" autocomplete="name" required placeholder="Örn. Tayfun Timrus"></div><div class="form-field"><label>GİRİŞ E-POSTASI (OPSİYONEL)</label><input id="cp_email" name="card_person_email" type="email" autocomplete="email" placeholder="kart sahibi giriş yapacaksa"></div><div class="form-field"><label>GEÇİCİ ŞİFRE (OPSİYONEL)</label><input id="cp_password" name="card_person_password" type="password" autocomplete="new-password" placeholder="En az 8 karakter"></div></div><div class="section-sub" style="margin-top:12px">Kişi oluşturulduktan sonra hangi alanları düzenleyebileceğini ayrıca belirleyebilirsin.</div><div class="modal-actions"><button type="button" class="btn primary" onclick="createCardPerson()">Kişiyi Oluştur</button><button type="button" class="btn" onclick="closeModal()">Vazgeç</button></div>`;
   openModal();
   setTimeout(()=>document.getElementById('cp_name')?.focus(),50);
 }
-async function createCardPerson(button){
-  const modal=button?.closest('.modal') || document.getElementById('modalBody');
-  const nameInput=modal?.querySelector('#cp_name');
-  const emailInput=modal?.querySelector('#cp_email');
-  const passwordInput=modal?.querySelector('#cp_password');
-  const name=(nameInput?.value || '').trim();
-  const email=(emailInput?.value || '').trim();
-  const password=passwordInput?.value || '';
-  if(!name){showToast('Ad Soyad gerekli.');nameInput?.focus();return}
-  if(password && password.length<8){showToast('Şifre en az 8 karakter olmalı.');passwordInput?.focus();return}
+function getVisibleFieldValue(id){
+  const nodes=[...document.querySelectorAll('#'+id)];
+  const visible=nodes.find(el=>el && el.offsetParent!==null);
+  const el=visible || nodes[0];
+  return el ? String(el.value ?? '').trim() : '';
+}
+async function createCardPerson(){
+  const name=getVisibleFieldValue('cp_name');
+  const email=getVisibleFieldValue('cp_email');
+  const password=(()=>{
+    const nodes=[...document.querySelectorAll('#cp_password')];
+    const el=nodes.find(x=>x && x.offsetParent!==null) || nodes[0];
+    return el ? String(el.value ?? '') : '';
+  })();
+  if(!name){
+    showToast('Ad Soyad gerekli.');
+    const el=[...document.querySelectorAll('#cp_name')].find(x=>x && x.offsetParent!==null) || document.querySelector('#cp_name');
+    el?.focus();
+    return;
+  }
+  if(password && password.length<8){
+    showToast('Şifre en az 8 karakter olmalı.');
+    const el=[...document.querySelectorAll('#cp_password')].find(x=>x && x.offsetParent!==null) || document.querySelector('#cp_password');
+    el?.focus();
+    return;
+  }
   try{
-    await api('/api/admin/card-people',{method:'POST',body:JSON.stringify({email,password,data:{person_name:name,display_name:name},enabled:true})});
+    await api('/api/admin/card-people',{
+      method:'POST',
+      body:JSON.stringify({
+        email,
+        password,
+        data:{person_name:name,display_name:name},
+        enabled:true
+      })
+    });
     closeModal();
     showToast('Business Card kişisi oluşturuldu.');
     await showBusinessCardManager();
