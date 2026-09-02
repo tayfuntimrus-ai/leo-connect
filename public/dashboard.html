@@ -2083,6 +2083,18 @@ main{
 @media(max-width:760px){.command-bar{align-items:flex-start;flex-direction:column}.command-actions{width:100%;justify-content:flex-start}.command-btn{flex:1;text-align:center}.access-strip{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:430px){.access-strip{grid-template-columns:1fr 1fr}.command-btn{font-size:11px;padding:9px 8px}}
 
+
+/* ==================================================
+   BUSINESS CENTER V3 ANALYTICS
+================================================== */
+.analytics-v3{margin:24px 0;background:linear-gradient(145deg,#111,#0b0b0b);border:1px solid #292929;border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.analytics-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+.analytics-head h2{margin:0;font-size:20px}.analytics-head p{margin:6px 0 0;color:#888;font-size:13px}
+.analytics-periods{display:flex;gap:7px;flex-wrap:wrap}.analytics-periods button{border:1px solid #303030;background:#151515;color:#999;border-radius:999px;padding:8px 13px;cursor:pointer}.analytics-periods button.active{background:#c59a52;color:#080808;border-color:#c59a52;font-weight:800}
+.analytics-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.analytics-kpi{padding:17px;border:1px solid #292929;border-radius:18px;background:#121212}.analytics-kpi small{display:block;color:#777;font-size:10px;letter-spacing:.12em}.analytics-kpi strong{display:block;font-size:28px;margin-top:8px}.analytics-kpi span{color:#888;font-size:12px}
+.analytics-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}.analytics-box{border:1px solid #292929;border-radius:20px;background:#101010;padding:18px}.analytics-box h3{margin:0 0 15px;font-size:14px}.traffic-bars{height:180px;display:flex;align-items:end;gap:5px;overflow:hidden}.traffic-bar-wrap{height:100%;flex:1;min-width:8px;display:flex;align-items:end;justify-content:center}.traffic-bar{width:100%;max-width:22px;border-radius:7px 7px 2px 2px;background:linear-gradient(to top,#8d6b32,#e0bd7b);min-height:3px}.traffic-label{font-size:9px;color:#666;margin-top:7px;text-align:center}.action-row{display:grid;grid-template-columns:100px 1fr 45px;gap:8px;align-items:center;margin:11px 0;font-size:12px}.action-track{height:7px;background:#202020;border-radius:99px;overflow:hidden}.action-fill{height:100%;background:#c59a52;border-radius:99px}.analytics-empty{padding:35px;text-align:center;color:#777}.analytics-locked{padding:20px;border:1px dashed #3a3a3a;border-radius:16px;color:#888;text-align:center}
+@media(max-width:800px){.analytics-kpis{grid-template-columns:repeat(2,1fr)}.analytics-grid{grid-template-columns:1fr}.analytics-head{flex-direction:column}}
+
 </style>
 
 </head>
@@ -2469,6 +2481,34 @@ main{
 </section>
 
 
+
+<!-- ==================================================
+     BUSINESS ANALYTICS V3
+================================================== -->
+<section id="businessAnalyticsV3" class="analytics-v3" style="display:none">
+  <div class="analytics-head">
+    <div>
+      <h2>📊 Akıllı İşletme Analizi</h2>
+      <p>İşletmenizin dijital profil performansını tek ekranda takip edin.</p>
+    </div>
+    <div class="analytics-periods">
+      <button type="button" data-period="today" onclick="loadBusinessAnalytics('today')">Bugün</button>
+      <button type="button" data-period="7d" class="active" onclick="loadBusinessAnalytics('7d')">7 Gün</button>
+      <button type="button" data-period="30d" onclick="loadBusinessAnalytics('30d')">30 Gün</button>
+      <button type="button" data-period="all" onclick="loadBusinessAnalytics('all')">Tümü</button>
+    </div>
+  </div>
+  <div class="analytics-kpis">
+    <div class="analytics-kpi"><small>TOPLAM ETKİLEŞİM</small><strong id="baTotal">0</strong><span>tüm aksiyonlar</span></div>
+    <div class="analytics-kpi"><small>PROFİL</small><strong id="baProfile">0</strong><span>görüntülenme</span></div>
+    <div class="analytics-kpi"><small>QR + NFC</small><strong id="baDigital">0</strong><span>fiziksel temas</span></div>
+    <div class="analytics-kpi"><small>İLETİŞİM</small><strong id="baContact">0</strong><span>telefon + WhatsApp</span></div>
+  </div>
+  <div class="analytics-grid">
+    <div class="analytics-box"><h3>Günlük Trafik</h3><div id="baTraffic" class="traffic-bars"></div><div id="baTrafficLabels" style="display:flex;gap:5px"></div></div>
+    <div class="analytics-box"><h3>Müşteri Aksiyonları</h3><div id="baActions"></div></div>
+  </div>
+</section>
 
 <!-- ==================================================
      QUICK ACTIONS
@@ -4554,6 +4594,30 @@ function applyPermissions(business){
 }
 
 
+
+/* ==================================================
+   BUSINESS CENTER ANALYTICS V3
+================================================== */
+async function loadBusinessAnalytics(period='7d'){
+  if(!currentBusiness?.permissions?.analytics) return;
+  document.querySelectorAll('.analytics-periods button').forEach(b=>b.classList.toggle('active',b.dataset.period===period));
+  const data=await api('/api/business-analytics?period='+encodeURIComponent(period));
+  if(!data) return;
+  const t=data.totals||{};
+  const n=v=>Number(v||0);
+  document.getElementById('baTotal').textContent=n(t.total_events).toLocaleString('tr-TR');
+  document.getElementById('baProfile').textContent=n(t.profile_views).toLocaleString('tr-TR');
+  document.getElementById('baDigital').textContent=(n(t.qr_scans)+n(t.nfc_taps)).toLocaleString('tr-TR');
+  document.getElementById('baContact').textContent=(n(t.phone_clicks)+n(t.whatsapp_clicks)).toLocaleString('tr-TR');
+  const days=data.daily||[]; const max=Math.max(1,...days.map(x=>n(x.events)));
+  const traffic=document.getElementById('baTraffic'), labels=document.getElementById('baTrafficLabels'); traffic.innerHTML=''; labels.innerHTML='';
+  if(!days.length){traffic.innerHTML='<div class="analytics-empty">Henüz seçilen dönemde veri yok.</div>';return;}
+  days.slice(-30).forEach(x=>{const wrap=document.createElement('div');wrap.className='traffic-bar-wrap';wrap.title=x.day+': '+n(x.events)+' etkileşim';const bar=document.createElement('div');bar.className='traffic-bar';bar.style.height=(n(x.events)/max*100)+'%';wrap.appendChild(bar);traffic.appendChild(wrap);const l=document.createElement('span');l.className='traffic-label';l.style.flex='1';l.textContent=x.day.slice(5);labels.appendChild(l);});
+  const actions=(data.actions||[]).slice(0,6), actionMax=Math.max(1,...actions.map(x=>n(x.count))), names={profile_view:'Profil',qr_scan:'QR',qr:'QR',nfc:'NFC',phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google',website:'Website',menu:'Menü'};
+  document.getElementById('baActions').innerHTML=actions.length?actions.map(x=>`<div class="action-row"><span>${names[x.type]||x.type}</span><div class="action-track"><div class="action-fill" style="width:${n(x.count)/actionMax*100}%"></div></div><strong>${n(x.count)}</strong></div>`).join(''):'<div class="analytics-empty">Henüz aksiyon yok.</div>';
+}
+
+
 /* ==================================================
    LOAD
 ================================================== */
@@ -4576,6 +4640,12 @@ async function load(){
     business;
 
   applyPermissions(business);
+
+  const analyticsCard=document.getElementById('businessAnalyticsV3');
+  if(analyticsCard){
+    analyticsCard.style.display=business?.permissions?.analytics?'':'none';
+    if(business?.permissions?.analytics) loadBusinessAnalytics('7d');
+  }
 
 
 
