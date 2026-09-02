@@ -171,6 +171,7 @@ a{color:inherit;text-decoration:none}
       <button onclick="focusBusinesses();setActive(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
       <button onclick="showNFCManager(this)"><span class="nav-icon">◉</span><span>NFC Etiketleri</span></button>
       <button onclick="showQRManager(this)"><span class="nav-icon">▣</span><span>QR Merkezi</span></button>
+      <button onclick="showBusinessCardManager(this)"><span class="nav-icon">💳</span><span>Business Card</span></button>
       <button onclick="focusAnalytics()"><span class="nav-icon">⌁</span><span>Analytics</span></button>
     </nav>
     <div class="nav-title">SİSTEM</div>
@@ -471,7 +472,7 @@ async function copyText(text){try{await navigator.clipboard.writeText(text);show
 async function openBusiness(id){
   try{
     const d=await api("/api/admin/business/"+id);
-    currentBusiness={...d.business,permissions:d.permissions||{profile:true,qr:false,nfc:false,analytics:false},nfc_tags:d.nfc_tags||[]};
+    currentBusiness={...d.business,permissions:d.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:d.nfc_tags||[]};
     document.querySelector(".content").style.display="none";
     document.getElementById("businessPage").classList.add("show");
     renderBusinessPage();
@@ -594,7 +595,7 @@ async function saveBusinessPage(){
     showToast("İşletme profili güncellendi.");
     await loadAll();
     const d=await api("/api/admin/business/"+id);
-    currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false},nfc_tags:d.nfc_tags||[]};
+    currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:d.nfc_tags||[]};
     renderBusinessPage();
   }catch(e){showToast(e.message)}
 }
@@ -636,7 +637,7 @@ async function createNFC(businessId){
     const d=await api("/api/admin/nfc-tags",{method:"POST",body:JSON.stringify({business_id:businessId,name,placement})});
     closeModal();showToast("NFC etiketi oluşturuldu.");
     const fresh=await api("/api/admin/business/"+businessId);
-    currentBusiness={...fresh.business,permissions:fresh.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false},nfc_tags:fresh.nfc_tags||[]};
+    currentBusiness={...fresh.business,permissions:fresh.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:fresh.nfc_tags||[]};
     renderBusinessPage();
     switchBizTab("nfc",document.querySelector('[data-tab=nfc]'));
     if(d.url)showCreatedNFC(d.url,d);
@@ -664,7 +665,7 @@ async function saveNFCPage(id,businessId){
   try{
     await api("/api/admin/nfc-tags/"+id,{method:"PUT",body:JSON.stringify(body)});
     closeModal();showToast("NFC etiketi güncellendi.");
-    const d=await api("/api/admin/business/"+businessId);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
+    const d=await api("/api/admin/business/"+businessId);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
   }catch(e){showToast(e.message)}
 }
 async function deleteNFCPage(id){
@@ -672,7 +673,7 @@ async function deleteNFCPage(id){
   try{
     await api("/api/admin/nfc-tags/"+id,{method:"DELETE"});
     showToast("NFC etiketi silindi.");
-    const d=await api("/api/admin/business/"+currentBusiness.id);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
+    const d=await api("/api/admin/business/"+currentBusiness.id);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
     switchBizTab("nfc",document.querySelector('[data-tab=nfc]'));
   }catch(e){showToast(e.message)}
 }
@@ -747,7 +748,7 @@ async function loadBizAnalytics(){
 }
 
 function renderBizPermissions(){
-  const b=currentBusiness, p=b.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false};
+  const b=currentBusiness, p=b.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false};
   document.getElementById("bizPermissions").innerHTML=`
     <section class="card biz-section">
       <h3>Erişim İzinleri</h3>
@@ -760,6 +761,7 @@ function renderBizPermissions(){
         <div class="permission-card"><div><strong>🟢 Canlı Takip</strong><span>Son müşteri hareketlerini canlı olarak görüntüleme</span></div><label class="switch"><input id="perm_live" type="checkbox" ${p.live?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>🧠 LEO AI Insights</strong><span>Yapay zekâ destekli işletme raporlarını görüntüleme</span></div><label class="switch"><input id="perm_ai" type="checkbox" ${p.ai?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>⭐ Review Booster</strong><span>Müşterileri Google yorumuna yönlendirme ve memnuniyet akışı</span></div><label class="switch"><input id="perm_review" type="checkbox" ${p.review?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>💳 Digital Business Card</strong><span>İşletmenin dijital kartvizit modülünü kullanabilsin</span></div><label class="switch"><input id="perm_card" type="checkbox" ${p.card?'checked':''}><span class="slider"></span></label></div>
       </div>
       <div class="modal-actions"><button class="btn primary" onclick="saveBusinessPermissions()">İzinleri Kaydet</button></div>
       <div class="section-sub" style="margin-top:10px">🔒 QR ve NFC varsayılan olarak kapalıdır. Sen açmadıkça işletme panelinde görünmez ve ilgili API'lere erişemez.</div>
@@ -767,7 +769,7 @@ function renderBizPermissions(){
 }
 async function saveBusinessPermissions(){
   const id=currentBusiness.id;
-  const permissions={profile:document.getElementById("perm_profile").checked,qr:document.getElementById("perm_qr").checked,nfc:document.getElementById("perm_nfc").checked,analytics:document.getElementById("perm_analytics").checked,live:document.getElementById("perm_live").checked,ai:document.getElementById("perm_ai").checked,review:document.getElementById("perm_review").checked};
+  const permissions={profile:document.getElementById("perm_profile").checked,qr:document.getElementById("perm_qr").checked,nfc:document.getElementById("perm_nfc").checked,analytics:document.getElementById("perm_analytics").checked,live:document.getElementById("perm_live").checked,ai:document.getElementById("perm_ai").checked,review:document.getElementById("perm_review").checked,card:document.getElementById("perm_card").checked};
   try{
     const d=await api("/api/admin/business/"+id+"/permissions",{method:"PUT",body:JSON.stringify(permissions)});
     currentBusiness.permissions=d.permissions||permissions;
@@ -843,6 +845,60 @@ async function deleteGlobalNFC(id){
   if(!confirm("Bu NFC etiketini silmek istediğine emin misin?"))return;
   try{await api("/api/admin/nfc-tags/"+id,{method:"DELETE"});showToast("NFC etiketi silindi.");await showNFCManager();}catch(e){showToast(e.message)}
 }
+
+const BUSINESS_CARD_FIELDS=[
+  ['display_name','Kart Başlığı / İşletme Adı'],['person_name','Yetkili / Kişi Adı'],['job_title','Unvan'],
+  ['phone','Telefon'],['whatsapp','WhatsApp'],['email','E-posta'],['website','Web Sitesi'],['address','Adres'],
+  ['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['linkedin','LinkedIn'],
+  ['google_review','Google Yorum'],['menu','Menü'],['iban','IBAN'],['iban_holder','IBAN Sahibi'],['hours','Çalışma Saatleri'],['note','Not / Kısa Açıklama']
+];
+
+async function showBusinessCardManager(btn){
+  if(btn)setActive(btn);
+  showGlobalPage('Business Card','Tüm işletmelerin Digital Business Card modülünü ve alan bazlı yetkilerini tek merkezden yönet.','<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
+  try{
+    const d=await api('/api/admin/business-cards');
+    const rows=Array.isArray(d.businesses)?d.businesses:[];
+    document.getElementById('globalContent').innerHTML=`
+      <section class="card biz-section">
+        <div class="global-row"><div><h3>💳 Digital Business Card Merkezi</h3><div class="sub">Her işletme için modülü açabilir ve hangi kartvizit alanlarını düzenleyebileceğini ayrı ayrı belirleyebilirsin.</div></div><span class="badge">${n(rows.filter(x=>x.dashboard_card).length)} AKTİF</span></div>
+        <div class="global-grid" style="margin-top:15px">
+          ${rows.length?rows.map(b=>{
+            const perms=b.card?.permissions||{}; const count=BUSINESS_CARD_FIELDS.filter(x=>perms[x[0]]===true).length;
+            return `<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">💳</div><div><div class="global-name">${esc(b.name||'İsimsiz')}</div><div class="global-sub">${esc(b.category||'—')} • /card/${esc(b.slug||'')}</div><div class="global-sub">${b.dashboard_card?'Kart modülü açık':'Kart modülü kapalı'} • ${count}/${BUSINESS_CARD_FIELDS.length} alan yetkili</div></div></div><div class="modal-actions"><span class="badge">${b.dashboard_card?'AKTİF':'KAPALI'}</span><button class="btn primary" onclick="openBusinessCardPermissions(${Number(b.id)})">Yetkileri Yönet</button>${b.dashboard_card?`<button class="btn" onclick="window.open('/card/${encodeURIComponent(b.slug||'')}','_blank')">Kartı Gör ↗</button>`:''}</div></div></div>`
+          }).join(''):'<div class="empty">İşletme bulunamadı.</div>'}
+        </div>
+      </section>`;
+  }catch(e){document.getElementById('globalContent').innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
+}
+
+async function openBusinessCardPermissions(id){
+  try{
+    const d=await api('/api/admin/business/'+id+'/business-card');
+    const b=d.business||{}, c=d.card||{}, perms=c.permissions||{}, data=c.data||{};
+    document.getElementById('modalTitle').textContent='💳 Business Card • '+(b.name||'İşletme');
+    document.getElementById('modalBody').innerHTML=`
+      <div class="detail-box"><small>PUBLIC KART</small><strong style="display:block;margin-top:5px;word-break:break-all">/card/${esc(b.slug||'')}</strong></div>
+      <div class="permission-card" style="margin-top:14px"><div><strong>Business Card modülü</strong><span>İşletme panelinde kartvizit bölümünü tamamen aç/kapat.</span></div><label class="switch"><input id="bc_enabled" type="checkbox" ${c.enabled?'checked':''}><span class="slider"></span></label></div>
+      <div class="section-sub" style="margin:14px 0 8px"><strong>Alan bazlı işlem yetkileri</strong><br>Kapalı alanı işletme değiştiremez ve public kartta gösterilmez. Böylece Instagram, Facebook vb. her içerik ayrı kontrol edilir.</div>
+      <div class="permission-grid">${BUSINESS_CARD_FIELDS.map(([key,label])=>`<div class="permission-card"><div><strong>${esc(label)}</strong><span>${data[key]?'İçerik mevcut':'İçerik henüz girilmedi'}</span></div><label class="switch"><input class="bc-perm" data-field="${key}" type="checkbox" ${perms[key]===true?'checked':''}><span class="slider"></span></label></div>`).join('')}</div>
+      <div class="section-sub" style="margin-top:12px">🔒 Yetki kontrolü sunucu tarafında da yapılır. İşletme API üzerinden kapalı alanı güncelleyemez.</div>
+      <div class="modal-actions"><button class="btn primary" onclick="saveBusinessCardPermissions(${Number(id)})">Yetkileri Kaydet</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;
+    openModal();
+  }catch(e){showToast(e.message)}
+}
+
+async function saveBusinessCardPermissions(id){
+  try{
+    const d=await api('/api/admin/business/'+id+'/business-card');
+    const existing=d.card||{}, permissions={};
+    document.querySelectorAll('.bc-perm').forEach(el=>permissions[el.dataset.field]=el.checked===true);
+    const payload={enabled:document.getElementById('bc_enabled').checked===true,data:existing.data||{},permissions};
+    await api('/api/admin/business/'+id+'/business-card',{method:'PUT',body:JSON.stringify(payload)});
+    closeModal(); showToast('Business Card yetkileri güncellendi.'); await showBusinessCardManager();
+  }catch(e){showToast(e.message)}
+}
+
 async function showQRManager(btn){
   if(btn)setActive(btn);
   showGlobalPage("QR Merkezi","Tüm işletmelerin mevcut QR kodlarını tek merkezden yönet.",'<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
