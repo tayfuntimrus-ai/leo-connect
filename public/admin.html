@@ -147,11 +147,12 @@ a{color:inherit;text-decoration:none}
 @media(max-width:900px){.live-kpis{grid-template-columns:repeat(2,1fr)}.live-layout{grid-template-columns:1fr}}
 @media(max-width:520px){.live-kpis{grid-template-columns:1fr 1fr}.live-item{padding:11px 12px}}
 </style>
+<style id="leo-layout-vars">:root{--topbar-h:82px}@media(max-width:720px){:root{--topbar-h:58px}}</style>
 <style id="leo-fit-fix">
 html,body{width:100%;max-width:100%;overflow-x:hidden}
 .app,.main{min-width:0;width:100%;max-width:100%}
 .content,.business-page,.global-page{box-sizing:border-box;width:100%;max-width:1500px;min-width:0}
-.business-page.show,.global-page.show{overflow-x:hidden;overflow-y:auto}
+.business-page.show,.global-page.show{overflow-x:hidden;overflow-y:auto;box-sizing:border-box}
 .cards,.grid-main,.biz-stat-grid,.biz-columns,.analytics-grid,.analytics-two,.analytics-cards,.permission-grid,.form-grid,.info-grid{min-width:0}
 .analytics-two{grid-template-columns:minmax(0,1.55fr) minmax(0,.95fr)}
 .analytics-box,.analytics-kpi,.analytics-card,.biz-section,.global-card,.permission-card{min-width:0;box-sizing:border-box}
@@ -184,12 +185,12 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
     <div class="brand"><div class="brand-mark">🦁</div><div><strong>LEO CONNECT</strong><small>COMMAND CENTER</small></div></div>
     <div class="nav-title">ANA MENÜ</div>
     <nav class="nav">
-      <button class="active" onclick="setActive(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
+      <button class="active" onclick="showOverview(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
       <button onclick="showBusinessesManager(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
       <button onclick="showNFCManager(this)"><span class="nav-icon">◉</span><span>NFC Etiketleri</span></button>
       <button onclick="showQRManager(this)"><span class="nav-icon">▣</span><span>QR Merkezi</span></button>
       <button onclick="showBusinessCardManager(this)"><span class="nav-icon">💳</span><span>Business Card</span></button>
-      <button onclick="focusAnalytics()"><span class="nav-icon">⌁</span><span>Analytics</span></button>
+      <button onclick="focusAnalytics(this)"><span class="nav-icon">⌁</span><span>Analytics</span></button>
     </nav>
     <div class="nav-title">SİSTEM</div>
     <nav class="nav">
@@ -439,7 +440,7 @@ function renderBusinesses(list=allBusinesses){
   if(!list.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty">İşletme bulunamadı.</div></td></tr>';return}
   tbody.innerHTML=list.map(b=>`
     <tr>
-      <td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td>
+      <td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display=&quot;none&quot;"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td>
       <td class="accent">${esc(b.category||"—")}</td>
       <td>${n(b.profile_views)}</td><td>${n(b.qr_scans)}</td><td>${n(b.nfc_scans)}</td>
       <td><span class="badge">${n(b.nfc_tags)} NFC</span></td>
@@ -483,12 +484,39 @@ async function showBusinessesManager(btn){
   showGlobalPage("İşletmeler","Tüm işletmeleri merkezi çalışma alanında yönet.",'<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
   try{
     if(!allBusinesses.length){const d=await api("/api/admin/businesses");allBusinesses=d.businesses||d||[];}
-    document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div class="global-row"><div><h3>🏢 İşletme Merkezi</h3><div class="sub">İşletme kayıtları, profil, QR, NFC ve yetkileri buradan yönet.</div></div><button class="btn primary" onclick="newBusiness()">＋ İşletme Ekle</button></div><div class="table-wrap" style="margin-top:14px"><table class="table" style="min-width:760px"><thead><tr><th>İŞLETME</th><th>KATEGORİ</th><th>PROFİL</th><th>QR</th><th>NFC</th><th>ETİKET</th><th>İŞLEM</th></tr></thead><tbody>${allBusinesses.length?allBusinesses.map(b=>`<tr><td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td><td class="accent">${esc(b.category||"—")}</td><td>${n(b.profile_views)}</td><td>${n(b.qr_scans)}</td><td>${n(b.nfc_scans)}</td><td><span class="badge">${n(b.nfc_tags)} NFC</span></td><td><button class="btn primary" onclick="openBusiness(${Number(b.id)})">Detay ›</button></td></tr>`).join(""):'<tr><td colspan="7"><div class="empty">İşletme bulunamadı.</div></td></tr>'}</tbody></table></div></section>`;
+    document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div class="global-row"><div><h3>🏢 İşletme Merkezi</h3><div class="sub">İşletme kayıtları, profil, QR, NFC ve yetkileri buradan yönet.</div></div><button class="btn primary" onclick="newBusiness()">＋ İşletme Ekle</button></div><div class="table-wrap" style="margin-top:14px"><table class="table" style="min-width:760px"><thead><tr><th>İŞLETME</th><th>KATEGORİ</th><th>PROFİL</th><th>QR</th><th>NFC</th><th>ETİKET</th><th>İŞLEM</th></tr></thead><tbody>${allBusinesses.length?allBusinesses.map(b=>`<tr><td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display=&quot;none&quot;"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td><td class="accent">${esc(b.category||"—")}</td><td>${n(b.profile_views)}</td><td>${n(b.qr_scans)}</td><td>${n(b.nfc_scans)}</td><td><span class="badge">${n(b.nfc_tags)} NFC</span></td><td><button class="btn primary" onclick="openBusiness(${Number(b.id)})">Detay ›</button></td></tr>`).join(""):'<tr><td colspan="7"><div class="empty">İşletme bulunamadı.</div></td></tr>'}</tbody></table></div></section>`;
   }catch(e){document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
 }
-function focusBusinesses(){showBusinessesManager();}
-function focusAnalytics(){showGlobalPage("Analytics","Merkezi analiz alanı.",'<div class="global-card"><div class="empty">Bir işletme seçerek detaylı Analytics ekranını açabilirsin.</div></div>');}
-function setActive(btn){document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}
+function showOverview(btn){
+  if(btn)setActive(btn);
+  currentBusiness=null;
+  document.getElementById("globalPage").classList.remove("show");
+  document.getElementById("businessPage").classList.remove("show");
+  document.querySelector(".content").style.display="";
+  window.scrollTo(0,0);
+}
+function focusBusinesses(btn){showBusinessesManager(btn);}
+async function focusAnalytics(btn){
+  if(btn)setActive(btn);
+  try{
+    if(!allBusinesses.length){const d=await api("/api/admin/businesses");allBusinesses=d.businesses||d||[];}
+    const rows=allBusinesses||[];
+    const cards=rows.length?rows.map(b=>{
+      const logo=esc(b.logo_url||"");
+      const name=esc(b.name||"İsimsiz");
+      const category=esc(b.category||"—");
+      return '<div class="global-card"><div class="global-row"><div class="global-main"><img src="'+logo+'" style="width:44px;height:44px;border-radius:12px;object-fit:cover;border:1px solid var(--line);background:var(--panel2)" onerror="this.style.display=&quot;none&quot;"><div><div class="global-name">'+name+'</div><div class="global-sub">'+category+' • Profil '+n(b.profile_views)+' • QR '+n(b.qr_scans)+' • NFC '+n(b.nfc_scans)+'</div></div></div><button class="btn primary" onclick="openBusinessAnalytics('+Number(b.id)+')">Analytics\'i Aç ›</button></div></div>';
+    }).join(""):'<div class="empty">İşletme bulunamadı.</div>';
+    showGlobalPage("Analytics","Merkezi analiz alanı.",'<section class="card biz-section"><div class="global-row"><div><h3>Analytics Merkezi</h3><div class="sub">Bir işletme seçerek detaylı performans, QR, NFC ve etkileşim analizini aç.</div></div></div><div class="global-grid" style="margin-top:15px">'+cards+'</div></section>');
+  }catch(e){showGlobalPage("Analytics","Merkezi analiz alanı.",'<div class="global-card"><div class="empty">'+esc(e.message||"Analytics yüklenemedi.")+'</div></div>')}
+}
+async function openBusinessAnalytics(id){
+  await openBusiness(id);
+  const b=document.querySelector('[data-tab="analytics"]');
+  if(b)switchBizTab("analytics",b);
+  window.scrollTo(0,0);
+}
+function setActive(btn){document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));if(btn)btn.classList.add("active")}
 function openModal(){document.getElementById("modalBg").classList.add("show")}
 function closeModal(){document.getElementById("modalBg").classList.remove("show")}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2800)}
@@ -518,7 +546,7 @@ function renderBusinessPage(){
   document.getElementById("businessHero").innerHTML=`
     <div class="business-hero">
       <div class="business-hero-left">
-        <img class="business-hero-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'">
+        <img class="business-hero-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display=&quot;none&quot;">
         <div><div class="eyebrow">İŞLETME YÖNETİMİ</div><h2>${esc(b.name||"İsimsiz")}</h2><p>${esc(b.category||"—")} • /p/${esc(b.slug||"")}</p></div>
       </div>
       <div class="hero-actions">
