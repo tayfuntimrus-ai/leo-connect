@@ -6642,11 +6642,13 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
   const esc2=v=>String(v??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
   let settings={allowed_platforms:{},social_links:{},custom_links:[]};
 
+  let settingsLoaded=false;
   async function loadSettings(){
     try{
-      const data=await api('/api/business-v2-settings');
-      if(data&&!data.error){settings=data;window.leoProfileSettings=data;renderConnections();}
-    }catch(e){console.warn('Profile connection settings:',e)}
+      const data=await api('/api/business-v2-settings?fresh='+Date.now(),{cache:'no-store'});
+      if(data&&!data.error){settings={...data,allowed_platforms:(data.allowed_platforms&&typeof data.allowed_platforms==='object')?data.allowed_platforms:{}};window.leoProfileSettings=settings;settingsLoaded=true;renderConnections();return true;}
+      throw new Error(data?.error||'Profil ayarları alınamadı');
+    }catch(e){settingsLoaded=false;console.warn('Profile connection settings:',e);const panel=document.getElementById('profileConnectionPanel');if(panel)panel.innerHTML='<div class="pcc-panel-head"><div><strong>Bağlantı izinleri alınamadı</strong><span>Lütfen tekrar deneyin.</span></div></div>';return false;}
   }
   function publicUrl(){
     return document.getElementById('headerProfile')?.href||'';
@@ -6669,10 +6671,10 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
       ${(settings.custom_links||[]).length?`<div style="margin-top:10px;display:grid;gap:6px">${settings.custom_links.map((x,i)=>`<div class="pcc-conn"><div class="pcc-conn-main"><div class="pcc-conn-icon">${esc2(x.icon||'🔗')}</div><div><strong>${esc2(x.title)}</strong><small>${esc2(x.url)}</small></div></div><button type="button" class="pcc-connect" onclick="removeProfileCustomLink(${i})">Sil</button></div>`).join('')}</div>`:''}
     `;
   }
-  window.openProfileGroup=function(group){
+  window.openProfileGroup=async function(group){
     const panel=document.getElementById('profileConnectionPanel'); if(!panel)return;
     panel.style.display='block';
-    if(group==='connections'){renderConnections();panel.scrollIntoView({behavior:'smooth',block:'center'});return;}
+    if(group==='connections'){panel.innerHTML='<div class="pcc-panel-head"><div><strong>Dijital Bağlantılar</strong><span>Admin izinleri kontrol ediliyor…</span></div></div>';panel.scrollIntoView({behavior:'smooth',block:'center'});const ok=await loadSettings();if(ok)renderConnections();return;}
     if(group==='info'){document.querySelector('#profile .form-grid')?.scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('name')?.focus();return;}
     if(group==='payment'){document.getElementById('iban')?.scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('iban')?.focus();return;}
     if(group==='appearance'){
@@ -6736,6 +6738,8 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
   if(typeof originalLoad==='function'){
     window.load=async function(){await originalLoad.apply(this,arguments);await loadSettings();const p=document.getElementById('pccPublicProfile');const h=document.getElementById('headerProfile');if(p&&h)p.href=h.href;};
   }
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadSettings();});
+  window.addEventListener('focus',()=>loadSettings());
 })();
 </script>
 
