@@ -784,7 +784,7 @@ function renderBizPermissions(){
       <div class="sub">İşletmenin tema değiştirme hakkını ve hangi dijital bağlantı türlerinin kullanılabileceğini buradan belirle.</div>
       <div class="permission-grid" style="margin-top:14px">
         <div class="permission-card"><div><strong>Tema Değiştirme</strong><span>İşletme panelinde 4 tema arasından seçim yapabilsin</span></div><label class="switch"><input id="perm_profile_theme" type="checkbox" ${currentBusinessV2Settings?.theme_permission!==false?'checked':''}><span class="slider"></span></label></div>
-        ${[['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['youtube','YouTube'],['linkedin','LinkedIn'],['x','X'],['whatsapp','WhatsApp'],['google','Google'],['website','Website']].map(([k,l])=>`<div class="permission-card"><div><strong>${l}</strong><span>Profil bağlantısı olarak kullanılabilsin</span></div><label class="switch"><input id="perm_social_${k}" type="checkbox" ${currentBusinessV2Settings?.allowed_platforms?.[k]!==false?'checked':''}><span class="slider"></span></label></div>`).join('')}
+        ${[['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['youtube','YouTube'],['linkedin','LinkedIn'],['x','X'],['whatsapp','WhatsApp'],['google','Google'],['website','Website'],['yemeksepeti','Yemeksepeti'],['getir','Getir'],['trendyol-yemek','Trendyol Yemek'],['migros-yemek','Migros Yemek'],['rezervasyon','Rezervasyon'],['bilet','Bilet / Etkinlik'],['menu','Online Menü'],['location','Konum'],['tripadvisor','Tripadvisor'],['booking','Booking'],['telegram','Telegram'],['email','E-posta']].map(([k,l])=>`<div class="permission-card"><div><strong>${l}</strong><span>Profil bağlantısı olarak kullanılabilsin</span></div><label class="switch"><input id="perm_social_${k}" type="checkbox" ${currentBusinessV2Settings?.allowed_platforms?.[k]!==false?'checked':''}><span class="slider"></span></label></div>`).join('')}
       </div>
       <div style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)">
         <div style="font-size:11px;font-weight:800">İşletmenin Aktif Teması</div>
@@ -824,7 +824,7 @@ async function saveBusinessV2ProfilePermissions(){
   if(!currentBusiness)return;
   try{
     const allowed={};
-    ['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google','website'].forEach(k=>allowed[k]=document.getElementById('perm_social_'+k)?.checked!==false);
+    ['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google','website','yemeksepeti','getir','trendyol-yemek','migros-yemek','rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email'].forEach(k=>allowed[k]=document.getElementById('perm_social_'+k)?.checked!==false);
     const themeAllowed=document.getElementById('perm_profile_theme')?.checked!==false;
     const d=await api("/api/admin/business/"+currentBusiness.id+"/theme-permission",{method:"PUT",body:JSON.stringify({allowed:themeAllowed})});
     const s=await api("/api/admin/business/"+currentBusiness.id+"/social-platform-permissions",{method:"PUT",body:JSON.stringify({allowed_platforms:allowed})});
