@@ -2487,32 +2487,105 @@ main{
 </style>
 
 
-<style id="leo-business-center-final">
-/* LEO CONNECT BUSINESS CENTER FINAL — V1 CORE + ADMIN STYLE NAV */
-.bc-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 22px;padding:10px;border:1px solid var(--border,#2b2b2b);border-radius:18px;background:#101010;position:sticky;top:8px;z-index:50;box-shadow:0 12px 35px rgba(0,0,0,.22)}
-.bc-nav button{border:1px solid #292929;background:#151515;color:#999;border-radius:12px;padding:12px 10px;font:inherit;font-size:11px;font-weight:900;cursor:pointer;transition:.18s}
-.bc-nav button:hover,.bc-nav button.active{background:linear-gradient(135deg,#c59a52,#9e7738);border-color:#c59a52;color:#fff;transform:translateY(-1px)}
-.bc-nav button .bc-icon{display:block;font-size:18px;margin-bottom:4px}.bc-nav button small{display:block;font-size:8px;opacity:.7;margin-top:2px}
-.bc-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}.bc-section-title h2{margin:0}.bc-section-title span{color:#777;font-size:10px}
-.bc-tool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}.bc-tool{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid #292929;border-radius:15px;background:#101010;cursor:pointer;text-align:left;color:#eee}.bc-tool:hover{border-color:#c59a5266;background:#14120e}.bc-tool-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#1b1710;border:1px solid #c59a5238;font-size:19px;flex:none}.bc-tool strong{display:block;font-size:11px}.bc-tool span{display:block;margin-top:4px;color:#777;font-size:9px;line-height:1.4}
-.bc-settings{margin:0 0 18px;padding:18px;border:1px solid #292929;border-radius:18px;background:#101010}.bc-theme-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.bc-theme{padding:13px;border:1px solid #2b2b2b;border-radius:13px;background:#0d0d0d;color:#eee;cursor:pointer;text-align:left}.bc-theme.active{border-color:#c59a52;box-shadow:0 0 0 1px #c59a52 inset}.bc-theme strong{display:block;font-size:10px}.bc-theme span{display:block;color:#777;font-size:8px;margin-top:4px}.bc-theme-dot{width:28px;height:28px;border-radius:9px;margin-bottom:8px;border:1px solid #444}.bc-social-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.bc-social{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px;border:1px solid #292929;border-radius:12px;background:#0d0d0d}.bc-social strong{font-size:10px}.bc-social small{display:block;color:#666;font-size:8px;margin-top:3px}.bc-social button{border:1px solid #4a3a20;background:#17130d;color:#d7b56d;border-radius:9px;padding:7px 9px;font-size:8px;font-weight:900;cursor:pointer}
-body.bc-overview #profile,body.bc-overview #digital,body.bc-overview #performanceSection,body.bc-overview #liveSection,body.bc-overview #aiSection,body.bc-overview #profileDesign,body.bc-overview #reviewSection,body.bc-overview #campaignSection,body.bc-overview #bcProfileExtras{display:none!important}
-body.bc-profile .profile-hero,body.bc-profile .health,body.bc-profile .stats,body.bc-profile #businessAnalyticsV3,body.bc-profile .quick-grid,body.bc-profile #digital,body.bc-profile #performanceSection,body.bc-profile #liveSection,body.bc-profile #aiSection,body.bc-profile #reviewSection,body.bc-profile #campaignSection{display:none!important}
-body.bc-digital .profile-hero,body.bc-digital .health,body.bc-digital .stats,body.bc-digital #businessAnalyticsV3,body.bc-digital .quick-grid,body.bc-digital #profile,body.bc-digital #performanceSection,body.bc-digital #liveSection,body.bc-digital #aiSection,body.bc-digital #profileDesign,body.bc-digital #reviewSection,body.bc-digital #campaignSection,body.bc-digital #bcProfileExtras{display:none!important}
-body.bc-campaigns .profile-hero,body.bc-campaigns .health,body.bc-campaigns .stats,body.bc-campaigns #businessAnalyticsV3,body.bc-campaigns .quick-grid,body.bc-campaigns #profile,body.bc-campaigns #digital,body.bc-campaigns #performanceSection,body.bc-campaigns #liveSection,body.bc-campaigns #aiSection,body.bc-campaigns #profileDesign,body.bc-campaigns #reviewSection,body.bc-campaigns #bcProfileExtras{display:none!important}
-body.bc-stats .profile-hero,body.bc-stats .health,body.bc-stats .stats,body.bc-stats #businessAnalyticsV3,body.bc-stats .quick-grid,body.bc-stats #profile,body.bc-stats #digital,body.bc-stats #profileDesign,body.bc-stats #reviewSection,body.bc-stats #campaignSection,body.bc-stats #bcProfileExtras{display:none!important}
-body.bc-stats #performanceSection,body.bc-stats #liveSection,body.bc-stats #aiSection{display:block!important}
-body.bc-profile #profile,body.bc-profile #profileDesign,body.bc-profile #bcProfileExtras{display:block!important}
-body.bc-digital #digital{display:block!important}
-body.bc-campaigns #campaignSection{display:block!important}
-@media(max-width:820px){.bc-nav{grid-template-columns:repeat(2,1fr);position:static}.bc-tool-grid,.bc-social-grid{grid-template-columns:1fr}.bc-theme-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.bc-nav{grid-template-columns:1fr 1fr}.bc-nav button{padding:10px 7px}.bc-theme-grid{grid-template-columns:1fr}}
+<style id="leo-business-final-ui">
+:root{--bc-bg:#080a0f;--bc-panel:#10141c;--bc-panel2:#0d1118;--bc-line:#202733;--bc-gold:#d6aa55;--bc-gold2:#f0c979;--bc-text:#f5f7fb;--bc-muted:#8b93a1;--bc-green:#46d88a;--bc-blue:#5ea7ff;--bc-purple:#a678ff}
+html{scroll-behavior:smooth}body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 75% -10%,rgba(214,170,85,.10),transparent 34%),radial-gradient(circle at 10% 30%,rgba(94,167,255,.05),transparent 28%);z-index:-1}
+/* Admin-style shell */
+.bc-sidebar{position:fixed;z-index:1000;left:0;top:0;bottom:0;width:248px;padding:22px 16px;background:linear-gradient(180deg,#0a0d13,#080a0f);border-right:1px solid var(--bc-line);display:flex;flex-direction:column;gap:18px}
+.bc-brand{display:flex;align-items:center;gap:11px;padding:4px 7px 15px;border-bottom:1px solid var(--bc-line)}
+.bc-brand-mark{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#17130b,#0d0f14);border:1px solid #8f6b2c;color:var(--bc-gold2);font-size:22px;box-shadow:0 8px 24px #0008}
+.bc-brand strong{font-size:14px;letter-spacing:.04em}.bc-brand span{display:block;color:var(--bc-gold2);font-size:9px;letter-spacing:.16em;margin-top:3px}
+.bc-nav{display:flex;flex-direction:column;gap:6px}.bc-nav button{width:100%;border:1px solid transparent;background:transparent;color:#aeb5c0;padding:12px 13px;border-radius:11px;display:flex;align-items:center;gap:12px;text-align:left;font:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:.16s}.bc-nav button:hover{background:#111722;color:#fff;border-color:#1f2733}.bc-nav button.active{background:linear-gradient(135deg,#c99b43,#8f6828);color:#fff;border-color:#d6aa55;box-shadow:0 8px 22px #b47f281f}.bc-nav .ico{width:23px;text-align:center;font-size:16px}
+.bc-divider{height:1px;background:var(--bc-line);margin:2px 4px}.bc-side-quick{margin-top:auto;border:1px solid #242b36;background:#0d1118;border-radius:13px;padding:12px}.bc-side-quick strong{font-size:10px;letter-spacing:.08em}.bc-side-quick button{display:block;width:100%;margin-top:8px;padding:9px 10px;border-radius:9px;border:1px solid #272e39;background:#111722;color:#cbd1da;text-align:left;font:inherit;font-size:10px;cursor:pointer}.bc-side-quick button:hover{border-color:#80632f;color:#fff}
+.bc-main-shell{margin-left:248px;min-height:100vh}.bc-topbar{height:72px;position:sticky;top:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(8,10,15,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--bc-line)}.bc-top-left small{display:block;color:var(--bc-gold2);font-size:9px;letter-spacing:.15em;font-weight:900}.bc-top-left strong{display:block;font-size:18px;margin-top:4px}.bc-top-actions{display:flex;gap:8px;align-items:center}.bc-top-btn{border:1px solid #28303b;background:#10151d;color:#d9dee6;border-radius:10px;padding:9px 12px;font:inherit;font-size:10px;font-weight:800;text-decoration:none;cursor:pointer}.bc-top-btn.gold{background:linear-gradient(135deg,#c99b43,#8f6828);border-color:#d6aa55;color:#fff}
+.bc-main-shell main{max-width:none;margin:0;padding:24px 28px 50px}.bc-main-shell .page-head{margin-bottom:18px}.bc-main-shell .command-bar,.bc-main-shell .access-strip{display:none!important}
+.bc-view{display:none}.bc-view.active{display:block}.bc-view-overview.active{display:block}
+.bc-section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:4px 0 16px}.bc-section-title h1{margin:0;font-size:25px}.bc-section-title p{margin:5px 0 0;color:var(--bc-muted);font-size:11px}.bc-section-title .bc-live{color:var(--bc-green);font-size:10px;font-weight:900}
+/* Restyle existing V1 blocks */
+.bc-main-shell .profile-hero,.bc-main-shell .health,.bc-main-shell .stats,.bc-main-shell .box,.bc-main-shell .feature-box,.bc-main-shell .analytics-v3,.bc-main-shell .performance{border-color:var(--bc-line)!important;background:linear-gradient(145deg,#11161f,#0d1118)!important;box-shadow:0 16px 45px #00000022}
+.bc-main-shell .profile-hero{border-radius:16px!important}.bc-main-shell .box,.bc-main-shell .feature-box,.bc-main-shell .analytics-v3{border-radius:15px!important}.bc-main-shell .stat{border-color:#232b37!important;background:#10151d!important;border-radius:13px!important}.bc-main-shell .quick{border-color:#27303b!important;background:#10151d!important;border-radius:13px!important;transition:.16s}.bc-main-shell .quick:hover{transform:translateY(-2px);border-color:#8a682f!important;background:#131a23!important}.bc-main-shell .quick-grid{margin-bottom:18px}
+.bc-main-shell .box-head h2,.bc-main-shell .analytics-head h2{font-size:17px}.bc-main-shell input,.bc-main-shell select,.bc-main-shell textarea{background:#0b0f15!important;border-color:#252e3a!important;color:#f2f4f8!important}.bc-main-shell label span,.bc-main-shell .design-field label,.bc-main-shell .field label{color:#aeb6c2}.bc-main-shell .feature-btn,.bc-main-shell .design-save-button{border-radius:9px!important}
+/* Overview command cards */
+.bc-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:16px}.bc-kpi{position:relative;overflow:hidden;padding:14px;border:1px solid var(--bc-line);border-radius:13px;background:linear-gradient(145deg,#111720,#0d1118)}.bc-kpi:after{content:"";position:absolute;right:-25px;bottom:-30px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,#d6aa5520,transparent 65%)}.bc-kpi small{display:block;color:#89919e;font-size:8px;font-weight:900;letter-spacing:.1em}.bc-kpi strong{display:block;font-size:23px;margin:8px 0 3px}.bc-kpi span{font-size:9px;color:#6f7784}
+.bc-actions-panel{border:1px solid var(--bc-line);border-radius:15px;background:#0f141c;padding:17px;margin-bottom:16px}.bc-actions-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.bc-actions-head strong{font-size:12px}.bc-actions-head span{color:#707987;font-size:9px}.bc-action-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.bc-action{min-height:90px;border:1px solid #242d39;border-radius:12px;background:#111720;color:#e8ebf0;text-decoration:none;padding:13px;cursor:pointer;text-align:left}.bc-action:hover{border-color:#86652f;background:#151b24}.bc-action .aico{font-size:20px;margin-bottom:9px}.bc-action strong{display:block;font-size:10px}.bc-action span{display:block;color:#737c89;font-size:8px;margin-top:4px;line-height:1.4}
+.bc-overview-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.bc-overview-card{border:1px solid var(--bc-line);border-radius:15px;background:#0f141c;padding:17px}.bc-overview-card h3{margin:0 0 13px;font-size:12px}.bc-overview-card .bc-mini-link{float:right;color:var(--bc-gold2);font-size:9px;cursor:pointer}.bc-health-mini{display:grid;grid-template-columns:90px 1fr;gap:16px;align-items:center}.bc-score{width:82px;height:82px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--bc-gold) 0deg,var(--bc-gold) var(--score,0deg),#252b34 var(--score,0deg),#252b34 360deg);position:relative}.bc-score:after{content:"";position:absolute;inset:7px;border-radius:50%;background:#0f141c}.bc-score strong{position:relative;z-index:2;font-size:19px}.bc-health-mini strong{font-size:13px}.bc-health-mini p{font-size:9px;color:#737c89;line-height:1.5}.bc-health-mini .bc-progress{height:7px;background:#252b34;border-radius:99px;overflow:hidden}.bc-health-mini .bc-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#a47732,#e0bd7b);border-radius:99px}
+.bc-list{display:flex;flex-direction:column;gap:8px}.bc-list-item{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid #222a35;background:#111720;border-radius:10px}.bc-list-item .li-ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#18202b;font-size:14px}.bc-list-item strong{display:block;font-size:9px}.bc-list-item span{display:block;color:#737c89;font-size:8px;margin-top:3px}.bc-list-item .li-right{margin-left:auto;color:#bfc6cf;font-size:8px}
+/* section-specific wrappers */
+.bc-subnav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}.bc-subnav button{border:1px solid #252d38;background:#0e131a;color:#aeb6c1;border-radius:9px;padding:8px 11px;font:inherit;font-size:9px;font-weight:800;cursor:pointer}.bc-subnav button.active{border-color:#8a672f;color:#f1c96f;background:#17140e}
+.bc-mobile-nav{display:none}
+@media(max-width:1100px){.bc-kpis{grid-template-columns:repeat(3,1fr)}.bc-action-grid{grid-template-columns:repeat(3,1fr)}.bc-overview-grid{grid-template-columns:1fr}}
+@media(max-width:820px){.bc-sidebar{width:210px}.bc-main-shell{margin-left:210px}.bc-topbar{padding:0 16px}.bc-main-shell main{padding:18px 16px 80px}.bc-kpis{grid-template-columns:repeat(2,1fr)}.bc-action-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.bc-sidebar{display:none}.bc-main-shell{margin-left:0}.bc-topbar{height:64px}.bc-top-left strong{font-size:15px}.bc-top-actions .bc-top-btn.site{display:none}.bc-mobile-nav{position:fixed;z-index:1100;display:grid;grid-template-columns:repeat(5,1fr);left:8px;right:8px;bottom:8px;padding:6px;background:rgba(13,17,24,.96);backdrop-filter:blur(16px);border:1px solid #2a313b;border-radius:15px;box-shadow:0 10px 35px #0009}.bc-mobile-nav button{border:0;background:transparent;color:#7f8793;font:inherit;font-size:8px;font-weight:800;padding:7px 3px;border-radius:9px}.bc-mobile-nav button.active{color:#fff;background:#5f451d}.bc-mobile-nav .mi{display:block;font-size:16px;margin-bottom:3px}.bc-kpis{grid-template-columns:1fr 1fr}.bc-action-grid{grid-template-columns:1fr 1fr}.bc-main-shell .page-head{display:none}.bc-health-mini{grid-template-columns:1fr}.bc-score{margin:auto}.bc-main-shell .profile-hero{margin-top:0}}
 </style>
-</head>
+<style id="leo-hide-legacy">#legacyBusinessMain{display:none!important}body>header{display:none!important}#legacyBusinessMain > .page-head,#legacyBusinessMain > .command-bar,#legacyBusinessMain > .access-strip{display:none!important}</style></head>
 
 
 
 <body>
+
+<!-- LEO CONNECT BUSINESS CENTER FINAL UI -->
+<aside class="bc-sidebar" id="bcSidebar">
+  <div class="bc-brand"><div class="bc-brand-mark">🦁</div><div><strong>LEO CONNECT</strong><span>BUSINESS CENTER</span></div></div>
+  <nav class="bc-nav">
+    <button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="ico">⌂</span>Genel Bakış</button>
+    <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="ico">👤</span>Profil</button>
+    <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="ico">▦</span>QR & NFC</button>
+    <button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="ico">🚀</span>Kampanyalar</button>
+    <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="ico">▥</span>İstatistikler</button>
+  </nav>
+  <div class="bc-divider"></div>
+  <div class="bc-side-quick"><strong>HIZLI İŞLEMLER</strong>
+    <button onclick="showBusinessSection('profile')">✎ Profil Düzenle</button>
+    <button onclick="showBusinessSection('digital')">▦ QR & NFC</button>
+    <button onclick="showBusinessSection('campaigns')">＋ Kampanya Oluştur</button>
+    <button onclick="showBusinessSection('stats')">▥ İstatistikleri Gör</button>
+  </div>
+</aside>
+<div class="bc-main-shell">
+  <div class="bc-topbar"><div class="bc-top-left"><small>LEO CONNECT • BUSINESS</small><strong id="bcTopTitle">Genel Bakış</strong></div><div class="bc-top-actions"><a id="bcProfileLink" class="bc-top-btn gold" target="_blank" rel="noopener">👁 Profili Gör</a><a href="/" class="bc-top-btn site">Site</a></div></div>
+  <div class="bc-view bc-view-overview active" data-view="overview">
+    <div class="bc-section-title"><div><h1>Genel Bakış</h1><p>İşletmenin dijital performansını tek ekrandan yönet.</p></div><div class="bc-live">● Sistem aktif</div></div>
+    <div class="bc-kpis">
+      <div class="bc-kpi"><small>PROFİL GÖRÜNTÜLEME</small><strong id="bcKpiProfile">0</strong><span>görüntülenme</span></div>
+      <div class="bc-kpi"><small>QR TARAMALARI</small><strong id="bcKpiQR">0</strong><span>tarama</span></div>
+      <div class="bc-kpi"><small>NFC DOKUNUŞLARI</small><strong id="bcKpiNFC">0</strong><span>dokunma</span></div>
+      <div class="bc-kpi"><small>WHATSAPP</small><strong id="bcKpiWA">0</strong><span>etkileşim</span></div>
+      <div class="bc-kpi"><small>TELEFON</small><strong id="bcKpiPhone">0</strong><span>tıklama</span></div>
+      <div class="bc-kpi"><small>TOPLAM</small><strong id="bcKpiTotal">0</strong><span>etkileşim</span></div>
+    </div>
+    <div class="bc-actions-panel"><div class="bc-actions-head"><strong>HIZLI İŞLEMLER</strong><span>En sık kullanılan işlemler</span></div><div class="bc-action-grid">
+      <button class="bc-action" onclick="showBusinessSection('profile')"><div class="aico">👤</div><strong>Profil Düzenle</strong><span>İşletme bilgilerini güncelle</span></button>
+      <button class="bc-action" onclick="showBusinessSection('digital')"><div class="aico">▦</div><strong>QR & NFC</strong><span>Kod ve bağlantıları yönet</span></button>
+      <button class="bc-action" onclick="showBusinessSection('campaigns')"><div class="aico">🚀</div><strong>Kampanya Oluştur</strong><span>Yeni kampanya yayınla</span></button>
+      <button class="bc-action" onclick="showBusinessSection('stats')"><div class="aico">▥</div><strong>İstatistikleri Gör</strong><span>Detaylı performansı incele</span></button>
+      <button class="bc-action" onclick="copyProfileLink()"><div class="aico">🔗</div><strong>Linki Kopyala</strong><span>Profil bağlantısını paylaş</span></button>
+    </div></div>
+    <div class="bc-overview-grid">
+      <div class="bc-overview-card"><h3>PROFİL SAĞLIK DURUMU <span class="bc-mini-link" onclick="showBusinessSection('profile')">Profili Düzenle →</span></h3><div class="bc-health-mini"><div id="bcScore" class="bc-score"><strong id="bcScoreText">0</strong></div><div><strong id="bcHealthTitle">Profil kontrol ediliyor</strong><p id="bcHealthMsg">Profil bilgileri analiz ediliyor...</p><div class="bc-progress"><i id="bcHealthFill"></i></div></div></div></div>
+      <div class="bc-overview-card"><h3>SON HAREKETLER <span class="bc-mini-link" onclick="showBusinessSection('stats')">Tümünü Gör →</span></h3><div id="bcLiveMini" class="bc-list"><div class="bc-list-item"><div class="li-ico">⏳</div><div><strong>Aktiviteler yükleniyor</strong><span>Canlı hareketler hazırlanıyor</span></div></div></div></div>
+    </div>
+  </div>
+  <div class="bc-view" data-view="profile">
+    <div class="bc-section-title"><div><h1>Profil</h1><p>İşletme bilgileri ve müşteri profilinin görünümünü yönet.</p></div></div>
+    <div class="bc-subnav"><button class="active" onclick="bcScrollTo('profile')">İşletme Bilgileri</button><button onclick="bcScrollTo('profileDesign')">Görünüm & Tema</button></div><div class="bc-actions-panel" style="margin-bottom:16px"><div class="bc-actions-head"><strong>GÖRÜNÜM & TEMA</strong><span>Profilinin müşteri tarafındaki görünümünü seç</span></div><div class="bc-action-grid" style="grid-template-columns:repeat(4,1fr)"><button class="bc-action" onclick="bcSelectTheme('midnight-gold')"><div class="aico">🌙</div><strong>Midnight Gold</strong><span>Siyah / altın premium</span></button><button class="bc-action" onclick="bcSelectTheme('obsidian')"><div class="aico">⬛</div><strong>Obsidian</strong><span>Ultra dark / tech</span></button><button class="bc-action" onclick="bcSelectTheme('champagne')"><div class="aico">🥂</div><strong>Champagne</strong><span>Sıcak lüks</span></button><button class="bc-action" onclick="bcSelectTheme('pure-light')"><div class="aico">☀️</div><strong>Pure Light</strong><span>Aydınlık premium</span></button></div></div>
+    <div id="bcProfileMount"></div><div id="bcDesignMount"></div>
+  </div>
+  <div class="bc-view" data-view="digital">
+    <div class="bc-section-title"><div><h1>QR & NFC</h1><p>Müşterilerin işletmene tek tarama veya tek dokunuşla ulaşsın.</p></div></div>
+    <div id="bcDigitalMount"></div>
+  </div>
+  <div class="bc-view" data-view="campaigns">
+    <div class="bc-section-title"><div><h1>Kampanyalar</h1><p>Smart Campaigns ile kampanyalarını tek merkezden yönet.</p></div><button class="bc-top-btn gold" type="button" onclick="openCampaignEditor()">＋ Yeni Kampanya</button></div>
+    <div id="bcCampaignMount"></div>
+  </div>
+  <div class="bc-view" data-view="stats">
+    <div class="bc-section-title"><div><h1>İstatistikler</h1><p>Performans, canlı hareketler, AI içgörüleri ve Review Booster.</p></div></div>
+    <div id="bcStatsMount"></div>
+  </div>
+</div>
+<div class="bc-mobile-nav"><button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="mi">⌂</span>Genel</button><button data-bc="profile" onclick="showBusinessSection('profile')"><span class="mi">👤</span>Profil</button><button data-bc="digital" onclick="showBusinessSection('digital')"><span class="mi">▦</span>QR/NFC</button><button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="mi">🚀</span>Kampanya</button><button data-bc="stats" onclick="showBusinessSection('stats')"><span class="mi">▥</span>İstatistik</button></div>
+
 
 
 
@@ -2593,7 +2666,7 @@ body.bc-campaigns #campaignSection{display:block!important}
 
 
 
-<main>
+<main id="legacyBusinessMain">
 
 
 
@@ -6514,49 +6587,43 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 
 
 
-<script id="leo-business-center-final-js">
+<script id="leo-business-final-js">
 (function(){
- const panels={overview:{label:'Genel Bakış',icon:'🏠'},profile:{label:'Profil',icon:'👤'},digital:{label:'QR & NFC',icon:'📱'},campaigns:{label:'Kampanyalar',icon:'🚀'},stats:{label:'İstatistikler',icon:'📊'}};
- function go(panel){
-   document.body.classList.remove('bc-overview','bc-profile','bc-digital','bc-campaigns','bc-stats');
-   document.body.classList.add('bc-'+panel);localStorage.setItem('leo_bc_panel',panel);
-   document.querySelectorAll('.bc-nav button').forEach(b=>b.classList.toggle('active',b.dataset.panel===panel));
-   window.scrollTo({top:0,behavior:'smooth'});
-   if(panel==='stats'&&typeof loadBusinessAnalytics==='function') loadBusinessAnalytics('7d');
-   if(panel==='digital'&&typeof createNFCUrl==='function') { try{createNFCUrl();}catch(e){} }
-   if(panel==='campaigns'&&typeof loadBusinessCampaigns==='function') loadBusinessCampaigns();
- }
- window.leoBusinessGo=go;
- function addNav(){
-   const head=document.querySelector('.page-head'); if(!head||document.querySelector('.bc-nav'))return;
-   const nav=document.createElement('nav');nav.className='bc-nav';
-   Object.entries(panels).forEach(([key,x])=>{const b=document.createElement('button');b.type='button';b.dataset.panel=key;b.innerHTML='<span class="bc-icon">'+x.icon+'</span>'+x.label; b.onclick=()=>go(key);nav.appendChild(b)});
-   head.insertAdjacentElement('afterend',nav);
-   const saved=localStorage.getItem('leo_bc_panel');go(panels[saved]?saved:'overview');
- }
- function addTools(){
-   const hero=document.querySelector('.profile-hero');if(!hero||document.querySelector('.bc-tool-grid'))return;
-   const wrap=document.createElement('div');wrap.className='bc-tool-grid';
-   const items=[['👤','Profil Bilgileri','İşletme bilgilerini düzenle','profile'],['🎨','Görünüm & Tema','Profil görünümünü yönet','profile'],['🔗','Dijital Bağlantılar','Sosyal hesap ve özel bağlantılar','profile'],['📱','QR Yönetimi','QR kodu görüntüle ve indir','digital'],['📡','NFC Yönetimi','NFC bağlantısını yönet','digital'],['🚀','Smart Campaigns','Kampanya oluştur ve düzenle','campaigns'],['📈','Detaylı İstatistik','Trafik ve dönüşümleri incele','stats'],['⚡','Canlı Hareketler','Son müşteri aksiyonlarını gör','stats'],['⭐','Review Booster','Yorum akışını yönet','overview']];
-   items.forEach(i=>{const b=document.createElement('button');b.className='bc-tool';b.type='button';b.onclick=()=>{if(i[1]==='Review Booster'){document.getElementById('reviewSection')?.scrollIntoView({behavior:'smooth'});return}go(i[3]);if(i[1]==='Görünüm & Tema')setTimeout(()=>document.getElementById('bcProfileExtras')?.scrollIntoView({behavior:'smooth'}),150);if(i[1]==='Dijital Bağlantılar')setTimeout(()=>document.getElementById('bcSocialGrid')?.scrollIntoView({behavior:'smooth'}),150)};b.innerHTML='<span class="bc-tool-icon">'+i[0]+'</span><span><strong>'+i[1]+'</strong><span>'+i[2]+'</span></span>';wrap.appendChild(b)});
-   hero.insertAdjacentElement('afterend',wrap);
- }
- function addProfileExtras(){
-   const profile=document.getElementById('profile');if(!profile||document.getElementById('bcProfileExtras'))return;
-   const el=document.createElement('div');el.id='bcProfileExtras';el.className='bc-settings';el.innerHTML=`<div class="bc-section-title"><div><h2>Görünüm & Dijital Bağlantılar</h2><span>İşletme profilinin müşteri tarafındaki görünümünü buradan yönet.</span></div></div><div class="bc-section-title"><div><h3>🎨 Tema</h3><span>Yalnızca yönetici izin verdiyse değiştirilebilir.</span></div></div><div class="bc-theme-grid" id="bcThemeGrid"></div><div class="bc-section-title" style="margin-top:20px"><div><h3>🔗 Hesap Bağlantıları</h3><span>URL yazmak yerine bağlantını ekle ve düzenle.</span></div></div><div class="bc-social-grid" id="bcSocialGrid"></div>`;
-   profile.appendChild(el);renderExtras();loadExtras();
- }
- const themes=[['midnight-gold','Midnight Gold','#111','#d7b56d'],['obsidian','Obsidian','#050505','#9fa8b3'],['champagne','Champagne','#21180e','#e3c58d'],['pure-light','Pure Light','#f5f2eb','#9a742c']];
- const socials=[['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['youtube','YouTube'],['linkedin','LinkedIn'],['x','X'],['whatsapp','WhatsApp'],['google','Google'],['website','Website']];
- function renderExtras(){
-   const tg=document.getElementById('bcThemeGrid'),sg=document.getElementById('bcSocialGrid');if(!tg||!sg)return;
-   const cur=window.leoBCSettings?.theme||'midnight-gold';tg.innerHTML=themes.map(t=>`<button type="button" class="bc-theme ${cur===t[0]?'active':''}" onclick="leoSetTheme('${t[0]}')"><div class="bc-theme-dot" style="background:${t[2]};box-shadow:inset 0 0 0 3px ${t[3]}55"></div><strong>${t[1]}</strong><span>${cur===t[0]?'Seçili tema':'Temayı kullan'}</span></button>`).join('');
-   const links=window.leoBCSettings?.social_links||{};sg.innerHTML=socials.map(x=>{const v=links[x[0]]?.url||'';return `<div class="bc-social"><div><strong>${x[1]}</strong><small>${v?'Bağlı':'Henüz bağlı değil'}</small></div><button type="button" onclick="leoConnect('${x[0]}')">${v?'Düzenle':'Hesabı Bağla'}</button></div>`}).join('');
- }
- async function loadExtras(){try{const r=await fetch('/api/business-v2-settings',{credentials:'include'});const d=await r.json();if(!d||d.error)return;window.leoBCSettings=d;renderExtras()}catch(e){console.warn(e)}}
- window.leoSetTheme=async function(theme){try{const r=await fetch('/api/business-theme',{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({theme})});const d=await r.json();if(!r.ok||d.error)throw Error(d.error||'Tema kaydedilemedi');window.leoBCSettings={...(window.leoBCSettings||{}),theme:d.theme||theme};renderExtras();document.body.dataset.theme=theme;if(typeof showToast==='function')showToast('Tema kaydedildi: '+theme)}catch(e){if(typeof showToast==='function')showToast(e.message)}};
- window.leoConnect=async function(type){const names=Object.fromEntries(socials);const old=window.leoBCSettings?.social_links?.[type]?.url||'';const value=prompt(names[type]+' bağlantısı',old);if(value===null)return;try{const links={...(window.leoBCSettings?.social_links||{})};links[type]={url:value.trim(),enabled:!!value.trim(),label:names[type]};const r=await fetch('/api/business-social-links',{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({social_links:links})});const d=await r.json();if(!r.ok||d.error)throw Error(d.error||'Bağlantı kaydedilemedi');window.leoBCSettings={...(window.leoBCSettings||{}),social_links:d.social_links||links};renderExtras();if(typeof showToast==='function')showToast(names[type]+' bağlantısı güncellendi.')}catch(e){if(typeof showToast==='function')showToast(e.message)}};
- window.addEventListener('load',()=>{addNav();addTools();addProfileExtras();});
+  const map={overview:{title:'Genel Bakış',ids:[]},profile:{title:'Profil',ids:['profile','profileDesign']},digital:{title:'QR & NFC',ids:['digital']},campaigns:{title:'Kampanyalar',ids:['campaignSection']},stats:{title:'İstatistikler',ids:['businessAnalyticsV3','performanceSection','liveSection','aiSection','reviewSection']}};
+  window.showBusinessSection=function(name){
+    const cfg=map[name]||map.overview;
+    document.querySelectorAll('.bc-view').forEach(v=>v.classList.toggle('active',v.dataset.view===name));
+    document.querySelectorAll('[data-bc]').forEach(b=>b.classList.toggle('active',b.dataset.bc===name));
+    document.querySelectorAll('.bc-main-shell main > section,.bc-main-shell main > .box,.bc-main-shell main > .feature-box,.bc-main-shell main > .analytics-v3,.bc-main-shell main > .performance').forEach(el=>{
+      const id=el.id||'';
+      el.dataset.bcOriginalDisplay=el.dataset.bcOriginalDisplay||el.style.display||'';
+      el.style.display='none';
+    });
+    // Move original working V1 sections into the correct V2 view containers without cloning.
+    cfg.ids.forEach(id=>{const el=document.getElementById(id); if(el){el.style.display=el.dataset.bcOriginalDisplay||''; const mount=document.getElementById(name==='profile'?(id==='profile'?'bcProfileMount':'bcDesignMount'):name==='digital'?'bcDigitalMount':name==='campaigns'?'bcCampaignMount':'bcStatsMount'); if(mount && el.parentElement!==mount) mount.appendChild(el);}});
+    document.getElementById('bcTopTitle').textContent=cfg.title;
+    window.scrollTo({top:0,behavior:'smooth'});
+    if(name==='digital' && typeof loadQR==='function'){try{loadQR()}catch(e){}}
+    if(name==='campaigns' && typeof loadBusinessCampaigns==='function'){try{loadBusinessCampaigns()}catch(e){}}
+    if(name==='stats'){try{if(typeof loadBusinessAnalytics==='function')loadBusinessAnalytics('7d');if(typeof loadBusinessLive==='function')loadBusinessLive();if(typeof loadAIInsights==='function')loadAIInsights('7d');if(typeof loadReviewBooster==='function')loadReviewBooster()}catch(e){}}
+  };
+  window.bcScrollTo=function(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});};
+  window.bcSelectTheme=function(theme){const sel=document.getElementById('design_theme');if(!sel)return;sel.value=theme;sel.dispatchEvent(new Event('change',{bubbles:true}));const save=document.querySelector('#profileDesign .design-save-button, #profileDesign button[type=submit]');if(typeof updateDesignPreview==='function')updateDesignPreview();if(save)save.click();};
+  function syncKpis(){
+    const pairs=[['profileViews','bcKpiProfile'],['qrViews','bcKpiQR'],['nfcViews','bcKpiNFC'],['whatsappViews','bcKpiWA'],['phoneViews','bcKpiPhone'],['totalViews','bcKpiTotal']];
+    pairs.forEach(([a,b])=>{const x=document.getElementById(a),y=document.getElementById(b);if(x&&y)y.textContent=x.textContent||'0';});
+    const hs=document.getElementById('healthScore'), ht=document.getElementById('healthTitle'), hm=document.getElementById('healthMessage'), hf=document.getElementById('healthFill');
+    if(hs){document.getElementById('bcScoreText').textContent=hs.textContent||'0';const n=Number(hs.textContent)||0;document.getElementById('bcScore').style.setProperty('--score',(n*3.6)+'deg');document.getElementById('bcHealthFill').style.width=n+'%';}
+    if(ht)document.getElementById('bcHealthTitle').textContent=ht.textContent; if(hm)document.getElementById('bcHealthMsg').textContent=hm.textContent;
+  }
+  function syncLive(){const src=document.getElementById('liveActivityList'),dst=document.getElementById('bcLiveMini');if(!src||!dst)return;const items=[...src.querySelectorAll('.feature-item')].slice(0,5);if(!items.length)return;dst.innerHTML=items.map(x=>`<div class="bc-list-item"><div class="li-ico">⚡</div><div><strong>${x.querySelector('strong')?.textContent||'Aktivite'}</strong><span>Son hareket</span></div><div class="li-right">●</div></div>`).join('');}
+  function boot(){
+    const profileLink=document.getElementById('headerProfile');const topLink=document.getElementById('bcProfileLink');if(profileLink&&topLink){const obs=new MutationObserver(()=>{if(profileLink.href)topLink.href=profileLink.href});obs.observe(profileLink,{attributes:true,attributeFilter:['href']});if(profileLink.href)topLink.href=profileLink.href;}
+    setInterval(()=>{syncKpis();syncLive();},700);
+    // Keep original V1 main functions alive; only reorganize their existing DOM.
+    showBusinessSection('overview');
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
 </body>
