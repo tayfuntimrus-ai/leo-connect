@@ -2391,6 +2391,32 @@ main{
   .design-field.full{grid-column:auto}
 }
 
+
+.review-grid{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:16px;
+}
+.review-preview{
+  min-height:270px;
+  padding:26px 20px;
+  border-radius:18px;
+  border:1px solid #c59a5240;
+  background:radial-gradient(circle at 80% 0%,#c59a5225,transparent 45%),#0a0a0a;
+  text-align:center;
+}
+.review-preview-icon{
+  width:48px;height:48px;margin:0 auto 12px;
+  display:grid;place-items:center;border-radius:15px;
+  border:1px solid #c59a5260;color:#e0bd7b;font-size:22px;
+}
+.review-preview-title{font-size:17px;font-weight:900}
+.review-preview-text{margin-top:8px;color:#888;font-size:10px;line-height:1.6}
+.review-stars{margin-top:22px;font-size:28px;letter-spacing:3px;color:#e0bd7b}
+.review-preview-note{margin-top:15px;color:#555;font-size:8px}
+.live-inline{margin-left:8px;color:#45c27a;font-size:9px;font-weight:900}
+@media(max-width:820px){.review-grid{grid-template-columns:1fr}}
+
 </style>
 
 </head>
@@ -3371,6 +3397,89 @@ main{
     </div>
   </div>
 </section>
+
+
+<!-- ==================================================
+     V2 — REVIEW BOOSTER
+================================================== -->
+<section id="reviewBooster" class="box">
+  <div class="box-head">
+    <div>
+      <div class="eyebrow">V2 • REVIEW BOOSTER</div>
+      <h2>⭐ Review Booster</h2>
+      <p>Memnun müşteriyi Google yorumuna yönlendir, sorun yaşayan müşteriyi doğrudan işletmene getir.</p>
+    </div>
+    <div class="design-badge">V2 ACTIVE</div>
+  </div>
+
+  <div class="review-grid">
+    <div>
+      <div class="design-grid">
+        <div class="design-field full">
+          <label>DURUM</label>
+          <div class="design-toggle">
+            <span>Review Booster'ı müşterilere göster</span>
+            <label class="switch">
+              <input id="review_enabled" type="checkbox" onchange="updateReviewPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="design-field full">
+          <label>BAŞLIK</label>
+          <input id="review_title" maxlength="160" oninput="updateReviewPreview()" placeholder="Deneyimini bizimle paylaş">
+        </div>
+
+        <div class="design-field full">
+          <label>AÇIKLAMA</label>
+          <textarea id="review_text" maxlength="500" oninput="updateReviewPreview()" placeholder="Memnun kaldıysan Google'da bizi değerlendir..."></textarea>
+        </div>
+
+        <div class="design-field">
+          <label>GOOGLE'A YÖNLENDİRME PUANI</label>
+          <select id="review_threshold" onchange="updateReviewPreview()">
+            <option value="3">3 ve üzeri</option>
+            <option value="4">4 ve üzeri</option>
+            <option value="5">5 yıldız</option>
+          </select>
+        </div>
+
+        <div class="design-field">
+          <label>MEMNUNİYETSİZ BAŞLIK</label>
+          <input id="review_low_title" maxlength="160" oninput="updateReviewPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>MEMNUNİYETSİZ MESAJ</label>
+          <textarea id="review_low_text" maxlength="500" oninput="updateReviewPreview()"></textarea>
+        </div>
+      </div>
+
+      <div class="design-save-row">
+        <button id="reviewSaveButton" class="design-save-button" onclick="saveReviewBooster()" type="button">✓ Review Booster'ı Kaydet</button>
+        <div id="reviewMessage"></div>
+      </div>
+    </div>
+
+    <div class="design-preview-box">
+      <div class="design-preview-head">
+        <div>
+          <strong>Canlı önizleme</strong>
+          <span class="live-inline">● CANLI</span>
+        </div>
+      </div>
+      <div id="reviewPreview" class="review-preview">
+        <div class="review-preview-icon">★</div>
+        <div class="review-preview-title">Deneyimini bizimle paylaş</div>
+        <div class="review-preview-text">Memnun kaldıysan Google’da bizi değerlendir.</div>
+        <div class="review-stars">☆ ☆ ☆ ☆ ☆</div>
+        <div class="review-preview-note">Puanını seçtiğinde uygun yönlendirme açılır.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 <!-- ==================================================
      DIGITAL
@@ -5553,6 +5662,18 @@ async function load(){
     console.error("Profile design load error:", error);
   }
 
+  try{
+    const reviewBox = document.getElementById("reviewBooster");
+    if(currentBusiness?.permissions?.review === true){
+      if(reviewBox) reviewBox.style.display = "";
+      await loadReviewBooster();
+    }else{
+      if(reviewBox) reviewBox.style.display = "none";
+    }
+  }catch(error){
+    console.error("Review Booster load error:", error);
+  }
+
 
 
   /* TITLE */
@@ -6215,6 +6336,83 @@ function hideLoading(){
 
 }
 
+
+
+
+/* ==================================================
+   V2 — REVIEW BOOSTER
+================================================== */
+
+let reviewBooster = {
+  enabled:false,
+  title:"Deneyimini bizimle paylaş",
+  text:"Memnun kaldıysan Google’da bizi değerlendir. Bir sorun yaşadıysan doğrudan bize ulaş.",
+  threshold:4,
+  low_title:"Bunu duymak isteriz",
+  low_text:"Yaşadığın sorunu bize ilet, seninle ilgilenelim."
+};
+
+function updateReviewPreview(){
+  const title = document.getElementById("review_title")?.value?.trim() || "Deneyimini bizimle paylaş";
+  const text = document.getElementById("review_text")?.value?.trim() || "Memnun kaldıysan Google’da bizi değerlendir.";
+  const previewTitle = document.querySelector(".review-preview-title");
+  const previewText = document.querySelector(".review-preview-text");
+  const enabled = document.getElementById("review_enabled")?.checked === true;
+  if(previewTitle) previewTitle.textContent = enabled ? title : "Review Booster pasif";
+  if(previewText) previewText.textContent = enabled ? text : "Müşteri profilinde gösterilmez.";
+}
+
+function loadReviewIntoForm(data){
+  reviewBooster = {...reviewBooster, ...(data || {})};
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.value = v ?? ""; };
+  const check = (id,v) => { const el=document.getElementById(id); if(el) el.checked = v === true; };
+  check("review_enabled", reviewBooster.enabled);
+  set("review_title", reviewBooster.title);
+  set("review_text", reviewBooster.text);
+  set("review_threshold", String(reviewBooster.threshold || 4));
+  set("review_low_title", reviewBooster.low_title);
+  set("review_low_text", reviewBooster.low_text);
+  updateReviewPreview();
+}
+
+async function loadReviewBooster(){
+  if(!document.getElementById("reviewBooster")) return;
+  const result = await api("/api/business-review-booster");
+  if(result && !result.error) loadReviewIntoForm(result);
+  else if(result?.error){
+    const msg=document.getElementById("reviewMessage");
+    if(msg) msg.textContent=result.error;
+  }
+}
+
+async function saveReviewBooster(){
+  const button=document.getElementById("reviewSaveButton");
+  const message=document.getElementById("reviewMessage");
+  if(!button || !message) return;
+  const payload={
+    enabled:document.getElementById("review_enabled")?.checked === true,
+    title:document.getElementById("review_title")?.value?.trim() || "",
+    text:document.getElementById("review_text")?.value?.trim() || "",
+    threshold:Number(document.getElementById("review_threshold")?.value || 4),
+    low_title:document.getElementById("review_low_title")?.value?.trim() || "",
+    low_text:document.getElementById("review_low_text")?.value?.trim() || "",
+    success_title:reviewBooster.success_title || "Teşekkürler!",
+    success_text:reviewBooster.success_text || "Değerlendirmen bizim için çok değerli."
+  };
+  button.disabled=true;
+  button.textContent="Kaydediliyor...";
+  const result=await api("/api/business-review-booster",{method:"PUT",body:JSON.stringify(payload)});
+  if(result && !result.error){
+    loadReviewIntoForm(result);
+    message.textContent="✓ Review Booster kaydedildi.";
+    showToast("Review Booster güncellendi.");
+  }else{
+    message.textContent=result?.error || "Kaydedilemedi.";
+    showToast("Review Booster kaydedilemedi.");
+  }
+  button.disabled=false;
+  button.textContent="✓ Review Booster'ı Kaydet";
+}
 
 
 /* ==================================================
