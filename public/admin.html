@@ -60,6 +60,18 @@ a{color:inherit;text-decoration:none}
 .tip{margin-top:16px;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:15px}.tip-left{display:flex;gap:11px;align-items:center}.tip-icon{font-size:23px}.tip strong{font-size:11px}.tip span{font-size:10px;color:var(--muted);display:block;margin-top:3px}
 .empty{padding:30px;text-align:center;color:var(--muted)}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(9px);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal-bg.show{display:flex}.modal{width:min(760px,100%);max-height:88vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 90px rgba(0,0,0,.5)}.modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-body{padding:20px}.close{border:0;background:transparent;color:var(--muted);font-size:22px}.detail-top{display:flex;gap:14px;align-items:center}.detail-logo{width:62px;height:62px;border-radius:15px;object-fit:cover;border:1px solid var(--line)}.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}.detail-box{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel2)}.detail-box small{color:var(--muted);display:block;font-size:9px;margin-bottom:4px}.detail-box strong{font-size:12px;word-break:break-word}.modal-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}
+
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.form-grid .full{grid-column:1/-1}
+.form-field label{display:block;font-size:9px;color:var(--muted);letter-spacing:1px;font-weight:800;margin:0 0 6px}
+.form-field input,.form-field select,.form-field textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--text);outline:none}
+.form-field textarea{min-height:82px;resize:vertical}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:rgba(var(--accent-rgb),.55)}
+.tag-row{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center}
+.analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:15px}
+.mini-stat{border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:13px}
+.mini-stat small{display:block;color:var(--muted);font-size:9px}.mini-stat strong{display:block;font-size:22px;color:var(--accent);margin-top:3px}
+@media(max-width:720px){.form-grid,.analytics-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.tag-row{grid-template-columns:1fr}}
 .toast{position:fixed;right:20px;bottom:20px;background:var(--panel);border:1px solid rgba(var(--accent-rgb),.4);box-shadow:var(--shadow);padding:12px 15px;border-radius:12px;font-size:11px;display:none;z-index:80}.toast.show{display:block}
 .login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 50% 10%,rgba(var(--accent-rgb),.10),transparent 38%),var(--bg)}.login-card{width:min(520px,100%);padding:35px;border:1px solid var(--line);background:var(--panel);border-radius:24px;box-shadow:var(--shadow)}.login-logo{text-align:center;font-size:45px}.login h2{text-align:center;letter-spacing:3px;margin:13px 0 4px}.login p{text-align:center;color:var(--muted);font-size:11px;margin:0 0 27px}.field{margin-bottom:13px}.field label{display:block;font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;margin-bottom:6px}.field input{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);outline:none}.field input:focus{border-color:rgba(var(--accent-rgb),.55)}.login .btn{width:100%;padding:13px;margin-top:4px}.error{color:var(--danger);font-size:11px;margin-top:10px;text-align:center;min-height:15px}
 @media(max-width:1100px){.app{grid-template-columns:78px 1fr}.sidebar{padding:18px 10px}.brand{justify-content:center}.brand div:last-child,.nav-title,.nav button span,.admin-card .admin-mail,.admin-card .online,.admin-card .admin-name{display:none}.nav button{justify-content:center}.admin-card{padding:10px}.admin-row{justify-content:center}.cards{grid-template-columns:repeat(2,1fr)}.grid-main{grid-template-columns:1fr}}
@@ -136,7 +148,7 @@ a{color:inherit;text-decoration:none}
         <section id="businessSection" class="card section">
           <div class="section-head">
             <div><div class="section-title">İşletmeler</div><div class="section-sub">İşletme detaylarına ve performansına buradan ulaş.</div></div>
-            <div class="search"><input id="businessSearch" placeholder="İşletme ara..." oninput="filterBusinesses()"><button class="btn primary" onclick="showToast('İşletme ekleme API desteği henüz mevcut değil.')">＋ İşletme Ekle</button></div>
+            <div class="search"><input id="businessSearch" placeholder="İşletme ara..." oninput="filterBusinesses()"><button class="btn primary" onclick="showToast('İşletme oluşturma API\'si henüz mevcut değil. Mevcut işletmeler tam yönetilebilir.')">＋ İşletme Ekle</button></div>
           </div>
           <div class="table-wrap"><table class="table"><thead><tr><th>İŞLETME</th><th>KATEGORİ</th><th>PROFİL</th><th>QR</th><th>NFC</th><th>ETİKET</th><th>İŞLEM</th></tr></thead><tbody id="businessRows"><tr><td colspan="7"><div class="empty">Yükleniyor…</div></td></tr></tbody></table></div>
         </section>
@@ -190,6 +202,7 @@ const API=location.origin;
 let adminToken=localStorage.getItem("admin_token")||"";
 let allBusinesses=[];
 let overview={};
+let currentBusiness=null;
 
 function authHeaders(){return adminToken?{"Authorization":"Bearer "+adminToken}:{}}
 async function api(path,options={}){
@@ -206,7 +219,12 @@ function adminLogin(){
   if(!email||!password){document.getElementById("loginError").textContent="E-posta ve şifre gerekli.";return;}
   fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password})})
     .then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"Giriş başarısız");return d})
-    .then(d=>{adminToken=d.token;localStorage.setItem("admin_token",adminToken);showApp();loadAll()})
+    .then(d=>{
+      adminToken=d.token;
+      localStorage.setItem("admin_token",adminToken);
+      localStorage.setItem("admin_email",email);
+      showApp();loadAll();
+    })
     .catch(e=>document.getElementById("loginError").textContent=e.message);
 }
 function showApp(){
@@ -222,11 +240,10 @@ async function loadAll(){
   if(!adminToken)return;
   try{
     const [ov,biz]=await Promise.all([api("/api/admin/overview"),api("/api/admin/businesses")]);
-    overview=ov||{};allBusinesses=biz.businesses||biz||[];
+    overview=ov||{};
+    allBusinesses=biz.businesses||biz||[];
     renderOverview();renderBusinesses();
-    const me=allBusinesses[0];
-    const stored=localStorage.getItem("admin_email");
-    document.getElementById("adminMail").textContent=stored||"Admin erişimi";
+    document.getElementById("adminMail").textContent=localStorage.getItem("admin_email")||"Admin erişimi";
   }catch(e){showToast(e.message)}
 }
 function n(v){return Number(v||0).toLocaleString("tr-TR")}
@@ -263,34 +280,66 @@ function filterBusinesses(){
 }
 function focusBusinesses(){document.getElementById("businessSection").scrollIntoView({behavior:"smooth",block:"start"})}
 function setActive(btn){document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}
+function openModal(){document.getElementById("modalBg").classList.add("show")}
+function closeModal(){document.getElementById("modalBg").classList.remove("show")}
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2800)}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+async function copyText(text){try{await navigator.clipboard.writeText(text);showToast("Kopyalandı.")}catch(e){showToast("Kopyalama başarısız.")}}
+
 async function openBusiness(id){
   try{
     const d=await api("/api/admin/business/"+id);
-    const b=d.business||d;
-    const tags=d.nfc_tags||[];
-    document.getElementById("modalTitle").textContent=b.name||"İşletme Detayı";
-    document.getElementById("modalBody").innerHTML=`
-      <div class="detail-top">
-        <img class="detail-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'">
-        <div><div style="font-size:20px;font-weight:800">${esc(b.name||"—")}</div><div style="color:var(--muted);font-size:11px;margin-top:4px">${esc(b.category||"—")} • /p/${esc(b.slug||"")}</div></div>
-      </div>
-      <div class="detail-grid">
-        <div class="detail-box"><small>PROFİL GÖRÜNTÜLEME</small><strong class="accent">${n(b.profile_views)}</strong></div>
-        <div class="detail-box"><small>QR TARAMA</small><strong class="accent">${n(b.qr_scans)}</strong></div>
-        <div class="detail-box"><small>NFC DOKUNUŞ</small><strong class="accent">${n(b.nfc_scans)}</strong></div>
-        <div class="detail-box"><small>TELEFON</small><strong>${n(b.phone_clicks)}</strong></div>
-        <div class="detail-box"><small>WHATSAPP</small><strong>${n(b.whatsapp_clicks)}</strong></div>
-        <div class="detail-box"><small>NFC ETİKET SAYISI</small><strong>${n(tags.length)}</strong></div>
-      </div>
-      <div class="modal-actions">
-        <button class="btn primary" onclick="showQR(${Number(id)})">QR'ı Gör</button>
-        <button class="btn" onclick="window.open('/p/${encodeURIComponent(b.slug||"")}','_blank')">Profili Aç ↗</button>
-        <a class="btn" href="/nfc-center">NFC Merkezi</a>
-        <button class="btn" onclick="showTags(${Number(id)},${JSON.stringify(tags).replace(/"/g,'&quot;')})">NFC Etiketleri (${tags.length})</button>
-      </div>`;
+    currentBusiness={...d.business,nfc_tags:d.nfc_tags||[]};
+    renderBusinessDetail();
     openModal();
   }catch(e){showToast(e.message)}
 }
+function renderBusinessDetail(){
+  const b=currentBusiness,tags=b.nfc_tags||[];
+  document.getElementById("modalTitle").textContent=b.name||"İşletme Detayı";
+  document.getElementById("modalBody").innerHTML=`
+    <div class="detail-top">
+      <img class="detail-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'">
+      <div><div style="font-size:20px;font-weight:800">${esc(b.name||"—")}</div><div style="color:var(--muted);font-size:11px;margin-top:4px">${esc(b.category||"—")} • /p/${esc(b.slug||"")}</div></div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-box"><small>PROFİL GÖRÜNTÜLEME</small><strong class="accent">${n(b.profile_views)}</strong></div>
+      <div class="detail-box"><small>QR TARAMA</small><strong class="accent">${n(b.qr_scans)}</strong></div>
+      <div class="detail-box"><small>NFC DOKUNUŞ</small><strong class="accent">${n(b.nfc_scans)}</strong></div>
+      <div class="detail-box"><small>TELEFON</small><strong>${n(b.phone_clicks)}</strong></div>
+      <div class="detail-box"><small>WHATSAPP</small><strong>${n(b.whatsapp_clicks)}</strong></div>
+      <div class="detail-box"><small>NFC ETİKET SAYISI</small><strong>${n(tags.length)}</strong></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn primary" onclick="showQR(${Number(b.id)})">QR'ı Gör</button>
+      <button class="btn" onclick="editBusiness(${Number(b.id)})">✎ Profili Düzenle</button>
+      <button class="btn" onclick="showBusinessAnalytics(${Number(b.id)})">⌁ Analytics</button>
+      <button class="btn" onclick="showBusinessNFC(${Number(b.id)})">◉ NFC Yönetimi</button>
+      <button class="btn" onclick="window.open('/p/${encodeURIComponent(b.slug||"")}','_blank')">Profili Aç ↗</button>
+    </div>
+    <div style="margin-top:20px;border-top:1px solid var(--line);padding-top:17px">
+      <div class="section-title" style="font-size:14px">NFC Etiketleri</div>
+      ${tags.length?tags.map(t=>tagCard(t)).join(""):'<div class="empty">Bu işletmede NFC etiketi yok.</div>'}
+      <div class="modal-actions"><button class="btn accent" onclick="newNFC(${Number(b.id)})">＋ NFC Etiketi Oluştur</button></div>
+    </div>`;
+}
+function tagCard(t){
+  const url=t.url||("/p/nfc/"+t.code);
+  return `<div class="detail-box" style="margin-top:9px">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+      <strong>${esc(t.name||"NFC Etiketi")}</strong><span class="badge">${t.is_active?"Aktif":"Pasif"}</span>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:7px">${esc(t.placement||"Konum belirtilmemiş")} • ${n(t.tap_count)} dokunuş${t.last_tap?" • Son: "+esc(new Date(t.last_tap).toLocaleString("tr-TR")):""}</div>
+    <div style="font-size:9px;color:var(--muted);margin-top:5px;word-break:break-all">${esc(url)}</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="copyText(${JSON.stringify(url)})">URL Kopyala</button>
+      <button class="btn" onclick="window.open(${JSON.stringify(url)},'_blank')">Test ↗</button>
+      <button class="btn" onclick="editNFC(${Number(t.id)})">Düzenle</button>
+      <button class="btn" onclick="deleteNFC(${Number(t.id)},${Number(currentBusiness.id)})">Sil</button>
+    </div>
+  </div>`;
+}
+async function showBusinessNFC(id){await openBusiness(id)}
 async function showQR(id){
   try{
     const d=await api("/api/admin/business/"+id+"/qr");
@@ -302,27 +351,123 @@ async function showQR(id){
         <div class="modal-actions" style="justify-content:center">
           <button class="btn primary" onclick="copyText(${JSON.stringify(d.url||"")})">URL Kopyala</button>
           <button class="btn" onclick="window.open(${JSON.stringify(d.url||"")} ,'_blank')">Profili Aç</button>
+          <button class="btn" onclick="openBusiness(${Number(id)})">← Detaya Dön</button>
         </div>
       </div>`;
     openModal();
   }catch(e){showToast(e.message)}
 }
-function showTags(id,tags){
-  document.getElementById("modalTitle").textContent="NFC Etiketleri";
-  if(!tags.length){document.getElementById("modalBody").innerHTML='<div class="empty">Bu işletmede NFC etiketi yok.</div>';openModal();return}
-  document.getElementById("modalBody").innerHTML=tags.map(t=>`
-    <div class="detail-box" style="margin-bottom:9px">
-      <div style="display:flex;justify-content:space-between;gap:10px"><strong>${esc(t.name||"NFC Etiketi")}</strong><span class="badge">${t.is_active?"Aktif":"Pasif"}</span></div>
-      <div style="font-size:10px;color:var(--muted);margin-top:7px">${esc(t.placement||"Konum belirtilmemiş")} • ${n(t.tap_count)} dokunuş</div>
-      <div style="font-size:9px;color:var(--muted);margin-top:5px;word-break:break-all">${esc(t.url||("/p/nfc/"+t.code))}</div>
-    </div>`).join("")+'<div class="modal-actions"><a class="btn primary" href="/nfc-center">NFC Merkezini Aç</a></div>';
+async function showBusinessAnalytics(id){
+  try{
+    const d=await api("/api/admin/business/"+id+"/analytics?period=all");
+    const a=d.analytics||d.events||d||{};
+    const rows=Array.isArray(a)?a:(
+      Object.entries(a).map(([type,count])=>({type,count}))
+    );
+    document.getElementById("modalTitle").textContent="Analytics";
+    document.getElementById("modalBody").innerHTML=`
+      <div class="section-sub">Tüm zamanlar • ${esc(currentBusiness?.name||"İşletme")}</div>
+      <div class="analytics-grid">
+        ${rows.length?rows.slice(0,12).map(x=>`<div class="mini-stat"><small>${esc(String(x.type||x.event_type||"EVENT").replaceAll("_"," ").toUpperCase())}</small><strong>${n(x.count??x.total??0)}</strong></div>`).join(""):'<div class="empty">Analytics verisi bulunamadı.</div>'}
+      </div>
+      <div class="modal-actions"><button class="btn" onclick="openBusiness(${Number(id)})">← İşletme Detayı</button></div>`;
+    openModal();
+  }catch(e){showToast(e.message)}
+}
+function editBusiness(id){
+  const b=currentBusiness;
+  document.getElementById("modalTitle").textContent="İşletme Profilini Düzenle";
+  const fields=[
+    ["name","İşletme Adı",b.name],["category","Kategori",b.category],["phone","Telefon",b.phone],
+    ["whatsapp","WhatsApp",b.whatsapp],["address","Adres",b.address],["instagram","Instagram",b.instagram],
+    ["tiktok","TikTok",b.tiktok],["google_review","Google Yorum",b.google_review],["website","Website",b.website],
+    ["menu","Menü",b.menu],["iban","IBAN",b.iban],["iban_holder","IBAN Sahibi",b.iban_holder],
+    ["hours","Çalışma Saatleri",b.hours],["logo_url","Logo URL",b.logo_url]
+  ];
+  document.getElementById("modalBody").innerHTML=`
+    <div class="form-grid">
+      ${fields.map(([k,l,v])=>`<div class="form-field"><label>${l}</label><input id="f_${k}" value="${esc(v||"")}"></div>`).join("")}
+      <div class="form-field full"><label>AÇIKLAMA</label><textarea id="f_description">${esc(b.description||"")}</textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn primary" onclick="saveBusiness(${Number(id)})">Değişiklikleri Kaydet</button>
+      <button class="btn" onclick="openBusiness(${Number(id)})">Vazgeç</button>
+    </div>
+    <div class="section-sub" style="margin-top:12px">Not: Mevcut slug korunur; işletmenin mevcut QR adresi değiştirilmez.</div>`;
+}
+async function saveBusiness(id){
+  const keys=["name","category","description","phone","whatsapp","address","instagram","tiktok","google_review","website","menu","iban","iban_holder","hours","logo_url"];
+  const body={};keys.forEach(k=>{const el=document.getElementById("f_"+k);if(el)body[k]=el.value.trim()});
+  try{
+    await api("/api/admin/business/"+id,{method:"PUT",body:JSON.stringify(body)});
+    showToast("İşletme güncellendi.");
+    await loadAll();await openBusiness(id);
+  }catch(e){showToast(e.message)}
+}
+function newNFC(businessId){
+  document.getElementById("modalTitle").textContent="Yeni NFC Etiketi";
+  document.getElementById("modalBody").innerHTML=`
+    <div class="form-grid">
+      <div class="form-field full"><label>ETİKET ADI</label><input id="n_name" placeholder="Örn. Masa 1"></div>
+      <div class="form-field full"><label>KONUM / YERLEŞİM</label><input id="n_placement" placeholder="Örn. Masa 1, Kasa, Menü"></div>
+    </div>
+    <div class="modal-actions"><button class="btn primary" onclick="createNFC(${Number(businessId)})">NFC Etiketi Oluştur</button><button class="btn" onclick="openBusiness(${Number(businessId)})">Vazgeç</button></div>`;
+}
+async function createNFC(businessId){
+  const name=document.getElementById("n_name").value.trim();
+  const placement=document.getElementById("n_placement").value.trim();
+  if(!name||!placement){showToast("Etiket adı ve konum gerekli.");return}
+  try{
+    const d=await api("/api/admin/nfc-tags",{method:"POST",body:JSON.stringify({business_id:businessId,name,placement})});
+    showToast("NFC etiketi oluşturuldu.");
+    if(d.url)await showCreatedNFC(d.url,d);
+    else await openBusiness(businessId);
+  }catch(e){showToast(e.message)}
+}
+async function showCreatedNFC(url,d){
+  document.getElementById("modalTitle").textContent="NFC Etiketi Hazır";
+  document.getElementById("modalBody").innerHTML=`
+    <div class="detail-box">
+      <small>NFC URL</small><strong style="display:block;word-break:break-all;margin-top:5px">${esc(url)}</strong>
+    </div>
+    <div class="modal-actions">
+      <button class="btn primary" onclick="copyText(${JSON.stringify(url)})">URL Kopyala</button>
+      <button class="btn" onclick="window.open(${JSON.stringify(url)},'_blank')">Test Et ↗</button>
+      ${currentBusiness?`<button class="btn" onclick="openBusiness(${Number(currentBusiness.id)})">İşletmeye Dön</button>`:""}
+    </div>`;
   openModal();
 }
-function openModal(){document.getElementById("modalBg").classList.add("show")}
-function closeModal(){document.getElementById("modalBg").classList.remove("show")}
-function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2600)}
-async function copyText(text){try{await navigator.clipboard.writeText(text);showToast("Kopyalandı.")}catch(e){showToast("Kopyalama başarısız.")}}
-function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+async function editNFC(id){
+  try{
+    const d=await api("/api/admin/nfc-tags/"+id);
+    const t=d.nfc_tag||d;
+    document.getElementById("modalTitle").textContent="NFC Etiketini Düzenle";
+    document.getElementById("modalBody").innerHTML=`
+      <div class="form-grid">
+        <div class="form-field full"><label>ETİKET ADI</label><input id="e_name" value="${esc(t.name||"")}"></div>
+        <div class="form-field full"><label>KONUM / YERLEŞİM</label><input id="e_placement" value="${esc(t.placement||"")}"></div>
+        <div class="form-field full"><label>DURUM</label><select id="e_active"><option value="true" ${t.is_active?"selected":""}>Aktif</option><option value="false" ${!t.is_active?"selected":""}>Pasif</option></select></div>
+      </div>
+      <div class="detail-box" style="margin-top:13px"><small>NFC URL</small><strong style="display:block;word-break:break-all;margin-top:5px">${esc(t.url||("/p/nfc/"+t.code))}</strong></div>
+      <div class="modal-actions"><button class="btn primary" onclick="saveNFC(${Number(id)},${Number(t.business_id||currentBusiness?.id||0)})">Kaydet</button><button class="btn" onclick="openBusiness(${Number(t.business_id||currentBusiness?.id||0)})">Vazgeç</button></div>`;
+    openModal();
+  }catch(e){showToast(e.message)}
+}
+async function saveNFC(id,businessId){
+  const body={name:document.getElementById("e_name").value.trim(),placement:document.getElementById("e_placement").value.trim(),is_active:document.getElementById("e_active").value==="true"};
+  if(!body.name||!body.placement){showToast("Etiket adı ve konum gerekli.");return}
+  try{
+    await api("/api/admin/nfc-tags/"+id,{method:"PUT",body:JSON.stringify(body)});
+    showToast("NFC etiketi güncellendi.");await loadAll();await openBusiness(businessId);
+  }catch(e){showToast(e.message)}
+}
+async function deleteNFC(id,businessId){
+  if(!confirm("Bu NFC etiketini silmek istediğine emin misin?"))return;
+  try{
+    await api("/api/admin/nfc-tags/"+id,{method:"DELETE"});
+    showToast("NFC etiketi silindi.");await loadAll();await openBusiness(businessId);
+  }catch(e){showToast(e.message)}
+}
 function toggleTheme(){
   document.body.classList.toggle("light");
   const light=document.body.classList.contains("light");
