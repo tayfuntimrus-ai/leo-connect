@@ -1189,6 +1189,86 @@ body{
   font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.1);
 }
 .dynamic-button.show{display:inline-flex!important;}
+
+/* ==================================================
+   SMART CAMPAIGNS
+================================================== */
+.smart-campaigns{
+  display:none;
+  margin-top:16px;
+}
+.smart-campaign{
+  position:relative;
+  overflow:hidden;
+  margin-top:12px;
+  padding:16px;
+  border:1px solid rgba(214,173,85,.24);
+  border-radius:16px;
+  background:
+    linear-gradient(145deg,rgba(214,173,85,.13),rgba(255,255,255,.025));
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
+  text-align:left;
+}
+.smart-campaign:first-child{
+  margin-top:0;
+}
+.smart-campaign-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-bottom:9px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:rgba(214,173,85,.12);
+  border:1px solid rgba(214,173,85,.2);
+  color:var(--lc-gold-soft);
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.7px;
+  text-transform:uppercase;
+}
+.smart-campaign-title{
+  display:block;
+  margin:0 0 7px;
+  color:#fff;
+  font-size:14px;
+  line-height:1.35;
+  font-weight:900;
+}
+.smart-campaign-text{
+  display:block;
+  color:#d0d0d0;
+  font-size:11px;
+  line-height:1.6;
+  white-space:pre-wrap;
+}
+.smart-campaign-image{
+  display:block;
+  width:100%;
+  max-height:280px;
+  object-fit:cover;
+  margin-top:12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.07);
+  background:#080808;
+}
+.smart-campaign-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:12px;
+  padding:10px 14px;
+  border-radius:11px;
+  background:linear-gradient(135deg,var(--lc-gold),#9e7738);
+  color:#fff;
+  text-decoration:none;
+  font-size:9px;
+  font-weight:900;
+  border:1px solid rgba(255,255,255,.1);
+}
+.smart-campaign-button:hover{
+  filter:brightness(1.08);
+}
 .dynamic-gallery{
   display:none;margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;
 }
@@ -1378,6 +1458,8 @@ body{
   <img id="dynamicCampaignImage" class="dynamic-media" alt="Kampanya görseli">
   <a id="dynamicCampaignButton" class="dynamic-button" target="_blank" rel="noopener"></a>
 </div>
+
+<div id="smartCampaigns" class="smart-campaigns"></div>
 
 <div id="dynamicFeatured" class="dynamic-featured">
   <strong id="dynamicFeaturedTitle"></strong>
@@ -2314,6 +2396,76 @@ function dynamicYoutubeEmbed(value){
   }catch(e){ return ''; }
 }
 
+function renderSmartCampaigns(){
+  const box=document.getElementById('smartCampaigns');
+  if(!box) return;
+
+  box.innerHTML='';
+
+  const campaigns=Array.isArray(business?.campaigns)
+    ? business.campaigns.slice(0,5)
+    : [];
+
+  if(!campaigns.length){
+    box.style.display='none';
+    return;
+  }
+
+  campaigns.forEach(c=>{
+    const card=document.createElement('div');
+    card.className='smart-campaign';
+
+    const badge=document.createElement('div');
+    badge.className='smart-campaign-badge';
+    badge.textContent='🔥 AKTİF KAMPANYA';
+    card.appendChild(badge);
+
+    if(String(c.title||'').trim()){
+      const title=document.createElement('strong');
+      title.className='smart-campaign-title';
+      title.textContent=String(c.title||'');
+      card.appendChild(title);
+    }
+
+    if(String(c.text||'').trim()){
+      const body=document.createElement('span');
+      body.className='smart-campaign-text';
+      body.textContent=String(c.text||'');
+      card.appendChild(body);
+    }
+
+    const imageUrl=dynamicSafeUrl(c.image_url);
+    if(imageUrl){
+      const img=document.createElement('img');
+      img.className='smart-campaign-image';
+      img.src=imageUrl;
+      img.alt=String(c.title||'Kampanya görseli');
+      img.loading='lazy';
+      img.onerror=()=>img.remove();
+      card.appendChild(img);
+    }
+
+    const buttonUrl=dynamicSafeUrl(c.button_url);
+    const buttonText=String(c.button_text||'').trim();
+
+    if(buttonUrl && buttonText){
+      const btn=document.createElement('a');
+      btn.className='smart-campaign-button';
+      btn.href=buttonUrl;
+      btn.textContent=buttonText;
+      btn.target='_blank';
+      btn.rel='noopener';
+      btn.addEventListener('click',()=>track('campaign'));
+      card.appendChild(btn);
+    }
+
+    box.appendChild(card);
+  });
+
+  box.style.display=box.children.length ? 'block' : 'none';
+}
+
+
 function renderDynamicProfile(){
   const d=business?.profile_design || {};
   const theme=String(d.theme||'midnight-gold');
@@ -2410,6 +2562,7 @@ function renderDynamicProfile(){
 function render(){
 
   renderDynamicProfile();
+  renderSmartCampaigns();
 
   /* V2 REVIEW BOOSTER */
   try{
