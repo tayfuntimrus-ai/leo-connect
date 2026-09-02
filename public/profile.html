@@ -1137,6 +1137,33 @@ body{
 
 
 /* ==================================================
+   LEO CONNECT PREMIUM PAYMENT V3
+================================================== */
+.premium-payment-section{position:relative;overflow:hidden;}
+.premium-payment-title .premium-payment-icon{display:grid;place-items:center;color:#e2b85b;}
+.premium-payment-icon svg{width:21px;height:21px;}
+.premium-payment-title strong{font-size:17px !important;letter-spacing:-.01em;}
+.premium-payment-title span{font-size:11px !important;color:#8f8f8f !important;margin-top:3px;}
+.premium-payment-card{position:relative;isolation:isolate;overflow:hidden;padding:22px;border-radius:22px;background:radial-gradient(circle at 92% 8%,rgba(214,173,85,.13),transparent 32%),linear-gradient(145deg,#1b1b1b 0%,#111 52%,#0d0d0d 100%);border:1px solid rgba(214,173,85,.24);box-shadow:0 18px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.045);}
+.payment-card-glow{position:absolute;inset:-35% -20% auto auto;width:180px;height:180px;border-radius:50%;background:rgba(214,173,85,.08);filter:blur(30px);pointer-events:none;z-index:-1;}
+.payment-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+.payment-card-brand{font-size:10px;font-weight:800;letter-spacing:.2em;color:#cdbb91;}
+.payment-card-chip{width:28px;height:22px;border:1px solid rgba(226,184,91,.45);border-radius:6px;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;opacity:.9;}
+.payment-card-chip span{border-right:1px solid rgba(226,184,91,.35);}.payment-card-chip span:last-child{border-right:0;}
+.payment-label{font-size:9px;font-weight:700;letter-spacing:.16em;color:#777;}
+.premium-iban-number{margin-top:9px !important;color:#fff !important;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace !important;font-size:clamp(16px,4.4vw,22px) !important;font-weight:750 !important;letter-spacing:.055em !important;line-height:1.5 !important;word-break:normal !important;overflow-wrap:anywhere !important;text-shadow:0 1px 12px rgba(255,255,255,.06);}
+.premium-copy-button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;margin-top:15px;padding:11px 14px;border-radius:13px;cursor:pointer;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;}
+.premium-copy-button:hover{transform:translateY(-1px);}.premium-copy-button:active{transform:translateY(0);}
+.premium-copy-primary{color:#fff;border:1px solid rgba(226,184,91,.7);background:linear-gradient(135deg,#cfa354,#a77b36);box-shadow:0 8px 22px rgba(167,123,54,.2);}
+.premium-copy-secondary{width:auto;min-width:122px;margin:0;flex:0 0 auto;color:#ddd;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.035);}
+.copy-button-icon{display:grid;place-items:center;}.copy-button-icon svg{width:16px;height:16px;}
+.premium-copy-message{min-height:17px;margin-top:8px;text-align:center;color:#d9b765;font-size:10px;font-weight:700;letter-spacing:.02em;}
+.payment-card-divider{height:1px;margin:18px 0 17px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);}
+.payment-holder-block{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;}.premium-holder{margin-top:7px !important;font-size:17px !important;font-weight:750 !important;letter-spacing:-.01em;}.holder-message{margin-top:8px;text-align:right;}
+.payment-trust-note{display:flex;align-items:center;justify-content:center;gap:7px;margin:13px 2px 0;color:#777;font-size:9px;line-height:1.45;text-align:center;}.payment-trust-note svg{width:14px;height:14px;color:#b9934d;flex:0 0 14px;}
+@media(max-width:520px){.premium-payment-card{padding:19px;border-radius:20px;}.payment-card-top{margin-bottom:24px;}.premium-iban-number{font-size:clamp(15px,4.5vw,19px) !important;letter-spacing:.045em !important;}.payment-holder-block{align-items:stretch;flex-direction:column;gap:12px;}.premium-copy-secondary{width:100%;min-width:0;}.holder-message{text-align:center;}}
+
+/* ==================================================
    LEO CONNECT V2 — DYNAMIC PROFILE
 ================================================== */
 .dynamic-cover{
@@ -1808,115 +1835,36 @@ body{
 
 
 <!-- ==================================================
-     IBAN
+     PREMIUM PAYMENT / IBAN
 ================================================== -->
-
-<section
-  id="ibanSection"
-  class="section hidden"
->
-
-
-  <div class="section-title">
-
-    <div class="section-icon">
-      💳
+<section id="ibanSection" class="section hidden premium-payment-section">
+  <div class="section-title premium-payment-title">
+    <div class="section-icon premium-payment-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.7"/>
+        <path d="M3 9h18" stroke="currentColor" stroke-width="1.7"/>
+        <path d="M7 14h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        <circle cx="16.5" cy="14.5" r="1.2" fill="currentColor"/>
+      </svg>
     </div>
-
-    <div>
-
-      <strong>
-        Ödeme Bilgileri
-      </strong>
-
-      <span>
-        IBAN ve hesap sahibi bilgilerini görüntüle
-      </span>
-
-    </div>
-
+    <div><strong>Ödeme Bilgileri</strong><span>Güvenli ödeme için hesap bilgileri</span></div>
   </div>
-
-
-  <div class="iban-card">
-
-
-    <!-- IBAN -->
-
-    <div class="iban-label">
-      IBAN
+  <div class="premium-payment-card">
+    <div class="payment-card-glow"></div>
+    <div class="payment-card-top"><div class="payment-card-brand">LEO CONNECT</div><div class="payment-card-chip"><span></span><span></span><span></span></div></div>
+    <div class="payment-label">IBAN</div>
+    <div id="iban" class="iban-number premium-iban-number">-</div>
+    <button class="premium-copy-button premium-copy-primary" type="button" onclick="copyIBAN()"><span class="copy-button-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" stroke="currentColor" stroke-width="1.7"/></svg></span><span>IBAN'ı Kopyala</span></button>
+    <div id="ibanMessage" class="premium-copy-message" role="status" aria-live="polite"></div>
+    <div class="payment-card-divider"></div>
+    <div class="payment-holder-block">
+      <div><div class="payment-label">HESAP SAHİBİ</div><div id="ibanHolder" class="iban-holder premium-holder">-</div></div>
+      <button class="premium-copy-button premium-copy-secondary" type="button" onclick="copyIBANHolder()"><span class="copy-button-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" stroke="currentColor" stroke-width="1.7"/></svg></span><span>Adı Kopyala</span></button>
     </div>
-
-
-    <div
-      id="iban"
-      class="iban-number"
-    >
-      -
-    </div>
-
-
-    <div class="iban-buttons">
-
-      <button
-        class="iban-button gold"
-        onclick="copyIBAN()"
-      >
-        IBAN'I KOPYALA
-      </button>
-
-    </div>
-
-
-    <div
-      id="ibanMessage"
-      class="iban-message"
-    ></div>
-
-
-
-    <!-- HESAP SAHİBİ -->
-
-    <div
-      class="iban-label"
-      style="margin-top:18px;"
-    >
-      HESAP SAHİBİ
-    </div>
-
-
-    <div
-      id="ibanHolder"
-      class="iban-holder"
-    >
-      -
-    </div>
-
-
-    <div class="iban-buttons">
-
-      <button
-        class="iban-button"
-        onclick="copyIBANHolder()"
-      >
-        ADI KOPYALA
-      </button>
-
-    </div>
-
-
-    <div
-      id="ibanHolderMessage"
-      class="iban-message"
-    ></div>
-
-
+    <div id="ibanHolderMessage" class="premium-copy-message holder-message" role="status" aria-live="polite"></div>
   </div>
-
-
+  <div class="payment-trust-note"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 19 6v5c0 4.7-2.9 8.2-7 10-4.1-1.8-7-5.3-7-10V6l7-3Z" stroke="currentColor" stroke-width="1.6"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Bilgileri kopyalamak için tek dokunuş yeterli.</span></div>
 </section>
-
-
 
 
 <section id="reviewBooster" class="review-booster hidden">
@@ -2994,7 +2942,7 @@ function render(){
     document.getElementById(
       "iban"
     ).textContent =
-      business.iban;
+      formatIBANDisplay(business.iban);
 
 
     document.getElementById(
@@ -3021,6 +2969,12 @@ function render(){
 
 }
 
+
+/* PREMIUM IBAN DISPLAY */
+function formatIBANDisplay(value){
+  const raw=String(value||'').replace(/\s+/g,'').trim();
+  return raw ? raw.replace(/(.{4})/g,'$1 ').trim() : '';
+}
 
 /* ==================================================
    COPY IBAN
