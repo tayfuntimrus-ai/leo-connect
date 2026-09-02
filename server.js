@@ -2795,7 +2795,7 @@ app.get('/api/business-ai-insights', auth, requireBusinessPermission('ai'), asyn
       COUNT(*) FILTER(WHERE type='location')::int location,
       COUNT(*) FILTER(WHERE type='share')::int share
       FROM events WHERE ${where}`,params);
-    const hourlyQ=await pool.query(`SELECT EXTRACT(HOUR FROM created_at)::int hour, COUNT(*)::int events FROM events WHERE ${where} GROUP BY 1 ORDER BY events DESC LIMIT 1`,params);
+    const hourlyQ=await pool.query(`SELECT EXTRACT(HOUR FROM created_at)::int AS hour, COUNT(*)::int AS events FROM events WHERE ${where} GROUP BY 1 ORDER BY events DESC LIMIT 1`,params);
     const actionsQ=await pool.query(`SELECT type, COUNT(*)::int count FROM events WHERE ${where} GROUP BY type ORDER BY count DESC LIMIT 5`,params);
     const sourceQ=await pool.query(`SELECT COALESCE(NULLIF(source,''),'direct') source, COUNT(*)::int count FROM events WHERE ${where} GROUP BY 1 ORDER BY count DESC`,params);
     const t=totalsQ.rows[0]||{};
@@ -3404,13 +3404,7 @@ app.get(
       const profile = publicBusiness(result.rows[0]);
       const profile_design = await getPublicProfileDesign(result.rows[0].id);
       const review_booster = await getReviewBooster(result.rows[0].id);
-      const campaignResult = await pool.query(`
-        SELECT * FROM campaigns
-        WHERE business_id=$1
-        ORDER BY enabled DESC, priority DESC, created_at DESC
-        LIMIT 5
-      `,[result.rows[0].id]);
-      const campaigns = campaignResult.rows.map(normalizeCampaign);
+      const campaigns = await getActiveCampaigns(result.rows[0].id);
 
       return res.json({
         ...profile,
@@ -3495,13 +3489,7 @@ app.get(
       const profile = publicBusiness(result.rows[0]);
       const profile_design = await getPublicProfileDesign(result.rows[0].id);
       const review_booster = await getReviewBooster(result.rows[0].id);
-      const campaignResult = await pool.query(`
-        SELECT * FROM campaigns
-        WHERE business_id=$1
-        ORDER BY enabled DESC, priority DESC, created_at DESC
-        LIMIT 5
-      `,[result.rows[0].id]);
-      const campaigns = campaignResult.rows.map(normalizeCampaign);
+      const campaigns = await getActiveCampaigns(result.rows[0].id);
 
       return res.json({
         ...profile,
