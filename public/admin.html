@@ -194,6 +194,667 @@ a{color:inherit;text-decoration:none}
   .business-page.show .biz-stat-grid{grid-template-columns:1fr 1fr}
 }
 
+
+/* =========================================================
+   LEO CONNECT — MOBILE FINAL
+   Amaç: küçük ekranlarda taşma, sıkışma ve okunabilirlik
+   sorunlarını tek bir son katmanda kontrol etmek.
+   ========================================================= */
+@media(max-width:720px){
+
+  html,body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+  }
+
+  .app{
+    display:block;
+    width:100%;
+    min-width:0;
+  }
+
+  .main{
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    padding-bottom:72px;
+    overflow-x:hidden;
+  }
+
+  /* Üst bar */
+  .topbar{
+    height:58px;
+    min-height:58px;
+    padding:8px 12px;
+    overflow:hidden;
+  }
+
+  .topbar > div:first-child{
+    display:none;
+  }
+
+  .top-actions{
+    width:100%;
+    justify-content:flex-end;
+    gap:6px;
+    min-width:0;
+  }
+
+  .top-actions .mode,
+  .top-actions .colors{
+    display:none;
+  }
+
+  .top-actions .tool{
+    padding:8px 10px;
+    min-height:38px;
+    font-size:10px;
+    white-space:nowrap;
+  }
+
+  /* Mobil alt menü: sadece ana çalışma modülleri.
+     Sistem menüsü masaüstünde kalır; mobilde ekranı doldurmaz. */
+  .sidebar{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    top:auto;
+    width:100%;
+    height:68px;
+    min-height:68px;
+    padding:6px 6px;
+    border-right:0;
+    border-top:1px solid var(--line);
+    background:var(--sidebar);
+    z-index:40;
+    overflow:hidden;
+  }
+
+  .sidebar .brand,
+  .sidebar .admin-card,
+  .sidebar .nav-title{
+    display:none;
+  }
+
+  .sidebar .nav{
+    display:flex;
+    width:100%;
+    height:100%;
+    align-items:stretch;
+    justify-content:space-between;
+    gap:3px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scrollbar-width:none;
+  }
+
+  .sidebar .nav::-webkit-scrollbar{
+    display:none;
+  }
+
+  .sidebar .nav:nth-of-type(2){
+    display:none;
+  }
+
+  .sidebar .nav button{
+    flex:0 0 16.666%;
+    width:16.666%;
+    min-width:0;
+    height:56px;
+    padding:5px 2px;
+    margin:0;
+    border-radius:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    text-align:center;
+  }
+
+  .sidebar .nav button .nav-icon{
+    display:block !important;
+    width:auto;
+    font-size:16px;
+    line-height:18px;
+  }
+
+  .sidebar .nav button > span:not(.nav-icon){
+    display:block !important;
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:7px;
+    line-height:9px;
+    color:inherit;
+  }
+
+  /* Dashboard */
+  .content{
+    width:100%;
+    max-width:100%;
+    padding:18px 12px 28px;
+    margin:0;
+    overflow:hidden;
+  }
+
+  .hero{
+    display:block;
+    margin-bottom:16px;
+  }
+
+  .hero h1{
+    font-size:28px;
+    line-height:1.05;
+    letter-spacing:-.8px;
+    margin:7px 0 7px;
+  }
+
+  .hero p{
+    font-size:11px;
+    line-height:1.45;
+  }
+
+  .cards{
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  .stat{
+    min-height:112px;
+    padding:13px;
+  }
+
+  .stat-icon{
+    width:32px;
+    height:32px;
+    font-size:15px;
+  }
+
+  .stat-label{
+    font-size:9px;
+    margin-top:12px;
+    letter-spacing:.6px;
+  }
+
+  .stat-value{
+    font-size:23px;
+  }
+
+  .grid-main{
+    grid-template-columns:1fr;
+    gap:10px;
+    margin-top:10px;
+  }
+
+  .section-head{
+    padding:16px 14px 13px;
+  }
+
+  .section-title{
+    font-size:15px;
+  }
+
+  .section-sub{
+    font-size:9px;
+    line-height:1.4;
+  }
+
+  .table-wrap{
+    max-width:100%;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .table{
+    min-width:680px;
+  }
+
+  .chart-card{
+    padding:14px;
+  }
+
+  .chart{
+    height:190px;
+  }
+
+  .summary{
+    margin-top:10px;
+    padding:14px;
+  }
+
+  .summary-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .summary-item{
+    padding:9px 8px 9px 0;
+  }
+
+  .summary-value{
+    font-size:21px;
+  }
+
+  .quick-grid{
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+  }
+
+  .quick{
+    padding:11px;
+    min-width:0;
+  }
+
+  .quick strong{
+    font-size:10px;
+  }
+
+  .quick span{
+    font-size:8px;
+  }
+
+  .tip{
+    align-items:flex-start;
+    flex-direction:column;
+    padding:13px;
+  }
+
+  .tip .btn{
+    width:100%;
+  }
+
+  /* İşletme çalışma alanı */
+  .business-page.show,
+  .global-page.show{
+    top:58px;
+    left:0;
+    right:auto;
+    width:100vw;
+    max-width:100vw;
+    bottom:68px;
+    padding:14px 12px 28px;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    border-left:0;
+  }
+
+  .backbar{
+    margin-bottom:12px;
+  }
+
+  .back-btn{
+    padding:9px 11px;
+    font-size:10px;
+  }
+
+  .business-hero{
+    width:100%;
+    padding:14px;
+    gap:13px;
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .business-hero-left{
+    width:100%;
+    gap:11px;
+  }
+
+  .business-hero-logo{
+    width:58px;
+    height:58px;
+    flex:0 0 58px;
+  }
+
+  .business-hero h2{
+    font-size:21px;
+    line-height:1.1;
+    overflow-wrap:anywhere;
+  }
+
+  .business-hero p{
+    font-size:9px;
+    overflow-wrap:anywhere;
+  }
+
+  .hero-actions{
+    width:100%;
+    display:grid !important;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+  }
+
+  .hero-actions .btn{
+    width:100%;
+    min-width:0;
+    padding:9px 8px;
+    font-size:9px;
+  }
+
+  .hero-actions .btn:last-child{
+    grid-column:1/-1;
+  }
+
+  .business-tabs{
+    width:100%;
+    max-width:100%;
+    margin:12px 0;
+    padding-bottom:2px;
+    display:flex !important;
+    overflow-x:auto !important;
+    overflow-y:hidden;
+    white-space:nowrap;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .business-tabs::-webkit-scrollbar{
+    display:none;
+  }
+
+  .business-tabs button{
+    flex:0 0 auto !important;
+    padding:9px 11px;
+    font-size:9px;
+  }
+
+  .biz-stat-grid{
+    grid-template-columns:1fr 1fr !important;
+    gap:7px;
+  }
+
+  .biz-stat{
+    padding:12px;
+    min-width:0;
+  }
+
+  .biz-stat small{
+    font-size:8px;
+    line-height:1.3;
+  }
+
+  .biz-stat strong{
+    font-size:22px;
+  }
+
+  .biz-columns{
+    grid-template-columns:1fr !important;
+    gap:10px;
+    margin-top:10px;
+  }
+
+  .biz-section{
+    padding:14px;
+    min-width:0;
+  }
+
+  .info-grid,
+  .profile-editor,
+  .form-grid{
+    grid-template-columns:1fr !important;
+    gap:9px;
+  }
+
+  .profile-editor .full,
+  .form-grid .full{
+    grid-column:auto !important;
+  }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea{
+    min-width:0;
+    font-size:12px;
+  }
+
+  .nfc-admin-top{
+    align-items:flex-start;
+  }
+
+  .nfc-admin-card{
+    padding:12px;
+  }
+
+  .nfc-admin-card .modal-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .nfc-admin-card .modal-actions .btn{
+    width:100%;
+  }
+
+  /* İşletme Analytics */
+  .analytics-grid{
+    grid-template-columns:1fr 1fr !important;
+    gap:7px;
+  }
+
+  .analytics-kpi{
+    padding:12px;
+  }
+
+  .analytics-kpi small{
+    font-size:8px;
+    line-height:1.3;
+  }
+
+  .analytics-kpi strong{
+    font-size:22px;
+  }
+
+  .analytics-two{
+    grid-template-columns:1fr !important;
+    gap:9px;
+    margin-top:9px;
+  }
+
+  .analytics-box-head{
+    padding:14px;
+  }
+
+  .analytics-chart{
+    min-height:210px;
+    padding:11px;
+  }
+
+  .analytics-bars{
+    height:165px;
+    gap:4px;
+  }
+
+  .analytics-bar-group{
+    min-width:6px;
+    gap:1px;
+  }
+
+  .analytics-bar{
+    min-width:2px;
+  }
+
+  .analytics-donut{
+    padding:12px 14px;
+  }
+
+  .metric-row{
+    padding:10px 0;
+    font-size:10px;
+  }
+
+  .analytics-table{
+    min-width:600px;
+  }
+
+  .analytics-toolbar{
+    padding:9px;
+    margin-top:12px;
+  }
+
+  .analytics-periods{
+    display:grid !important;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    width:100%;
+  }
+
+  .analytics-period{
+    width:100%;
+    padding:9px 6px;
+    font-size:9px;
+  }
+
+  /* Merkezi sayfalar */
+  .global-head{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:9px;
+  }
+
+  .global-head h2{
+    font-size:23px;
+  }
+
+  .global-head p{
+    font-size:10px;
+    line-height:1.4;
+  }
+
+  .global-head > .btn{
+    width:100%;
+  }
+
+  .global-row{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .global-row > .btn{
+    width:100%;
+  }
+
+  .global-main{
+    width:100%;
+    min-width:0;
+  }
+
+  .global-card{
+    padding:13px;
+  }
+
+  .global-sub{
+    overflow-wrap:anywhere;
+  }
+
+  .permission-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .permission-card{
+    padding:12px;
+  }
+
+  /* Modallar */
+  .modal-bg{
+    padding:10px;
+  }
+
+  .modal{
+    width:100%;
+    max-width:100%;
+    max-height:calc(100vh - 20px);
+    border-radius:16px;
+  }
+
+  .modal-head{
+    padding:14px;
+  }
+
+  .modal-body{
+    padding:14px;
+  }
+
+  .detail-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .modal-actions{
+    flex-wrap:wrap;
+  }
+
+  .modal-actions .btn{
+    min-width:0;
+  }
+
+  /* Canlı takip */
+  .live-kpis{
+    grid-template-columns:1fr 1fr !important;
+  }
+
+  .live-layout{
+    grid-template-columns:1fr !important;
+  }
+
+  .live-head{
+    align-items:flex-start;
+  }
+
+  .live-item{
+    padding:10px 11px;
+  }
+}
+
+@media(max-width:420px){
+
+  .content{
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .cards{
+    gap:7px;
+  }
+
+  .stat{
+    padding:11px;
+  }
+
+  .stat-value{
+    font-size:21px;
+  }
+
+  .quick-grid{
+    grid-template-columns:1fr;
+  }
+
+  .business-page.show,
+  .global-page.show{
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .biz-stat-grid,
+  .analytics-grid{
+    grid-template-columns:1fr 1fr !important;
+  }
+
+  .business-hero h2{
+    font-size:20px;
+  }
+
+  .sidebar .nav button{
+    flex-basis:16.666%;
+  }
+
+  .sidebar .nav button > span:not(.nav-icon){
+    font-size:6.5px;
+  }
+}
+
 </style>
 </head>
 <body data-accent="gold">
