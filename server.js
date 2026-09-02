@@ -101,7 +101,14 @@ const LEO_V2_THEMES = {
   'pure-light': { name:'Pure Light', description:'Aydınlık, temiz ve premium tema' }
 };
 
-const LEO_V2_SOCIAL_PLATFORMS = ['instagram','tiktok','facebook','youtube','linkedin','x','whatsapp','google','website'];
+const LEO_V2_SOCIAL_PLATFORMS = ['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google','website'];
+const LEO_V2_DEFAULT_ALLOWED_PLATFORMS = Object.fromEntries(LEO_V2_SOCIAL_PLATFORMS.map(k=>[k,true]));
+function normalizeAllowedPlatforms(value){
+  let raw=value;
+  if(typeof raw==='string'){ try{raw=JSON.parse(raw)}catch(_){raw={};} }
+  raw=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
+  return Object.fromEntries(LEO_V2_SOCIAL_PLATFORMS.map(k=>[k,raw[k]!==false]));
+}
 
 function normalizeSocialLinks(value){
   let raw=value;
@@ -405,7 +412,8 @@ async function initDatabase() {
       ADD COLUMN IF NOT EXISTS profile_field_permissions JSONB NOT NULL DEFAULT '{}'::jsonb,
       ADD COLUMN IF NOT EXISTS profile_theme_permission BOOLEAN NOT NULL DEFAULT TRUE,
       ADD COLUMN IF NOT EXISTS social_links JSONB NOT NULL DEFAULT '{}'::jsonb,
-      ADD COLUMN IF NOT EXISTS custom_links JSONB NOT NULL DEFAULT '[]'::jsonb
+      ADD COLUMN IF NOT EXISTS custom_links JSONB NOT NULL DEFAULT '[]'::jsonb,
+      ADD COLUMN IF NOT EXISTS social_platform_permissions JSONB NOT NULL DEFAULT '{}'::jsonb
   `);
 
 
@@ -2688,12 +2696,12 @@ app.put('/api/me', auth, requireBusinessPermission('profile'), async (req, res) 
 
 app.get('/api/business-v2-settings', auth, requireBusinessPermission('profile'), async (req,res)=>{
   try{
-    const r=await pool.query(`SELECT id,profile_theme_permission,social_links,custom_links FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
+    const r=await pool.query(`SELECT id,profile_theme_permission,social_links,custom_links,social_platform_permissions FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
     if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
     const d=await pool.query(`SELECT theme,accent_color FROM profile_designs WHERE business_id=$1 LIMIT 1`,[req.user.id]);
     const design=d.rows[0]||{};
     const theme=LEO_V2_THEMES[design.theme] ? design.theme : 'midnight-gold';
-    res.json({theme,themes:LEO_V2_THEMES,theme_permission:r.rows[0].profile_theme_permission!==false,accent_color:design.accent_color||'#D4AF37',social_links:normalizeSocialLinks(r.rows[0].social_links),custom_links:normalizeCustomLinks(r.rows[0].custom_links)});
+    res.json({theme,themes:LEO_V2_THEMES,theme_permission:r.rows[0].profile_theme_permission!==false,accent_color:design.accent_color||'#D4AF37',social_links:normalizeSocialLinks(r.rows[0].social_links),custom_links:normalizeCustomLinks(r.rows[0].custom_links),allowed_platforms:normalizeAllowedPlatforms(r.rows[0].social_platform_permissions)});
   }catch(e){console.error('V2 SETTINGS GET ERROR:',e);res.status(500).json({error:'Profil ayarları alınamadı'});}
 });
 
@@ -2712,7 +2720,14 @@ app.put('/api/business-theme', auth, requireBusinessPermission('profile'), async
 
 app.put('/api/business-social-links', auth, requireBusinessPermission('profile'), async (req,res)=>{
   try{
-    const links=normalizeSocialLinks(req.body?.social_links||req.body);
+    const b=await pool.query(`SELECT social_platform_permissions FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
+    if(!b.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    const allowed=normalizeAllowedPlatforms(b.rows[0].social_platform_permissions);
+    const incoming=normalizeSocialLinks(req.body?.social_links||req.body);
+    const links={};
+    for(const key of LEO_V2_SOCIAL_PLATFORMS){
+      if(allowed[key]!==false) links[key]=incoming[key]||{url:'',enabled:false};
+    }
     const r=await pool.query(`UPDATE businesses SET social_links=$1::jsonb WHERE id=$2 RETURNING social_links`,[JSON.stringify(links),req.user.id]);
     if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
     res.json({social_links:normalizeSocialLinks(r.rows[0].social_links)});
@@ -2731,10 +2746,10 @@ app.put('/api/business-custom-links', auth, requireBusinessPermission('profile')
 app.get('/api/admin/business/:id/v2-settings', adminAuth, async (req,res)=>{
   try{
     const id=Number(req.params.id);
-    const r=await pool.query(`SELECT b.id,b.name,b.profile_theme_permission,b.social_links,b.custom_links,COALESCE(pd.theme,'midnight-gold') theme,COALESCE(pd.accent_color,'#D4AF37') accent_color FROM businesses b LEFT JOIN profile_designs pd ON pd.business_id=b.id WHERE b.id=$1 LIMIT 1`,[id]);
+    const r=await pool.query(`SELECT b.id,b.name,b.profile_theme_permission,b.social_links,b.custom_links,b.social_platform_permissions,COALESCE(pd.theme,'midnight-gold') theme,COALESCE(pd.accent_color,'#D4AF37') accent_color FROM businesses b LEFT JOIN profile_designs pd ON pd.business_id=b.id WHERE b.id=$1 LIMIT 1`,[id]);
     if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
     const row=r.rows[0];
-    res.json({id:row.id,name:row.name,theme:LEO_V2_THEMES[row.theme]?row.theme:'midnight-gold',themes:LEO_V2_THEMES,theme_permission:row.profile_theme_permission!==false,accent_color:row.accent_color,social_links:normalizeSocialLinks(row.social_links),custom_links:normalizeCustomLinks(row.custom_links)});
+    res.json({id:row.id,name:row.name,theme:LEO_V2_THEMES[row.theme]?row.theme:'midnight-gold',themes:LEO_V2_THEMES,theme_permission:row.profile_theme_permission!==false,accent_color:row.accent_color,social_links:normalizeSocialLinks(row.social_links),custom_links:normalizeCustomLinks(row.custom_links),allowed_platforms:normalizeAllowedPlatforms(row.social_platform_permissions)});
   }catch(e){console.error('ADMIN V2 SETTINGS GET ERROR:',e);res.status(500).json({error:'V2 ayarları alınamadı'});}
 });
 
@@ -2756,6 +2771,17 @@ app.put('/api/admin/business/:id/theme-permission', adminAuth, async (req,res)=>
     res.json({id:r.rows[0].id,name:r.rows[0].name,theme_permission:r.rows[0].profile_theme_permission!==false});
   }catch(e){console.error('ADMIN THEME PERMISSION ERROR:',e);res.status(500).json({error:'Tema yetkisi kaydedilemedi'});}
 });
+
+app.put('/api/admin/business/:id/social-platform-permissions', adminAuth, async (req,res)=>{
+  try{
+    const id=Number(req.params.id);
+    const allowed=normalizeAllowedPlatforms(req.body?.allowed_platforms||req.body);
+    const r=await pool.query(`UPDATE businesses SET social_platform_permissions=$1::jsonb WHERE id=$2 RETURNING id,name,social_platform_permissions`,[JSON.stringify(allowed),id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    res.json({id:r.rows[0].id,name:r.rows[0].name,allowed_platforms:normalizeAllowedPlatforms(r.rows[0].social_platform_permissions)});
+  }catch(e){console.error('ADMIN SOCIAL PLATFORM PERMISSION ERROR:',e);res.status(500).json({error:'Bağlantı yetkileri kaydedilemedi'});}
+});
+
 
 /* =========================================================
    QR
