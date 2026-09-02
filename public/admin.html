@@ -387,8 +387,18 @@ function renderBusinessPage(){
 function switchBizTab(name,btn){
   document.querySelectorAll(".business-tabs button").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".biz-panel").forEach(x=>x.classList.remove("active"));
-  btn?.classList.add("active");
-  document.getElementById("biz"+name.charAt(0).toUpperCase()+name.slice(1)).classList.add("active");
+  if(btn) btn.classList.add("active");
+  const panelMap={
+    overview:"bizOverview",
+    profile:"bizProfile",
+    nfc:"bizNFC",
+    analytics:"bizAnalytics",
+    permissions:"bizPermissions",
+    qr:"bizQR"
+  };
+  const panel=document.getElementById(panelMap[name]);
+  if(!panel){showToast("Panel bulunamadı: "+name);return;}
+  panel.classList.add("active");
   if(name==="nfc")renderBizNFC();
   if(name==="analytics")renderBizAnalytics();
   if(name==="permissions")renderBizPermissions();
