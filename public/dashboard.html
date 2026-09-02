@@ -2461,6 +2461,7 @@ main{
 
 
   <a
+    id="quickQR"
     href="/qr-center"
     class="quick"
   >
@@ -2482,6 +2483,7 @@ main{
 
 
   <a
+    id="quickNFC"
     href="#digital"
     class="quick"
   >
@@ -2855,7 +2857,7 @@ main{
 
     <!-- QR -->
 
-    <div class="digital-card">
+    <div id="qrCard" class="digital-card">
 
       <div class="digital-icon">
         ▣
@@ -2917,7 +2919,7 @@ main{
 
     <!-- NFC -->
 
-    <div class="digital-card">
+    <div id="nfcCard" class="digital-card">
 
       <div class="nfc-symbol">
         📡
@@ -4439,6 +4441,43 @@ async function shareProfile(){
 
 
 /* ==================================================
+   PANEL PERMISSIONS
+================================================== */
+
+function applyPermissions(business){
+  const p=business?.permissions||{profile:true,qr:false,nfc:false,analytics:false};
+  const hide=id=>{const el=document.getElementById(id);if(el)el.style.display="none"};
+  const show=id=>{const el=document.getElementById(id);if(el)el.style.display=""};
+
+  const qrStat=document.getElementById("qrViews")?.closest(".stat");
+  const nfcStat=document.getElementById("nfcViews")?.closest(".stat");
+  if(qrStat)qrStat.style.display=p.qr?"":"none";
+  if(nfcStat)nfcStat.style.display=p.nfc?"":"none";
+
+  if(p.qr)show("quickQR");else hide("quickQR");
+  if(p.nfc)show("quickNFC");else hide("quickNFC");
+
+  if(p.qr)show("qrCard");else hide("qrCard");
+  if(p.nfc)show("nfcCard");else hide("nfcCard");
+
+  const digital=document.getElementById("digital");
+  if(digital)digital.style.display=(p.qr||p.nfc)?"":"none";
+
+  const profile=document.getElementById("profile");
+  if(profile)profile.style.display=p.profile?"":"none";
+
+  document.querySelectorAll('a[href="#profile"]').forEach(el=>{el.style.display=p.profile?"":"none"});
+  const save=document.getElementById("saveButton");
+  if(save)save.style.display=p.profile?"":"none";
+
+  if(!p.analytics){
+    const summary=document.querySelector(".summary");
+    if(summary)summary.style.display="none";
+  }
+}
+
+
+/* ==================================================
    LOAD
 ================================================== */
 
@@ -4458,6 +4497,8 @@ async function load(){
 
   currentBusiness =
     business;
+
+  applyPermissions(business);
 
 
 
