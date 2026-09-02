@@ -2283,6 +2283,62 @@ app.get('/api/qr', auth, requireBusinessPermission('qr'), async (req, res) => {
 
 
 /* =========================================================
+   BUSINESS CENTER ANALYTICS V3
+========================================================= */
+
+app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'), async (req, res) => {
+  try {
+    const period = ['today','7d','30d','all'].includes(req.query.period) ? req.query.period : '7d';
+    let where = 'business_id=$1';
+    if (period === 'today') where += " AND created_at >= CURRENT_DATE";
+    if (period === '7d') where += " AND created_at >= NOW() - INTERVAL '7 days'";
+    if (period === '30d') where += " AND created_at >= NOW() - INTERVAL '30 days'";
+
+    const totals = await pool.query(`
+      SELECT
+        COUNT(*)::int AS total_events,
+        COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
+        COUNT(*) FILTER (WHERE type IN ('qr_scan','qr'))::int AS qr_scans,
+        COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
+        COUNT(*) FILTER (WHERE type='phone')::int AS phone_clicks,
+        COUNT(*) FILTER (WHERE type='whatsapp')::int AS whatsapp_clicks,
+        COUNT(*) FILTER (WHERE type='instagram')::int AS instagram_clicks,
+        COUNT(*) FILTER (WHERE type='tiktok')::int AS tiktok_clicks,
+        COUNT(*) FILTER (WHERE type='google_review')::int AS google_review_clicks,
+        COUNT(*) FILTER (WHERE type='website')::int AS website_clicks,
+        COUNT(*) FILTER (WHERE type='menu')::int AS menu_clicks
+      FROM events WHERE ${where}`,[req.user.id]);
+
+    const daily = await pool.query(`
+      SELECT TO_CHAR(created_at::date,'YYYY-MM-DD') AS day,
+        COUNT(*)::int AS events,
+        COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
+        COUNT(*) FILTER (WHERE type IN ('qr_scan','qr'))::int AS qr_scans,
+        COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps
+      FROM events WHERE ${where}
+      GROUP BY created_at::date ORDER BY created_at::date ASC`,[req.user.id]);
+
+    const hourly = await pool.query(`
+      SELECT EXTRACT(HOUR FROM created_at)::int AS hour, COUNT(*)::int AS events
+      FROM events WHERE ${where}
+      GROUP BY EXTRACT(HOUR FROM created_at) ORDER BY hour ASC`,[req.user.id]);
+
+    const actions = await pool.query(`
+      SELECT type, COUNT(*)::int AS count FROM events
+      WHERE ${where} GROUP BY type ORDER BY count DESC`,[req.user.id]);
+
+    const tags = await pool.query(`
+      SELECT id,name,code,placement,tap_count,last_tap FROM nfc_tags
+      WHERE business_id=$1 ORDER BY tap_count DESC NULLS LAST, created_at DESC LIMIT 10`,[req.user.id]);
+
+    res.json({period, totals: totals.rows[0], daily: daily.rows, hourly: hourly.rows, actions: actions.rows, top_nfc: tags.rows});
+  } catch(error) {
+    console.error('BUSINESS ANALYTICS V3 ERROR:', error);
+    res.status(500).json({error:'Analiz verileri alınamadı'});
+  }
+});
+
+/* =========================================================
    STATS
 ========================================================= */
 
