@@ -86,11 +86,49 @@ function publicBusiness(row) {
     iban_holder: row.iban_holder || '',
     hours: row.hours || '',
     logo_url: row.logo_url || '',
+    social_links: normalizeSocialLinks(row.social_links),
+    custom_links: normalizeCustomLinks(row.custom_links),
     created_at: row.created_at
   };
 }
 
 
+
+const LEO_V2_THEMES = {
+  'midnight-gold': { name:'Midnight Gold', description:'Siyah + altın, ana premium tema' },
+  'obsidian': { name:'Obsidian', description:'Ultra koyu, modern ve teknolojik tema' },
+  'champagne': { name:'Champagne', description:'Sıcak, zarif ve lüks tema' },
+  'pure-light': { name:'Pure Light', description:'Aydınlık, temiz ve premium tema' }
+};
+
+const LEO_V2_SOCIAL_PLATFORMS = ['instagram','tiktok','facebook','youtube','linkedin','x','whatsapp','google','website'];
+
+function normalizeSocialLinks(value){
+  let raw=value;
+  if(typeof raw==='string'){ try{ raw=JSON.parse(raw); }catch(_){ raw={}; } }
+  raw=raw && typeof raw==='object' && !Array.isArray(raw) ? raw : {};
+  const out={};
+  for(const key of LEO_V2_SOCIAL_PLATFORMS){
+    const item=raw[key];
+    if(typeof item==='string') out[key]={url:item.trim().slice(0,2000),enabled:true};
+    else if(item && typeof item==='object') out[key]={url:String(item.url||'').trim().slice(0,2000),enabled:item.enabled!==false,label:String(item.label||'').trim().slice(0,80)};
+  }
+  return out;
+}
+
+function normalizeCustomLinks(value){
+  let raw=value;
+  if(typeof raw==='string'){ try{ raw=JSON.parse(raw); }catch(_){ raw=[]; } }
+  if(!Array.isArray(raw)) return [];
+  return raw.slice(0,20).map((item,i)=>({
+    id:String(item?.id || `custom-${i+1}`),
+    title:String(item?.title || '').trim().slice(0,80),
+    url:String(item?.url || '').trim().slice(0,2000),
+    icon:String(item?.icon || '🔗').trim().slice(0,8),
+    enabled:item?.enabled!==false,
+    sort_order:Number.isFinite(Number(item?.sort_order)) ? Number(item.sort_order) : i
+  })).filter(x=>x.title && x.url);
+}
 
 const DYNAMIC_PROFILE_DEFAULTS = {
   theme: 'midnight-gold',
@@ -263,6 +301,7 @@ function businessPermissions(row) {
     ai: row?.dashboard_ai === true,
     review: row?.dashboard_review === true,
     campaign: row?.dashboard_campaign === true,
+    profile_theme: row?.profile_theme_permission !== false,
     profile_fields: businessProfileFieldPermissions(row)
   };
 }
@@ -363,7 +402,10 @@ async function initDatabase() {
       ADD COLUMN IF NOT EXISTS dashboard_analytics BOOLEAN NOT NULL DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS dashboard_live BOOLEAN NOT NULL DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS dashboard_ai BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS profile_field_permissions JSONB NOT NULL DEFAULT '{}'::jsonb
+      ADD COLUMN IF NOT EXISTS profile_field_permissions JSONB NOT NULL DEFAULT '{}'::jsonb,
+      ADD COLUMN IF NOT EXISTS profile_theme_permission BOOLEAN NOT NULL DEFAULT TRUE,
+      ADD COLUMN IF NOT EXISTS social_links JSONB NOT NULL DEFAULT '{}'::jsonb,
+      ADD COLUMN IF NOT EXISTS custom_links JSONB NOT NULL DEFAULT '[]'::jsonb
   `);
 
 
@@ -1130,7 +1172,7 @@ app.get(
 app.get('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_field_permissions
+      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_theme_permission, profile_field_permissions
       FROM businesses WHERE id=$1 LIMIT 1
     `, [Number(req.params.id)]);
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
@@ -1164,6 +1206,9 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
       ? body.profile_fields
       : {};
     const profile_fields = businessProfileFieldPermissions(current.rows[0]);
+    const profile_theme = body.profile_theme !== undefined
+      ? body.profile_theme === true
+      : current.rows[0].profile_theme_permission !== false;
     for (const key of BUSINESS_PROFILE_FIELDS) {
       if (Object.prototype.hasOwnProperty.call(incomingFields, key)) {
         profile_fields[key] = incomingFields[key] === true;
@@ -1172,10 +1217,10 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
 
     const result = await pool.query(`
       UPDATE businesses
-      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7, dashboard_campaign=$8, profile_field_permissions=$9::jsonb
-      WHERE id=$10
-      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_field_permissions
-    `, [profile, qr, nfc, analytics, live, ai, review, campaign, JSON.stringify(profile_fields), id]);
+      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7, dashboard_campaign=$8, profile_theme_permission=$9, profile_field_permissions=$10::jsonb
+      WHERE id=$11
+      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_theme_permission, profile_field_permissions
+    `, [profile, qr, nfc, analytics, live, ai, review, campaign, profile_theme, JSON.stringify(profile_fields), id]);
 
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
     res.json({ success: true, permissions: businessPermissions(result.rows[0]) });
@@ -2636,6 +2681,81 @@ app.put('/api/me', auth, requireBusinessPermission('profile'), async (req, res) 
   }
 });
 
+
+/* =========================================================
+   V2 FINAL — THEME + SOCIAL/DIGITAL LINKS
+========================================================= */
+
+app.get('/api/business-v2-settings', auth, requireBusinessPermission('profile'), async (req,res)=>{
+  try{
+    const r=await pool.query(`SELECT id,profile_theme_permission,social_links,custom_links FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    const d=await pool.query(`SELECT theme,accent_color FROM profile_designs WHERE business_id=$1 LIMIT 1`,[req.user.id]);
+    const design=d.rows[0]||{};
+    const theme=LEO_V2_THEMES[design.theme] ? design.theme : 'midnight-gold';
+    res.json({theme,themes:LEO_V2_THEMES,theme_permission:r.rows[0].profile_theme_permission!==false,accent_color:design.accent_color||'#D4AF37',social_links:normalizeSocialLinks(r.rows[0].social_links),custom_links:normalizeCustomLinks(r.rows[0].custom_links)});
+  }catch(e){console.error('V2 SETTINGS GET ERROR:',e);res.status(500).json({error:'Profil ayarları alınamadı'});}
+});
+
+app.put('/api/business-theme', auth, requireBusinessPermission('profile'), async (req,res)=>{
+  try{
+    const b=await pool.query(`SELECT profile_theme_permission FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
+    if(!b.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    if(b.rows[0].profile_theme_permission===false) return res.status(403).json({error:'Tema değiştirme yetkisi admin tarafından kapatıldı'});
+    const theme=String(req.body?.theme||'').trim();
+    if(!LEO_V2_THEMES[theme]) return res.status(400).json({error:'Geçersiz tema'});
+    const accent=String(req.body?.accent_color||'').trim().slice(0,30)||'#D4AF37';
+    const r=await pool.query(`INSERT INTO profile_designs(business_id,theme,accent_color,updated_at) VALUES($1,$2,$3,CURRENT_TIMESTAMP) ON CONFLICT(business_id) DO UPDATE SET theme=EXCLUDED.theme,accent_color=EXCLUDED.accent_color,updated_at=CURRENT_TIMESTAMP RETURNING theme,accent_color`,[req.user.id,theme,accent]);
+    res.json({theme:r.rows[0].theme,accent_color:r.rows[0].accent_color,theme_name:LEO_V2_THEMES[r.rows[0].theme].name});
+  }catch(e){console.error('BUSINESS THEME UPDATE ERROR:',e);res.status(500).json({error:'Tema kaydedilemedi'});}
+});
+
+app.put('/api/business-social-links', auth, requireBusinessPermission('profile'), async (req,res)=>{
+  try{
+    const links=normalizeSocialLinks(req.body?.social_links||req.body);
+    const r=await pool.query(`UPDATE businesses SET social_links=$1::jsonb WHERE id=$2 RETURNING social_links`,[JSON.stringify(links),req.user.id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    res.json({social_links:normalizeSocialLinks(r.rows[0].social_links)});
+  }catch(e){console.error('SOCIAL LINKS UPDATE ERROR:',e);res.status(500).json({error:'Bağlantılar kaydedilemedi'});}
+});
+
+app.put('/api/business-custom-links', auth, requireBusinessPermission('profile'), async (req,res)=>{
+  try{
+    const links=normalizeCustomLinks(req.body?.custom_links);
+    const r=await pool.query(`UPDATE businesses SET custom_links=$1::jsonb WHERE id=$2 RETURNING custom_links`,[JSON.stringify(links),req.user.id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    res.json({custom_links:normalizeCustomLinks(r.rows[0].custom_links)});
+  }catch(e){console.error('CUSTOM LINKS UPDATE ERROR:',e);res.status(500).json({error:'Özel bağlantılar kaydedilemedi'});}
+});
+
+app.get('/api/admin/business/:id/v2-settings', adminAuth, async (req,res)=>{
+  try{
+    const id=Number(req.params.id);
+    const r=await pool.query(`SELECT b.id,b.name,b.profile_theme_permission,b.social_links,b.custom_links,COALESCE(pd.theme,'midnight-gold') theme,COALESCE(pd.accent_color,'#D4AF37') accent_color FROM businesses b LEFT JOIN profile_designs pd ON pd.business_id=b.id WHERE b.id=$1 LIMIT 1`,[id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    const row=r.rows[0];
+    res.json({id:row.id,name:row.name,theme:LEO_V2_THEMES[row.theme]?row.theme:'midnight-gold',themes:LEO_V2_THEMES,theme_permission:row.profile_theme_permission!==false,accent_color:row.accent_color,social_links:normalizeSocialLinks(row.social_links),custom_links:normalizeCustomLinks(row.custom_links)});
+  }catch(e){console.error('ADMIN V2 SETTINGS GET ERROR:',e);res.status(500).json({error:'V2 ayarları alınamadı'});}
+});
+
+app.put('/api/admin/business/:id/theme', adminAuth, async (req,res)=>{
+  try{
+    const id=Number(req.params.id), theme=String(req.body?.theme||'').trim();
+    if(!LEO_V2_THEMES[theme]) return res.status(400).json({error:'Geçersiz tema'});
+    const accent=String(req.body?.accent_color||'').trim().slice(0,30)||'#D4AF37';
+    const r=await pool.query(`INSERT INTO profile_designs(business_id,theme,accent_color,updated_at) VALUES($1,$2,$3,CURRENT_TIMESTAMP) ON CONFLICT(business_id) DO UPDATE SET theme=EXCLUDED.theme,accent_color=EXCLUDED.accent_color,updated_at=CURRENT_TIMESTAMP RETURNING theme,accent_color`,[id,theme,accent]);
+    res.json({theme:r.rows[0].theme,accent_color:r.rows[0].accent_color,theme_name:LEO_V2_THEMES[r.rows[0].theme].name});
+  }catch(e){console.error('ADMIN THEME UPDATE ERROR:',e);res.status(500).json({error:'Tema kaydedilemedi'});}
+});
+
+app.put('/api/admin/business/:id/theme-permission', adminAuth, async (req,res)=>{
+  try{
+    const id=Number(req.params.id), allowed=req.body?.allowed!==false;
+    const r=await pool.query(`UPDATE businesses SET profile_theme_permission=$1 WHERE id=$2 RETURNING id,name,profile_theme_permission`,[allowed,id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    res.json({id:r.rows[0].id,name:r.rows[0].name,theme_permission:r.rows[0].profile_theme_permission!==false});
+  }catch(e){console.error('ADMIN THEME PERMISSION ERROR:',e);res.status(500).json({error:'Tema yetkisi kaydedilemedi'});}
+});
 
 /* =========================================================
    QR
@@ -4640,7 +4760,7 @@ initDatabase()
       () => {
 
         console.log(
-          `LEO CONNECT 3.8 STABLE PUBLIC PROFILE çalışıyor: ${PORT}`
+          `LEO CONNECT V2 FINAL CORE + V1 COMPATIBILITY çalışıyor: ${PORT}`
         );
 
       }
