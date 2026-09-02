@@ -2050,6 +2050,39 @@ main{
 
 }
 
+
+/* ==================================================
+   BUSINESS CENTER V2 — COMMAND BAR
+================================================== */
+.command-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:0 0 22px;
+  padding:14px 16px;
+  border:1px solid #c59a5230;
+  border-radius:18px;
+  background:linear-gradient(135deg,#15120d,#101010 55%,#171717);
+  box-shadow:0 18px 50px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
+}
+.command-left{display:flex;align-items:center;gap:12px;min-width:0}
+.command-badge{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#c59a5218;border:1px solid #c59a5245;font-size:18px}
+.command-copy{min-width:0}
+.command-copy strong{display:block;font-size:13px;letter-spacing:.02em}
+.command-copy span{display:block;color:#8d8d8d;font-size:12px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.command-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.command-btn{border:1px solid #303030;background:#121212;color:#eee;border-radius:11px;padding:9px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}
+.command-btn.gold{border-color:#c59a5260;background:#c59a5214;color:#e0bd7b}
+.command-btn:hover{border-color:#c59a5280;transform:translateY(-1px)}
+.access-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 22px}
+.access-item{padding:12px 13px;border:1px solid #292929;border-radius:14px;background:#101010;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.access-item span:first-child{font-size:12px;color:#8f8f8f}
+.access-state{font-size:11px;font-weight:800;letter-spacing:.05em}
+.access-state.on{color:#62d992}.access-state.off{color:#666}
+@media(max-width:760px){.command-bar{align-items:flex-start;flex-direction:column}.command-actions{width:100%;justify-content:flex-start}.command-btn{flex:1;text-align:center}.access-strip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:430px){.access-strip{grid-template-columns:1fr 1fr}.command-btn{font-size:11px;padding:9px 8px}}
+
 </style>
 
 </head>
@@ -2176,6 +2209,33 @@ main{
 </div>
 
 
+
+
+
+<!-- ==================================================
+     BUSINESS CENTER V2 — COMMAND BAR
+================================================== -->
+<div class="command-bar">
+  <div class="command-left">
+    <div class="command-badge">🦁</div>
+    <div class="command-copy">
+      <strong>LEO CONNECT COMMAND CENTER</strong>
+      <span id="commandStatus">İşletme dijital varlıkların hazır.</span>
+    </div>
+  </div>
+  <div class="command-actions">
+    <a id="commandProfile" class="command-btn gold" target="_blank" rel="noopener">👁 Profili Gör</a>
+    <button class="command-btn" type="button" onclick="copyProfileLink()">🔗 Linki Kopyala</button>
+    <button class="command-btn" type="button" onclick="shareProfile()">↗ Paylaş</button>
+  </div>
+</div>
+
+<div class="access-strip" id="accessStrip">
+  <div class="access-item"><span>Profil</span><span id="accessProfile" class="access-state on">AKTİF</span></div>
+  <div class="access-item"><span>QR Merkezi</span><span id="accessQR" class="access-state off">KİLİTLİ</span></div>
+  <div class="access-item"><span>NFC Merkezi</span><span id="accessNFC" class="access-state off">KİLİTLİ</span></div>
+  <div class="access-item"><span>Analiz</span><span id="accessAnalytics" class="access-state off">KİLİTLİ</span></div>
+</div>
 
 <!-- ==================================================
      PROFILE HERO
@@ -4352,6 +4412,18 @@ function renderPerformance(
 
 
 
+async function copyProfileLink(){
+  if(!currentBusiness?.slug) return;
+  const url=window.location.origin+"/p/"+currentBusiness.slug;
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast("Profil bağlantısı kopyalandı.");
+  }catch(error){
+    showToast("Profil bağlantısı: "+url);
+  }
+}
+
+
 /* ==================================================
    SHARE
 ================================================== */
@@ -4446,6 +4518,11 @@ async function shareProfile(){
 
 function applyPermissions(business){
   const p=business?.permissions||{profile:true,qr:false,nfc:false,analytics:false};
+  const setAccess=(id,on)=>{const el=document.getElementById(id);if(!el)return;el.textContent=on?"AKTİF":"KİLİTLİ";el.className="access-state "+(on?"on":"off")};
+  setAccess("accessProfile",p.profile);
+  setAccess("accessQR",p.qr);
+  setAccess("accessNFC",p.nfc);
+  setAccess("accessAnalytics",p.analytics);
   const hide=id=>{const el=document.getElementById(id);if(el)el.style.display="none"};
   const show=id=>{const el=document.getElementById(id);if(el)el.style.display=""};
 
@@ -4593,6 +4670,11 @@ async function load(){
     "heroProfile"
   ).href =
     profileUrl;
+
+  const commandProfile = document.getElementById("commandProfile");
+  if(commandProfile) commandProfile.href = profileUrl;
+  const commandStatus = document.getElementById("commandStatus");
+  if(commandStatus) commandStatus.textContent = (business.name || "İşletme") + " dijital varlıkların tek merkezden yönetiliyor.";
 
 
 
