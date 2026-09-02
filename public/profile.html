@@ -1721,6 +1721,7 @@ body{
 ================================================== */
 
 let business = null;
+let nfcCode = '';
 
 let source =
   new URLSearchParams(
@@ -1766,6 +1767,8 @@ async function getBusiness(){
 
     const code =
       pathParts[2];
+
+    nfcCode = code || '';
 
     if(!code){
       showError();
@@ -1853,7 +1856,12 @@ async function track(
 
         body:
           JSON.stringify({
-            type
+            type,
+            source: source || 'direct',
+            nfc_code:
+              source === 'nfc'
+                ? nfcCode
+                : ''
           })
 
       }
