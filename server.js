@@ -3417,6 +3417,7 @@ app.get(
             iban_holder,
             hours,
             logo_url,
+            profile_field_permissions,
             created_at
           FROM businesses
           WHERE slug=$1
@@ -3499,6 +3500,7 @@ app.get(
             b.iban_holder,
             b.hours,
             b.logo_url,
+            b.profile_field_permissions,
             b.created_at
           FROM nfc_tags t
           INNER JOIN businesses b
