@@ -40,8 +40,8 @@ a{color:inherit;text-decoration:none}
 .avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--gold2);color:#17130a;font-weight:800}
 .admin-row{display:flex;gap:10px;align-items:center}.admin-name{font-weight:700;font-size:13px}.admin-mail{font-size:10px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis}
 .online{color:var(--accent);font-size:10px;margin-top:7px}.online i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);margin-right:5px}
-.main{min-width:0}
-.topbar{height:82px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(14px);position:sticky;top:0;z-index:15}
+.main{min-width:0;position:relative}
+.topbar{--topbar-h:82px;height:var(--topbar-h);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(14px);position:sticky;top:0;z-index:15}
 .top-actions{display:flex;align-items:center;gap:9px}
 .tool{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:11px;padding:10px 12px}
 .tool:hover{border-color:rgba(var(--accent-rgb),.45)}
@@ -74,7 +74,7 @@ a{color:inherit;text-decoration:none}
 @media(max-width:720px){.form-grid,.analytics-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.tag-row{grid-template-columns:1fr}}
 
 .business-page{display:none;padding:30px 34px 50px;max-width:1500px;margin:auto}
-.business-page.show{display:block}
+.business-page.show{display:block;position:absolute;top:var(--topbar-h);left:0;right:0;min-height:calc(100vh - var(--topbar-h));background:var(--bg);z-index:10}
 .backbar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
 .back-btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;padding:10px 13px}
 .business-hero{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,var(--panel),var(--panel2));box-shadow:var(--shadow)}
@@ -104,7 +104,7 @@ a{color:inherit;text-decoration:none}
 @media(max-width:720px){.business-page{padding:20px 14px 80px}.business-hero{align-items:flex-start;flex-direction:column}.hero-actions{justify-content:flex-start}.business-hero-logo{width:62px;height:62px}.business-hero h2{font-size:23px}.biz-stat-grid{grid-template-columns:1fr 1fr}.profile-editor,.info-grid{grid-template-columns:1fr}.profile-editor .full{grid-column:auto}.analytics-cards{grid-template-columns:1fr}}
 
 
-.global-page{display:none;padding:30px 34px 55px;max-width:1500px;margin:auto}.global-page.show{display:block}.global-head{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:18px}.global-head h2{margin:7px 0 5px;font-size:30px}.global-head p{margin:0;color:var(--muted);font-size:12px}.global-grid{display:grid;gap:12px}.global-card{border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));border-radius:16px;padding:16px}.global-row{display:flex;justify-content:space-between;align-items:center;gap:15px}.global-main{display:flex;align-items:center;gap:12px;min-width:0}.global-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(var(--accent-rgb),.10);border:1px solid rgba(var(--accent-rgb),.2);color:var(--accent);font-size:20px}.global-name{font-weight:800;font-size:13px}.global-sub{font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all}.permission-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}.permission-card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)}.permission-card strong{display:block;font-size:12px}.permission-card span{display:block;color:var(--muted);font-size:9px;margin-top:4px}.switch{position:relative;width:48px;height:27px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;border-radius:30px;background:var(--line);transition:.2s;cursor:pointer}.slider:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:2px;border-radius:50%;background:#777;transition:.2s}.switch input:checked+.slider{background:rgba(var(--accent-rgb),.25);border:1px solid rgba(var(--accent-rgb),.45)}.switch input:checked+.slider:before{transform:translateX(20px);background:var(--accent)}.global-table{width:100%;border-collapse:collapse;margin-top:12px}.global-table th{font-size:9px;color:var(--muted);letter-spacing:1px;text-align:left;padding:12px;border-bottom:1px solid var(--line)}.global-table td{padding:12px;border-bottom:1px solid var(--line);font-size:11px}.global-table tr:last-child td{border-bottom:0}@media(max-width:720px){.global-page{padding:20px 14px 80px}.permission-grid{grid-template-columns:1fr}.global-head{align-items:flex-start;flex-direction:column}}
+.global-page{display:none;padding:30px 34px 55px;max-width:1500px;margin:auto}.global-page.show{display:block;position:absolute;top:var(--topbar-h);left:0;right:0;min-height:calc(100vh - var(--topbar-h));background:var(--bg);z-index:10}.global-head{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:18px}.global-head h2{margin:7px 0 5px;font-size:30px}.global-head p{margin:0;color:var(--muted);font-size:12px}.global-grid{display:grid;gap:12px}.global-card{border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));border-radius:16px;padding:16px}.global-row{display:flex;justify-content:space-between;align-items:center;gap:15px}.global-main{display:flex;align-items:center;gap:12px;min-width:0}.global-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(var(--accent-rgb),.10);border:1px solid rgba(var(--accent-rgb),.2);color:var(--accent);font-size:20px}.global-name{font-weight:800;font-size:13px}.global-sub{font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all}.permission-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}.permission-card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)}.permission-card strong{display:block;font-size:12px}.permission-card span{display:block;color:var(--muted);font-size:9px;margin-top:4px}.switch{position:relative;width:48px;height:27px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;border-radius:30px;background:var(--line);transition:.2s;cursor:pointer}.slider:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:2px;border-radius:50%;background:#777;transition:.2s}.switch input:checked+.slider{background:rgba(var(--accent-rgb),.25);border:1px solid rgba(var(--accent-rgb),.45)}.switch input:checked+.slider:before{transform:translateX(20px);background:var(--accent)}.global-table{width:100%;border-collapse:collapse;margin-top:12px}.global-table th{font-size:9px;color:var(--muted);letter-spacing:1px;text-align:left;padding:12px;border-bottom:1px solid var(--line)}.global-table td{padding:12px;border-bottom:1px solid var(--line);font-size:11px}.global-table tr:last-child td{border-bottom:0}@media(max-width:720px){.global-page{padding:20px 14px 80px}.permission-grid{grid-template-columns:1fr}.global-head{align-items:flex-start;flex-direction:column}}
 
 
 .analytics-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}
@@ -120,7 +120,7 @@ a{color:inherit;text-decoration:none}
 .toast{position:fixed;right:20px;bottom:20px;background:var(--panel);border:1px solid rgba(var(--accent-rgb),.4);box-shadow:var(--shadow);padding:12px 15px;border-radius:12px;font-size:11px;display:none;z-index:80}.toast.show{display:block}
 .login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 50% 10%,rgba(var(--accent-rgb),.10),transparent 38%),var(--bg)}.login-card{width:min(520px,100%);padding:35px;border:1px solid var(--line);background:var(--panel);border-radius:24px;box-shadow:var(--shadow)}.login-logo{text-align:center;font-size:45px}.login h2{text-align:center;letter-spacing:3px;margin:13px 0 4px}.login p{text-align:center;color:var(--muted);font-size:11px;margin:0 0 27px}.field{margin-bottom:13px}.field label{display:block;font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;margin-bottom:6px}.field input{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);outline:none}.field input:focus{border-color:rgba(var(--accent-rgb),.55)}.login .btn{width:100%;padding:13px;margin-top:4px}.error{color:var(--danger);font-size:11px;margin-top:10px;text-align:center;min-height:15px}
 @media(max-width:1100px){.app{grid-template-columns:78px 1fr}.sidebar{padding:18px 10px}.brand{justify-content:center}.brand div:last-child,.nav-title,.nav button span,.admin-card .admin-mail,.admin-card .online,.admin-card .admin-name{display:none}.nav button{justify-content:center}.admin-card{padding:10px}.admin-row{justify-content:center}.cards{grid-template-columns:repeat(2,1fr)}.grid-main{grid-template-columns:1fr}}
-@media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;border-right:0;border-top:1px solid var(--line);padding:7px 8px}.brand,.admin-card,.nav-title{display:none}.nav{display:flex;justify-content:space-around}.nav button{padding:9px;flex:1}.nav button span{display:none}.main{padding-bottom:62px}.topbar{height:auto;padding:12px 14px}.top-actions{margin-left:auto}.colors label{display:none}.content{padding:22px 14px}.hero{align-items:start}.hero h1{font-size:31px}.status{display:none}.cards{grid-template-columns:1fr 1fr;gap:9px}.stat{min-height:125px;padding:14px}.stat-value{font-size:26px}.grid-main{margin-top:10px}.section-head{display:block}.search{margin-top:12px}.search input{width:100%}.summary-grid{grid-template-columns:1fr 1fr}.summary-item{padding:10px 0;border-right:0;border-bottom:1px solid var(--line)}.detail-grid{grid-template-columns:1fr}.topbar .tool:first-child{display:none}}
+@media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;border-right:0;border-top:1px solid var(--line);padding:7px 8px}.brand,.admin-card,.nav-title{display:none}.nav{display:flex;justify-content:space-around}.nav button{padding:9px;flex:1}.nav button span{display:none}.main{padding-bottom:62px}.topbar{--topbar-h:58px;height:var(--topbar-h);padding:12px 14px}.top-actions{margin-left:auto}.colors label{display:none}.content{padding:22px 14px}.hero{align-items:start}.hero h1{font-size:31px}.status{display:none}.cards{grid-template-columns:1fr 1fr;gap:9px}.stat{min-height:125px;padding:14px}.stat-value{font-size:26px}.grid-main{margin-top:10px}.section-head{display:block}.search{margin-top:12px}.search input{width:100%}.summary-grid{grid-template-columns:1fr 1fr}.summary-item{padding:10px 0;border-right:0;border-bottom:1px solid var(--line)}.detail-grid{grid-template-columns:1fr}.topbar .tool:first-child{display:none}}
 
 .live-center{margin-top:16px}
 .live-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
@@ -168,7 +168,7 @@ a{color:inherit;text-decoration:none}
     <div class="nav-title">ANA MENÜ</div>
     <nav class="nav">
       <button class="active" onclick="setActive(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
-      <button onclick="focusBusinesses();setActive(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
+      <button onclick="showBusinessesManager(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
       <button onclick="showNFCManager(this)"><span class="nav-icon">◉</span><span>NFC Etiketleri</span></button>
       <button onclick="showQRManager(this)"><span class="nav-icon">▣</span><span>QR Merkezi</span></button>
       <button onclick="showBusinessCardManager(this)"><span class="nav-icon">💳</span><span>Business Card</span></button>
@@ -460,8 +460,16 @@ function filterBusinesses(){
   const q=document.getElementById("businessSearch").value.toLowerCase().trim();
   renderBusinesses(allBusinesses.filter(b=>(b.name+" "+b.email+" "+b.category).toLowerCase().includes(q)));
 }
-function focusBusinesses(){document.getElementById("businessSection").scrollIntoView({behavior:"smooth",block:"start"})}
-function focusAnalytics(){focusBusinesses();showToast("Bir işletme seçip Analytics sekmesini açabilirsin.")}
+async function showBusinessesManager(btn){
+  if(btn)setActive(btn);
+  showGlobalPage("İşletmeler","Tüm işletmeleri merkezi çalışma alanında yönet.",'<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
+  try{
+    if(!allBusinesses.length){const d=await api("/api/admin/businesses");allBusinesses=d.businesses||d||[];}
+    document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div class="global-row"><div><h3>🏢 İşletme Merkezi</h3><div class="sub">İşletme kayıtları, profil, QR, NFC ve yetkileri buradan yönet.</div></div><button class="btn primary" onclick="newBusiness()">＋ İşletme Ekle</button></div><div class="table-wrap" style="margin-top:14px"><table class="table" style="min-width:760px"><thead><tr><th>İŞLETME</th><th>KATEGORİ</th><th>PROFİL</th><th>QR</th><th>NFC</th><th>ETİKET</th><th>İŞLEM</th></tr></thead><tbody>${allBusinesses.length?allBusinesses.map(b=>`<tr><td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td><td class="accent">${esc(b.category||"—")}</td><td>${n(b.profile_views)}</td><td>${n(b.qr_scans)}</td><td>${n(b.nfc_scans)}</td><td><span class="badge">${n(b.nfc_tags)} NFC</span></td><td><button class="btn primary" onclick="openBusiness(${Number(b.id)})">Detay ›</button></td></tr>`).join(""):'<tr><td colspan="7"><div class="empty">İşletme bulunamadı.</div></td></tr>'}</tbody></table></div></section>`;
+  }catch(e){document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
+}
+function focusBusinesses(){showBusinessesManager();}
+function focusAnalytics(){showGlobalPage("Analytics","Merkezi analiz alanı.",'<div class="global-card"><div class="empty">Bir işletme seçerek detaylı Analytics ekranını açabilirsin.</div></div>');}
 function setActive(btn){document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}
 function openModal(){document.getElementById("modalBg").classList.add("show")}
 function closeModal(){document.getElementById("modalBg").classList.remove("show")}
@@ -474,6 +482,7 @@ async function openBusiness(id){
     const d=await api("/api/admin/business/"+id);
     currentBusiness={...d.business,permissions:d.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:d.nfc_tags||[]};
     document.querySelector(".content").style.display="none";
+    document.getElementById("globalPage").classList.remove("show");
     document.getElementById("businessPage").classList.add("show");
     renderBusinessPage();
     window.scrollTo({top:0,behavior:"smooth"});
@@ -846,58 +855,42 @@ async function deleteGlobalNFC(id){
   try{await api("/api/admin/nfc-tags/"+id,{method:"DELETE"});showToast("NFC etiketi silindi.");await showNFCManager();}catch(e){showToast(e.message)}
 }
 
-const BUSINESS_CARD_FIELDS=[
-  ['display_name','Kart Başlığı / İşletme Adı'],['person_name','Yetkili / Kişi Adı'],['job_title','Unvan'],
-  ['phone','Telefon'],['whatsapp','WhatsApp'],['email','E-posta'],['website','Web Sitesi'],['address','Adres'],
-  ['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['linkedin','LinkedIn'],
-  ['google_review','Google Yorum'],['menu','Menü'],['iban','IBAN'],['iban_holder','IBAN Sahibi'],['hours','Çalışma Saatleri'],['note','Not / Kısa Açıklama']
+const CARD_PERSON_FIELDS=[
+ ['display_name','Kart Başlığı'],['person_name','Ad Soyad'],['job_title','Unvan'],['company','Şirket / Kurum'],
+ ['phone','Telefon'],['whatsapp','WhatsApp'],['email','E-posta'],['website','Web Sitesi'],['address','Adres'],
+ ['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['linkedin','LinkedIn'],['youtube','YouTube'],['x','X / Twitter'],
+ ['photo_url','Profil Fotoğrafı'],['cover_url','Kapak Görseli'],['bio','Hakkımda'],['note','Not / Kısa Açıklama']
 ];
-
 async function showBusinessCardManager(btn){
   if(btn)setActive(btn);
-  showGlobalPage('Business Card','Tüm işletmelerin Digital Business Card modülünü ve alan bazlı yetkilerini tek merkezden yönet.','<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
+  showGlobalPage('Business Card','İşletmelerden bağımsız kişisel dijital kartvizitleri yönet.','<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
   try{
-    const d=await api('/api/admin/business-cards');
-    const rows=Array.isArray(d.businesses)?d.businesses:[];
+    const d=await api('/api/admin/card-people'), rows=Array.isArray(d.people)?d.people:[];
     document.getElementById('globalContent').innerHTML=`
       <section class="card biz-section">
-        <div class="global-row"><div><h3>💳 Digital Business Card Merkezi</h3><div class="sub">Her işletme için modülü açabilir ve hangi kartvizit alanlarını düzenleyebileceğini ayrı ayrı belirleyebilirsin.</div></div><span class="badge">${n(rows.filter(x=>x.dashboard_card).length)} AKTİF</span></div>
-        <div class="global-grid" style="margin-top:15px">
-          ${rows.length?rows.map(b=>{
-            const perms=b.card?.permissions||{}; const count=BUSINESS_CARD_FIELDS.filter(x=>perms[x[0]]===true).length;
-            return `<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">💳</div><div><div class="global-name">${esc(b.name||'İsimsiz')}</div><div class="global-sub">${esc(b.category||'—')} • /card/${esc(b.slug||'')}</div><div class="global-sub">${b.dashboard_card?'Kart modülü açık':'Kart modülü kapalı'} • ${count}/${BUSINESS_CARD_FIELDS.length} alan yetkili</div></div></div><div class="modal-actions"><span class="badge">${b.dashboard_card?'AKTİF':'KAPALI'}</span><button class="btn primary" onclick="openBusinessCardPermissions(${Number(b.id)})">Yetkileri Yönet</button>${b.dashboard_card?`<button class="btn" onclick="window.open('/card/${encodeURIComponent(b.slug||'')}','_blank')">Kartı Gör ↗</button>`:''}</div></div></div>`
-          }).join(''):'<div class="empty">İşletme bulunamadı.</div>'}
-        </div>
+        <div class="global-row"><div><h3>💳 Kişisel Business Card Merkezi</h3><div class="sub">Her kişi bağımsız bir karta sahiptir. İşletme kaydı gerekmez.</div></div><button class="btn primary" onclick="newCardPerson()">＋ Kişi Ekle</button></div>
+        <div class="global-grid" style="margin-top:15px">${rows.length?rows.map(p=>{const count=CARD_PERSON_FIELDS.filter(([k])=>p.permissions?.[k]===true).length; const d=p.data||{};return `<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">👤</div><div><div class="global-name">${esc(d.person_name||d.display_name||'İsimsiz')}</div><div class="global-sub">${esc(d.company||'Kişisel Kart')} • /card/${esc(p.slug||'')}</div><div class="global-sub">${p.email?esc(p.email)+' • ':''}${count}/${CARD_PERSON_FIELDS.length} alan yetkili</div></div></div><div class="modal-actions"><span class="badge">${p.enabled?'AKTİF':'KAPALI'}</span><button class="btn primary" onclick="editCardPerson(${Number(p.id)})">Yönet</button>${p.enabled?`<button class="btn" onclick="window.open('/card/${encodeURIComponent(p.slug||'')}','_blank')">Kartı Gör ↗</button>`:''}</div></div></div>`}).join(''):'<div class="empty">Henüz Business Card kişisi oluşturulmadı.</div>'}</div>
       </section>`;
   }catch(e){document.getElementById('globalContent').innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
 }
-
-async function openBusinessCardPermissions(id){
-  try{
-    const d=await api('/api/admin/business/'+id+'/business-card');
-    const b=d.business||{}, c=d.card||{}, perms=c.permissions||{}, data=c.data||{};
-    document.getElementById('modalTitle').textContent='💳 Business Card • '+(b.name||'İşletme');
-    document.getElementById('modalBody').innerHTML=`
-      <div class="detail-box"><small>PUBLIC KART</small><strong style="display:block;margin-top:5px;word-break:break-all">/card/${esc(b.slug||'')}</strong></div>
-      <div class="permission-card" style="margin-top:14px"><div><strong>Business Card modülü</strong><span>İşletme panelinde kartvizit bölümünü tamamen aç/kapat.</span></div><label class="switch"><input id="bc_enabled" type="checkbox" ${c.enabled?'checked':''}><span class="slider"></span></label></div>
-      <div class="section-sub" style="margin:14px 0 8px"><strong>Alan bazlı işlem yetkileri</strong><br>Kapalı alanı işletme değiştiremez ve public kartta gösterilmez. Böylece Instagram, Facebook vb. her içerik ayrı kontrol edilir.</div>
-      <div class="permission-grid">${BUSINESS_CARD_FIELDS.map(([key,label])=>`<div class="permission-card"><div><strong>${esc(label)}</strong><span>${data[key]?'İçerik mevcut':'İçerik henüz girilmedi'}</span></div><label class="switch"><input class="bc-perm" data-field="${key}" type="checkbox" ${perms[key]===true?'checked':''}><span class="slider"></span></label></div>`).join('')}</div>
-      <div class="section-sub" style="margin-top:12px">🔒 Yetki kontrolü sunucu tarafında da yapılır. İşletme API üzerinden kapalı alanı güncelleyemez.</div>
-      <div class="modal-actions"><button class="btn primary" onclick="saveBusinessCardPermissions(${Number(id)})">Yetkileri Kaydet</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;
-    openModal();
-  }catch(e){showToast(e.message)}
+function newCardPerson(){
+  document.getElementById('modalTitle').textContent='💳 Yeni Business Card Kişisi';
+  document.getElementById('modalBody').innerHTML=`<div class="form-grid"><div class="form-field full"><label>AD SOYAD</label><input id="cp_name" placeholder="Örn. Tayfun Timrus"></div><div class="form-field"><label>GİRİŞ E-POSTASI (OPSİYONEL)</label><input id="cp_email" type="email" placeholder="kart sahibi giriş yapacaksa"></div><div class="form-field"><label>GEÇİCİ ŞİFRE (OPSİYONEL)</label><input id="cp_password" type="password" placeholder="En az 8 karakter"></div></div><div class="section-sub" style="margin-top:12px">Kişi oluşturulduktan sonra hangi alanları düzenleyebileceğini ayrıca belirleyebilirsin.</div><div class="modal-actions"><button class="btn primary" onclick="createCardPerson()">Kişiyi Oluştur</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;
+  openModal(); setTimeout(()=>document.getElementById('cp_name')?.focus(),50);
 }
-
-async function saveBusinessCardPermissions(id){
-  try{
-    const d=await api('/api/admin/business/'+id+'/business-card');
-    const existing=d.card||{}, permissions={};
-    document.querySelectorAll('.bc-perm').forEach(el=>permissions[el.dataset.field]=el.checked===true);
-    const payload={enabled:document.getElementById('bc_enabled').checked===true,data:existing.data||{},permissions};
-    await api('/api/admin/business/'+id+'/business-card',{method:'PUT',body:JSON.stringify(payload)});
-    closeModal(); showToast('Business Card yetkileri güncellendi.'); await showBusinessCardManager();
-  }catch(e){showToast(e.message)}
+async function createCardPerson(){
+  const name=document.getElementById('cp_name').value.trim(),email=document.getElementById('cp_email').value.trim(),password=document.getElementById('cp_password').value;
+  if(!name){showToast('Ad Soyad gerekli.');return}
+  if(password && password.length<8){showToast('Şifre en az 8 karakter olmalı.');return}
+  try{await api('/api/admin/card-people',{method:'POST',body:JSON.stringify({email,password,data:{person_name:name,display_name:name},enabled:true})});closeModal();showToast('Business Card kişisi oluşturuldu.');await showBusinessCardManager();}catch(e){showToast(e.message)}
 }
+async function editCardPerson(id){
+  try{const d=await api('/api/admin/card-people/'+id),p=d.person||{},data=p.data||{},perms=p.permissions||{};document.getElementById('modalTitle').textContent='💳 Business Card • '+(data.person_name||'Kişi');document.getElementById('modalBody').innerHTML=`<div class="detail-box"><small>PUBLIC KART</small><strong style="display:block;margin-top:5px;word-break:break-all">/card/${esc(p.slug||'')}</strong></div><div class="form-grid" style="margin-top:14px"><div class="form-field"><label>E-POSTA</label><input id="cp_edit_email" value="${esc(p.email||'')}"></div><div class="form-field"><label>YENİ ŞİFRE</label><input id="cp_edit_password" type="password" placeholder="Değiştirmek istemiyorsan boş bırak"></div></div><div class="section-sub" style="margin:14px 0 8px"><strong>Alan bazlı işlem yetkileri</strong><br>Kapalı alan kişi tarafından değiştirilemez ve public kartta gösterilmez.</div><div class="permission-grid">${CARD_PERSON_FIELDS.map(([k,l])=>`<div class="permission-card"><div><strong>${esc(l)}</strong><span>${data[k]?'İçerik mevcut':'İçerik henüz girilmedi'}</span></div><label class="switch"><input class="cp-perm" data-field="${k}" type="checkbox" ${perms[k]===true?'checked':''}><span class="slider"></span></label></div>`).join('')}</div><div class="permission-card" style="margin-top:12px"><div><strong>Kart aktif</strong><span>Public kartı erişilebilir yapar.</span></div><label class="switch"><input id="cp_enabled" type="checkbox" ${p.enabled?'checked':''}><span class="slider"></span></label></div><div class="modal-actions"><button class="btn primary" onclick="saveCardPerson(${Number(id)})">Kaydet</button><button class="btn" onclick="deleteCardPerson(${Number(id)})">Kişiyi Sil</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal();}catch(e){showToast(e.message)}
+}
+async function saveCardPerson(id){
+  try{const d=await api('/api/admin/card-people/'+id),existing=d.person||{},permissions={};document.querySelectorAll('.cp-perm').forEach(x=>permissions[x.dataset.field]=x.checked===true);const data={...(existing.data||{})};await api('/api/admin/card-people/'+id,{method:'PUT',body:JSON.stringify({email:document.getElementById('cp_edit_email').value.trim(),password:document.getElementById('cp_edit_password').value,enabled:document.getElementById('cp_enabled').checked,data,permissions})});closeModal();showToast('Business Card yetkileri güncellendi.');await showBusinessCardManager();}catch(e){showToast(e.message)}
+}
+async function deleteCardPerson(id){if(!confirm('Bu kişisel Business Card kaydını silmek istediğine emin misin?'))return;try{await api('/api/admin/card-people/'+id,{method:'DELETE'});closeModal();showToast('Kişisel kart silindi.');await showBusinessCardManager();}catch(e){showToast(e.message)}}
 
 async function showQRManager(btn){
   if(btn)setActive(btn);
