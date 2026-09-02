@@ -1332,6 +1332,16 @@ function updateDesignPreview(){
 
     const theme = data.theme || "midnight-gold";
     root.className = "preview-frame theme-" + theme;
+    /* Theme is applied directly to the preview root so it never depends on nested CSS selectors. */
+    const themeMap = {
+      "midnight-gold": {bg:"#101010", color:"#fff"},
+      "obsidian": {bg:"#050505", color:"#fff"},
+      "champagne": {bg:"#17120b", color:"#fff"},
+      "pure-light": {bg:"#f5f2eb", color:"#151515"}
+    };
+    const themeStyle = themeMap[theme] || themeMap["midnight-gold"];
+    root.style.background = themeStyle.bg;
+    root.style.color = themeStyle.color;
     root.style.setProperty("--preview-accent", data.accent_color);
     root.style.setProperty("--lc-gold", data.accent_color);
     root.style.setProperty("--gold-light", data.accent_color);
@@ -1551,34 +1561,25 @@ function updateDesignPreview(){
 /* Gerçek canlı önizleme: inline handler'a ek olarak
    tüm tasarım alanlarını merkezi olarak dinle. */
 function initLiveDesignPreview(){
-  const container =
-    document.getElementById("profileDesign");
-
+  const container = document.getElementById("profileDesign");
   if(!container) return;
 
   const refresh = function(){
-    window.requestAnimationFrame(updateDesignPreview);
+    try{ updateDesignPreview(); }catch(error){ console.error("LEO CONNECT preview refresh error:", error); }
   };
 
+  /* Capture phase ensures the listener survives any dashboard navigation/rendering. */
   container.addEventListener("input", function(event){
-    if(event.target && event.target.matches(
-      "input, textarea, select"
-    )){
-      refresh();
-    }
-  });
+    if(event.target && event.target.matches("input, textarea, select")) refresh();
+  }, true);
 
   container.addEventListener("change", function(event){
-    if(event.target && event.target.matches(
-      "input, textarea, select"
-    )){
-      refresh();
-    }
-  });
+    if(event.target && event.target.matches("input, textarea, select")) refresh();
+  }, true);
 
-  /* Sayfa açıldığında ilk render */
   refresh();
 }
+
 
 async function loadProfileDesign(){
   const result = await api("/api/business-profile-design");
@@ -2831,12 +2832,12 @@ async function saveProfileDesign(){
   color:#777;
   font-size:8px;
 }
-.theme-pure-light .preview-frame{background:#f5f2eb;color:#151515}
-.theme-pure-light .preview-body{color:#151515}
-.theme-pure-light .preview-category{color:#8f6c29}
-.theme-pure-light .preview-announcement,.theme-pure-light .preview-campaign,.theme-pure-light .preview-featured{background:#fff;border-color:#d7c6a1}
-.theme-obsidian .preview-frame{background:#050505}
-.theme-champagne .preview-frame{background:#17120b}
+.preview-frame.theme-pure-light{background:#f5f2eb;color:#151515}
+.preview-frame.theme-pure-light .preview-body{color:#151515}
+.preview-frame.theme-pure-light .preview-category{color:#8f6c29}
+.preview-frame.theme-pure-light .preview-announcement,.preview-frame.theme-pure-light .preview-campaign,.preview-frame.theme-pure-light .preview-featured{background:#fff;border-color:#d7c6a1}
+.preview-frame.theme-obsidian{background:#050505}
+.preview-frame.theme-champagne{background:#17120b}
 @media(max-width:820px){
   .profile-design-shell{grid-template-columns:1fr}
   .design-preview-box{position:static}
