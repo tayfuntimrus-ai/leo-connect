@@ -2402,9 +2402,17 @@ function renderSmartCampaigns(){
 
   box.innerHTML='';
 
-  const campaigns=Array.isArray(business?.campaigns)
-    ? business.campaigns.slice(0,5)
-    : [];
+  // Backend /api/profile/:slug kampanyaları `campaigns` alanında döndürür.
+  // Eski/veri uyumluluğu için profile_design.campaigns da desteklenir.
+  const rawCampaigns = Array.isArray(business?.campaigns)
+    ? business.campaigns
+    : (Array.isArray(business?.profile_design?.campaigns)
+      ? business.profile_design.campaigns
+      : []);
+
+  const campaigns = rawCampaigns
+    .filter(c => c && typeof c === 'object')
+    .slice(0,5);
 
   if(!campaigns.length){
     box.style.display='none';
@@ -2463,6 +2471,13 @@ function renderSmartCampaigns(){
   });
 
   box.style.display=box.children.length ? 'block' : 'none';
+
+  // Kampanya alanı görünür olduğunda sayfanın yerleşimi bozulmasın.
+  if(box.children.length){
+    box.setAttribute('aria-label','Aktif kampanyalar');
+  }else{
+    box.removeAttribute('aria-label');
+  }
 }
 
 
