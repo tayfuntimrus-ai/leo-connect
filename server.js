@@ -624,6 +624,97 @@ app.get('/api/admin/businesses', adminAuth, async (req, res) => {
 
 
 /* =========================================================
+   ADMIN BUSINESS CREATE
+========================================================= */
+
+app.post('/api/admin/businesses', adminAuth, async (req, res) => {
+
+  try {
+
+    const {
+      name,
+      email,
+      password,
+      category
+    } = req.body || {};
+
+    const businessName = String(name || '').trim();
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    const businessPassword = String(password || '');
+
+    if (!businessName || !normalizedEmail || businessPassword.length < 8) {
+      return res.status(400).json({
+        error: 'İşletme adı, e-posta ve en az 8 karakter şifre gerekli'
+      });
+    }
+
+    const existing = await pool.query(
+      `SELECT id FROM businesses WHERE email=$1 LIMIT 1`,
+      [normalizedEmail]
+    );
+
+    if (existing.rows.length) {
+      return res.status(409).json({ error: 'Bu e-posta zaten kayıtlı' });
+    }
+
+    const base = slugify(businessName) || 'business';
+    let slug = base;
+    let n = 1;
+
+    while (true) {
+      const check = await pool.query(
+        `SELECT id FROM businesses WHERE slug=$1 LIMIT 1`,
+        [slug]
+      );
+      if (!check.rows.length) break;
+      n++;
+      slug = `${base}-${n}`;
+    }
+
+    const passwordHash = await bcrypt.hash(businessPassword, 12);
+
+    const result = await pool.query(`
+      INSERT INTO businesses(
+        name,
+        slug,
+        email,
+        password_hash,
+        category,
+        dashboard_profile,
+        dashboard_qr,
+        dashboard_nfc,
+        dashboard_analytics
+      )
+      VALUES($1,$2,$3,$4,$5,TRUE,FALSE,FALSE,FALSE)
+      RETURNING *
+    `, [
+      businessName,
+      slug,
+      normalizedEmail,
+      passwordHash,
+      String(category || '').trim()
+    ]);
+
+    res.status(201).json({
+      success: true,
+      business: publicBusiness(result.rows[0]),
+      permissions: businessPermissions(result.rows[0])
+    });
+
+  } catch (error) {
+
+    console.error('ADMIN BUSINESS CREATE ERROR:', error);
+
+    res.status(500).json({
+      error: 'İşletme oluşturulamadı'
+    });
+
+  }
+
+});
+
+
+/* =========================================================
    ADMIN BUSINESS DETAIL
 ========================================================= */
 
