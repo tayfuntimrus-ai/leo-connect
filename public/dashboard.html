@@ -2486,6 +2486,28 @@ main{
 </style>
 </style>
 
+
+<style id="leo-business-center-final">
+/* LEO CONNECT BUSINESS CENTER FINAL — V1 CORE + ADMIN STYLE NAV */
+.bc-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 22px;padding:10px;border:1px solid var(--border,#2b2b2b);border-radius:18px;background:#101010;position:sticky;top:8px;z-index:50;box-shadow:0 12px 35px rgba(0,0,0,.22)}
+.bc-nav button{border:1px solid #292929;background:#151515;color:#999;border-radius:12px;padding:12px 10px;font:inherit;font-size:11px;font-weight:900;cursor:pointer;transition:.18s}
+.bc-nav button:hover,.bc-nav button.active{background:linear-gradient(135deg,#c59a52,#9e7738);border-color:#c59a52;color:#fff;transform:translateY(-1px)}
+.bc-nav button .bc-icon{display:block;font-size:18px;margin-bottom:4px}.bc-nav button small{display:block;font-size:8px;opacity:.7;margin-top:2px}
+.bc-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}.bc-section-title h2{margin:0}.bc-section-title span{color:#777;font-size:10px}
+.bc-tool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}.bc-tool{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid #292929;border-radius:15px;background:#101010;cursor:pointer;text-align:left;color:#eee}.bc-tool:hover{border-color:#c59a5266;background:#14120e}.bc-tool-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#1b1710;border:1px solid #c59a5238;font-size:19px;flex:none}.bc-tool strong{display:block;font-size:11px}.bc-tool span{display:block;margin-top:4px;color:#777;font-size:9px;line-height:1.4}
+.bc-settings{margin:0 0 18px;padding:18px;border:1px solid #292929;border-radius:18px;background:#101010}.bc-theme-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.bc-theme{padding:13px;border:1px solid #2b2b2b;border-radius:13px;background:#0d0d0d;color:#eee;cursor:pointer;text-align:left}.bc-theme.active{border-color:#c59a52;box-shadow:0 0 0 1px #c59a52 inset}.bc-theme strong{display:block;font-size:10px}.bc-theme span{display:block;color:#777;font-size:8px;margin-top:4px}.bc-theme-dot{width:28px;height:28px;border-radius:9px;margin-bottom:8px;border:1px solid #444}.bc-social-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.bc-social{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px;border:1px solid #292929;border-radius:12px;background:#0d0d0d}.bc-social strong{font-size:10px}.bc-social small{display:block;color:#666;font-size:8px;margin-top:3px}.bc-social button{border:1px solid #4a3a20;background:#17130d;color:#d7b56d;border-radius:9px;padding:7px 9px;font-size:8px;font-weight:900;cursor:pointer}
+body.bc-overview #profile,body.bc-overview #digital,body.bc-overview #performanceSection,body.bc-overview #liveSection,body.bc-overview #aiSection,body.bc-overview #profileDesign,body.bc-overview #reviewSection,body.bc-overview #campaignSection,body.bc-overview #bcProfileExtras{display:none!important}
+body.bc-profile .profile-hero,body.bc-profile .health,body.bc-profile .stats,body.bc-profile #businessAnalyticsV3,body.bc-profile .quick-grid,body.bc-profile #digital,body.bc-profile #performanceSection,body.bc-profile #liveSection,body.bc-profile #aiSection,body.bc-profile #reviewSection,body.bc-profile #campaignSection{display:none!important}
+body.bc-digital .profile-hero,body.bc-digital .health,body.bc-digital .stats,body.bc-digital #businessAnalyticsV3,body.bc-digital .quick-grid,body.bc-digital #profile,body.bc-digital #performanceSection,body.bc-digital #liveSection,body.bc-digital #aiSection,body.bc-digital #profileDesign,body.bc-digital #reviewSection,body.bc-digital #campaignSection,body.bc-digital #bcProfileExtras{display:none!important}
+body.bc-campaigns .profile-hero,body.bc-campaigns .health,body.bc-campaigns .stats,body.bc-campaigns #businessAnalyticsV3,body.bc-campaigns .quick-grid,body.bc-campaigns #profile,body.bc-campaigns #digital,body.bc-campaigns #performanceSection,body.bc-campaigns #liveSection,body.bc-campaigns #aiSection,body.bc-campaigns #profileDesign,body.bc-campaigns #reviewSection,body.bc-campaigns #bcProfileExtras{display:none!important}
+body.bc-stats .profile-hero,body.bc-stats .health,body.bc-stats .stats,body.bc-stats #businessAnalyticsV3,body.bc-stats .quick-grid,body.bc-stats #profile,body.bc-stats #digital,body.bc-stats #profileDesign,body.bc-stats #reviewSection,body.bc-stats #campaignSection,body.bc-stats #bcProfileExtras{display:none!important}
+body.bc-stats #performanceSection,body.bc-stats #liveSection,body.bc-stats #aiSection{display:block!important}
+body.bc-profile #profile,body.bc-profile #profileDesign,body.bc-profile #bcProfileExtras{display:block!important}
+body.bc-digital #digital{display:block!important}
+body.bc-campaigns #campaignSection{display:block!important}
+@media(max-width:820px){.bc-nav{grid-template-columns:repeat(2,1fr);position:static}.bc-tool-grid,.bc-social-grid{grid-template-columns:1fr}.bc-theme-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.bc-nav{grid-template-columns:1fr 1fr}.bc-nav button{padding:10px 7px}.bc-theme-grid{grid-template-columns:1fr}}
+</style>
 </head>
 
 
@@ -6491,6 +6513,52 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 
 
 
+
+<script id="leo-business-center-final-js">
+(function(){
+ const panels={overview:{label:'Genel Bakış',icon:'🏠'},profile:{label:'Profil',icon:'👤'},digital:{label:'QR & NFC',icon:'📱'},campaigns:{label:'Kampanyalar',icon:'🚀'},stats:{label:'İstatistikler',icon:'📊'}};
+ function go(panel){
+   document.body.classList.remove('bc-overview','bc-profile','bc-digital','bc-campaigns','bc-stats');
+   document.body.classList.add('bc-'+panel);localStorage.setItem('leo_bc_panel',panel);
+   document.querySelectorAll('.bc-nav button').forEach(b=>b.classList.toggle('active',b.dataset.panel===panel));
+   window.scrollTo({top:0,behavior:'smooth'});
+   if(panel==='stats'&&typeof loadBusinessAnalytics==='function') loadBusinessAnalytics('7d');
+   if(panel==='digital'&&typeof createNFCUrl==='function') { try{createNFCUrl();}catch(e){} }
+   if(panel==='campaigns'&&typeof loadBusinessCampaigns==='function') loadBusinessCampaigns();
+ }
+ window.leoBusinessGo=go;
+ function addNav(){
+   const head=document.querySelector('.page-head'); if(!head||document.querySelector('.bc-nav'))return;
+   const nav=document.createElement('nav');nav.className='bc-nav';
+   Object.entries(panels).forEach(([key,x])=>{const b=document.createElement('button');b.type='button';b.dataset.panel=key;b.innerHTML='<span class="bc-icon">'+x.icon+'</span>'+x.label; b.onclick=()=>go(key);nav.appendChild(b)});
+   head.insertAdjacentElement('afterend',nav);
+   const saved=localStorage.getItem('leo_bc_panel');go(panels[saved]?saved:'overview');
+ }
+ function addTools(){
+   const hero=document.querySelector('.profile-hero');if(!hero||document.querySelector('.bc-tool-grid'))return;
+   const wrap=document.createElement('div');wrap.className='bc-tool-grid';
+   const items=[['👤','Profil Bilgileri','İşletme bilgilerini düzenle','profile'],['🎨','Görünüm & Tema','Profil görünümünü yönet','profile'],['🔗','Dijital Bağlantılar','Sosyal hesap ve özel bağlantılar','profile'],['📱','QR Yönetimi','QR kodu görüntüle ve indir','digital'],['📡','NFC Yönetimi','NFC bağlantısını yönet','digital'],['🚀','Smart Campaigns','Kampanya oluştur ve düzenle','campaigns'],['📈','Detaylı İstatistik','Trafik ve dönüşümleri incele','stats'],['⚡','Canlı Hareketler','Son müşteri aksiyonlarını gör','stats'],['⭐','Review Booster','Yorum akışını yönet','overview']];
+   items.forEach(i=>{const b=document.createElement('button');b.className='bc-tool';b.type='button';b.onclick=()=>{if(i[1]==='Review Booster'){document.getElementById('reviewSection')?.scrollIntoView({behavior:'smooth'});return}go(i[3]);if(i[1]==='Görünüm & Tema')setTimeout(()=>document.getElementById('bcProfileExtras')?.scrollIntoView({behavior:'smooth'}),150);if(i[1]==='Dijital Bağlantılar')setTimeout(()=>document.getElementById('bcSocialGrid')?.scrollIntoView({behavior:'smooth'}),150)};b.innerHTML='<span class="bc-tool-icon">'+i[0]+'</span><span><strong>'+i[1]+'</strong><span>'+i[2]+'</span></span>';wrap.appendChild(b)});
+   hero.insertAdjacentElement('afterend',wrap);
+ }
+ function addProfileExtras(){
+   const profile=document.getElementById('profile');if(!profile||document.getElementById('bcProfileExtras'))return;
+   const el=document.createElement('div');el.id='bcProfileExtras';el.className='bc-settings';el.innerHTML=`<div class="bc-section-title"><div><h2>Görünüm & Dijital Bağlantılar</h2><span>İşletme profilinin müşteri tarafındaki görünümünü buradan yönet.</span></div></div><div class="bc-section-title"><div><h3>🎨 Tema</h3><span>Yalnızca yönetici izin verdiyse değiştirilebilir.</span></div></div><div class="bc-theme-grid" id="bcThemeGrid"></div><div class="bc-section-title" style="margin-top:20px"><div><h3>🔗 Hesap Bağlantıları</h3><span>URL yazmak yerine bağlantını ekle ve düzenle.</span></div></div><div class="bc-social-grid" id="bcSocialGrid"></div>`;
+   profile.appendChild(el);renderExtras();loadExtras();
+ }
+ const themes=[['midnight-gold','Midnight Gold','#111','#d7b56d'],['obsidian','Obsidian','#050505','#9fa8b3'],['champagne','Champagne','#21180e','#e3c58d'],['pure-light','Pure Light','#f5f2eb','#9a742c']];
+ const socials=[['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['youtube','YouTube'],['linkedin','LinkedIn'],['x','X'],['whatsapp','WhatsApp'],['google','Google'],['website','Website']];
+ function renderExtras(){
+   const tg=document.getElementById('bcThemeGrid'),sg=document.getElementById('bcSocialGrid');if(!tg||!sg)return;
+   const cur=window.leoBCSettings?.theme||'midnight-gold';tg.innerHTML=themes.map(t=>`<button type="button" class="bc-theme ${cur===t[0]?'active':''}" onclick="leoSetTheme('${t[0]}')"><div class="bc-theme-dot" style="background:${t[2]};box-shadow:inset 0 0 0 3px ${t[3]}55"></div><strong>${t[1]}</strong><span>${cur===t[0]?'Seçili tema':'Temayı kullan'}</span></button>`).join('');
+   const links=window.leoBCSettings?.social_links||{};sg.innerHTML=socials.map(x=>{const v=links[x[0]]?.url||'';return `<div class="bc-social"><div><strong>${x[1]}</strong><small>${v?'Bağlı':'Henüz bağlı değil'}</small></div><button type="button" onclick="leoConnect('${x[0]}')">${v?'Düzenle':'Hesabı Bağla'}</button></div>`}).join('');
+ }
+ async function loadExtras(){try{const r=await fetch('/api/business-v2-settings',{credentials:'include'});const d=await r.json();if(!d||d.error)return;window.leoBCSettings=d;renderExtras()}catch(e){console.warn(e)}}
+ window.leoSetTheme=async function(theme){try{const r=await fetch('/api/business-theme',{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({theme})});const d=await r.json();if(!r.ok||d.error)throw Error(d.error||'Tema kaydedilemedi');window.leoBCSettings={...(window.leoBCSettings||{}),theme:d.theme||theme};renderExtras();document.body.dataset.theme=theme;if(typeof showToast==='function')showToast('Tema kaydedildi: '+theme)}catch(e){if(typeof showToast==='function')showToast(e.message)}};
+ window.leoConnect=async function(type){const names=Object.fromEntries(socials);const old=window.leoBCSettings?.social_links?.[type]?.url||'';const value=prompt(names[type]+' bağlantısı',old);if(value===null)return;try{const links={...(window.leoBCSettings?.social_links||{})};links[type]={url:value.trim(),enabled:!!value.trim(),label:names[type]};const r=await fetch('/api/business-social-links',{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({social_links:links})});const d=await r.json();if(!r.ok||d.error)throw Error(d.error||'Bağlantı kaydedilemedi');window.leoBCSettings={...(window.leoBCSettings||{}),social_links:d.social_links||links};renderExtras();if(typeof showToast==='function')showToast(names[type]+' bağlantısı güncellendi.')}catch(e){if(typeof showToast==='function')showToast(e.message)}};
+ window.addEventListener('load',()=>{addNav();addTools();addProfileExtras();});
+})();
+</script>
 </body>
 
 </html>
