@@ -480,7 +480,7 @@ async function copyText(text){try{await navigator.clipboard.writeText(text);show
 async function openBusiness(id){
   try{
     const d=await api("/api/admin/business/"+id);
-    currentBusiness={...d.business,permissions:d.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:d.nfc_tags||[]};
+    currentBusiness={...d.business,permissions:d.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:d.nfc_tags||[]};
     document.querySelector(".content").style.display="none";
     document.getElementById("globalPage").classList.remove("show");
     document.getElementById("businessPage").classList.add("show");
@@ -604,7 +604,7 @@ async function saveBusinessPage(){
     showToast("İşletme profili güncellendi.");
     await loadAll();
     const d=await api("/api/admin/business/"+id);
-    currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:d.nfc_tags||[]};
+    currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:d.nfc_tags||[]};
     renderBusinessPage();
   }catch(e){showToast(e.message)}
 }
@@ -646,7 +646,7 @@ async function createNFC(businessId){
     const d=await api("/api/admin/nfc-tags",{method:"POST",body:JSON.stringify({business_id:businessId,name,placement})});
     closeModal();showToast("NFC etiketi oluşturuldu.");
     const fresh=await api("/api/admin/business/"+businessId);
-    currentBusiness={...fresh.business,permissions:fresh.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:fresh.nfc_tags||[]};
+    currentBusiness={...fresh.business,permissions:fresh.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:fresh.nfc_tags||[]};
     renderBusinessPage();
     switchBizTab("nfc",document.querySelector('[data-tab=nfc]'));
     if(d.url)showCreatedNFC(d.url,d);
@@ -674,7 +674,7 @@ async function saveNFCPage(id,businessId){
   try{
     await api("/api/admin/nfc-tags/"+id,{method:"PUT",body:JSON.stringify(body)});
     closeModal();showToast("NFC etiketi güncellendi.");
-    const d=await api("/api/admin/business/"+businessId);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
+    const d=await api("/api/admin/business/"+businessId);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
   }catch(e){showToast(e.message)}
 }
 async function deleteNFCPage(id){
@@ -682,7 +682,7 @@ async function deleteNFCPage(id){
   try{
     await api("/api/admin/nfc-tags/"+id,{method:"DELETE"});
     showToast("NFC etiketi silindi.");
-    const d=await api("/api/admin/business/"+currentBusiness.id);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
+    const d=await api("/api/admin/business/"+currentBusiness.id);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
     switchBizTab("nfc",document.querySelector('[data-tab=nfc]'));
   }catch(e){showToast(e.message)}
 }
@@ -757,7 +757,7 @@ async function loadBizAnalytics(){
 }
 
 function renderBizPermissions(){
-  const b=currentBusiness, p=b.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,card:false};
+  const b=currentBusiness, p=b.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false};
   document.getElementById("bizPermissions").innerHTML=`
     <section class="card biz-section">
       <h3>Erişim İzinleri</h3>
@@ -770,6 +770,7 @@ function renderBizPermissions(){
         <div class="permission-card"><div><strong>🟢 Canlı Takip</strong><span>Son müşteri hareketlerini canlı olarak görüntüleme</span></div><label class="switch"><input id="perm_live" type="checkbox" ${p.live?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>🧠 LEO AI Insights</strong><span>Yapay zekâ destekli işletme raporlarını görüntüleme</span></div><label class="switch"><input id="perm_ai" type="checkbox" ${p.ai?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>⭐ Review Booster</strong><span>Müşterileri Google yorumuna yönlendirme ve memnuniyet akışı</span></div><label class="switch"><input id="perm_review" type="checkbox" ${p.review?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>🚀 Smart Campaigns</strong><span>Kampanya oluşturma, zamanlama ve müşteri profilinde yayınlama</span></div><label class="switch"><input id="perm_campaign" type="checkbox" ${p.campaign?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>💳 Digital Business Card</strong><span>İşletmenin dijital kartvizit modülünü kullanabilsin</span></div><label class="switch"><input id="perm_card" type="checkbox" ${p.card?'checked':''}><span class="slider"></span></label></div>
       </div>
       <div class="modal-actions"><button class="btn primary" onclick="saveBusinessPermissions()">İzinleri Kaydet</button></div>
@@ -778,7 +779,7 @@ function renderBizPermissions(){
 }
 async function saveBusinessPermissions(){
   const id=currentBusiness.id;
-  const permissions={profile:document.getElementById("perm_profile").checked,qr:document.getElementById("perm_qr").checked,nfc:document.getElementById("perm_nfc").checked,analytics:document.getElementById("perm_analytics").checked,live:document.getElementById("perm_live").checked,ai:document.getElementById("perm_ai").checked,review:document.getElementById("perm_review").checked,card:document.getElementById("perm_card").checked};
+  const permissions={profile:document.getElementById("perm_profile").checked,qr:document.getElementById("perm_qr").checked,nfc:document.getElementById("perm_nfc").checked,analytics:document.getElementById("perm_analytics").checked,live:document.getElementById("perm_live").checked,ai:document.getElementById("perm_ai").checked,review:document.getElementById("perm_review").checked,campaign:document.getElementById("perm_campaign").checked,card:document.getElementById("perm_card").checked};
   try{
     const d=await api("/api/admin/business/"+id+"/permissions",{method:"PUT",body:JSON.stringify(permissions)});
     currentBusiness.permissions=d.permissions||permissions;
@@ -875,50 +876,26 @@ async function showBusinessCardManager(btn){
 }
 function newCardPerson(){
   document.getElementById('modalTitle').textContent='💳 Yeni Business Card Kişisi';
-  document.getElementById('modalBody').innerHTML=`<div class="form-grid"><div class="form-field full"><label>AD SOYAD</label><input id="cp_name" name="card_person_name" autocomplete="name" required placeholder="Örn. Tayfun Timrus"></div><div class="form-field"><label>GİRİŞ E-POSTASI (OPSİYONEL)</label><input id="cp_email" name="card_person_email" type="email" autocomplete="email" placeholder="kart sahibi giriş yapacaksa"></div><div class="form-field"><label>GEÇİCİ ŞİFRE (OPSİYONEL)</label><input id="cp_password" name="card_person_password" type="password" autocomplete="new-password" placeholder="En az 8 karakter"></div></div><div class="section-sub" style="margin-top:12px">Kişi oluşturulduktan sonra hangi alanları düzenleyebileceğini ayrıca belirleyebilirsin.</div><div class="modal-actions"><button type="button" class="btn primary" onclick="createCardPerson(event)">Kişiyi Oluştur</button><button type="button" class="btn" onclick="closeModal()">Vazgeç</button></div>`;
+  document.getElementById('modalBody').innerHTML=`<div class="form-grid"><div class="form-field full"><label>AD SOYAD</label><input id="cp_name" name="card_person_name" autocomplete="name" required placeholder="Örn. Tayfun Timrus"></div><div class="form-field"><label>GİRİŞ E-POSTASI (OPSİYONEL)</label><input id="cp_email" name="card_person_email" type="email" autocomplete="email" placeholder="kart sahibi giriş yapacaksa"></div><div class="form-field"><label>GEÇİCİ ŞİFRE (OPSİYONEL)</label><input id="cp_password" name="card_person_password" type="password" autocomplete="new-password" placeholder="En az 8 karakter"></div></div><div class="section-sub" style="margin-top:12px">Kişi oluşturulduktan sonra hangi alanları düzenleyebileceğini ayrıca belirleyebilirsin.</div><div class="modal-actions"><button type="button" class="btn primary" onclick="createCardPerson(this)">Kişiyi Oluştur</button><button type="button" class="btn" onclick="closeModal()">Vazgeç</button></div>`;
   openModal();
   setTimeout(()=>document.getElementById('cp_name')?.focus(),50);
 }
-async function createCardPerson(event){
-  const button = event?.currentTarget;
-  const modal = button?.closest('.modal') || document.getElementById('modalBody');
-  const nameInput = modal?.querySelector('input[name="card_person_name"]');
-  const emailInput = modal?.querySelector('input[name="card_person_email"]');
-  const passwordInput = modal?.querySelector('input[name="card_person_password"]');
-
-  const name = String(nameInput?.value || '').trim();
-  const email = String(emailInput?.value || '').trim();
-  const password = String(passwordInput?.value || '');
-
-  if(!name){
-    showToast('Ad Soyad gerekli.');
-    nameInput?.focus();
-    return;
-  }
-  if(password && password.length < 8){
-    showToast('Şifre en az 8 karakter olmalı.');
-    passwordInput?.focus();
-    return;
-  }
-
+async function createCardPerson(button){
+  const modal=button?.closest('.modal') || document.getElementById('modalBody');
+  const nameInput=modal?.querySelector('#cp_name');
+  const emailInput=modal?.querySelector('#cp_email');
+  const passwordInput=modal?.querySelector('#cp_password');
+  const name=(nameInput?.value || '').trim();
+  const email=(emailInput?.value || '').trim();
+  const password=passwordInput?.value || '';
+  if(!name){showToast('Ad Soyad gerekli.');nameInput?.focus();return}
+  if(password && password.length<8){showToast('Şifre en az 8 karakter olmalı.');passwordInput?.focus();return}
   try{
-    await api('/api/admin/card-people',{
-      method:'POST',
-      body:JSON.stringify({
-        person_name:name,
-        display_name:name,
-        email,
-        password,
-        data:{person_name:name,display_name:name},
-        enabled:true
-      })
-    });
+    await api('/api/admin/card-people',{method:'POST',body:JSON.stringify({email,password,data:{person_name:name,display_name:name},enabled:true})});
     closeModal();
     showToast('Business Card kişisi oluşturuldu.');
     await showBusinessCardManager();
-  }catch(e){
-    showToast(e.message);
-  }
+  }catch(e){showToast(e.message)}
 }
 async function editCardPerson(id){
   try{const d=await api('/api/admin/card-people/'+id),p=d.person||{},data=p.data||{},perms=p.permissions||{};document.getElementById('modalTitle').textContent='💳 Business Card • '+(data.person_name||'Kişi');document.getElementById('modalBody').innerHTML=`<div class="detail-box"><small>PUBLIC KART</small><strong style="display:block;margin-top:5px;word-break:break-all">/card/${esc(p.slug||'')}</strong></div><div class="form-grid" style="margin-top:14px"><div class="form-field"><label>E-POSTA</label><input id="cp_edit_email" value="${esc(p.email||'')}"></div><div class="form-field"><label>YENİ ŞİFRE</label><input id="cp_edit_password" type="password" placeholder="Değiştirmek istemiyorsan boş bırak"></div></div><div class="section-sub" style="margin:14px 0 8px"><strong>Alan bazlı işlem yetkileri</strong><br>Kapalı alan kişi tarafından değiştirilemez ve public kartta gösterilmez.</div><div class="permission-grid">${CARD_PERSON_FIELDS.map(([k,l])=>`<div class="permission-card"><div><strong>${esc(l)}</strong><span>${data[k]?'İçerik mevcut':'İçerik henüz girilmedi'}</span></div><label class="switch"><input class="cp-perm" data-field="${k}" type="checkbox" ${perms[k]===true?'checked':''}><span class="slider"></span></label></div>`).join('')}</div><div class="permission-card" style="margin-top:12px"><div><strong>Kart aktif</strong><span>Public kartı erişilebilir yapar.</span></div><label class="switch"><input id="cp_enabled" type="checkbox" ${p.enabled?'checked':''}><span class="slider"></span></label></div><div class="modal-actions"><button class="btn primary" onclick="saveCardPerson(${Number(id)})">Kaydet</button><button class="btn" onclick="deleteCardPerson(${Number(id)})">Kişiyi Sil</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal();}catch(e){showToast(e.message)}
