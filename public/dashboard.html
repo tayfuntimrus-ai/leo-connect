@@ -1175,463 +1175,6 @@ main{
 
 
 /* ==================================================
-   V2 — DYNAMIC PROFILE DESIGN
-================================================== */
-
-const designFields = [
-  "design_theme",
-  "design_accent",
-  "design_cover_url",
-  "design_cover_position",
-  "design_announcement_text",
-  "design_campaign_title",
-  "design_campaign_text",
-  "design_campaign_image_url",
-  "design_campaign_button_text",
-  "design_campaign_button_url",
-  "design_featured_title",
-  "design_featured_text",
-  "design_featured_image_url",
-  "design_featured_button_text",
-  "design_featured_button_url",
-  "design_gallery",
-  "design_video_url"
-];
-
-let profileDesign = {
-  theme:"midnight-gold",
-  accent_color:"#D4AF37",
-  cover_url:"",
-  cover_position:"center",
-  announcement_text:"",
-  announcement_enabled:false,
-  campaign_title:"",
-  campaign_text:"",
-  campaign_image_url:"",
-  campaign_button_text:"",
-  campaign_button_url:"",
-  campaign_enabled:false,
-  featured_title:"",
-  featured_text:"",
-  featured_image_url:"",
-  featured_button_text:"",
-  featured_button_url:"",
-  featured_enabled:false,
-  gallery:[],
-  video_url:"",
-  video_enabled:false
-};
-
-function safeDesignColor(value){
-  const v = String(value || "").trim();
-  return /^#[0-9a-fA-F]{6}$/.test(v) ? v : "#D4AF37";
-}
-
-function syncDesignColor(source){
-  const text = document.getElementById("design_accent");
-  const picker = document.getElementById("design_accent_picker");
-  if(!text || !picker) return;
-
-  if(source === "picker"){
-    text.value = picker.value.toUpperCase();
-  }else{
-    const value = text.value.trim();
-    if(/^#[0-9a-fA-F]{6}$/.test(value)) picker.value = value;
-  }
-  updateDesignPreview();
-}
-
-function getDesignForm(){
-  const val = id => document.getElementById(id)?.value?.trim() || "";
-  const checked = id => document.getElementById(id)?.checked === true;
-  const gallery = val("design_gallery")
-    .split(/\r?\n/)
-    .map(x => x.trim())
-    .filter(Boolean)
-    .slice(0,30)
-    .map(url => ({url}));
-
-  return {
-    theme: val("design_theme") || "midnight-gold",
-    accent_color: safeDesignColor(val("design_accent")),
-    cover_url: val("design_cover_url"),
-    cover_position: val("design_cover_position") || "center",
-    announcement_text: val("design_announcement_text"),
-    announcement_enabled: checked("design_announcement_enabled"),
-    campaign_title: val("design_campaign_title"),
-    campaign_text: val("design_campaign_text"),
-    campaign_image_url: val("design_campaign_image_url"),
-    campaign_button_text: val("design_campaign_button_text"),
-    campaign_button_url: val("design_campaign_button_url"),
-    campaign_enabled: checked("design_campaign_enabled"),
-    featured_title: val("design_featured_title"),
-    featured_text: val("design_featured_text"),
-    featured_image_url: val("design_featured_image_url"),
-    featured_button_text: val("design_featured_button_text"),
-    featured_button_url: val("design_featured_button_url"),
-    featured_enabled: checked("design_featured_enabled"),
-    gallery,
-    video_url: val("design_video_url"),
-    video_enabled: checked("design_video_enabled")
-  };
-}
-
-function setDesignField(id, value){
-  const el = document.getElementById(id);
-  if(el) el.value = value ?? "";
-}
-
-function loadDesignIntoForm(data){
-  profileDesign = {
-    ...profileDesign,
-    ...(data || {})
-  };
-
-  setDesignField("design_theme", profileDesign.theme || "midnight-gold");
-  setDesignField("design_accent", safeDesignColor(profileDesign.accent_color));
-  setDesignField("design_cover_url", profileDesign.cover_url);
-  setDesignField("design_cover_position", profileDesign.cover_position || "center");
-  setDesignField("design_announcement_text", profileDesign.announcement_text);
-  setDesignField("design_campaign_title", profileDesign.campaign_title);
-  setDesignField("design_campaign_text", profileDesign.campaign_text);
-  setDesignField("design_campaign_image_url", profileDesign.campaign_image_url);
-  setDesignField("design_campaign_button_text", profileDesign.campaign_button_text);
-  setDesignField("design_campaign_button_url", profileDesign.campaign_button_url);
-  setDesignField("design_featured_title", profileDesign.featured_title);
-  setDesignField("design_featured_text", profileDesign.featured_text);
-  setDesignField("design_featured_image_url", profileDesign.featured_image_url);
-  setDesignField("design_featured_button_text", profileDesign.featured_button_text);
-  setDesignField("design_featured_button_url", profileDesign.featured_button_url);
-  setDesignField("design_video_url", profileDesign.video_url);
-
-  const gallery = Array.isArray(profileDesign.gallery) ? profileDesign.gallery : [];
-  setDesignField("design_gallery", gallery.map(item => typeof item === "string" ? item : item?.url || "").filter(Boolean).join("\n"));
-
-  const checks = [
-    ["design_announcement_enabled", profileDesign.announcement_enabled],
-    ["design_campaign_enabled", profileDesign.campaign_enabled],
-    ["design_featured_enabled", profileDesign.featured_enabled],
-    ["design_video_enabled", profileDesign.video_enabled]
-  ];
-  checks.forEach(([id, value]) => {
-    const el = document.getElementById(id);
-    if(el) el.checked = value === true;
-  });
-
-  const picker = document.getElementById("design_accent_picker");
-  if(picker) picker.value = safeDesignColor(profileDesign.accent_color);
-
-  updateDesignPreview();
-}
-
-function updateDesignPreview(){
-  try{
-    const data = getDesignForm();
-    const root = document.getElementById("designPreview");
-    if(!root) return;
-
-    const theme = data.theme || "midnight-gold";
-    root.className = "preview-frame theme-" + theme;
-    /* Theme is applied directly to the preview root so it never depends on nested CSS selectors. */
-    const themeMap = {
-      "midnight-gold": {bg:"#101010", color:"#fff"},
-      "obsidian": {bg:"#050505", color:"#fff"},
-      "champagne": {bg:"#17120b", color:"#fff"},
-      "pure-light": {bg:"#f5f2eb", color:"#151515"}
-    };
-    const themeStyle = themeMap[theme] || themeMap["midnight-gold"];
-    root.style.background = themeStyle.bg;
-    root.style.color = themeStyle.color;
-    root.style.setProperty("--preview-accent", data.accent_color);
-    root.style.setProperty("--lc-gold", data.accent_color);
-    root.style.setProperty("--gold-light", data.accent_color);
-
-    /* COVER */
-    const cover = document.getElementById("previewCover");
-    if(cover){
-      cover.style.backgroundPosition = data.cover_position || "center";
-      cover.style.backgroundImage = data.cover_url
-        ? `linear-gradient(180deg,transparent 20%,rgba(0,0,0,.82) 100%), url("${String(data.cover_url).replace(/"/g,'\\"')}")`
-        : "radial-gradient(circle at 80% 20%,#c59a5230,transparent 35%),linear-gradient(145deg,#1d1d1d,#090909)";
-    }
-
-    /* BUSINESS */
-    const name = document.getElementById("previewName");
-    const category = document.getElementById("previewCategory");
-
-    if(name){
-      name.textContent = currentBusiness?.name || "İşletme";
-    }
-
-    if(category){
-      category.textContent =
-        (currentBusiness?.category || "İŞLETME").toUpperCase();
-    }
-
-    /* LOGO */
-    const logo = document.getElementById("previewLogo");
-
-    if(logo){
-      const logoUrl = currentBusiness?.logo_url || "";
-
-      logo.innerHTML = logoUrl
-        ? `<img src="${esc(logoUrl)}" alt="">`
-        : "🦁";
-    }
-
-    /* ANNOUNCEMENT */
-    const announcement =
-      document.getElementById("previewAnnouncement");
-
-    const announcementText =
-      document.getElementById("previewAnnouncementText");
-
-    if(announcement && announcementText){
-      const enabled =
-        data.announcement_enabled === true &&
-        !!data.announcement_text;
-
-      announcement.style.display =
-        enabled ? "block" : "none";
-
-      announcementText.textContent =
-        data.announcement_text || "";
-    }
-
-    /* CAMPAIGN */
-    const campaign =
-      document.getElementById("previewCampaign");
-
-    if(campaign){
-      const show =
-        data.campaign_enabled === true &&
-        !!(data.campaign_title || data.campaign_text);
-
-      campaign.style.display =
-        show ? "block" : "none";
-
-      if(data.campaign_image_url){
-        campaign.style.backgroundImage =
-          `linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.72)), url("${String(data.campaign_image_url).replace(/"/g,'\\"')}")`;
-        campaign.style.backgroundSize = "cover";
-        campaign.style.backgroundPosition = "center";
-      }else{
-        campaign.style.backgroundImage = "none";
-      }
-
-      const title =
-        document.getElementById("previewCampaignTitle");
-
-      const text =
-        document.getElementById("previewCampaignText");
-
-      const button =
-        document.getElementById("previewCampaignButton");
-
-      if(title){
-        title.textContent =
-          data.campaign_title || "Kampanya";
-      }
-
-      if(text){
-        text.textContent =
-          data.campaign_text || "Kampanya detayları";
-      }
-
-      if(button){
-        button.style.display =
-          data.campaign_button_text
-            ? "inline-flex"
-            : "none";
-
-        button.textContent =
-          data.campaign_button_text || "";
-      }
-    }
-
-    /* FEATURED */
-    const featured =
-      document.getElementById("previewFeatured");
-
-    if(featured){
-      const show =
-        data.featured_enabled === true &&
-        !!(data.featured_title || data.featured_text);
-
-      featured.style.display =
-        show ? "block" : "none";
-
-      if(data.featured_image_url){
-        featured.style.backgroundImage =
-          `linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.68)), url("${String(data.featured_image_url).replace(/"/g,'\\"')}")`;
-        featured.style.backgroundSize = "cover";
-        featured.style.backgroundPosition = "center";
-      }else{
-        featured.style.backgroundImage = "none";
-      }
-
-      const title =
-        document.getElementById("previewFeaturedTitle");
-
-      const text =
-        document.getElementById("previewFeaturedText");
-
-      const button =
-        document.getElementById("previewFeaturedButton");
-
-      if(title){
-        title.textContent =
-          data.featured_title || "Öne Çıkan";
-      }
-
-      if(text){
-        text.textContent =
-          data.featured_text || "Öne çıkan içerik";
-      }
-
-      if(button){
-        button.style.display =
-          data.featured_button_text
-            ? "inline-flex"
-            : "none";
-
-        button.textContent =
-          data.featured_button_text || "";
-      }
-    }
-
-    /* GALLERY */
-    const galleryBox =
-      document.getElementById("previewGallery");
-
-    if(galleryBox){
-      const gallery =
-        Array.isArray(data.gallery)
-          ? data.gallery
-          : [];
-
-      galleryBox.innerHTML =
-        gallery
-          .slice(0,6)
-          .map(item => {
-            const url =
-              typeof item === "string"
-                ? item
-                : item?.url || "";
-
-            return url
-              ? `<div><img src="${esc(url)}" alt=""></div>`
-              : "";
-          })
-          .join("");
-    }
-
-    /* VIDEO */
-    const video =
-      document.getElementById("previewVideo");
-
-    if(video){
-      video.style.display =
-        data.video_enabled && data.video_url
-          ? "block"
-          : "none";
-    }
-
-    /* LIVE INDICATOR */
-    const live =
-      document.getElementById("previewLiveStatus");
-
-    if(live){
-      live.textContent = "● CANLI";
-    }
-
-  }catch(error){
-    console.error("LEO CONNECT preview error:", error);
-
-    const message =
-      document.getElementById("designMessage");
-
-    if(message && !message.textContent){
-      message.textContent =
-        "Önizleme güncellenemedi.";
-    }
-  }
-}
-
-/* Gerçek canlı önizleme: inline handler'a ek olarak
-   tüm tasarım alanlarını merkezi olarak dinle. */
-function initLiveDesignPreview(){
-  const container = document.getElementById("profileDesign");
-  if(!container) return;
-
-  const refresh = function(){
-    try{ updateDesignPreview(); }catch(error){ console.error("LEO CONNECT preview refresh error:", error); }
-  };
-
-  /* Capture phase ensures the listener survives any dashboard navigation/rendering. */
-  container.addEventListener("input", function(event){
-    if(event.target && event.target.matches("input, textarea, select")) refresh();
-  }, true);
-
-  container.addEventListener("change", function(event){
-    if(event.target && event.target.matches("input, textarea, select")) refresh();
-  }, true);
-
-  refresh();
-}
-
-
-async function loadProfileDesign(){
-  const result = await api("/api/business-profile-design");
-  if(result && !result.error){
-    const design = result.design && typeof result.design === "object"
-      ? result.design
-      : result;
-    loadDesignIntoForm(design);
-    updateDesignPreview();
-  }else if(result?.error){
-    const msg = document.getElementById("designMessage");
-    if(msg) msg.textContent = result.error;
-  }
-}
-
-async function saveProfileDesign(){
-  const button = document.getElementById("designSaveButton");
-  const message = document.getElementById("designMessage");
-  const data = getDesignForm();
-
-  if(!button || !message) return;
-
-  button.disabled = true;
-  button.textContent = "Kaydediliyor...";
-  message.textContent = "";
-
-  const result = await api("/api/business-profile-design", {
-    method:"PUT",
-    body:JSON.stringify(data)
-  });
-
-  if(result && !result.error){
-    const savedDesign = result.design && typeof result.design === "object"
-      ? result.design
-      : result;
-    profileDesign = savedDesign;
-    loadDesignIntoForm(savedDesign);
-    updateDesignPreview();
-    message.textContent = "✓ Profil tasarımı kaydedildi.";
-    showToast("Profil tasarımı güncellendi.");
-  }else{
-    message.textContent = result?.error || "Tasarım kaydedilemedi.";
-    showToast("Tasarım kaydedilirken hata oluştu.");
-  }
-
-  button.disabled = false;
-  button.textContent = "✓ Tasarımı Kaydet";
-  setTimeout(() => { message.textContent = ""; }, 3500);
-}
-
-
-/* ==================================================
    SAVE
 ================================================== */
 
@@ -4493,6 +4036,463 @@ async function saveProfileDesign(){
 
 
 <script>
+
+/* ==================================================
+   V2 — DYNAMIC PROFILE DESIGN
+================================================== */
+
+const designFields = [
+  "design_theme",
+  "design_accent",
+  "design_cover_url",
+  "design_cover_position",
+  "design_announcement_text",
+  "design_campaign_title",
+  "design_campaign_text",
+  "design_campaign_image_url",
+  "design_campaign_button_text",
+  "design_campaign_button_url",
+  "design_featured_title",
+  "design_featured_text",
+  "design_featured_image_url",
+  "design_featured_button_text",
+  "design_featured_button_url",
+  "design_gallery",
+  "design_video_url"
+];
+
+let profileDesign = {
+  theme:"midnight-gold",
+  accent_color:"#D4AF37",
+  cover_url:"",
+  cover_position:"center",
+  announcement_text:"",
+  announcement_enabled:false,
+  campaign_title:"",
+  campaign_text:"",
+  campaign_image_url:"",
+  campaign_button_text:"",
+  campaign_button_url:"",
+  campaign_enabled:false,
+  featured_title:"",
+  featured_text:"",
+  featured_image_url:"",
+  featured_button_text:"",
+  featured_button_url:"",
+  featured_enabled:false,
+  gallery:[],
+  video_url:"",
+  video_enabled:false
+};
+
+function safeDesignColor(value){
+  const v = String(value || "").trim();
+  return /^#[0-9a-fA-F]{6}$/.test(v) ? v : "#D4AF37";
+}
+
+function syncDesignColor(source){
+  const text = document.getElementById("design_accent");
+  const picker = document.getElementById("design_accent_picker");
+  if(!text || !picker) return;
+
+  if(source === "picker"){
+    text.value = picker.value.toUpperCase();
+  }else{
+    const value = text.value.trim();
+    if(/^#[0-9a-fA-F]{6}$/.test(value)) picker.value = value;
+  }
+  updateDesignPreview();
+}
+
+function getDesignForm(){
+  const val = id => document.getElementById(id)?.value?.trim() || "";
+  const checked = id => document.getElementById(id)?.checked === true;
+  const gallery = val("design_gallery")
+    .split(/\r?\n/)
+    .map(x => x.trim())
+    .filter(Boolean)
+    .slice(0,30)
+    .map(url => ({url}));
+
+  return {
+    theme: val("design_theme") || "midnight-gold",
+    accent_color: safeDesignColor(val("design_accent")),
+    cover_url: val("design_cover_url"),
+    cover_position: val("design_cover_position") || "center",
+    announcement_text: val("design_announcement_text"),
+    announcement_enabled: checked("design_announcement_enabled"),
+    campaign_title: val("design_campaign_title"),
+    campaign_text: val("design_campaign_text"),
+    campaign_image_url: val("design_campaign_image_url"),
+    campaign_button_text: val("design_campaign_button_text"),
+    campaign_button_url: val("design_campaign_button_url"),
+    campaign_enabled: checked("design_campaign_enabled"),
+    featured_title: val("design_featured_title"),
+    featured_text: val("design_featured_text"),
+    featured_image_url: val("design_featured_image_url"),
+    featured_button_text: val("design_featured_button_text"),
+    featured_button_url: val("design_featured_button_url"),
+    featured_enabled: checked("design_featured_enabled"),
+    gallery,
+    video_url: val("design_video_url"),
+    video_enabled: checked("design_video_enabled")
+  };
+}
+
+function setDesignField(id, value){
+  const el = document.getElementById(id);
+  if(el) el.value = value ?? "";
+}
+
+function loadDesignIntoForm(data){
+  profileDesign = {
+    ...profileDesign,
+    ...(data || {})
+  };
+
+  setDesignField("design_theme", profileDesign.theme || "midnight-gold");
+  setDesignField("design_accent", safeDesignColor(profileDesign.accent_color));
+  setDesignField("design_cover_url", profileDesign.cover_url);
+  setDesignField("design_cover_position", profileDesign.cover_position || "center");
+  setDesignField("design_announcement_text", profileDesign.announcement_text);
+  setDesignField("design_campaign_title", profileDesign.campaign_title);
+  setDesignField("design_campaign_text", profileDesign.campaign_text);
+  setDesignField("design_campaign_image_url", profileDesign.campaign_image_url);
+  setDesignField("design_campaign_button_text", profileDesign.campaign_button_text);
+  setDesignField("design_campaign_button_url", profileDesign.campaign_button_url);
+  setDesignField("design_featured_title", profileDesign.featured_title);
+  setDesignField("design_featured_text", profileDesign.featured_text);
+  setDesignField("design_featured_image_url", profileDesign.featured_image_url);
+  setDesignField("design_featured_button_text", profileDesign.featured_button_text);
+  setDesignField("design_featured_button_url", profileDesign.featured_button_url);
+  setDesignField("design_video_url", profileDesign.video_url);
+
+  const gallery = Array.isArray(profileDesign.gallery) ? profileDesign.gallery : [];
+  setDesignField("design_gallery", gallery.map(item => typeof item === "string" ? item : item?.url || "").filter(Boolean).join("\n"));
+
+  const checks = [
+    ["design_announcement_enabled", profileDesign.announcement_enabled],
+    ["design_campaign_enabled", profileDesign.campaign_enabled],
+    ["design_featured_enabled", profileDesign.featured_enabled],
+    ["design_video_enabled", profileDesign.video_enabled]
+  ];
+  checks.forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if(el) el.checked = value === true;
+  });
+
+  const picker = document.getElementById("design_accent_picker");
+  if(picker) picker.value = safeDesignColor(profileDesign.accent_color);
+
+  updateDesignPreview();
+}
+
+function updateDesignPreview(){
+  try{
+    const data = getDesignForm();
+    const root = document.getElementById("designPreview");
+    if(!root) return;
+
+    const theme = data.theme || "midnight-gold";
+    root.className = "preview-frame theme-" + theme;
+    /* Theme is applied directly to the preview root so it never depends on nested CSS selectors. */
+    const themeMap = {
+      "midnight-gold": {bg:"#101010", color:"#fff"},
+      "obsidian": {bg:"#050505", color:"#fff"},
+      "champagne": {bg:"#17120b", color:"#fff"},
+      "pure-light": {bg:"#f5f2eb", color:"#151515"}
+    };
+    const themeStyle = themeMap[theme] || themeMap["midnight-gold"];
+    root.style.background = themeStyle.bg;
+    root.style.color = themeStyle.color;
+    root.style.setProperty("--preview-accent", data.accent_color);
+    root.style.setProperty("--lc-gold", data.accent_color);
+    root.style.setProperty("--gold-light", data.accent_color);
+
+    /* COVER */
+    const cover = document.getElementById("previewCover");
+    if(cover){
+      cover.style.backgroundPosition = data.cover_position || "center";
+      cover.style.backgroundImage = data.cover_url
+        ? `linear-gradient(180deg,transparent 20%,rgba(0,0,0,.82) 100%), url("${String(data.cover_url).replace(/"/g,'\\"')}")`
+        : "radial-gradient(circle at 80% 20%,#c59a5230,transparent 35%),linear-gradient(145deg,#1d1d1d,#090909)";
+    }
+
+    /* BUSINESS */
+    const name = document.getElementById("previewName");
+    const category = document.getElementById("previewCategory");
+
+    if(name){
+      name.textContent = currentBusiness?.name || "İşletme";
+    }
+
+    if(category){
+      category.textContent =
+        (currentBusiness?.category || "İŞLETME").toUpperCase();
+    }
+
+    /* LOGO */
+    const logo = document.getElementById("previewLogo");
+
+    if(logo){
+      const logoUrl = currentBusiness?.logo_url || "";
+
+      logo.innerHTML = logoUrl
+        ? `<img src="${esc(logoUrl)}" alt="">`
+        : "🦁";
+    }
+
+    /* ANNOUNCEMENT */
+    const announcement =
+      document.getElementById("previewAnnouncement");
+
+    const announcementText =
+      document.getElementById("previewAnnouncementText");
+
+    if(announcement && announcementText){
+      const enabled =
+        data.announcement_enabled === true &&
+        !!data.announcement_text;
+
+      announcement.style.display =
+        enabled ? "block" : "none";
+
+      announcementText.textContent =
+        data.announcement_text || "";
+    }
+
+    /* CAMPAIGN */
+    const campaign =
+      document.getElementById("previewCampaign");
+
+    if(campaign){
+      const show =
+        data.campaign_enabled === true &&
+        !!(data.campaign_title || data.campaign_text);
+
+      campaign.style.display =
+        show ? "block" : "none";
+
+      if(data.campaign_image_url){
+        campaign.style.backgroundImage =
+          `linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.72)), url("${String(data.campaign_image_url).replace(/"/g,'\\"')}")`;
+        campaign.style.backgroundSize = "cover";
+        campaign.style.backgroundPosition = "center";
+      }else{
+        campaign.style.backgroundImage = "none";
+      }
+
+      const title =
+        document.getElementById("previewCampaignTitle");
+
+      const text =
+        document.getElementById("previewCampaignText");
+
+      const button =
+        document.getElementById("previewCampaignButton");
+
+      if(title){
+        title.textContent =
+          data.campaign_title || "Kampanya";
+      }
+
+      if(text){
+        text.textContent =
+          data.campaign_text || "Kampanya detayları";
+      }
+
+      if(button){
+        button.style.display =
+          data.campaign_button_text
+            ? "inline-flex"
+            : "none";
+
+        button.textContent =
+          data.campaign_button_text || "";
+      }
+    }
+
+    /* FEATURED */
+    const featured =
+      document.getElementById("previewFeatured");
+
+    if(featured){
+      const show =
+        data.featured_enabled === true &&
+        !!(data.featured_title || data.featured_text);
+
+      featured.style.display =
+        show ? "block" : "none";
+
+      if(data.featured_image_url){
+        featured.style.backgroundImage =
+          `linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.68)), url("${String(data.featured_image_url).replace(/"/g,'\\"')}")`;
+        featured.style.backgroundSize = "cover";
+        featured.style.backgroundPosition = "center";
+      }else{
+        featured.style.backgroundImage = "none";
+      }
+
+      const title =
+        document.getElementById("previewFeaturedTitle");
+
+      const text =
+        document.getElementById("previewFeaturedText");
+
+      const button =
+        document.getElementById("previewFeaturedButton");
+
+      if(title){
+        title.textContent =
+          data.featured_title || "Öne Çıkan";
+      }
+
+      if(text){
+        text.textContent =
+          data.featured_text || "Öne çıkan içerik";
+      }
+
+      if(button){
+        button.style.display =
+          data.featured_button_text
+            ? "inline-flex"
+            : "none";
+
+        button.textContent =
+          data.featured_button_text || "";
+      }
+    }
+
+    /* GALLERY */
+    const galleryBox =
+      document.getElementById("previewGallery");
+
+    if(galleryBox){
+      const gallery =
+        Array.isArray(data.gallery)
+          ? data.gallery
+          : [];
+
+      galleryBox.innerHTML =
+        gallery
+          .slice(0,6)
+          .map(item => {
+            const url =
+              typeof item === "string"
+                ? item
+                : item?.url || "";
+
+            return url
+              ? `<div><img src="${esc(url)}" alt=""></div>`
+              : "";
+          })
+          .join("");
+    }
+
+    /* VIDEO */
+    const video =
+      document.getElementById("previewVideo");
+
+    if(video){
+      video.style.display =
+        data.video_enabled && data.video_url
+          ? "block"
+          : "none";
+    }
+
+    /* LIVE INDICATOR */
+    const live =
+      document.getElementById("previewLiveStatus");
+
+    if(live){
+      live.textContent = "● CANLI";
+    }
+
+  }catch(error){
+    console.error("LEO CONNECT preview error:", error);
+
+    const message =
+      document.getElementById("designMessage");
+
+    if(message && !message.textContent){
+      message.textContent =
+        "Önizleme güncellenemedi.";
+    }
+  }
+}
+
+/* Gerçek canlı önizleme: inline handler'a ek olarak
+   tüm tasarım alanlarını merkezi olarak dinle. */
+function initLiveDesignPreview(){
+  const container = document.getElementById("profileDesign");
+  if(!container) return;
+
+  const refresh = function(){
+    try{ updateDesignPreview(); }catch(error){ console.error("LEO CONNECT preview refresh error:", error); }
+  };
+
+  /* Capture phase ensures the listener survives any dashboard navigation/rendering. */
+  container.addEventListener("input", function(event){
+    if(event.target && event.target.matches("input, textarea, select")) refresh();
+  }, true);
+
+  container.addEventListener("change", function(event){
+    if(event.target && event.target.matches("input, textarea, select")) refresh();
+  }, true);
+
+  refresh();
+}
+
+
+async function loadProfileDesign(){
+  const result = await api("/api/business-profile-design");
+  if(result && !result.error){
+    const design = result.design && typeof result.design === "object"
+      ? result.design
+      : result;
+    loadDesignIntoForm(design);
+    updateDesignPreview();
+  }else if(result?.error){
+    const msg = document.getElementById("designMessage");
+    if(msg) msg.textContent = result.error;
+  }
+}
+
+async function saveProfileDesign(){
+  const button = document.getElementById("designSaveButton");
+  const message = document.getElementById("designMessage");
+  const data = getDesignForm();
+
+  if(!button || !message) return;
+
+  button.disabled = true;
+  button.textContent = "Kaydediliyor...";
+  message.textContent = "";
+
+  const result = await api("/api/business-profile-design", {
+    method:"PUT",
+    body:JSON.stringify(data)
+  });
+
+  if(result && !result.error){
+    const savedDesign = result.design && typeof result.design === "object"
+      ? result.design
+      : result;
+    profileDesign = savedDesign;
+    loadDesignIntoForm(savedDesign);
+    updateDesignPreview();
+    message.textContent = "✓ Profil tasarımı kaydedildi.";
+    showToast("Profil tasarımı güncellendi.");
+  }else{
+    message.textContent = result?.error || "Tasarım kaydedilemedi.";
+    showToast("Tasarım kaydedilirken hata oluştu.");
+  }
+
+  button.disabled = false;
+  button.textContent = "✓ Tasarımı Kaydet";
+  setTimeout(() => { message.textContent = ""; }, 3500);
+}
+
 
 
 
