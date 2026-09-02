@@ -2486,28 +2486,6 @@ main{
 </style>
 </style>
 
-
-<style id="leo-connect-v2-final-style">
-:root{--v2-bg:#070707;--v2-card:#101010;--v2-line:#262626;--v2-gold:#d7b56d;--v2-gold2:#9e7738;--v2-text:#f5f1e8;--v2-muted:#8d8a83}
-body{background:var(--v2-bg)!important;color:var(--v2-text)}
-.v2-shell{max-width:1180px;margin:0 auto;padding:0 18px 30px}
-.v2-nav{position:sticky;top:10px;z-index:30;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 18px;padding:8px;border:1px solid #c59a5230;border-radius:18px;background:#0b0b0be8;backdrop-filter:blur(18px);box-shadow:0 16px 45px #0008}
-.v2-nav button{min-height:46px;border:1px solid #292929;background:#111;color:#929292;border-radius:12px;font:inherit;font-size:11px;font-weight:900;cursor:pointer;transition:.18s}
-.v2-nav button:hover{border-color:#c59a5266;color:#eee;transform:translateY(-1px)}
-.v2-nav button.active{background:linear-gradient(135deg,#d7b56d,#9e7738);border-color:#d7b56d;color:#0b0b0b;box-shadow:0 8px 24px #c59a5225}
-.v2-page{display:none}.v2-page.active{display:block}
-.v2-titlebar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0 0 16px;padding:18px 20px;border:1px solid #262626;border-radius:18px;background:linear-gradient(135deg,#15120d,#101010 55%,#151515)}
-.v2-titlebar strong{font-size:17px}.v2-titlebar span{display:block;color:#888;font-size:11px;margin-top:4px}.v2-badge{padding:7px 10px;border:1px solid #c59a5260;border-radius:999px;color:#d7b56d;font-size:9px;font-weight:900;letter-spacing:.12em}
-.v2-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.v2-card{padding:18px;border:1px solid #242424;border-radius:18px;background:linear-gradient(145deg,#111,#0b0b0b);box-shadow:0 16px 45px #0005}.v2-card h3{margin:0 0 6px;font-size:13px}.v2-card p{margin:0;color:#777;font-size:10px;line-height:1.6}
-.v2-theme-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:14px}.v2-theme{min-height:88px;text-align:left;border:1px solid #292929;border-radius:14px;padding:13px;background:#0d0d0d;color:#eee;cursor:pointer}.v2-theme strong{display:block;font-size:11px}.v2-theme span{display:block;margin-top:5px;color:#777;font-size:9px}.v2-theme.selected{border-color:#d7b56d;box-shadow:0 0 0 2px #d7b56d18 inset}.v2-theme:disabled{opacity:.42;cursor:not-allowed}
-.v2-connection-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:14px}.v2-connection{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;border:1px solid #292929;border-radius:13px;background:#0d0d0d}.v2-connection strong{font-size:10px}.v2-connection small{display:block;color:#666;margin-top:3px;font-size:8px}.v2-connection button{white-space:nowrap;border:1px solid #3b3322;background:#17130c;color:#d7b56d;padding:7px 9px;border-radius:9px;font:inherit;font-size:8px;font-weight:900;cursor:pointer}
-.v2-custom-list{display:grid;gap:7px;margin-top:12px}.v2-custom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid #292929;border-radius:11px;background:#0d0d0d}.v2-custom a{color:#ddd;text-decoration:none;font-size:9px}.v2-custom button{border:0;background:none;color:#b77;font-size:9px;cursor:pointer}
-.v2-note{margin-top:10px;color:#666;font-size:8px;line-height:1.5}.v2-hidden-source{display:none!important}
-@media(max-width:900px){.v2-connection-grid{grid-template-columns:repeat(2,1fr)}.v2-theme-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:650px){.v2-shell{padding:0 10px 24px}.v2-nav{grid-template-columns:repeat(2,1fr);top:5px}.v2-nav button{font-size:10px}.v2-grid,.v2-connection-grid,.v2-theme-grid{grid-template-columns:1fr}.v2-titlebar{align-items:flex-start}}
-</style>
-
 </head>
 
 
@@ -2592,17 +2570,6 @@ body{background:var(--v2-bg)!important;color:var(--v2-text)}
 </header>
 
 
-
-
-<div class="v2-shell" id="leoV2Shell">
-  <nav class="v2-nav" aria-label="LEO CONNECT Business Center">
-    <button type="button" class="active" data-v2tab="overview" onclick="leoV2Go('overview')">🏠 Genel Bakış</button>
-    <button type="button" data-v2tab="profile" onclick="leoV2Go('profile')">👤 Profil</button>
-    <button type="button" data-v2tab="digital" onclick="leoV2Go('digital')">📱 QR & NFC</button>
-    <button type="button" data-v2tab="campaign" onclick="leoV2Go('campaign')">🚀 Kampanyalar</button>
-    <button type="button" data-v2tab="stats" onclick="leoV2Go('stats')">📊 İstatistikler</button>
-  </nav>
-</div>
 
 <main>
 
@@ -3323,29 +3290,7 @@ body{background:var(--v2-bg)!important;color:var(--v2-text)}
 
 
 
-  
-<div id="leoV2ProfileControls" class="v2-grid" style="margin-top:18px">
-  <div class="v2-card">
-    <h3>🎨 Profil Teması</h3>
-    <p>İşletmenin müşteriye görünen profil temasını seç.</p>
-    <div class="v2-theme-grid">
-      <button type="button" class="v2-theme" data-v2theme="midnight-gold" onclick="leoV2SelectTheme('midnight-gold')"><strong>Midnight Gold</strong><span>Siyah / altın premium</span></button>
-      <button type="button" class="v2-theme" data-v2theme="obsidian" onclick="leoV2SelectTheme('obsidian')"><strong>Obsidian</strong><span>Ultra dark / tech</span></button>
-      <button type="button" class="v2-theme" data-v2theme="champagne" onclick="leoV2SelectTheme('champagne')"><strong>Champagne</strong><span>Sıcak / lüks</span></button>
-      <button type="button" class="v2-theme" data-v2theme="pure-light" onclick="leoV2SelectTheme('pure-light')"><strong>Pure Light</strong><span>Aydınlık premium</span></button>
-    </div>
-    <div class="v2-note" id="leoV2ThemeNote">Tema seçimi yükleniyor...</div>
-  </div>
-  <div class="v2-card">
-    <h3>🔗 Dijital Bağlantılar</h3>
-    <p>URL alanlarıyla uğraşmadan hesaplarını bağla. İstersen özel bağlantılar da ekleyebilirsin.</p>
-    <div id="leoV2Connections" class="v2-connection-grid"></div>
-    <div id="leoV2CustomLinks" class="v2-custom-list"></div>
-    <button type="button" class="feature-btn" style="margin-top:10px" onclick="leoV2AddCustomLink()">＋ Özel bağlantı ekle</button>
-  </div>
-</div>
-
-<div class="save-area">
+  <div class="save-area">
 
     <button
       id="saveButton"
@@ -6545,104 +6490,6 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 </script>
 
 
-
-
-<script id="leo-connect-v2-final-js">
-(function(){
-  const tabs=['overview','profile','digital','campaign','stats'];
-  const themeNames={
-    'midnight-gold':'Midnight Gold','obsidian':'Obsidian','champagne':'Champagne','pure-light':'Pure Light'
-  };
-  const socials={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website'};
-  const icons={instagram:'📸',facebook:'ⓕ',tiktok:'🎵',youtube:'▶️',linkedin:'in',x:'𝕏',whatsapp:'💬',google:'G',website:'🌐'};
-  window.leoV2Settings=window.leoV2Settings||{};
-  function v2Perm(key){return currentBusiness?.permissions?.[key]!==false}
-  function setSection(id,on){const el=document.getElementById(id);if(el)el.classList.toggle('v2-hidden-source',!on)}
-  window.leoV2Go=function(tab){
-    if(!tabs.includes(tab))tab='overview';
-    const p=currentBusiness?.permissions||{};
-    if(tab==='profile'&&!v2Perm('profile'))return showToast('Profil yetkisi kapalı.');
-    if(tab==='digital'&&!((p.qr===true)||(p.nfc===true)))return showToast('QR / NFC yetkisi kapalı.');
-    if(tab==='campaign'&&!v2Perm('campaign'))return showToast('Kampanya yetkisi kapalı.');
-    if(tab==='stats'&&!v2Perm('analytics'))return showToast('İstatistik yetkisi kapalı.');
-    document.querySelectorAll('[data-v2tab]').forEach(b=>b.classList.toggle('active',b.dataset.v2tab===tab));
-    // Working DOM remains intact; only visibility is orchestrated here.
-    const groups={
-      overview:['businessAnalyticsV3','liveSection','aiSection','reviewSection','profile','digital','performanceSection','profileDesign','campaignSection'],
-      profile:['profile','profileDesign'],
-      digital:['digital'],
-      campaign:['campaignSection'],
-      stats:['businessAnalyticsV3','performanceSection']
-    };
-    const all=[...new Set(Object.values(groups).flat())];
-    all.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'});
-    (groups[tab]||groups.overview).forEach(id=>{
-      const el=document.getElementById(id);if(!el)return;
-      // respect module permissions
-      const allowed={profile:p.profile!==false, digital:(p.qr===true||p.nfc===true), campaign:p.campaign===true, analytics:p.analytics===true, live:p.live===true, ai:p.ai===true, review:p.review===true};
-      if(id==='profile'||id==='profileDesign'){if(allowed.profile)el.style.display=''}
-      else if(id==='digital'){if(allowed.digital)el.style.display=''}
-      else if(id==='campaignSection'){if(allowed.campaign)el.style.display=''}
-      else if(id==='businessAnalyticsV3'||id==='performanceSection'){if(allowed.analytics)el.style.display=''}
-      else if(id==='liveSection'){if(allowed.live)el.style.display=''}
-      else if(id==='aiSection'){if(allowed.ai)el.style.display=''}
-      else if(id==='reviewSection'){if(allowed.review)el.style.display=''}
-    });
-    const title=document.getElementById('title');
-    if(title)title.textContent=tab==='overview'?'Genel Bakış':tab==='profile'?'Profil':tab==='digital'?'QR & NFC':tab==='campaign'?'Kampanyalar':'İstatistikler';
-    window.scrollTo({top:0,behavior:'smooth'});
-  };
-  async function v2Api(url,options={}){
-    const r=await api(url,options); if(!r)throw new Error('Oturum sona erdi.'); if(r.error)throw new Error(r.error); return r;
-  }
-  function renderThemes(){
-    const current=window.leoV2Settings.theme||'midnight-gold';
-    const can=window.leoV2Settings.theme_permission!==false && currentBusiness?.permissions?.profile_theme!==false;
-    document.querySelectorAll('[data-v2theme]').forEach(b=>{b.classList.toggle('selected',b.dataset.v2theme===current);b.disabled=!can});
-    const n=document.getElementById('leoV2ThemeNote');if(n)n.textContent=can?'Seçtiğin tema profilinde kullanılacak.':'Tema seçimi yönetici tarafından kilitlendi.';
-  }
-  window.leoV2SelectTheme=async function(theme){
-    if(window.leoV2Settings.theme_permission===false||currentBusiness?.permissions?.profile_theme===false)return showToast('Tema değiştirme yetkisi kapalı.');
-    try{const d=await v2Api('/api/business-theme',{method:'PUT',body:JSON.stringify({theme})});window.leoV2Settings.theme=d.theme||theme;renderThemes();showToast(themeNames[theme]+' teması kaydedildi.');}catch(e){showToast(e.message||'Tema kaydedilemedi.');}
-  };
-  function renderConnections(){
-    const root=document.getElementById('leoV2Connections');if(!root)return;
-    const data=window.leoV2Settings.social_links||{};
-    root.innerHTML=Object.entries(socials).map(([key,name])=>{const row=data[key]||{};const connected=!!row.url;return `<div class="v2-connection"><div><strong>${icons[key]||'🔗'} ${name}</strong><small>${connected?'Bağlandı':'Bağlı değil'}</small></div><button type="button" onclick="leoV2Connect('${key}')">${connected?'Düzenle':'Hesabı Bağla'}</button></div>`}).join('');
-    const custom=window.leoV2Settings.custom_links||[];const cr=document.getElementById('leoV2CustomLinks');
-    if(cr)cr.innerHTML=custom.length?custom.map((x,i)=>`<div class="v2-custom"><a href="${esc(x.url)}" target="_blank" rel="noopener">🔗 ${esc(x.label||'Özel bağlantı')}</a><button type="button" onclick="leoV2RemoveCustom(${i})">Sil</button></div>`).join(''):'';
-  }
-  window.leoV2Connect=async function(type){
-    const name=socials[type]||type;const current={...(window.leoV2Settings.social_links||{})};
-    const old=current[type]?.url||'';const value=prompt(name+' bağlantısı',old);if(value===null)return;
-    if(!value.trim())return showToast('Bağlantı boş bırakılamaz.');
-    current[type]={url:value.trim(),enabled:true,label:name};
-    try{const d=await v2Api('/api/business-social-links',{method:'PUT',body:JSON.stringify({social_links:current})});window.leoV2Settings.social_links=d.social_links||current;renderConnections();showToast(name+' bağlantısı kaydedildi.');}catch(e){showToast(e.message||'Bağlantı kaydedilemedi.');}
-  };
-  window.leoV2AddCustomLink=async function(){
-    const label=prompt('Bağlantı adı (ör. Yemeksepeti)');if(!label?.trim())return;const url=prompt('Bağlantı adresi');if(!url?.trim())return;
-    const list=[...(window.leoV2Settings.custom_links||[])];list.push({label:label.trim(),url:url.trim(),enabled:true});
-    try{const d=await v2Api('/api/business-custom-links',{method:'PUT',body:JSON.stringify({custom_links:list.slice(0,20)})});window.leoV2Settings.custom_links=d.custom_links||list;renderConnections();showToast('Özel bağlantı eklendi.');}catch(e){showToast(e.message||'Özel bağlantı eklenemedi.');}
-  };
-  window.leoV2RemoveCustom=async function(i){const list=[...(window.leoV2Settings.custom_links||[])];if(!list[i])return;if(!confirm('Bu özel bağlantı silinsin mi?'))return;list.splice(i,1);try{const d=await v2Api('/api/business-custom-links',{method:'PUT',body:JSON.stringify({custom_links:list})});window.leoV2Settings.custom_links=d.custom_links||list;renderConnections();showToast('Bağlantı silindi.');}catch(e){showToast(e.message||'Bağlantı silinemedi.');}};
-  window.leoV2LoadSettings=async function(){
-    try{const d=await v2Api('/api/business-v2-settings');window.leoV2Settings=d||{};renderThemes();renderConnections();}catch(e){console.warn('LEO V2 settings:',e.message);}
-  };
-  function start(){
-    // Keep V1's full DOM and all existing JS functions. V2 only orchestrates presentation.
-    const shell=document.getElementById('leoV2Shell');if(shell)shell.classList.add('ready');
-    if(window.currentBusiness)window.leoV2LoadSettings();
-    setTimeout(()=>{if(window.currentBusiness)window.leoV2Go('overview')},250);
-  }
-  // load() already starts the V1 application. Wait for it, then layer V2 on top.
-  const oldLoad=window.load;
-  if(typeof oldLoad==='function'){
-    // Do not replace it; the V2 layer is initialized after the existing startup call.
-  }
-  window.addEventListener('load',start);
-  setTimeout(start,900);
-})();
-</script>
 
 </body>
 
