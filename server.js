@@ -3404,7 +3404,13 @@ app.get(
       const profile = publicBusiness(result.rows[0]);
       const profile_design = await getPublicProfileDesign(result.rows[0].id);
       const review_booster = await getReviewBooster(result.rows[0].id);
-      const campaigns = await getActiveCampaigns(result.rows[0].id);
+      const campaignResult = await pool.query(`
+        SELECT * FROM campaigns
+        WHERE business_id=$1
+        ORDER BY enabled DESC, priority DESC, created_at DESC
+        LIMIT 5
+      `,[result.rows[0].id]);
+      const campaigns = campaignResult.rows.map(normalizeCampaign);
 
       return res.json({
         ...profile,
@@ -3489,7 +3495,13 @@ app.get(
       const profile = publicBusiness(result.rows[0]);
       const profile_design = await getPublicProfileDesign(result.rows[0].id);
       const review_booster = await getReviewBooster(result.rows[0].id);
-      const campaigns = await getActiveCampaigns(result.rows[0].id);
+      const campaignResult = await pool.query(`
+        SELECT * FROM campaigns
+        WHERE business_id=$1
+        ORDER BY enabled DESC, priority DESC, created_at DESC
+        LIMIT 5
+      `,[result.rows[0].id]);
+      const campaigns = campaignResult.rows.map(normalizeCampaign);
 
       return res.json({
         ...profile,
