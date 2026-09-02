@@ -879,10 +879,50 @@ function newCardPerson(){
   openModal(); setTimeout(()=>document.getElementById('cp_name')?.focus(),50);
 }
 async function createCardPerson(){
-  const name=document.getElementById('cp_name').value.trim(),email=document.getElementById('cp_email').value.trim(),password=document.getElementById('cp_password').value;
-  if(!name){showToast('Ad Soyad gerekli.');return}
-  if(password && password.length<8){showToast('Şifre en az 8 karakter olmalı.');return}
-  try{await api('/api/admin/card-people',{method:'POST',body:JSON.stringify({email,password,data:{person_name:name,display_name:name},enabled:true})});closeModal();showToast('Business Card kişisi oluşturuldu.');await showBusinessCardManager();}catch(e){showToast(e.message)}
+  const modalBody = document.getElementById('modalBody');
+
+  const nameInput = modalBody?.querySelector('#cp_name');
+  const emailInput = modalBody?.querySelector('#cp_email');
+  const passwordInput = modalBody?.querySelector('#cp_password');
+
+  const name = nameInput?.value?.trim() || '';
+  const email = emailInput?.value?.trim() || '';
+  const password = passwordInput?.value || '';
+
+  if(!name){
+    showToast('Ad Soyad gerekli.');
+    nameInput?.focus();
+    return;
+  }
+
+  if(password && password.length < 8){
+    showToast('Şifre en az 8 karakter olmalı.');
+    passwordInput?.focus();
+    return;
+  }
+
+  try{
+    await api('/api/admin/card-people',{
+      method:'POST',
+      body:JSON.stringify({
+        email,
+        password,
+        data:{
+          person_name:name,
+          display_name:name
+        },
+        enabled:true
+      })
+    });
+
+    closeModal();
+    showToast('Business Card kişisi oluşturuldu.');
+    await showBusinessCardManager();
+
+  }catch(e){
+    showToast(e.message);
+  }
+}
 }
 async function editCardPerson(id){
   try{const d=await api('/api/admin/card-people/'+id),p=d.person||{},data=p.data||{},perms=p.permissions||{};document.getElementById('modalTitle').textContent='💳 Business Card • '+(data.person_name||'Kişi');document.getElementById('modalBody').innerHTML=`<div class="detail-box"><small>PUBLIC KART</small><strong style="display:block;margin-top:5px;word-break:break-all">/card/${esc(p.slug||'')}</strong></div><div class="form-grid" style="margin-top:14px"><div class="form-field"><label>E-POSTA</label><input id="cp_edit_email" value="${esc(p.email||'')}"></div><div class="form-field"><label>YENİ ŞİFRE</label><input id="cp_edit_password" type="password" placeholder="Değiştirmek istemiyorsan boş bırak"></div></div><div class="section-sub" style="margin:14px 0 8px"><strong>Alan bazlı işlem yetkileri</strong><br>Kapalı alan kişi tarafından değiştirilemez ve public kartta gösterilmez.</div><div class="permission-grid">${CARD_PERSON_FIELDS.map(([k,l])=>`<div class="permission-card"><div><strong>${esc(l)}</strong><span>${data[k]?'İçerik mevcut':'İçerik henüz girilmedi'}</span></div><label class="switch"><input class="cp-perm" data-field="${k}" type="checkbox" ${perms[k]===true?'checked':''}><span class="slider"></span></label></div>`).join('')}</div><div class="permission-card" style="margin-top:12px"><div><strong>Kart aktif</strong><span>Public kartı erişilebilir yapar.</span></div><label class="switch"><input id="cp_enabled" type="checkbox" ${p.enabled?'checked':''}><span class="slider"></span></label></div><div class="modal-actions"><button class="btn primary" onclick="saveCardPerson(${Number(id)})">Kaydet</button><button class="btn" onclick="deleteCardPerson(${Number(id)})">Kişiyi Sil</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal();}catch(e){showToast(e.message)}
