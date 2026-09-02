@@ -1136,36 +1136,78 @@ body{
 
 
 
-/* REAL BRAND ICONS */
-.link-icon img.brand-icon-svg,
-.action-icon img.brand-icon-svg,
-.info-icon img.brand-icon-svg {
-  width:24px;
-  height:24px;
-  display:block;
-  object-fit:contain;
+/* ==================================================
+   LEO CONNECT V2 — DYNAMIC PROFILE
+================================================== */
+.dynamic-cover{
+  display:none;
+  position:relative;
+  min-height:190px;
+  margin:-24px -24px 22px;
+  overflow:hidden;
+  border-radius:24px 24px 0 0;
+  background:linear-gradient(145deg,#191919,#0a0a0a);
+  border-bottom:1px solid rgba(214,173,85,.16);
 }
-
-.action-icon img.brand-icon-svg {
-  width:20px;
-  height:20px;
+.dynamic-cover img{
+  width:100%;height:100%;min-height:190px;display:block;object-fit:cover;
 }
-
-.link-icon {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex:0 0 46px;
-  width:46px;
-  height:46px;
+.dynamic-cover::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 30%,rgba(7,7,7,.72) 100%);
 }
-
-@media(max-width:430px){
-  .link-icon {
-    flex-basis:42px;
-    width:42px;
-    height:42px;
-  }
+.dynamic-announcement,
+.dynamic-campaign,
+.dynamic-featured,
+.dynamic-video{
+  display:none;
+  margin-top:16px;
+  padding:16px;
+  border-radius:18px;
+  border:1px solid rgba(214,173,85,.18);
+  background:linear-gradient(145deg,rgba(214,173,85,.09),rgba(255,255,255,.025));
+  text-align:left;
+}
+.dynamic-announcement strong,
+.dynamic-campaign strong,
+.dynamic-featured strong{
+  display:block;color:var(--lc-gold-soft);font-size:12px;margin-bottom:7px;
+}
+.dynamic-announcement span,
+.dynamic-campaign span,
+.dynamic-featured span{
+  display:block;color:#d0d0d0;font-size:11px;line-height:1.55;
+}
+.dynamic-media{
+  display:none;width:100%;margin-top:12px;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.07);background:#080808;
+}
+.dynamic-media img{display:block;width:100%;max-height:260px;object-fit:cover;}
+.dynamic-button{
+  display:none!important;width:max-content;margin-top:12px;padding:9px 13px;border-radius:11px;
+  background:linear-gradient(135deg,var(--lc-gold),#9e7738);color:#fff;text-decoration:none;
+  font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.1);
+}
+.dynamic-button.show{display:inline-flex!important;}
+.dynamic-gallery{
+  display:none;margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;
+}
+.dynamic-gallery:empty{display:none;}
+.dynamic-gallery-item{aspect-ratio:1/1;border-radius:13px;overflow:hidden;background:#101010;border:1px solid rgba(255,255,255,.06);}
+.dynamic-gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.dynamic-video iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:13px;display:block;}
+.dynamic-video-label{color:#888;font-size:9px;margin-bottom:8px;letter-spacing:.08em;font-weight:800;}
+.theme-obsidian{--lc-gold:#9aa0aa;--lc-gold-soft:#e0e4ea;}
+.theme-champagne{--lc-gold:#d8b36a;--lc-gold-soft:#f5dfae;}
+.theme-pure-light{--lc-gold:#a47a2d;--lc-gold-soft:#6e4d16;}
+.theme-pure-light .hero,.theme-pure-light .section{background:linear-gradient(145deg,#fff,#f4f1e9)!important;color:#151515;}
+.theme-pure-light .business-name,.theme-pure-light .section-title strong{color:#151515;}
+.theme-pure-light .description,.theme-pure-light .info-value,.theme-pure-light .link-text strong{color:#333!important;}
+.theme-pure-light .category{background:rgba(164,122,45,.08);}
+@media(max-width:520px){
+  .dynamic-cover{margin:-17px -17px 18px;border-radius:20px 20px 0 0;min-height:155px;}
+  .dynamic-cover img{min-height:155px;}
+  .dynamic-gallery{grid-template-columns:repeat(2,1fr);}
 }
 
 </style>
@@ -1262,7 +1304,7 @@ body{
       class="action gold"
       href="#"
     >
-      <span class="action-icon">☎</span> Ara
+      📞 Ara
     </a>
 
 
@@ -1273,7 +1315,7 @@ body{
       target="_blank"
       rel="noopener"
     >
-      <span class="action-icon"><img class="brand-icon-svg" src="https://cdn.simpleicons.org/whatsapp/FFFFFF" alt="WhatsApp" width="20" height="20"></span> WhatsApp
+      💬 WhatsApp
     </a>
 
   </div>
@@ -1281,6 +1323,38 @@ body{
 
 </section>
 
+<!-- ==================================================
+     V2 — DYNAMIC PROFILE CONTENT
+================================================== -->
+<div id="dynamicCover" class="dynamic-cover">
+  <img id="dynamicCoverImage" alt="Profil kapak görseli">
+</div>
+
+<div id="dynamicAnnouncement" class="dynamic-announcement">
+  <strong>📢 Duyuru</strong>
+  <span id="dynamicAnnouncementText"></span>
+</div>
+
+<div id="dynamicCampaign" class="dynamic-campaign">
+  <strong id="dynamicCampaignTitle"></strong>
+  <span id="dynamicCampaignText"></span>
+  <img id="dynamicCampaignImage" class="dynamic-media" alt="Kampanya görseli">
+  <a id="dynamicCampaignButton" class="dynamic-button" target="_blank" rel="noopener"></a>
+</div>
+
+<div id="dynamicFeatured" class="dynamic-featured">
+  <strong id="dynamicFeaturedTitle"></strong>
+  <span id="dynamicFeaturedText"></span>
+  <img id="dynamicFeaturedImage" class="dynamic-media" alt="Öne çıkan içerik görseli">
+  <a id="dynamicFeaturedButton" class="dynamic-button" target="_blank" rel="noopener"></a>
+</div>
+
+<div id="dynamicGallery" class="dynamic-gallery"></div>
+
+<div id="dynamicVideo" class="dynamic-video">
+  <div class="dynamic-video-label">VİDEO</div>
+  <div id="dynamicVideoFrame"></div>
+</div>
 
 
 <!-- ==================================================
@@ -1432,14 +1506,7 @@ body{
     >
 
       <div class="link-icon">
-        <img
-          class="brand-icon-svg"
-          src="https://cdn.simpleicons.org/instagram/FFFFFF"
-          alt="Instagram"
-          width="24"
-          height="24"
-          loading="lazy"
-        >
+        📸
       </div>
 
       <div class="link-text">
@@ -1465,14 +1532,7 @@ body{
     >
 
       <div class="link-icon">
-        <img
-          class="brand-icon-svg"
-          src="https://cdn.simpleicons.org/tiktok/FFFFFF"
-          alt="TikTok"
-          width="24"
-          height="24"
-          loading="lazy"
-        >
+        🎵
       </div>
 
       <div class="link-text">
@@ -1498,14 +1558,7 @@ body{
     >
 
       <div class="link-icon">
-        <img
-          class="brand-icon-svg"
-          src="https://cdn.simpleicons.org/google/FFFFFF"
-          alt="Google"
-          width="24"
-          height="24"
-          loading="lazy"
-        >
+        ⭐
       </div>
 
       <div class="link-text">
@@ -1531,10 +1584,7 @@ body{
     >
 
       <div class="link-icon">
-        <svg class="brand-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
-          <path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9S14.4 18.5 12 21M12 3c-2.4 2.5-3.6 5.5-3.6 9S9.6 18.5 12 21" fill="none" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
+        🌐
       </div>
 
       <div class="link-text">
@@ -1560,10 +1610,7 @@ body{
     >
 
       <div class="link-icon">
-        <svg class="brand-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="5" y="4" width="14" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
-          <path d="M9 4.5h6M9 9h6M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
+        📋
       </div>
 
       <div class="link-text">
@@ -2103,11 +2150,126 @@ function setupLink(
 }
 
 
+
+
+/* ==================================================
+   V2 — DYNAMIC PROFILE RENDERER
+================================================== */
+function dynamicSafeUrl(value){
+  const url=String(value||'').trim();
+  return /^https?:\/\//i.test(url) ? url : '';
+}
+
+function dynamicYoutubeEmbed(value){
+  const url=dynamicSafeUrl(value);
+  if(!url) return '';
+  try{
+    const u=new URL(url);
+    let id='';
+    if(u.hostname.includes('youtu.be')) id=u.pathname.replace(/^\//,'').split('/')[0];
+    if(u.hostname.includes('youtube.com')){
+      id=u.searchParams.get('v') || (u.pathname.match(/\/embed\/([^/]+)/)||[])[1] || (u.pathname.match(/\/shorts\/([^/]+)/)||[])[1] || '';
+    }
+    return id ? 'https://www.youtube.com/embed/'+encodeURIComponent(id)+'?rel=0' : '';
+  }catch(e){ return ''; }
+}
+
+function renderDynamicProfile(){
+  const d=business?.profile_design || {};
+  const theme=String(d.theme||'midnight-gold');
+  document.body.classList.remove('theme-obsidian','theme-champagne','theme-pure-light');
+  if(theme!=='midnight-gold') document.body.classList.add('theme-'+theme);
+  if(d.accent_color && /^#[0-9a-f]{6}$/i.test(String(d.accent_color))){
+    document.documentElement.style.setProperty('--lc-gold',d.accent_color);
+  }
+
+  const cover=document.getElementById('dynamicCover');
+  const coverImg=document.getElementById('dynamicCoverImage');
+  const coverUrl=dynamicSafeUrl(d.cover_url);
+  if(cover && coverImg && coverUrl){
+    cover.style.display='block';
+    coverImg.src=coverUrl;
+    const pos=['center','top','bottom','left','right'].includes(d.cover_position) ? d.cover_position : 'center';
+    coverImg.style.objectPosition=pos;
+    coverImg.onerror=()=>{cover.style.display='none';};
+  }
+
+  const announcement=document.getElementById('dynamicAnnouncement');
+  const announcementText=document.getElementById('dynamicAnnouncementText');
+  if(announcement && announcementText){
+    const show=d.announcement_enabled && String(d.announcement_text||'').trim();
+    announcement.style.display=show?'block':'none';
+    announcementText.textContent=String(d.announcement_text||'');
+  }
+
+  const campaign=document.getElementById('dynamicCampaign');
+  if(campaign){
+    const show=d.campaign_enabled && (d.campaign_title || d.campaign_text || d.campaign_image_url);
+    campaign.style.display=show?'block':'none';
+    document.getElementById('dynamicCampaignTitle').textContent=d.campaign_title||'Kampanya';
+    document.getElementById('dynamicCampaignText').textContent=d.campaign_text||'';
+    const img=document.getElementById('dynamicCampaignImage');
+    const imgUrl=dynamicSafeUrl(d.campaign_image_url);
+    if(imgUrl){img.src=imgUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}else img.style.display='none';
+    const btn=document.getElementById('dynamicCampaignButton');
+    const btnUrl=dynamicSafeUrl(d.campaign_button_url);
+    if(btnUrl && d.campaign_button_text){btn.href=btnUrl;btn.textContent=d.campaign_button_text;btn.classList.add('show');}else btn.classList.remove('show');
+    btn.onclick=()=>{ if(btnUrl) track('campaign'); };
+  }
+
+  const featured=document.getElementById('dynamicFeatured');
+  if(featured){
+    const show=d.featured_enabled && (d.featured_title || d.featured_text || d.featured_image_url);
+    featured.style.display=show?'block':'none';
+    document.getElementById('dynamicFeaturedTitle').textContent=d.featured_title||'Öne Çıkan';
+    document.getElementById('dynamicFeaturedText').textContent=d.featured_text||'';
+    const img=document.getElementById('dynamicFeaturedImage');
+    const imgUrl=dynamicSafeUrl(d.featured_image_url);
+    if(imgUrl){img.src=imgUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}else img.style.display='none';
+    const btn=document.getElementById('dynamicFeaturedButton');
+    const btnUrl=dynamicSafeUrl(d.featured_button_url);
+    if(btnUrl && d.featured_button_text){btn.href=btnUrl;btn.textContent=d.featured_button_text;btn.classList.add('show');}else btn.classList.remove('show');
+    btn.onclick=()=>{ if(btnUrl) track('featured'); };
+  }
+
+  const galleryBox=document.getElementById('dynamicGallery');
+  if(galleryBox){
+    galleryBox.innerHTML='';
+    const gallery=Array.isArray(d.gallery)?d.gallery:[];
+    gallery.slice(0,30).forEach(item=>{
+      const url=dynamicSafeUrl(typeof item==='string'?item:item?.url||'');
+      if(!url) return;
+      const cell=document.createElement('div');
+      cell.className='dynamic-gallery-item';
+      const img=document.createElement('img');
+      img.src=url;img.alt='';
+      img.onerror=()=>cell.remove();
+      cell.appendChild(img);galleryBox.appendChild(cell);
+    });
+    galleryBox.style.display=galleryBox.children.length?'grid':'none';
+  }
+
+  const video=document.getElementById('dynamicVideo');
+  const frame=document.getElementById('dynamicVideoFrame');
+  if(video && frame){
+    const embed=dynamicYoutubeEmbed(d.video_url);
+    if(d.video_enabled && embed){
+      frame.innerHTML='';
+      const iframe=document.createElement('iframe');
+      iframe.src=embed;iframe.title='İşletme videosu';iframe.loading='lazy';iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';iframe.allowFullscreen=true;
+      frame.appendChild(iframe);video.style.display='block';
+    }else{frame.innerHTML='';video.style.display='none';}
+  }
+}
+
+
 /* ==================================================
    RENDER
 ================================================== */
 
 function render(){
+
+  renderDynamicProfile();
 
   document.title =
     (
