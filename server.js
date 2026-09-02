@@ -88,6 +88,7 @@ function publicBusiness(row) {
     logo_url: row.logo_url || '',
     social_links: normalizeSocialLinks(row.social_links),
     custom_links: normalizeCustomLinks(row.custom_links),
+    social_platform_permissions: normalizeAllowedPlatforms(row.social_platform_permissions),
     created_at: row.created_at
   };
 }
@@ -101,7 +102,7 @@ const LEO_V2_THEMES = {
   'pure-light': { name:'Pure Light', description:'Aydınlık, temiz ve premium tema' }
 };
 
-const LEO_V2_SOCIAL_PLATFORMS = ['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google','website'];
+const LEO_V2_SOCIAL_PLATFORMS = ['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google','website','yemeksepeti','getir','trendyol-yemek','migros-yemek','rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email'];
 const LEO_V2_DEFAULT_ALLOWED_PLATFORMS = Object.fromEntries(LEO_V2_SOCIAL_PLATFORMS.map(k=>[k,true]));
 function normalizeAllowedPlatforms(value){
   let raw=value;
@@ -3564,6 +3565,9 @@ app.get(
             hours,
             logo_url,
             profile_field_permissions,
+            social_links,
+            custom_links,
+            social_platform_permissions,
             created_at
           FROM businesses
           WHERE slug=$1
@@ -3647,6 +3651,9 @@ app.get(
             b.hours,
             b.logo_url,
             b.profile_field_permissions,
+            b.social_links,
+            b.custom_links,
+            b.social_platform_permissions,
             b.created_at
           FROM nfc_tags t
           INNER JOIN businesses b
