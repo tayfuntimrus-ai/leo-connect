@@ -2247,8 +2247,16 @@ main{
   <div class="access-item"><span>QR Merkezi</span><span id="accessQR" class="access-state off">KİLİTLİ</span></div>
   <div class="access-item"><span>NFC Merkezi</span><span id="accessNFC" class="access-state off">KİLİTLİ</span></div>
   <div class="access-item"><span>Analiz</span><span id="accessAnalytics" class="access-state off">KİLİTLİ</span></div>
+  <div class="access-item"><span>Canlı Takip</span><span id="accessLive" class="access-state off">KİLİTLİ</span></div>
+  <div class="access-item"><span>LEO AI</span><span id="accessAI" class="access-state off">KİLİTLİ</span></div>
 </div>
 
+
+<style>
+.live-v4,.ai-v4{margin:24px 0;background:linear-gradient(145deg,#111,#090909);border:1px solid #292929;border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.24)}
+.live-head,.ai-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}.live-head h2,.ai-head h2{margin:0;font-size:20px}.live-head p,.ai-head p{margin:6px 0 0;color:#888;font-size:12px}.live-pulse{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid #2e2e2e;border-radius:999px;color:#aaa;font-size:10px}.live-pulse i{width:7px;height:7px;border-radius:50%;background:#57d68b;box-shadow:0 0 12px #57d68b}.live-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.live-kpi,.ai-box{padding:16px;border:1px solid #292929;border-radius:17px;background:#101010}.live-kpi small,.ai-box small{display:block;color:#777;font-size:9px;letter-spacing:.1em}.live-kpi strong{display:block;font-size:25px;margin-top:6px}.live-feed{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto}.live-item{display:flex;gap:12px;align-items:center;padding:12px 13px;border:1px solid #252525;border-radius:14px;background:#0d0d0d}.live-icon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:#171717;border:1px solid #292929}.live-item strong{font-size:11px}.live-item span{display:block;color:#777;font-size:9px;margin-top:3px}.ai-score{display:flex;align-items:center;gap:18px;padding:18px;border:1px solid #292929;border-radius:18px;background:#101010;margin-bottom:14px}.ai-ring{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;border:5px solid #c59a52;font-size:22px;font-weight:800;flex:none}.ai-copy strong{display:block;font-size:16px}.ai-copy span{display:block;color:#888;font-size:11px;margin-top:5px}.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ai-box ul{margin:10px 0 0;padding-left:18px;color:#aaa;font-size:11px;line-height:1.7}.ai-box li{margin-bottom:5px}.ai-toolbar{display:flex;gap:7px;flex-wrap:wrap}.ai-toolbar button{border:1px solid #303030;background:#151515;color:#999;border-radius:999px;padding:8px 13px;cursor:pointer}.ai-toolbar button.active{background:#c59a52;color:#080808;border-color:#c59a52;font-weight:800}.locked-v4{padding:22px;border:1px dashed #3a3a3a;border-radius:17px;text-align:center;color:#777;font-size:11px}
+@media(max-width:800px){.live-kpis,.ai-grid{grid-template-columns:1fr}.live-head,.ai-head{flex-direction:column}}
+</style>
 <!-- ==================================================
      PROFILE HERO
 ================================================== -->
@@ -2485,6 +2493,16 @@ main{
 <!-- ==================================================
      BUSINESS ANALYTICS V4
 ================================================== -->
+
+<section id="businessLiveV4" class="live-v4" style="display:none">
+  <div class="live-head"><div><h2>🟢 Canlı Takip</h2><p>İşletmenizin son müşteri hareketleri.</p></div><div class="live-pulse"><i></i> CANLI • 10 SN</div></div>
+  <div class="live-kpis"><div class="live-kpi"><small>SON 15 DK</small><strong id="bl15">0</strong></div><div class="live-kpi"><small>SON 60 DK</small><strong id="bl60">0</strong></div><div class="live-kpi"><small>BUGÜN</small><strong id="blToday">0</strong></div></div>
+  <div id="businessLiveFeed" class="live-feed"><div class="locked-v4">Canlı veriler yükleniyor…</div></div>
+</section>
+<section id="businessAIV4" class="ai-v4" style="display:none">
+  <div class="ai-head"><div><h2>🧠 LEO AI Insights</h2><p>Gerçek etkileşim verilerinden oluşturulan akıllı işletme raporu.</p></div><div class="ai-toolbar"><button data-aiperiod="today" onclick="loadAIInsights('today')">Bugün</button><button data-aiperiod="7d" class="active" onclick="loadAIInsights('7d')">7 Gün</button><button data-aiperiod="30d" onclick="loadAIInsights('30d')">30 Gün</button><button data-aiperiod="all" onclick="loadAIInsights('all')">Tümü</button></div></div>
+  <div id="aiInsightContent"><div class="locked-v4">AI raporu hazırlanıyor…</div></div>
+</section>
 <section id="businessAnalyticsV3" class="analytics-v4" style="display:none">
   <div class="analytics-head">
     <div><h2>📊 Akıllı İşletme Analizi <span style="font-size:10px;color:#c59a52;letter-spacing:.12em">V4</span></h2><p>İşletmenizin dijital performansını, dönüşümünü ve müşteri davranışını tek ekranda görün.</p></div>
@@ -4564,12 +4582,14 @@ async function shareProfile(){
 ================================================== */
 
 function applyPermissions(business){
-  const p=business?.permissions||{profile:true,qr:false,nfc:false,analytics:false};
+  const p=business?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false};
   const setAccess=(id,on)=>{const el=document.getElementById(id);if(!el)return;el.textContent=on?"AKTİF":"KİLİTLİ";el.className="access-state "+(on?"on":"off")};
   setAccess("accessProfile",p.profile);
   setAccess("accessQR",p.qr);
   setAccess("accessNFC",p.nfc);
   setAccess("accessAnalytics",p.analytics);
+  setAccess("accessLive",p.live);
+  setAccess("accessAI",p.ai);
   const hide=id=>{const el=document.getElementById(id);if(el)el.style.display="none"};
   const show=id=>{const el=document.getElementById(id);if(el)el.style.display=""};
 
@@ -4579,6 +4599,10 @@ function applyPermissions(business){
   if(nfcStat)nfcStat.style.display=p.nfc?"":"none";
 
   if(p.qr)show("quickQR");else hide("quickQR");
+  const liveCard=document.getElementById("businessLiveV4"); if(liveCard){liveCard.style.display=p.live?"":"none";}
+  const aiCard=document.getElementById("businessAIV4"); if(aiCard){aiCard.style.display=p.ai?"":"none";}
+  if(p.live) loadBusinessLive();
+  if(p.ai) loadAIInsights("7d");
   if(p.nfc)show("quickNFC");else hide("quickNFC");
 
   if(p.qr)show("qrCard");else hide("qrCard");
@@ -4650,6 +4674,36 @@ async function loadBusinessAnalytics(period='7d'){
   document.getElementById('baInsight').innerHTML=`<div class="score-ring"><strong>${score}</strong></div><div class="score-copy"><strong>${title}</strong><span>${copy}</span></div>`;
 }
 
+
+
+/* ==================================================
+   BUSINESS LIVE TRACKING V1
+================================================== */
+function liveLabel(type){const m={profile_view:'Profil görüntüleme',qr_scan:'QR tarama',qr:'QR',nfc:'NFC dokunuşu',phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google yorum',website:'Website',menu:'Menü',location:'Konum',iban:'IBAN',share:'Paylaş'};return m[type]||type}
+function liveIcon(type){const m={profile_view:'👁️',qr_scan:'📱',qr:'📱',nfc:'🦁',phone:'📞',whatsapp:'💬',instagram:'📸',tiktok:'♪',google_review:'⭐',website:'🌐',menu:'📋',location:'📍',iban:'💳',share:'↗'};return m[type]||'•'}
+function liveTime(v){try{return new Date(v).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch{return '—'}}
+async function loadBusinessLive(){
+ if(!currentBusiness?.permissions?.live)return;
+ try{const d=await api('/api/business-live-activity?limit=30'); if(!d)return;
+  document.getElementById('bl15').textContent=Number(d.stats?.last_15m||0).toLocaleString('tr-TR');document.getElementById('bl60').textContent=Number(d.stats?.last_60m||0).toLocaleString('tr-TR');document.getElementById('blToday').textContent=Number(d.stats?.today||0).toLocaleString('tr-TR');
+  const feed=document.getElementById('businessLiveFeed'); const rows=d.activities||[];
+  feed.innerHTML=rows.length?rows.map(x=>`<div class="live-item"><div class="live-icon">${liveIcon(x.type)}</div><div><strong>${liveLabel(x.type)}</strong><span>${x.source==='nfc'?'NFC'+(x.nfc_name?' • '+esc(x.nfc_name):''):(x.source==='qr'?'QR':'Direct')} • ${liveTime(x.created_at)}</span></div></div>`).join(''):'<div class="locked-v4">Henüz canlı aktivite yok.</div>';
+ }catch(e){const f=document.getElementById('businessLiveFeed');if(f)f.innerHTML='<div class="locked-v4">'+esc(e.message||'Canlı aktivite alınamadı')+'</div>'}
+}
+setInterval(()=>{if(currentBusiness?.permissions?.live)loadBusinessLive()},10000);
+
+/* ==================================================
+   LEO AI INSIGHTS V1
+================================================== */
+async function loadAIInsights(period='7d'){
+ if(!currentBusiness?.permissions?.ai)return;
+ document.querySelectorAll('[data-aiperiod]').forEach(b=>b.classList.toggle('active',b.dataset.aiperiod===period));
+ const box=document.getElementById('aiInsightContent');if(!box)return;box.innerHTML='<div class="locked-v4">🧠 Rapor analiz ediliyor…</div>';
+ try{const d=await api('/api/business-ai-insights?period='+encodeURIComponent(period));
+  const score=Number(d.score||0);const insights=d.insights||[];const recs=d.recommendations||[];
+  box.innerHTML=`<div class="ai-score"><div class="ai-ring">${score}</div><div class="ai-copy"><strong>${esc(d.title||'LEO AI Raporu')}</strong><span>Seçilen dönemdeki gerçek işletme verilerinin analizi • Dönüşüm: %${Number(d.conversion||0).toFixed(1)}</span></div></div><div class="ai-grid"><div class="ai-box"><small>🧠 LEO'NUN TESPİTLERİ</small><ul>${insights.length?insights.map(x=>`<li>${esc(x)}</li>`).join(''):'<li>Henüz yeterli veri oluşmadı.</li>'}</ul></div><div class="ai-box"><small>💡 ÖNERİLER</small><ul>${recs.length?recs.map(x=>`<li>${esc(x)}</li>`).join(''):'<li>Yeni veriler oluştukça öneriler burada görünecek.</li>'}</ul></div></div>`;
+ }catch(e){box.innerHTML='<div class="locked-v4">'+esc(e.message||'AI raporu alınamadı')+'</div>'}
+}
 
 /* ==================================================
    LOAD
