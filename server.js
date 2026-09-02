@@ -171,34 +171,40 @@ async function getReviewBooster(businessId) {
   return normalizeReviewBooster(result.rows[0]);
 }
 
-const BUSINESS_CARD_FIELDS = [
-  'display_name','person_name','job_title','phone','whatsapp','email','website','address',
-  'instagram','facebook','tiktok','linkedin','google_review','menu','iban','iban_holder','hours','note'
+
+/* =========================================================
+   V2 — INDEPENDENT PERSONAL BUSINESS CARD
+========================================================= */
+const CARD_PERSON_FIELDS = [
+  'display_name','person_name','job_title','company','phone','whatsapp','email','website','address',
+  'instagram','facebook','tiktok','linkedin','youtube','x','photo_url','cover_url','bio','note'
 ];
-
-const BUSINESS_CARD_FIELD_LABELS = {
-  display_name:'Kart Başlığı / İşletme Adı', person_name:'Yetkili / Kişi Adı', job_title:'Unvan',
+const CARD_PERSON_LABELS = {
+  display_name:'Kart Başlığı', person_name:'Ad Soyad', job_title:'Unvan', company:'Şirket / Kurum',
   phone:'Telefon', whatsapp:'WhatsApp', email:'E-posta', website:'Web Sitesi', address:'Adres',
-  instagram:'Instagram', facebook:'Facebook', tiktok:'TikTok', linkedin:'LinkedIn',
-  google_review:'Google Yorum', menu:'Menü', iban:'IBAN', iban_holder:'IBAN Sahibi', hours:'Çalışma Saatleri', note:'Not / Kısa Açıklama'
+  instagram:'Instagram', facebook:'Facebook', tiktok:'TikTok', linkedin:'LinkedIn', youtube:'YouTube', x:'X / Twitter',
+  photo_url:'Profil Fotoğrafı', cover_url:'Kapak Görseli', bio:'Hakkımda', note:'Not / Kısa Açıklama'
 };
-
-const BUSINESS_CARD_DEFAULT_DATA = Object.fromEntries(BUSINESS_CARD_FIELDS.map(k => [k, '']));
-const BUSINESS_CARD_DEFAULT_PERMISSIONS = Object.fromEntries(BUSINESS_CARD_FIELDS.map(k => [k, false]));
-
-function normalizeBusinessCard(row) {
-  const data = {...BUSINESS_CARD_DEFAULT_DATA, ...(row?.data || {})};
-  const permissions = {...BUSINESS_CARD_DEFAULT_PERMISSIONS, ...(row?.permissions || {})};
-  for (const key of BUSINESS_CARD_FIELDS) {
-    data[key] = String(data[key] ?? '');
-    permissions[key] = permissions[key] === true;
-  }
-  return { enabled: row?.enabled === true, data, permissions, field_labels: BUSINESS_CARD_FIELD_LABELS };
+const CARD_PERSON_DEFAULT_DATA = Object.fromEntries(CARD_PERSON_FIELDS.map(k=>[k,'']));
+const CARD_PERSON_DEFAULT_PERMISSIONS = Object.fromEntries(CARD_PERSON_FIELDS.map(k=>[k,false]));
+function normalizeCardPerson(row){
+  const data={...CARD_PERSON_DEFAULT_DATA,...(row?.data||{})};
+  const permissions={...CARD_PERSON_DEFAULT_PERMISSIONS,...(row?.permissions||{})};
+  for(const key of CARD_PERSON_FIELDS){ data[key]=String(data[key]??''); permissions[key]=permissions[key]===true; }
+  return {id:row?.id||null,slug:row?.slug||'',enabled:row?.enabled===true,email:row?.email||'',data,permissions,field_labels:CARD_PERSON_LABELS};
 }
-
-async function getBusinessCard(businessId) {
-  const result = await pool.query(`SELECT enabled, data, permissions FROM business_cards WHERE business_id=$1 LIMIT 1`, [businessId]);
-  return normalizeBusinessCard(result.rows[0]);
+async function getCardPerson(id){
+  const r=await pool.query(`SELECT id,slug,email,enabled,data,permissions FROM card_people WHERE id=$1 LIMIT 1`,[id]);
+  return normalizeCardPerson(r.rows[0]);
+}
+function cardPersonAuth(req,res,next){
+  try{
+    const header=req.headers.authorization||'';
+    if(!header.startsWith('Bearer ')) return res.status(401).json({error:'Kart sahibi oturumu gerekli'});
+    const decoded=jwt.verify(header.substring(7),SECRET);
+    if(!decoded?.id || decoded.role!=='card_person') return res.status(403).json({error:'Kart sahibi yetkisi gerekli'});
+    req.cardPerson=decoded; next();
+  }catch(e){ return res.status(401).json({error:'Kart sahibi oturumu geçersiz veya süresi dolmuş'}); }
 }
 
 function businessPermissions(row) {
@@ -209,8 +215,7 @@ function businessPermissions(row) {
     analytics: row?.dashboard_analytics === true,
     live: row?.dashboard_live === true,
     ai: row?.dashboard_ai === true,
-    review: row?.dashboard_review === true,
-    card: row?.dashboard_card === true
+    review: row?.dashboard_review === true
   };
 }
 
@@ -219,7 +224,7 @@ function requireBusinessPermission(permission) {
     try {
       if (req.user?.role === 'admin') return next();
       const result = await pool.query(
-        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_card
+        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review
          FROM businesses WHERE id=$1 LIMIT 1`,
         [req.user.id]
       );
@@ -309,8 +314,7 @@ async function initDatabase() {
       ADD COLUMN IF NOT EXISTS dashboard_nfc BOOLEAN NOT NULL DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS dashboard_analytics BOOLEAN NOT NULL DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS dashboard_live BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS dashboard_ai BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS dashboard_card BOOLEAN NOT NULL DEFAULT FALSE
+      ADD COLUMN IF NOT EXISTS dashboard_ai BOOLEAN NOT NULL DEFAULT FALSE
   `);
 
 
@@ -400,6 +404,23 @@ async function initDatabase() {
   `);
 
 
+
+  /* V2 — INDEPENDENT PERSONAL BUSINESS CARDS */
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS card_people (
+      id SERIAL PRIMARY KEY,
+      slug TEXT NOT NULL UNIQUE,
+      email TEXT UNIQUE,
+      password_hash TEXT,
+      enabled BOOLEAN NOT NULL DEFAULT TRUE,
+      data JSONB NOT NULL DEFAULT '{}'::jsonb,
+      permissions JSONB NOT NULL DEFAULT '{}'::jsonb,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_card_people_slug ON card_people(slug)`);
+
   /* V2 — DYNAMIC PROFILE DESIGN */
 
   /* V2 — REVIEW BOOSTER */
@@ -424,26 +445,6 @@ async function initDatabase() {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
-
-  /* V2 — DIGITAL BUSINESS CARD */
-  await pool.query(`
-    ALTER TABLE businesses
-      ADD COLUMN IF NOT EXISTS dashboard_card BOOLEAN NOT NULL DEFAULT FALSE
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS business_cards (
-      id SERIAL PRIMARY KEY,
-      business_id INTEGER NOT NULL UNIQUE REFERENCES businesses(id) ON DELETE CASCADE,
-      enabled BOOLEAN NOT NULL DEFAULT FALSE,
-      data JSONB NOT NULL DEFAULT '{}'::jsonb,
-      permissions JSONB NOT NULL DEFAULT '{}'::jsonb,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  await pool.query(`CREATE INDEX IF NOT EXISTS idx_business_cards_business_id ON business_cards(business_id)`);
-
 
   await pool.query(`
     CREATE INDEX IF NOT EXISTS idx_review_boosters_business_id
@@ -1058,7 +1059,7 @@ app.get(
 app.get('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_card
+      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review
       FROM businesses WHERE id=$1 LIMIT 1
     `, [Number(req.params.id)]);
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
@@ -1080,14 +1081,13 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
     const live = body.live === true;
     const ai = body.ai === true;
     const review = body.review === true;
-    const card = body.card === true;
 
     const result = await pool.query(`
       UPDATE businesses
-      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7, dashboard_card=$8
-      WHERE id=$9
-      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_card
-    `, [profile, qr, nfc, analytics, live, ai, review, card, id]);
+      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7
+      WHERE id=$8
+      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review
+    `, [profile, qr, nfc, analytics, live, ai, review, id]);
 
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
     res.json({ success: true, permissions: businessPermissions(result.rows[0]) });
@@ -1098,88 +1098,97 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
 });
 
 
+
 /* =========================================================
-   DIGITAL BUSINESS CARD
+   INDEPENDENT PERSONAL BUSINESS CARD API
 ========================================================= */
-
-app.get('/api/admin/business-cards', adminAuth, async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT b.id, b.name, b.email, b.category, b.slug, b.dashboard_card,
-             COALESCE(bc.enabled, FALSE) AS card_enabled,
-             COALESCE(bc.permissions, '{}'::jsonb) AS card_permissions
-      FROM businesses b
-      LEFT JOIN business_cards bc ON bc.business_id=b.id
-      ORDER BY b.created_at DESC
-    `);
-    res.json({ businesses: result.rows.map(r => ({
-      id:r.id,name:r.name,email:r.email,category:r.category,slug:r.slug,
-      card: { enabled:r.card_enabled===true, permissions:{...BUSINESS_CARD_DEFAULT_PERMISSIONS,...(r.card_permissions||{})} },
-      dashboard_card:r.dashboard_card===true
-    })) });
-  } catch(error){ console.error('ADMIN BUSINESS CARDS ERROR:',error); res.status(500).json({error:'Business Card listesi alınamadı'}); }
-});
-
-app.get('/api/admin/business/:id/business-card', adminAuth, async (req,res)=>{
+app.get('/api/admin/card-people', adminAuth, async (req,res)=>{
   try{
-    const id=Number(req.params.id);
-    const business=await pool.query(`SELECT id,name,email,category,slug,dashboard_card FROM businesses WHERE id=$1 LIMIT 1`,[id]);
-    if(!business.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
-    const card=await getBusinessCard(id);
-    res.json({business:business.rows[0],card});
-  }catch(error){console.error('ADMIN BUSINESS CARD GET ERROR:',error);res.status(500).json({error:'Business Card alınamadı'});}
+    const r=await pool.query(`SELECT id,slug,email,enabled,data,permissions,created_at,updated_at FROM card_people ORDER BY created_at DESC`);
+    res.json({people:r.rows.map(x=>normalizeCardPerson(x))});
+  }catch(e){console.error('ADMIN CARD PEOPLE LIST ERROR:',e);res.status(500).json({error:'Business Card kişileri alınamadı'});}
 });
-
-app.put('/api/admin/business/:id/business-card', adminAuth, async (req,res)=>{
+app.post('/api/admin/card-people', adminAuth, async (req,res)=>{
   try{
-    const id=Number(req.params.id), body=req.body||{};
+    const body=req.body||{}, name=String(body.person_name||body.display_name||'').trim();
+    if(!name) return res.status(400).json({error:'Ad Soyad gerekli'});
+    const base=slugify(name)||'kart';
+    let slug=base, i=2;
+    while((await pool.query(`SELECT 1 FROM card_people WHERE slug=$1 LIMIT 1`,[slug])).rows.length) slug=`${base}-${i++}`;
+    const data={...CARD_PERSON_DEFAULT_DATA};
+    for(const k of CARD_PERSON_FIELDS) if(Object.prototype.hasOwnProperty.call(body.data||{},k)) data[k]=String(body.data[k]??'').trim();
+    data.person_name=data.person_name||name;
+    const permissions={...CARD_PERSON_DEFAULT_PERMISSIONS};
+    for(const k of CARD_PERSON_FIELDS) if(body.permissions&&Object.prototype.hasOwnProperty.call(body.permissions,k)) permissions[k]=body.permissions[k]===true;
+    const email=String(body.email||'').trim().toLowerCase()||null;
+    let passwordHash=null;
+    if(body.password) passwordHash=await bcrypt.hash(String(body.password),10);
+    const r=await pool.query(`INSERT INTO card_people(slug,email,password_hash,enabled,data,permissions) VALUES($1,$2,$3,$4,$5::jsonb,$6::jsonb) RETURNING id,slug,email,enabled,data,permissions,created_at,updated_at`,[slug,email,passwordHash,body.enabled!==false,JSON.stringify(data),JSON.stringify(permissions)]);
+    res.status(201).json({person:normalizeCardPerson(r.rows[0])});
+  }catch(e){console.error('ADMIN CARD PERSON CREATE ERROR:',e);res.status(500).json({error:e.code==='23505'?'E-posta veya slug zaten kullanılıyor':'Business Card kişisi oluşturulamadı'});}
+});
+app.get('/api/admin/card-people/:id', adminAuth, async (req,res)=>{
+  try{const p=await getCardPerson(Number(req.params.id));if(!p.id)return res.status(404).json({error:'Kişi bulunamadı'});res.json({person:p});}
+  catch(e){res.status(500).json({error:'Business Card kişisi alınamadı'});}
+});
+app.put('/api/admin/card-people/:id', adminAuth, async (req,res)=>{
+  try{
+    const id=Number(req.params.id), current=await getCardPerson(id); if(!current.id)return res.status(404).json({error:'Kişi bulunamadı'});
+    const body=req.body||{}, data={...current.data}, permissions={...current.permissions};
+    if(body.data&&typeof body.data==='object') for(const k of CARD_PERSON_FIELDS) if(Object.prototype.hasOwnProperty.call(body.data,k)) data[k]=String(body.data[k]??'').trim();
+    if(body.permissions&&typeof body.permissions==='object') for(const k of CARD_PERSON_FIELDS) if(Object.prototype.hasOwnProperty.call(body.permissions,k)) permissions[k]=body.permissions[k]===true;
     const enabled=body.enabled===true;
-    const incomingData=body.data&&typeof body.data==='object'?body.data:{};
-    const incomingPermissions=body.permissions&&typeof body.permissions==='object'?body.permissions:{};
-    const data={...BUSINESS_CARD_DEFAULT_DATA};
-    const permissions={...BUSINESS_CARD_DEFAULT_PERMISSIONS};
-    for(const key of BUSINESS_CARD_FIELDS){
-      if(Object.prototype.hasOwnProperty.call(incomingData,key)) data[key]=String(incomingData[key]??'').trim();
-      if(Object.prototype.hasOwnProperty.call(incomingPermissions,key)) permissions[key]=incomingPermissions[key]===true;
-    }
-    const result=await pool.query(`
-      INSERT INTO business_cards(business_id,enabled,data,permissions,updated_at)
-      VALUES($1,$2,$3::jsonb,$4::jsonb,CURRENT_TIMESTAMP)
-      ON CONFLICT(business_id) DO UPDATE SET enabled=EXCLUDED.enabled,data=EXCLUDED.data,permissions=EXCLUDED.permissions,updated_at=CURRENT_TIMESTAMP
-      RETURNING enabled,data,permissions
-    `,[id,enabled,JSON.stringify(data),JSON.stringify(permissions)]);
-    await pool.query(`UPDATE businesses SET dashboard_card=$1 WHERE id=$2`,[enabled,id]);
-    res.json(normalizeBusinessCard(result.rows[0]));
-  }catch(error){console.error('ADMIN BUSINESS CARD UPDATE ERROR:',error);res.status(500).json({error:'Business Card güncellenemedi'});}
+    let passwordHash=null;
+    if(body.password) passwordHash=await bcrypt.hash(String(body.password),10);
+    const r=await pool.query(`UPDATE card_people SET email=$1,enabled=$2,data=$3::jsonb,permissions=$4::jsonb,password_hash=COALESCE($5,password_hash),updated_at=CURRENT_TIMESTAMP WHERE id=$6 RETURNING id,slug,email,enabled,data,permissions,created_at,updated_at`,[String(body.email??current.email).trim().toLowerCase()||null,enabled,JSON.stringify(data),JSON.stringify(permissions),passwordHash,id]);
+    res.json({person:normalizeCardPerson(r.rows[0])});
+  }catch(e){console.error('ADMIN CARD PERSON UPDATE ERROR:',e);res.status(500).json({error:'Business Card kişisi güncellenemedi'});}
+});
+app.delete('/api/admin/card-people/:id', adminAuth, async (req,res)=>{
+  try{const r=await pool.query(`DELETE FROM card_people WHERE id=$1 RETURNING id`,[Number(req.params.id)]);if(!r.rows.length)return res.status(404).json({error:'Kişi bulunamadı'});res.json({success:true});}
+  catch(e){res.status(500).json({error:'Business Card kişisi silinemedi'});}
 });
 
-app.get('/api/business-card', auth, requireBusinessPermission('card'), async (req,res)=>{
+app.post('/api/card-login', async (req,res)=>{
   try{
-    const card=await getBusinessCard(req.user.id);
-    res.json(card);
-  }catch(error){console.error('BUSINESS CARD GET ERROR:',error);res.status(500).json({error:'Business Card alınamadı'});}
+    const email=String(req.body?.email||'').trim().toLowerCase(), password=String(req.body?.password||'');
+    const r=await pool.query(`SELECT * FROM card_people WHERE email=$1 AND enabled=TRUE LIMIT 1`,[email]);
+    if(!r.rows.length || !r.rows[0].password_hash) return res.status(401).json({error:'E-posta veya şifre hatalı'});
+    if(!await bcrypt.compare(password,r.rows[0].password_hash)) return res.status(401).json({error:'E-posta veya şifre hatalı'});
+    const p=r.rows[0], token=jwt.sign({id:p.id,email:p.email,role:'card_person'},SECRET,{expiresIn:'30d'});
+    res.json({token,person:normalizeCardPerson(p)});
+  }catch(e){res.status(500).json({error:'Kart girişi yapılamadı'});}
 });
-
-app.put('/api/business-card', auth, requireBusinessPermission('card'), async (req,res)=>{
+app.get('/api/card/me', cardPersonAuth, async (req,res)=>{try{const p=await getCardPerson(req.cardPerson.id);if(!p.id)return res.status(404).json({error:'Kart bulunamadı'});res.json({person:p});}catch(e){res.status(500).json({error:'Kart bilgileri alınamadı'});}});
+app.put('/api/card/me', cardPersonAuth, async (req,res)=>{
   try{
-    const current=await getBusinessCard(req.user.id), body=req.body||{};
+    const current=await getCardPerson(req.cardPerson.id); if(!current.id)return res.status(404).json({error:'Kart bulunamadı'});
     const data={...current.data};
-    for(const key of BUSINESS_CARD_FIELDS){
-      if(Object.prototype.hasOwnProperty.call(body,key)){
-        if(current.permissions[key]!==true) return res.status(403).json({error:`${BUSINESS_CARD_FIELD_LABELS[key]} alanı için admin izni gerekli`,permission:`card_${key}`});
-        data[key]=String(body[key]??'').trim();
-      }
-    }
-    const result=await pool.query(`
-      INSERT INTO business_cards(business_id,enabled,data,permissions,updated_at)
-      VALUES($1,$2,$3::jsonb,$4::jsonb,CURRENT_TIMESTAMP)
-      ON CONFLICT(business_id) DO UPDATE SET data=EXCLUDED.data,updated_at=CURRENT_TIMESTAMP
-      RETURNING enabled,data,permissions
-    `,[req.user.id,current.enabled,JSON.stringify(data),JSON.stringify(current.permissions)]);
-    res.json(normalizeBusinessCard(result.rows[0]));
-  }catch(error){console.error('BUSINESS CARD UPDATE ERROR:',error);res.status(500).json({error:'Business Card güncellenemedi'});}
+    for(const k of CARD_PERSON_FIELDS){if(Object.prototype.hasOwnProperty.call(req.body||{},k)){if(current.permissions[k]!==true)return res.status(403).json({error:`${CARD_PERSON_LABELS[k]} alanı için admin izni gerekli`,permission:`card_${k}`});data[k]=String(req.body[k]??'').trim();}}
+    const r=await pool.query(`UPDATE card_people SET data=$1::jsonb,updated_at=CURRENT_TIMESTAMP WHERE id=$2 RETURNING id,slug,email,enabled,data,permissions`,[JSON.stringify(data),current.id]);
+    res.json({person:normalizeCardPerson(r.rows[0])});
+  }catch(e){res.status(500).json({error:'Kart bilgileri kaydedilemedi'});}
 });
 
+app.get('/card/:slug', async (req,res)=>{
+  try{
+    const r=await pool.query(`SELECT id,slug,enabled,data,permissions FROM card_people WHERE slug=$1 LIMIT 1`,[String(req.params.slug||'')]);
+    if(!r.rows.length || r.rows[0].enabled!==true)return res.status(404).send('Business Card bulunamadı');
+    return res.sendFile(path.join(__dirname,'public','business-card.html'));
+  }catch(e){console.error('PUBLIC CARD ERROR:',e);res.status(500).send('Business Card açılamadı');}
+});
+app.get('/api/public-card/:slug', async (req,res)=>{
+  try{
+    const r=await pool.query(`SELECT id,slug,enabled,data,permissions FROM card_people WHERE slug=$1 LIMIT 1`,[String(req.params.slug||'')]);
+    if(!r.rows.length || r.rows[0].enabled!==true)return res.status(404).json({error:'Business Card bulunamadı'});
+    const p=normalizeCardPerson(r.rows[0]), filtered={};
+    for(const k of CARD_PERSON_FIELDS) if(p.permissions[k]===true) filtered[k]=p.data[k];
+    res.json({card:{slug:p.slug,enabled:true,data:filtered,permissions:p.permissions,field_labels:CARD_PERSON_LABELS}});
+  }catch(e){res.status(500).json({error:'Business Card alınamadı'});}
+});
+
+app.get('/card-login',(req,res)=>res.sendFile(path.join(__dirname,'public','card-login.html')));
+app.get('/card-dashboard',(req,res)=>res.sendFile(path.join(__dirname,'public','card-dashboard.html')));
 
 /* =========================================================
    ADMIN BUSINESS ANALYTICS
@@ -2927,20 +2936,7 @@ app.post('/api/event/:slug', async (req, res) => {
       'review_feedback',
       'location',
       'iban',
-      'share',
-      'business_card_view',
-      'business_card_vcard',
-      'business_card_share',
-      'business_card_whatsapp',
-      'business_card_phone',
-      'business_card_email',
-      'business_card_instagram',
-      'business_card_facebook',
-      'business_card_tiktok',
-      'business_card_linkedin',
-      'business_card_website',
-      'business_card_location',
-      'business_card_iban'
+      'share'
     ];
 
     const allowedSources = ['', 'direct', 'qr', 'nfc'];
@@ -4314,34 +4310,6 @@ app.get(
 
   }
 );
-
-
-/* =========================================================
-   PUBLIC DIGITAL BUSINESS CARD
-========================================================= */
-app.get('/card/:slug', async (req,res)=>{
-  try{
-    const result=await pool.query(`SELECT * FROM businesses WHERE slug=$1 LIMIT 1`,[String(req.params.slug||'')]);
-    if(!result.rows.length) return res.status(404).send('İşletme bulunamadı');
-    const card=await getBusinessCard(result.rows[0].id);
-    if(!card.enabled) return res.status(404).send('Digital Business Card aktif değil');
-    await pool.query(`INSERT INTO events(business_id,type,source) VALUES($1,'business_card_view','card')`,[result.rows[0].id]);
-    return res.sendFile(path.join(__dirname,'public','business-card.html'));
-  }catch(error){console.error('PUBLIC BUSINESS CARD ERROR:',error);res.status(500).send('Business Card açılırken hata oluştu');}
-});
-
-
-app.get('/api/public-business-card/:slug', async (req,res)=>{
-  try{
-    const result=await pool.query(`SELECT * FROM businesses WHERE slug=$1 LIMIT 1`,[String(req.params.slug||'')]);
-    if(!result.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
-    const card=await getBusinessCard(result.rows[0].id);
-    if(!card.enabled) return res.status(404).json({error:'Digital Business Card aktif değil'});
-    const filtered={};
-    for(const key of BUSINESS_CARD_FIELDS) if(card.permissions[key]===true) filtered[key]=card.data[key];
-    res.json({business:publicBusiness(result.rows[0]),card:{enabled:true,data:filtered,permissions:card.permissions}});
-  }catch(error){console.error('PUBLIC BUSINESS CARD API ERROR:',error);res.status(500).json({error:'Business Card alınamadı'});}
-});
 
 
 /* =========================================================
