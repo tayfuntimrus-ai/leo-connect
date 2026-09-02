@@ -4401,61 +4401,40 @@ async function api(
 ){
 
   options.headers = {
-
     ...(options.headers || {}),
-
-    "Authorization":
-      "Bearer " + token,
-
-    "Content-Type":
-      "application/json"
-
+    "Authorization": "Bearer " + token,
+    "Content-Type": "application/json"
   };
 
-
-
   try{
+    const response = await fetch(url, options);
+    const raw = await response.text();
 
-    const response =
-      await fetch(
-        url,
-        options
-      );
-
-
-
-    if(
-      response.status === 401
-    ){
-
-      localStorage.removeItem(
-        "token"
-      );
-
-      window.location.href =
-        "/login";
-
-      return null;
-
+    let data = null;
+    try{
+      data = raw ? JSON.parse(raw) : null;
+    }catch(parseError){
+      console.error("API non-JSON response:", url, response.status, raw.slice(0,500));
+      return { error: "Sunucudan geçersiz yanıt geldi (" + response.status + ")." };
     }
 
+    if(response.status === 401){
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+      return null;
+    }
 
+    if(!response.ok){
+      console.error("API HTTP error:", url, response.status, data);
+      return data || { error: "İstek başarısız (" + response.status + ")." };
+    }
 
-    return await response.json();
-
+    return data;
   }catch(error){
-
-    console.error(
-      "API error:",
-      error
-    );
-
-    return null;
-
+    console.error("API error:", url, error);
+    return { error: "Sunucuya bağlanılamadı." };
   }
-
 }
-
 
 
 /* ==================================================
@@ -5285,256 +5264,75 @@ async function shareProfile(){
 
 async function load(){
 
-  const business =
-    await api(
-      "/api/me"
-    );
+  try{
+    const business = await api("/api/me");
 
-
-
-  if(!business)
-    return;
-
-
-
-  currentBusiness =
-    business;
-
-
-  /* V2 PROFILE DESIGN */
-
-  await loadProfileDesign();
-
-
-
-  /* TITLE */
-
-  document.getElementById(
-    "title"
-  ).textContent =
-    business.name ||
-    "İşletme Paneli";
-
-
-
-  document.getElementById(
-    "heroName"
-  ).textContent =
-    business.name ||
-    "İşletme";
-
-
-
-  document.getElementById(
-    "heroCategory"
-  ).textContent =
-    business.category ||
-    "İşletme";
-
-
-
-  document.getElementById(
-    "heroDescription"
-  ).textContent =
-    business.description ||
-    "Dijital işletme profilini yönet.";
-
-
-
-  /* FIELDS */
-
-  fields.forEach(
-    field => {
-
-      const element =
-        document.getElementById(
-          field
-        );
-
-
-
-      if(element){
-
-        element.value =
-          business[field] ||
-          "";
-
-      }
-
+    if(!business || business.error){
+      throw new Error(business?.error || "İşletme bilgileri alınamadı.");
     }
-  );
 
+    currentBusiness = business;
 
+    await loadProfileDesign();
 
-  previewLogo();
+    document.getElementById("title").textContent = business.name || "İşletme Paneli";
+    document.getElementById("heroName").textContent = business.name || "İşletme";
+    document.getElementById("heroCategory").textContent = business.category || "İşletme";
+    document.getElementById("heroDescription").textContent = business.description || "Dijital işletme profilini yönet.";
 
+    fields.forEach(field => {
+      const element = document.getElementById(field);
+      if(element) element.value = business[field] || "";
+    });
 
+    previewLogo();
+    renderHealth(business);
 
-  /* HEALTH */
+    const profileUrl = window.location.origin + "/p/" + business.slug;
+    ["headerProfile","heroProfile","quickProfile"].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.href = profileUrl;
+    });
 
-  renderHealth(
-    business
-  );
+    nfcUrl = createNFCUrl(business);
+    const nfcEl = document.getElementById("nfcUrl");
+    if(nfcEl) nfcEl.textContent = nfcUrl;
 
+    const qr = await api("/api/qr");
+    if(qr && !qr.error){
+      const qrEl = document.getElementById("qr");
+      if(qrEl) qrEl.src = qr.dataUrl || "";
+      const urlEl = document.getElementById("url");
+      if(urlEl) urlEl.textContent = qr.url || "";
+      const openEl = document.getElementById("open");
+      if(openEl) openEl.href = qr.url || "#";
+      const downloadEl = document.getElementById("download");
+      if(downloadEl) downloadEl.href = qr.dataUrl || "#";
+    }
 
+    const stats = await api("/api/stats");
+    if(Array.isArray(stats)){
+      statsData = stats;
+      renderStats();
+    }
 
-  /* PROFILE URL */
+    setInfo("infoPhone", business.phone);
+    setInfo("infoWhatsapp", business.whatsapp);
+    setInfo("infoAddress", business.address);
+    setInfo("infoInstagram", business.instagram);
+    setInfo("infoGoogle", business.google_review);
+    setInfo("infoHours", business.hours);
 
-  const profileUrl =
-    window.location.origin +
-    "/p/" +
-    business.slug;
-
-
-
-  document.getElementById(
-    "headerProfile"
-  ).href =
-    profileUrl;
-
-
-
-  document.getElementById(
-    "heroProfile"
-  ).href =
-    profileUrl;
-
-
-
-  document.getElementById(
-    "quickProfile"
-  ).href =
-    profileUrl;
-
-
-
-  /* NFC */
-
-  nfcUrl =
-    createNFCUrl(
-      business
-    );
-
-
-
-  document.getElementById(
-    "nfcUrl"
-  ).textContent =
-    nfcUrl;
-
-
-
-  /* QR */
-
-  const qr =
-    await api(
-      "/api/qr"
-    );
-
-
-
-  if(qr){
-
-    document.getElementById(
-      "qr"
-    ).src =
-      qr.dataUrl;
-
-
-
-    document.getElementById(
-      "url"
-    ).textContent =
-      qr.url;
-
-
-
-    document.getElementById(
-      "open"
-    ).href =
-      qr.url;
-
-
-
-    document.getElementById(
-      "download"
-    ).href =
-      qr.dataUrl;
-
+  }catch(error){
+    console.error("BUSINESS CENTER LOAD ERROR:", error);
+    const message = document.getElementById("designMessage");
+    if(message) message.textContent = "⚠ " + (error?.message || "Panel yüklenirken bir hata oluştu.");
+    const loadingText = document.querySelector(".loading-text");
+    if(loadingText) loadingText.textContent = "HATA — DETAYI KONTROL EDİN";
+  }finally{
+    hideLoading();
   }
-
-
-
-  /* STATS */
-
-  const stats =
-    await api(
-      "/api/stats"
-    );
-
-
-
-  if(
-    Array.isArray(stats)
-  ){
-
-    statsData =
-      stats;
-
-    renderStats();
-
-  }
-
-
-
-  /* INFO */
-
-  setInfo(
-    "infoPhone",
-    business.phone
-  );
-
-
-
-  setInfo(
-    "infoWhatsapp",
-    business.whatsapp
-  );
-
-
-
-  setInfo(
-    "infoAddress",
-    business.address
-  );
-
-
-
-  setInfo(
-    "infoInstagram",
-    business.instagram
-  );
-
-
-
-  setInfo(
-    "infoGoogle",
-    business.google_review
-  );
-
-
-
-  setInfo(
-    "infoHours",
-    business.hours
-  );
-
-
-
-  hideLoading();
-
 }
-
 
 
 /* ==================================================
