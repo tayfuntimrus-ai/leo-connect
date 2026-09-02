@@ -2735,6 +2735,15 @@ async function saveProfileDesign(){
       👤 Profilim
     </a>
 
+    <button
+      id="logoutButton"
+      class="header-button"
+      type="button"
+      onclick="logout()"
+    >
+      Çıkış
+    </button>
+
     <a
       href="/"
       class="header-button"
@@ -4392,6 +4401,23 @@ function esc(value){
 
 
 /* ==================================================
+   SESSION / LOGOUT
+================================================== */
+
+function logout(){
+  localStorage.removeItem("token");
+  localStorage.removeItem("leo_token");
+  sessionStorage.clear();
+  window.location.href = "/login";
+}
+
+function recoverSession(){
+  localStorage.removeItem("token");
+  localStorage.removeItem("leo_token");
+  window.location.href = "/login?reason=session";
+}
+
+/* ==================================================
    API
 ================================================== */
 
@@ -4434,6 +4460,12 @@ async function api(
     console.error("API error:", url, error);
     return { error: "Sunucuya bağlanılamadı." };
   }
+}
+
+function normalizeBusinessResponse(data){
+  if(!data) return null;
+  if(data.business && data.business.id) return { ...data.business, permissions:data.permissions || data.business.permissions };
+  return data;
 }
 
 
@@ -5265,10 +5297,12 @@ async function shareProfile(){
 async function load(){
 
   try{
-    const business = await api("/api/me");
+    const rawBusiness = await api("/api/me");
+    const business = normalizeBusinessResponse(rawBusiness);
 
-    if(!business || business.error){
-      throw new Error(business?.error || "İşletme bilgileri alınamadı.");
+    if(!business || business.error || !business.id){
+      const detail = business?.error || "İşletme oturumu doğrulanamadı.";
+      throw new Error(detail);
     }
 
     currentBusiness = business;
@@ -5328,7 +5362,12 @@ async function load(){
     const message = document.getElementById("designMessage");
     if(message) message.textContent = "⚠ " + (error?.message || "Panel yüklenirken bir hata oluştu.");
     const loadingText = document.querySelector(".loading-text");
-    if(loadingText) loadingText.textContent = "HATA — DETAYI KONTROL EDİN";
+    if(loadingText) loadingText.textContent = "OTURUM KONTROLÜ GEREKLİ";
+    const logoutButton = document.getElementById("logoutButton");
+    if(logoutButton){
+      logoutButton.textContent = "Oturumu Sıfırla";
+      logoutButton.style.borderColor = "#c59a52";
+    }
   }finally{
     hideLoading();
   }
@@ -5430,7 +5469,7 @@ async function save(){
 
 
 
-  const result =
+  const rawResult =
     await api(
 
       "/api/me",
@@ -5448,15 +5487,16 @@ async function save(){
 
     );
 
-
+  const result = normalizeBusinessResponse(rawResult);
 
   if(
     result &&
-    !result.error
+    !result.error &&
+    result.id
   ){
 
     currentBusiness =
-      result;
+      normalizeBusinessResponse(result);
 
 
 
