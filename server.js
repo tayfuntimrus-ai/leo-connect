@@ -66,30 +66,33 @@ function createNfcCode() {
 
 function publicBusiness(row) {
   if (!row) return null;
-
+  const allowed = normalizeAllowedPlatforms(row.social_platform_permissions);
+  const legacyAllowed = {
+    instagram: allowed.instagram !== false,
+    tiktok: allowed.tiktok !== false,
+    whatsapp: allowed.whatsapp !== false,
+    google_review: allowed.google !== false,
+    website: allowed.website !== false,
+    menu: allowed.menu !== false,
+    address: allowed.location !== false
+  };
+  const social = normalizeSocialLinks(row.social_links);
+  const filteredSocial = Object.fromEntries(
+    Object.entries(social).filter(([key,item]) => allowed[key] !== false && item && item.url)
+  );
   return {
-    id: row.id,
-    name: row.name,
-    slug: row.slug,
-    email: row.email,
-    category: row.category || '',
-    description: row.description || '',
-    phone: row.phone || '',
-    whatsapp: row.whatsapp || '',
-    address: row.address || '',
-    instagram: row.instagram || '',
-    tiktok: row.tiktok || '',
-    google_review: row.google_review || '',
-    website: row.website || '',
-    menu: row.menu || '',
-    iban: row.iban || '',
-    iban_holder: row.iban_holder || '',
-    hours: row.hours || '',
-    logo_url: row.logo_url || '',
-    social_links: normalizeSocialLinks(row.social_links),
-    custom_links: normalizeCustomLinks(row.custom_links),
-    social_platform_permissions: normalizeAllowedPlatforms(row.social_platform_permissions),
-    created_at: row.created_at
+    id: row.id, name: row.name, slug: row.slug, email: row.email,
+    category: row.category || '', description: row.description || '', phone: row.phone || '',
+    whatsapp: legacyAllowed.whatsapp ? (row.whatsapp || '') : '',
+    address: legacyAllowed.address ? (row.address || '') : '',
+    instagram: legacyAllowed.instagram ? (row.instagram || '') : '',
+    tiktok: legacyAllowed.tiktok ? (row.tiktok || '') : '',
+    google_review: legacyAllowed.google_review ? (row.google_review || '') : '',
+    website: legacyAllowed.website ? (row.website || '') : '',
+    menu: legacyAllowed.menu ? (row.menu || '') : '',
+    iban: row.iban || '', iban_holder: row.iban_holder || '', hours: row.hours || '', logo_url: row.logo_url || '',
+    social_links: filteredSocial, custom_links: normalizeCustomLinks(row.custom_links),
+    social_platform_permissions: allowed, created_at: row.created_at
   };
 }
 
@@ -2725,9 +2728,10 @@ app.put('/api/business-social-links', auth, requireBusinessPermission('profile')
     if(!b.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
     const allowed=normalizeAllowedPlatforms(b.rows[0].social_platform_permissions);
     const incoming=normalizeSocialLinks(req.body?.social_links||req.body);
-    const links={};
-    for(const key of LEO_V2_SOCIAL_PLATFORMS){
-      if(allowed[key]!==false) links[key]=incoming[key]||{url:'',enabled:false};
+    const existing=normalizeSocialLinks(b.rows[0].social_links);
+    const links={...existing};
+    for(const key of Object.keys(incoming)){
+      if(allowed[key]!==false) links[key]=incoming[key];
     }
     const r=await pool.query(`UPDATE businesses SET social_links=$1::jsonb WHERE id=$2 RETURNING social_links`,[JSON.stringify(links),req.user.id]);
     if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
