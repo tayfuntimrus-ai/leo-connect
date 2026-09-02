@@ -6636,8 +6636,8 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 
 <script id="leo-profile-connections-v1">
 (function(){
-  const names={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website'};
-  const icons={instagram:'📸',facebook:'f',tiktok:'🎵',youtube:'▶',linkedin:'in',x:'𝕏',whatsapp:'💬',google:'G',website:'🌐'};
+  const names={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website',yemeksepeti:'Yemeksepeti',getir:'Getir','trendyol-yemek':'Trendyol Yemek','migros-yemek':'Migros Yemek',rezervasyon:'Rezervasyon',bilet:'Bilet / Etkinlik',menu:'Online Menü',location:'Konum',tripadvisor:'Tripadvisor',booking:'Booking',telegram:'Telegram',email:'E-posta'};
+  const icons={instagram:'📸',facebook:'f',tiktok:'🎵',youtube:'▶',linkedin:'in',x:'𝕏',whatsapp:'💬',google:'G',website:'🌐',yemeksepeti:'🍴',getir:'🟡','trendyol-yemek':'🟠','migros-yemek':'🛒',rezervasyon:'📅',bilet:'🎟️',menu:'📖',location:'📍',tripadvisor:'🦉',booking:'🏨',telegram:'✈️',email:'✉️'};
   const legacyMap={instagram:'instagram',tiktok:'tiktok',whatsapp:'whatsapp',google:'google_review',website:'website'};
   const esc2=v=>String(v??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
   let settings={allowed_platforms:{},social_links:{},custom_links:[]};
@@ -6655,7 +6655,7 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
     const panel=document.getElementById('profileConnectionPanel'); if(!panel)return;
     const allowed=settings.allowed_platforms||{};
     const links=settings.social_links||{};
-    const platforms=Object.keys(names).filter(k=>allowed[k]!==false);
+    const platforms=Object.keys(names).filter(k=>Object.keys(allowed).length===0 || allowed[k]!==false);
     panel.innerHTML=`
       <div class="pcc-panel-head"><div><strong>🔗 Dijital Bağlantılar</strong><span>Bağla dediğinde müşteri profilinde görünür.</span></div><button type="button" class="action" onclick="closeProfileGroup()">Kapat</button></div>
       <div class="pcc-conn-grid">
