@@ -207,6 +207,41 @@ function cardPersonAuth(req,res,next){
   }catch(e){ return res.status(401).json({error:'Kart sahibi oturumu geçersiz veya süresi dolmuş'}); }
 }
 
+const BUSINESS_PROFILE_FIELDS = [
+  'name','category','description','phone','whatsapp','address',
+  'instagram','tiktok','google_review','website','menu',
+  'hours','iban','iban_holder','logo_url'
+];
+
+const BUSINESS_PROFILE_FIELD_LABELS = {
+  name:'İşletme Adı',
+  category:'Kategori',
+  description:'İşletme Açıklaması',
+  phone:'Telefon',
+  whatsapp:'WhatsApp',
+  address:'Konum / Google Maps',
+  instagram:'Instagram',
+  tiktok:'TikTok',
+  google_review:'Google Yorum',
+  website:'Web Sitesi',
+  menu:'Menü',
+  hours:'Çalışma Saatleri',
+  iban:'IBAN',
+  iban_holder:'IBAN Sahibi',
+  logo_url:'Logo Görseli'
+};
+
+function businessProfileFieldPermissions(row) {
+  let raw = row?.profile_field_permissions;
+  if (typeof raw === 'string') {
+    try { raw = JSON.parse(raw); } catch (_) { raw = {}; }
+  }
+  raw = raw && typeof raw === 'object' ? raw : {};
+  const result = {};
+  for (const key of BUSINESS_PROFILE_FIELDS) result[key] = raw[key] === false ? false : true;
+  return result;
+}
+
 function businessPermissions(row) {
   return {
     profile: row?.dashboard_profile !== false,
@@ -216,7 +251,8 @@ function businessPermissions(row) {
     live: row?.dashboard_live === true,
     ai: row?.dashboard_ai === true,
     review: row?.dashboard_review === true,
-    campaign: row?.dashboard_campaign === true
+    campaign: row?.dashboard_campaign === true,
+    profile_fields: businessProfileFieldPermissions(row)
   };
 }
 
@@ -315,7 +351,8 @@ async function initDatabase() {
       ADD COLUMN IF NOT EXISTS dashboard_nfc BOOLEAN NOT NULL DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS dashboard_analytics BOOLEAN NOT NULL DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS dashboard_live BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS dashboard_ai BOOLEAN NOT NULL DEFAULT FALSE
+      ADD COLUMN IF NOT EXISTS dashboard_ai BOOLEAN NOT NULL DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS profile_field_permissions JSONB NOT NULL DEFAULT '{}'::jsonb
   `);
 
 
@@ -1082,7 +1119,7 @@ app.get(
 app.get('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign
+      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_field_permissions
       FROM businesses WHERE id=$1 LIMIT 1
     `, [Number(req.params.id)]);
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
@@ -1106,12 +1143,28 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
     const review = body.review === true;
     const campaign = body.campaign === true;
 
+    const current = await pool.query(
+      `SELECT profile_field_permissions FROM businesses WHERE id=$1 LIMIT 1`,
+      [id]
+    );
+    if (!current.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
+
+    const incomingFields = body.profile_fields && typeof body.profile_fields === 'object'
+      ? body.profile_fields
+      : {};
+    const profile_fields = businessProfileFieldPermissions(current.rows[0]);
+    for (const key of BUSINESS_PROFILE_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(incomingFields, key)) {
+        profile_fields[key] = incomingFields[key] === true;
+      }
+    }
+
     const result = await pool.query(`
       UPDATE businesses
-      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7, dashboard_campaign=$8
-      WHERE id=$9
-      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign
-    `, [profile, qr, nfc, analytics, live, ai, review, campaign, id]);
+      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7, dashboard_campaign=$8, profile_field_permissions=$9::jsonb
+      WHERE id=$10
+      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_field_permissions
+    `, [profile, qr, nfc, analytics, live, ai, review, campaign, JSON.stringify(profile_fields), id]);
 
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
     res.json({ success: true, permissions: businessPermissions(result.rows[0]) });
@@ -2507,103 +2560,69 @@ app.get('/api/me', auth, async (req, res) => {
 ========================================================= */
 
 app.put('/api/me', auth, requireBusinessPermission('profile'), async (req, res) => {
-
   try {
+    let currentResult = await pool.query(
+      `SELECT * FROM businesses WHERE id=$1 LIMIT 1`,
+      [req.user.id]
+    );
 
-    const {
-      name,
-      category,
-      description,
-      phone,
-      whatsapp,
-      address,
-      instagram,
-      tiktok,
-      google_review,
-      website,
-      menu,
-      iban,
-      iban_holder,
-      hours,
-      logo_url
-    } = req.body;
+    if (!currentResult.rows.length && req.user.email) {
+      currentResult = await pool.query(
+        `SELECT * FROM businesses WHERE email=$1 LIMIT 1`,
+        [String(req.user.email).trim().toLowerCase()]
+      );
+    }
 
-    if (!name) {
+    if (!currentResult.rows.length) {
+      return res.status(404).json({ error: 'İşletme bulunamadı' });
+    }
 
-      return res.status(400).json({
-        error: 'İşletme adı gerekli'
-      });
+    const current = currentResult.rows[0];
+    const permissions = businessProfileFieldPermissions(current);
+    const body = req.body || {};
 
+    const valueFor = (key) => {
+      if (permissions[key] && Object.prototype.hasOwnProperty.call(body, key)) {
+        return String(body[key] ?? '').trim();
+      }
+      return String(current[key] ?? '');
+    };
+
+    const values = {};
+    for (const key of BUSINESS_PROFILE_FIELDS) values[key] = valueFor(key);
+
+    if (!values.name) {
+      return res.status(400).json({ error: 'İşletme adı gerekli' });
     }
 
     await pool.query(
-      `
-      UPDATE businesses
-
-      SET
-        name=$1,
-        category=$2,
-        description=$3,
-        phone=$4,
-        whatsapp=$5,
-        address=$6,
-        instagram=$7,
-        tiktok=$8,
-        google_review=$9,
-        website=$10,
-        menu=$11,
-        iban=$12,
-        iban_holder=$13,
-        hours=$14,
-        logo_url=$15
-
-      WHERE id=$16
-      `,
+      `UPDATE businesses SET
+        name=$1, category=$2, description=$3, phone=$4, whatsapp=$5,
+        address=$6, instagram=$7, tiktok=$8, google_review=$9,
+        website=$10, menu=$11, iban=$12, iban_holder=$13,
+        hours=$14, logo_url=$15
+       WHERE id=$16`,
       [
-        name,
-        category || '',
-        description || '',
-        phone || '',
-        whatsapp || '',
-        address || '',
-        instagram || '',
-        tiktok || '',
-        google_review || '',
-        website || '',
-        menu || '',
-        iban || '',
-        iban_holder || '',
-        hours || '',
-        logo_url || '',
-        req.user.id
+        values.name, values.category, values.description, values.phone,
+        values.whatsapp, values.address, values.instagram, values.tiktok,
+        values.google_review, values.website, values.menu, values.iban,
+        values.iban_holder, values.hours, values.logo_url, current.id
       ]
     );
 
-    const result =
-      await pool.query(
-        `
-        SELECT *
-        FROM businesses
-        WHERE id=$1
-        `,
-        [req.user.id]
-      );
+    const result = await pool.query(
+      `SELECT * FROM businesses WHERE id=$1`,
+      [current.id]
+    );
 
     res.json({
       ...publicBusiness(result.rows[0]),
       permissions: businessPermissions(result.rows[0])
     });
-
   } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Profil güncellenemedi'
-    });
-
+    console.error('BUSINESS PROFILE UPDATE ERROR:', error);
+    res.status(500).json({ error: 'Profil güncellenemedi' });
   }
-
 });
 
 
