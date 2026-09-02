@@ -852,54 +852,110 @@ app.get(
     try {
 
       const businessId = Number(req.params.id);
-
-      const period =
-        req.query.period || 'all';
-
-      let where = `
-        business_id=$1
-      `;
-
-      let params = [businessId];
-
-      if (period === 'today') {
-
-        where += `
-          AND created_at >= CURRENT_DATE
-        `;
-
-      } else if (period === '7d') {
-
-        where += `
-          AND created_at >= CURRENT_TIMESTAMP - INTERVAL '7 days'
-        `;
-
-      } else if (period === '30d') {
-
-        where += `
-          AND created_at >= CURRENT_TIMESTAMP - INTERVAL '30 days'
-        `;
-
+      if (!Number.isInteger(businessId) || businessId <= 0) {
+        return res.status(400).json({ error: 'Geçersiz işletme ID' });
       }
 
-      const result = await pool.query(`
+      const period = ['today','7d','30d','all'].includes(req.query.period)
+        ? req.query.period
+        : 'all';
+
+      let periodWhere = 'business_id=$1';
+      const params = [businessId];
+
+      if (period === 'today') {
+        periodWhere += ` AND created_at >= CURRENT_DATE`;
+      } else if (period === '7d') {
+        periodWhere += ` AND created_at >= CURRENT_TIMESTAMP - INTERVAL '7 days'`;
+      } else if (period === '30d') {
+        periodWhere += ` AND created_at >= CURRENT_TIMESTAMP - INTERVAL '30 days'`;
+      }
+
+      const totals = await pool.query(`
         SELECT
-          type,
-          COUNT(*)::int AS count
+          COUNT(*)::int AS total_events,
+          COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
+          COUNT(*) FILTER (WHERE type='qr_scan')::int AS qr_scans,
+          COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
+          COUNT(*) FILTER (WHERE type='phone')::int AS phone_clicks,
+          COUNT(*) FILTER (WHERE type='whatsapp')::int AS whatsapp_clicks,
+          COUNT(*) FILTER (WHERE type='instagram')::int AS instagram_clicks,
+          COUNT(*) FILTER (WHERE type='tiktok')::int AS tiktok_clicks,
+          COUNT(*) FILTER (WHERE type='google_review')::int AS google_review_clicks,
+          COUNT(*) FILTER (WHERE type='website')::int AS website_clicks,
+          COUNT(*) FILTER (WHERE type='menu')::int AS menu_clicks
         FROM events
-        WHERE ${where}
+        WHERE ${periodWhere}
+      `, params);
+
+      const daily = await pool.query(`
+        SELECT
+          DATE(created_at) AS date,
+          COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
+          COUNT(*) FILTER (WHERE type='qr_scan')::int AS qr_scans,
+          COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
+          COUNT(*)::int AS total_events
+        FROM events
+        WHERE ${periodWhere}
+        GROUP BY DATE(created_at)
+        ORDER BY date ASC
+        LIMIT 366
+      `, params);
+
+      const hourly = await pool.query(`
+        SELECT
+          EXTRACT(HOUR FROM created_at)::int AS hour,
+          COUNT(*)::int AS events,
+          COUNT(*) FILTER (WHERE type='qr_scan')::int AS qr_scans,
+          COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
+          COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views
+        FROM events
+        WHERE ${periodWhere}
+        GROUP BY EXTRACT(HOUR FROM created_at)
+        ORDER BY hour ASC
+      `, params);
+
+      const eventTypes = await pool.query(`
+        SELECT type, COUNT(*)::int AS count
+        FROM events
+        WHERE ${periodWhere}
         GROUP BY type
-        ORDER BY count DESC
+        ORDER BY count DESC, type ASC
+      `, params);
+
+      const topNfc = await pool.query(`
+        SELECT
+          t.id,
+          t.name,
+          t.placement,
+          t.code,
+          t.is_active,
+          COUNT(e.id)::int AS taps,
+          MAX(e.created_at) AS last_tap
+        FROM nfc_tags t
+        LEFT JOIN events e
+          ON e.nfc_tag_id=t.id
+          AND e.type='nfc'
+          AND ${periodWhere.replace('business_id=$1', 'e.business_id=$1').replace('created_at', 'e.created_at')}
+        WHERE t.business_id=$1
+        GROUP BY t.id, t.name, t.placement, t.code, t.is_active
+        ORDER BY taps DESC, t.id ASC
+        LIMIT 10
       `, params);
 
       res.json({
+        success: true,
         period,
-        events: result.rows
+        totals: totals.rows[0] || {},
+        daily: daily.rows,
+        hourly: hourly.rows,
+        event_types: eventTypes.rows,
+        top_nfc: topNfc.rows
       });
 
     } catch (error) {
 
-      console.error(error);
+      console.error('ADMIN ANALYTICS ERROR:', error);
 
       res.status(500).json({
         error: 'Analitik verileri alınamadı'
