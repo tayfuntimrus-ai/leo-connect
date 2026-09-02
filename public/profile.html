@@ -2411,6 +2411,13 @@ function render(){
 
   renderDynamicProfile();
 
+  /* V2 REVIEW BOOSTER */
+  try{
+    renderReviewBooster();
+  }catch(error){
+    console.error("Review Booster render error:", error);
+  }
+
   document.title =
     (
       business.name
