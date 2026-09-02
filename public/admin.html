@@ -185,6 +185,59 @@ html,body{width:100%;max-width:100%;overflow-x:hidden;}
   img,canvas,svg{max-width:100%;}
 }
 </style>
+
+<style id="leo-mobile-viewport-v2">
+/* LEO CONNECT — mobile viewport hardening */
+html{width:100%;max-width:100%;min-width:0;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+body{width:100%;max-width:100%;min-width:0;overflow-x:hidden;margin:0;padding:0;}
+.app{width:100%;max-width:100%;min-width:0;}
+.main{width:100%;max-width:100%;min-width:0;overflow-x:hidden;}
+.topbar{width:100%;max-width:100%;box-sizing:border-box;}
+.content,.business-page,.global-page{box-sizing:border-box;max-width:100%;min-width:0;}
+
+@media (max-width: 900px){
+  .app{display:block;min-height:100dvh;width:100%;}
+  .sidebar{display:none!important;}
+  .main{width:100%;min-height:100dvh;padding-bottom:76px;overflow-x:hidden;}
+  .topbar{height:58px;min-height:58px;padding:10px 12px;position:sticky;top:0;}
+  .top-actions{gap:6px;min-width:0;}
+  .top-actions .tool{padding:8px 9px;font-size:10px;white-space:nowrap;}
+  .mode{padding:6px 7px;}
+  .colors{padding:6px 7px;gap:5px;}
+  .content{width:100%;padding:18px 12px 28px;margin:0;}
+  .hero{width:100%;max-width:100%;gap:12px;margin-bottom:16px;}
+  .hero h1{font-size:28px;line-height:1.05;overflow-wrap:anywhere;}
+  .hero p{font-size:12px;overflow-wrap:anywhere;}
+  .cards{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .card,.section,.summary,.tip,.chart-card{min-width:0;max-width:100%;}
+  .stat{min-width:0;padding:13px;}
+  .stat-value{font-size:24px;overflow-wrap:anywhere;}
+  .grid-main{width:100%;grid-template-columns:minmax(0,1fr);gap:10px;}
+  .table-wrap{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .table{min-width:650px;}
+  .chart{width:100%;max-width:100%;overflow:hidden;}
+  .global-page.show,.business-page.show{left:0;right:0;width:100%;max-width:100%;}
+}
+
+@media (max-width: 480px){
+  .topbar{padding-left:10px;padding-right:10px;}
+  .top-actions .tool{padding:7px 8px;}
+  .colors .swatch{width:15px;height:15px;}
+  .content,.business-page,.global-page{padding-left:10px;padding-right:10px;}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .stat{padding:11px;}
+  .stat-label{font-size:9px;letter-spacing:.5px;}
+  .stat-value{font-size:22px;}
+}
+
+@supports (padding:max(0px)){
+  @media (max-width:900px){
+    .main{padding-bottom:max(76px,calc(68px + env(safe-area-inset-bottom)));}
+    .content{padding-bottom:max(28px,calc(28px + env(safe-area-inset-bottom)));}
+  }
+}
+</style>
+
 </head>
 <body data-accent="gold">
 
