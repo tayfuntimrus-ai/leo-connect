@@ -242,6 +242,17 @@ function businessProfileFieldPermissions(row) {
   return result;
 }
 
+function publicBusinessWithFieldPermissions(row) {
+  const profile = publicBusiness(row);
+  const permissions = businessProfileFieldPermissions(row);
+
+  for (const key of BUSINESS_PROFILE_FIELDS) {
+    if (!permissions[key]) profile[key] = '';
+  }
+
+  return profile;
+}
+
 function businessPermissions(row) {
   return {
     profile: row?.dashboard_profile !== false,
@@ -3420,7 +3431,7 @@ app.get(
         });
       }
 
-      const profile = publicBusiness(result.rows[0]);
+      const profile = publicBusinessWithFieldPermissions(result.rows[0]);
       const profile_design = await getPublicProfileDesign(result.rows[0].id);
       const review_booster = await getReviewBooster(result.rows[0].id);
       const campaigns = await getActiveCampaigns(result.rows[0].id);
@@ -3505,7 +3516,7 @@ app.get(
         });
       }
 
-      const profile = publicBusiness(result.rows[0]);
+      const profile = publicBusinessWithFieldPermissions(result.rows[0]);
       const profile_design = await getPublicProfileDesign(result.rows[0].id);
       const review_booster = await getReviewBooster(result.rows[0].id);
       const campaigns = await getActiveCampaigns(result.rows[0].id);
