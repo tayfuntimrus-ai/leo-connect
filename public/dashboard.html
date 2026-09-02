@@ -2530,10 +2530,9 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
 @media(max-width:820px){.bc-sidebar{width:210px}.bc-main-shell{margin-left:210px}.bc-topbar{padding:0 16px}.bc-main-shell main{padding:18px 16px 80px}.bc-kpis{grid-template-columns:repeat(2,1fr)}.bc-action-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.bc-sidebar{display:none}.bc-main-shell{margin-left:0}.bc-topbar{height:64px}.bc-top-left strong{font-size:15px}.bc-top-actions .bc-top-btn.site{display:none}.bc-mobile-nav{position:fixed;z-index:1100;display:grid;grid-template-columns:repeat(5,1fr);left:8px;right:8px;bottom:8px;padding:6px;background:rgba(13,17,24,.96);backdrop-filter:blur(16px);border:1px solid #2a313b;border-radius:15px;box-shadow:0 10px 35px #0009}.bc-mobile-nav button{border:0;background:transparent;color:#7f8793;font:inherit;font-size:8px;font-weight:800;padding:7px 3px;border-radius:9px}.bc-mobile-nav button.active{color:#fff;background:#5f451d}.bc-mobile-nav .mi{display:block;font-size:16px;margin-bottom:3px}.bc-kpis{grid-template-columns:1fr 1fr}.bc-action-grid{grid-template-columns:1fr 1fr}.bc-main-shell .page-head{display:none}.bc-health-mini{grid-template-columns:1fr}.bc-score{margin:auto}.bc-main-shell .profile-hero{margin-top:0}}
 </style>
-<style id="leo-hide-legacy">#legacyBusinessMain{display:none!important}body>header{display:none!important}#legacyBusinessMain > .page-head,#legacyBusinessMain > .command-bar,#legacyBusinessMain > .access-strip{display:none!important}</style><style id="leo-brand-icon-style">
-.pcc-conn-icon{width:42px;height:42px;display:grid;place-items:center;flex:0 0 42px;border-radius:12px;background:rgba(212,175,55,.10);border:1px solid rgba(212,175,55,.18)}
-.pcc-conn-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.pcc-conn-icon svg .fill{fill:currentColor;stroke:none}.pcc-conn-icon svg .cut{fill:var(--card,#111);stroke:none}
+<style id="leo-hide-legacy">#legacyBusinessMain{display:none!important}body>header{display:none!important}#legacyBusinessMain > .page-head,#legacyBusinessMain > .command-bar,#legacyBusinessMain > .access-strip{display:none!important}</style>
+<style id="leo-brand-icon-style">
+.pcc-conn-icon{width:42px;height:42px;display:grid;place-items:center;flex:0 0 42px;border-radius:12px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.16);overflow:hidden}.pcc-conn-icon svg{width:28px;height:28px;display:block}.pcc-conn-icon img{width:28px;height:28px;object-fit:contain}.pcc-conn-icon+div{min-width:0}
 </style>
 </head>
 
@@ -6642,38 +6641,18 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 <script id="leo-profile-connections-v1">
 (function(){
   const names={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website',yemeksepeti:'Yemeksepeti',getir:'Getir','trendyol-yemek':'Trendyol Yemek','migros-yemek':'Migros Yemek',rezervasyon:'Rezervasyon',bilet:'Bilet / Etkinlik',menu:'Online Menü',location:'Konum',tripadvisor:'Tripadvisor',booking:'Booking',telegram:'Telegram',email:'E-posta'};
-  const icons={
-instagram:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.7" r="1.2" class="fill"/></svg>',
-facebook:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 21v-8h2.8l.5-3H14V8.1c0-.9.3-1.6 1.7-1.6h1.8V3.7c-.8-.1-1.6-.2-2.5-.2-2.5 0-4.2 1.5-4.2 4.3V10H9v3h1.8v8H14z"/></svg>',
-tiktok:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v10.1a3.8 3.8 0 1 1-3-3.7v3.1a1 1 0 1 0 1 1V3h3z"/><path d="M14 3c.5 2.3 1.9 3.8 4.2 4.2v3C16.8 10 15.3 9.3 14 8.2V3z"/></svg>',
-youtube:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 7.2a2.8 2.8 0 0 0-2-2C17.3 4.7 12 4.7 12 4.7s-5.3 0-7 .5a2.8 2.8 0 0 0-2 2A29 29 0 0 0 2.5 12 29 29 0 0 0 3 16.8a2.8 2.8 0 0 0 2 2c1.7.5 7 .5 7 .5s5.3 0 7-.5a2.8 2.8 0 0 0 2-2 29 29 0 0 0 .5-4.8 29 29 0 0 0-.5-4.8z"/><path d="m10 15.3 5-3.3-5-3.3v6.6z" class="cut"/></svg>',
-linkedin:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 8.3H2.3V21h2.9V8.3zM3.8 3A1.7 1.7 0 1 0 3.8 6.4 1.7 1.7 0 0 0 3.8 3zM21.7 13.7c0-3.8-2-5.7-4.8-5.7-2.2 0-3.1 1.2-3.7 2v-1.7h-2.9V21h2.9v-6.3c0-1.7.3-3.4 2.5-3.4 2.2 0 2.2 2 2.2 3.5V21h2.9v-7.3z"/></svg>',
-x:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h4.4l4 5.4L17 3h3l-6.1 7.1L21 21h-4.4l-4.5-6-5.1 6H4l6.3-7.5L4 3z"/></svg>',
-whatsapp:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 3.6A11.8 11.8 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.1 1.6 5.9L0 24l6.3-1.6A12 12 0 0 0 12 24c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.6-8.4zM12 21.7c-1.8 0-3.6-.5-5.1-1.5l-.4-.2-3.7.9 1-3.6-.2-.4A9.7 9.7 0 1 1 12 21.7z"/><path d="M17.4 14.5c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-1.6-.8-2.7-1.5-3.8-3.4-.3-.5.3-.5.8-1.7.1-.3 0-.5-.1-.7-.1-.2-.7-1.7-.9-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.5-.3.3-1.1 1.1-1.1 2.6s1.1 3 1.2 3.2c.2.2 2.2 3.4 5.4 4.8 2 .9 2.7.9 3.6.8.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.4z"/></svg>',
-google:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.8 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.5a4.7 4.7 0 0 1-2 3.1v2.6h3.2c1.9-1.8 3.1-4.4 3.1-7.5z"/><path d="M12 22c2.7 0 5-.9 6.7-2.3l-3.2-2.6c-.9.6-2 1-3.5 1-2.7 0-5-1.8-5.8-4.3H2.9v2.7A10 10 0 0 0 12 22z"/><path d="M6.2 13.8A6 6 0 0 1 5.9 12c0-.6.1-1.2.3-1.8V7.5H2.9A10 10 0 0 0 2 12c0 1.6.4 3.1 1 4.5l3.2-2.7z"/><path d="M12 5.9c1.5 0 2.9.5 4 1.5l3-3C17 2.8 14.7 2 12 2a10 10 0 0 0-9.1 5.5l3.3 2.7C7 7.7 9.3 5.9 12 5.9z"/></svg>',
-website:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.2 2.4 3.2 5.4 3.2 9s-1 6.6-3.2 9c-2.2-2.4-3.2-5.4-3.2-9S9.8 5.4 12 3z"/></svg>',
-yemeksepeti:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1 10H5L4 9z"/><path d="M7 9c.2-3 2.1-5 5-5s4.8 2 5 5M8 13h8M9 16h6"/></svg>',
-getir:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4v16H5zM11 4h4v16h-4zM17 4h2v16h-2z"/></svg>',
-'trendyol-yemek':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1 10H5L4 9z"/><path d="M8 9c.3-3 1.8-5 4-5s3.7 2 4 5"/></svg>',
-'migros-yemek':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>',
-rezervasyon:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M7 14h3M7 17h6"/></svg>',
-bilet:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V6z"/><path d="M12 7v10"/></svg>',
-menu:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h4"/></svg>',
-location:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12A7 7 0 1 0 5 9c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.2" class="cut"/></svg>',
-tripadvisor:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10h20M4 10c2-3 5-4 8-4s6 1 8 4M7 11a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm10 0a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>',
-booking:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h9a4 4 0 0 1 2.5 7A4.5 4.5 0 0 1 14 20H5V4zM5 12h8M5 4v16"/></svg>',
-telegram:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-4 18-6-7-4-2 14-9zM11 14l-1 4"/></svg>',
-email:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>'
-};
+  const icons={instagram:'<svg viewBox="0 0 24 24"><defs><linearGradient id="ig" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#feda75"/><stop offset=".35" stop-color="#fa7e1e"/><stop offset=".7" stop-color="#d62976"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="5" fill="url(#ig)"/><circle cx="12" cy="12" r="4" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="17.4" cy="6.7" r="1.1" fill="#fff"/></svg>',facebook:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#1877F2"/><path d="M13.5 20v-7h2.4l.4-2.8h-2.8V8.4c0-.8.3-1.4 1.5-1.4h1.5V4.5c-.7-.1-1.5-.2-2.2-.2-2.3 0-3.8 1.4-3.8 3.9v2H8v2.8h2.5v7z" fill="#fff"/></svg>',tiktok:'<svg viewBox="0 0 24 24"><path d="M14.2 3h3.1c.2 1.8 1.2 3.2 2.7 4v3.1c-1.1-.1-2.2-.5-3.1-1.1v6.1c0 3-2.3 5.1-5.4 5.1A5.5 5.5 0 1 1 13 9.4v3.3a2.5 2.5 0 1 0 1.5 2.3V3z" fill="#111"/><path d="M13.1 3h2.1c.2 1.7 1.1 3 2.5 3.7v2.1c-1.1-.3-2-.8-2.8-1.5v6.7c0 2.8-2 4.8-4.8 4.8a4.9 4.9 0 0 1-3.7-1.7 4.9 4.9 0 0 0 3.1 1.1c3.1 0 5.4-2.1 5.4-5.1V7.1c.7.6 1.6 1 2.5 1.2-1.5-.9-2.4-2.4-2.6-4h-1.7z" fill="#25F4EE" opacity=".8"/></svg>',youtube:'<svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0000"/><path d="M10 9l6 3-6 3z" fill="#fff"/></svg>',linkedin:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="#0A66C2"/><circle cx="8" cy="9" r="1.2" fill="#fff"/><path d="M7 11h2v6H7zm4 0h2v.9c.6-.8 1.4-1.2 2.4-1.2 1.9 0 2.6 1.2 2.6 3.1V17h-2v-2.8c0-.8-.1-1.5-1-1.5s-1 1-1 1.7V17h-2z" fill="#fff"/></svg>',x:'<svg viewBox="0 0 24 24"><path d="M4 4l6.3 8.4L4.4 20h3l4.3-5.7L16 20h4l-6.7-8.9L19.3 4h-3l-4 5.3L8 4z" fill="#111"/></svg>',whatsapp:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#25D366"/><path d="M8.1 18l.8-2.7A6.1 6.1 0 1 1 18 8.4a6 6 0 0 1-8.5 8.7z" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M9.5 8.6c.3-.4.7-.4 1-.1l.8 1c.2.3.2.5 0 .8l-.4.5c.5 1 1.2 1.7 2.2 2.2l.5-.4c.3-.2.5-.2.8 0l1 .8c.3.2.3.7 0 1-.5.6-1.2.8-1.9.5-2.7-1-4.2-2.5-5.2-5.2-.3-.7-.1-1.4.5-1.9z" fill="#fff"/></svg>',google:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M21 12.2c0-.7-.1-1.4-.2-2H12v3.8h5c-.2 1.2-.9 2.2-1.9 2.9v2.4h3.1c1.8-1.7 2.8-4.1 2.8-7.1z" fill="#4285F4"/><path d="M12 21c2.6 0 4.8-.9 6.4-2.5l-3.1-2.4c-.9.6-2 1-3.3 1-2.5 0-4.6-1.7-5.3-4H3.5v2.5A9.7 9.7 0 0 0 12 21z" fill="#34A853"/><path d="M6.7 13.1A5.8 5.8 0 0 1 6.4 12c0-.4.1-.8.2-1.1V8.4H3.5A9 9 0 0 0 2.5 12c0 1.3.3 2.5 1 3.6z" fill="#FBBC05"/><path d="M12 6.9c1.4 0 2.7.5 3.7 1.4l2.7-2.7A9.7 9.7 0 0 0 3.5 8.4l3.1 2.5c.7-2.3 2.9-4 5.4-4z" fill="#EA4335"/></svg>',website:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#6C5CE7"/><path d="M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9S14.5 18.5 12 21c-2.5-2.5-3.5-5.5-3.5-9S9.5 5.5 12 3z" fill="none" stroke="#fff" stroke-width="1.4"/></svg>',yemeksepeti:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FA0050"/><path d="M7 10h10M8 10l1 8h6l1-8M10 7h4l1 3H9z" fill="none" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/></svg>',getir:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#5B2D8B"/><path d="M7 7h10v3H10v2h6v3h-6v2H7z" fill="#FFC900"/></svg>','trendyol-yemek':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#F27A1A"/><path d="M7 8h10v3h-7v2h6v3H7z" fill="#fff"/></svg>','migros-yemek':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FF8C00"/><path d="M6 9h12v7H6z" fill="#fff"/><path d="M8 9V7h8v2" fill="none" stroke="#FF8C00" stroke-width="1.5"/></svg>',rezervasyon:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3" fill="#00A884"/><path d="M7 3v4M17 3v4M3 9h18" stroke="#fff" stroke-width="1.6"/><path d="M8 13h3v3H8z" fill="#fff"/></svg>',bilet:'<svg viewBox="0 0 24 24"><path d="M4 7a3 3 0 0 0 0 6v4h16v-4a3 3 0 0 0 0-6V3H4z" fill="#7C4DFF"/><path d="M12 6v2m0 2v2m0 2v2" stroke="#fff" stroke-width="1.5"/></svg>',menu:'<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2" fill="#D4AF37"/><path d="M8 7h8M8 11h8M8 15h5" stroke="#111" stroke-width="1.5"/></svg>',location:'<svg viewBox="0 0 24 24"><path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12z" fill="#EA4335"/><circle cx="12" cy="9" r="2.5" fill="#fff"/></svg>',tripadvisor:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#00AF87"/><path d="M6 9h12M8 15a3 3 0 1 0 0-6m8 6a3 3 0 1 0 0-6" fill="none" stroke="#fff" stroke-width="1.5"/></svg>',booking:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#003B95"/><path d="M7 8h6a3 3 0 0 1 0 6H7zm0 0v8m0-4h6" fill="none" stroke="#fff" stroke-width="2"/></svg>',telegram:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#229ED9"/><path d="M5 11.7l13-5-3.2 10.6-3.2-3-2.1 2v-3.1z" fill="#fff"/></svg>',email:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="#EA4335"/><path d="M4 7l8 6 8-6" fill="none" stroke="#fff" stroke-width="1.6"/></svg>'};
   const legacyMap={instagram:'instagram',tiktok:'tiktok',whatsapp:'whatsapp',google:'google_review',website:'website'};
   const esc2=v=>String(v??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
   let settings={allowed_platforms:{},social_links:{},custom_links:[]};
 
+  let settingsLoaded=false;
   async function loadSettings(){
     try{
-      const data=await api('/api/business-v2-settings');
-      if(data&&!data.error){settings=data;window.leoProfileSettings=data;renderConnections();}
-    }catch(e){console.warn('Profile connection settings:',e)}
+      const data=await api('/api/business-v2-settings?fresh='+Date.now(),{cache:'no-store'});
+      if(data&&!data.error){settings={...data,allowed_platforms:(data.allowed_platforms&&typeof data.allowed_platforms==='object')?data.allowed_platforms:{}};window.leoProfileSettings=settings;settingsLoaded=true;renderConnections();return true;}
+      throw new Error(data?.error||'Profil ayarları alınamadı');
+    }catch(e){settingsLoaded=false;console.warn('Profile connection settings:',e);const panel=document.getElementById('profileConnectionPanel');if(panel)panel.innerHTML='<div class="pcc-panel-head"><div><strong>Bağlantı izinleri alınamadı</strong><span>Lütfen tekrar deneyin.</span></div></div>';return false;}
   }
   function publicUrl(){
     return document.getElementById('headerProfile')?.href||'';
@@ -6696,10 +6675,10 @@ email:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" 
       ${(settings.custom_links||[]).length?`<div style="margin-top:10px;display:grid;gap:6px">${settings.custom_links.map((x,i)=>`<div class="pcc-conn"><div class="pcc-conn-main"><div class="pcc-conn-icon">${esc2(x.icon||'🔗')}</div><div><strong>${esc2(x.title)}</strong><small>${esc2(x.url)}</small></div></div><button type="button" class="pcc-connect" onclick="removeProfileCustomLink(${i})">Sil</button></div>`).join('')}</div>`:''}
     `;
   }
-  window.openProfileGroup=function(group){
+  window.openProfileGroup=async function(group){
     const panel=document.getElementById('profileConnectionPanel'); if(!panel)return;
     panel.style.display='block';
-    if(group==='connections'){renderConnections();panel.scrollIntoView({behavior:'smooth',block:'center'});return;}
+    if(group==='connections'){panel.innerHTML='<div class="pcc-panel-head"><div><strong>Dijital Bağlantılar</strong><span>Admin izinleri kontrol ediliyor…</span></div></div>';panel.scrollIntoView({behavior:'smooth',block:'center'});const ok=await loadSettings();if(ok)renderConnections();return;}
     if(group==='info'){document.querySelector('#profile .form-grid')?.scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('name')?.focus();return;}
     if(group==='payment'){document.getElementById('iban')?.scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('iban')?.focus();return;}
     if(group==='appearance'){
@@ -6763,6 +6742,8 @@ email:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" 
   if(typeof originalLoad==='function'){
     window.load=async function(){await originalLoad.apply(this,arguments);await loadSettings();const p=document.getElementById('pccPublicProfile');const h=document.getElementById('headerProfile');if(p&&h)p.href=h.href;};
   }
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadSettings();});
+  window.addEventListener('focus',()=>loadSettings());
 })();
 </script>
 
