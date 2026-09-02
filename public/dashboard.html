@@ -1657,6 +1657,8 @@ main{
    TOAST
 ================================================== */
 
+.profile-field-locked{opacity:.62;position:relative}.profile-field-locked::after{content:'🔒 Admin tarafından kilitli';display:block;color:var(--muted);font-size:8px;margin-top:5px;letter-spacing:.2px}
+.profile-field-locked input,.profile-field-locked textarea{cursor:not-allowed}
 .toast{
 
   position:fixed;
@@ -4679,6 +4681,22 @@ function applyPermissions(business){
   setDisplay("aiSection",p.ai);
   setDisplay("reviewSection",p.review);
   setDisplay("campaignSection",p.campaign);
+
+  const profileFields={name:true,category:true,description:true,phone:true,whatsapp:true,address:true,instagram:true,tiktok:true,google_review:true,website:true,menu:true,hours:true,iban:true,iban_holder:true,logo_url:true,...(business?.permissions?.profile_fields||{})};
+  Object.entries(profileFields).forEach(([field,allowed])=>{
+    const el=document.getElementById(field);
+    if(!el)return;
+    el.disabled=!allowed;
+    const wrap=el.closest('.field');
+    if(wrap){
+      wrap.classList.toggle('profile-field-locked',!allowed);
+      const label=wrap.querySelector('label');
+      if(label){
+        label.dataset.originalText=label.dataset.originalText||label.textContent;
+        label.textContent=allowed?label.dataset.originalText:'🔒 '+label.dataset.originalText;
+      }
+    }
+  });
 }
 
 /* ==================================================
