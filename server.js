@@ -2222,7 +2222,7 @@ app.get('/api/me', auth, async (req, res) => {
 
   try {
 
-    const result =
+    let result =
       await pool.query(
         `
         SELECT *
@@ -2232,17 +2232,30 @@ app.get('/api/me', auth, async (req, res) => {
         [req.user.id]
       );
 
-    if (!result.rows.length) {
+    /* Eski oturumlarda ID değişmiş olabileceği için e-posta ile güvenli geri dönüş. */
+    if (!result.rows.length && req.user.email) {
+      result = await pool.query(
+        `
+        SELECT *
+        FROM businesses
+        WHERE email=$1
+        LIMIT 1
+        `,
+        [String(req.user.email).trim().toLowerCase()]
+      );
+    }
 
+    if (!result.rows.length) {
       return res.status(404).json({
         error: 'İşletme bulunamadı'
       });
-
     }
 
+    const business = result.rows[0];
+
     res.json({
-      ...publicBusiness(result.rows[0]),
-      permissions: businessPermissions(result.rows[0])
+      ...publicBusiness(business),
+      permissions: businessPermissions(business)
     });
 
   } catch (error) {
@@ -2346,8 +2359,8 @@ app.put('/api/me', auth, requireBusinessPermission('profile'), async (req, res) 
       );
 
     res.json({
-      business:
-        publicBusiness(result.rows[0])
+      ...publicBusiness(result.rows[0]),
+      permissions: businessPermissions(result.rows[0])
     });
 
   } catch (error) {
