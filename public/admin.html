@@ -147,20 +147,36 @@ a{color:inherit;text-decoration:none}
 @media(max-width:900px){.live-kpis{grid-template-columns:repeat(2,1fr)}.live-layout{grid-template-columns:1fr}}
 @media(max-width:520px){.live-kpis{grid-template-columns:1fr 1fr}.live-item{padding:11px 12px}}
 
-/* LEO CONNECT — çalışma alanı düzeni */
+/* LEO CONNECT — workspace & responsive final */
 @media(max-width:1100px){
   .business-page.show,.global-page.show{left:78px}
+  .analytics-two{grid-template-columns:1fr}
 }
 @media(max-width:720px){
   .business-page.show,.global-page.show{
-    top:var(--topbar-h);
-    left:0;
-    right:0;
-    bottom:62px;
+    top:58px;left:0;right:0;bottom:62px;
     border-left:0;
-    padding:20px 14px 35px;
+    padding:20px 14px 80px;
   }
+  .business-page.show .business-tabs{overflow-x:auto;white-space:nowrap;display:flex}
+  .business-page.show .business-tabs button{flex:0 0 auto}
+  .business-page.show .hero-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .business-page.show .hero-actions .btn:last-child{grid-column:1/-1}
+  .global-head h2{font-size:24px}
+  .global-row{align-items:flex-start;flex-direction:column}
+  .global-row .btn{width:100%}
+  .analytics-grid{grid-template-columns:1fr 1fr}
+  .analytics-two{grid-template-columns:1fr}
+  .analytics-toolbar{padding:10px}
+  .analytics-periods{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  .analytics-period{width:100%}
 }
+@media(max-width:420px){
+  .analytics-grid{grid-template-columns:1fr}
+  .business-page.show .hero-actions{grid-template-columns:1fr}
+  .business-page.show .hero-actions .btn:last-child{grid-column:auto}
+}
+
 </style>
 </head>
 <body data-accent="gold">
@@ -182,7 +198,7 @@ a{color:inherit;text-decoration:none}
     <div class="brand"><div class="brand-mark">🦁</div><div><strong>LEO CONNECT</strong><small>COMMAND CENTER</small></div></div>
     <div class="nav-title">ANA MENÜ</div>
     <nav class="nav">
-      <button class="active" onclick="setActive(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
+      <button class="active" onclick="showOverview(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
       <button onclick="showBusinessesManager(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
       <button onclick="showNFCManager(this)"><span class="nav-icon">◉</span><span>NFC Etiketleri</span></button>
       <button onclick="showQRManager(this)"><span class="nav-icon">▣</span><span>QR Merkezi</span></button>
@@ -484,10 +500,49 @@ async function showBusinessesManager(btn){
   }catch(e){document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
 }
 function focusBusinesses(){showBusinessesManager();}
-function focusAnalytics(){showGlobalPage("Analytics","Merkezi analiz alanı.",'<div class="global-card"><div class="empty">Bir işletme seçerek detaylı Analytics ekranını açabilirsin.</div></div>');}
+async function focusAnalytics(btn){
+  if(btn)setActive(btn);
+  showGlobalPage("Analytics","İşletme bazlı gerçek event verilerini merkezi alandan görüntüle.",'<div class="global-card"><div class="section-title">Analitik işletmeleri yükleniyor…</div></div>');
+  try{
+    if(!allBusinesses.length){
+      const d=await api("/api/admin/businesses");
+      allBusinesses=d.businesses||d||[];
+    }
+    const rows=allBusinesses.length?allBusinesses.map(b=>`
+      <div class="global-card">
+        <div class="global-row">
+          <div class="global-main">
+            <div class="global-icon">⌁</div>
+            <div>
+              <div class="global-name">${esc(b.name||"İsimsiz")}</div>
+              <div class="global-sub">${esc(b.category||"—")} • Profil ${n(b.profile_views)} • QR ${n(b.qr_scans)} • NFC ${n(b.nfc_scans)}</div>
+            </div>
+          </div>
+          <button class="btn primary" onclick="openBusinessAnalytics(${Number(b.id)})">Analytics Aç →</button>
+        </div>
+      </div>`).join("")
+      : '<div class="global-card"><div class="analytics-empty">Analiz edilecek işletme bulunamadı.</div></div>';
+    document.getElementById("globalContent").innerHTML=`<div class="global-grid">${rows}</div>`;
+  }catch(e){
+    document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="analytics-empty">'+esc(e.message||"Analytics verileri alınamadı")+'</div></div>';
+  }
+}
+function openBusinessAnalytics(id){
+  openBusiness(id).then(()=>{
+    switchBizTab("analytics",document.querySelector('[data-tab=analytics]'));
+  });
+}
+function showOverview(btn){
+  setActive(btn);
+  currentBusiness=null;
+  document.getElementById("businessPage").classList.remove("show");
+  document.getElementById("globalPage").classList.remove("show");
+  document.querySelector(".content").style.display="";
+  loadAll();
+}
 function setActive(btn){
   document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
-  if(btn) btn.classList.add("active");
+  if(btn)btn.classList.add("active");
 }
 function openModal(){document.getElementById("modalBg").classList.add("show")}
 function closeModal(){document.getElementById("modalBg").classList.remove("show")}
@@ -503,12 +558,14 @@ async function openBusiness(id){
     document.getElementById("globalPage").classList.remove("show");
     document.getElementById("businessPage").classList.add("show");
     renderBusinessPage();
-    }catch(e){showToast(e.message)}
+    
+  }catch(e){showToast(e.message)}
 }
 function closeBusinessPage(){
   currentBusiness=null;
   document.getElementById("businessPage").classList.remove("show");
   document.querySelector(".content").style.display="";
+  
 }
 function renderBusinessPage(){
   const b=currentBusiness,tags=b.nfc_tags||[];
@@ -835,6 +892,7 @@ async function showQR(id){
 function closeGlobalPage(){
   document.getElementById("globalPage").classList.remove("show");
   document.querySelector(".content").style.display="";
+  
 }
 function showGlobalPage(title,subtitle,html){
   document.querySelector(".content").style.display="none";
@@ -844,7 +902,7 @@ function showGlobalPage(title,subtitle,html){
   document.getElementById("globalSubtitle").textContent=subtitle;
   document.getElementById("globalContent").innerHTML=html;
   document.getElementById("globalPage").classList.add("show");
-  window.scrollTo({top:0,behavior:"smooth"});
+  
 }
 async function showNFCManager(btn){
   if(btn)setActive(btn);
