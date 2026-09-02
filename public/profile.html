@@ -1197,6 +1197,15 @@ body{
   display:none;
   margin-top:16px;
 }
+.smart-campaigns-heading{
+  display:flex;align-items:center;gap:9px;
+  margin:0 0 10px;
+  padding:2px 2px 4px;
+}
+.smart-campaigns-heading>span{font-size:18px}
+.smart-campaigns-heading strong{display:block;color:var(--lc-gold-soft,#e0bd7b);font-size:12px;line-height:1.2}
+.smart-campaigns-heading small{display:block;margin-top:2px;color:#777;font-size:8px;letter-spacing:.08em;text-transform:uppercase}
+
 .smart-campaign{
   position:relative;
   overflow:hidden;
@@ -2425,6 +2434,19 @@ function renderSmartCampaigns(){
     box.style.display='none';
     return;
   }
+
+  // Smart Campaigns aktifse eski Profil Tasarım Merkezi kampanyasını
+  // ayrıca göstermiyoruz; böylece aynı kampanya iki kez görünmez.
+  const legacyCampaign=document.getElementById('dynamicCampaign');
+  if(legacyCampaign && smart.length){
+    legacyCampaign.style.display='none';
+  }
+
+  // Public profile'da bunun Smart Campaigns olduğunu açıkça belirt.
+  const heading=document.createElement('div');
+  heading.className='smart-campaigns-heading';
+  heading.innerHTML='<span>🚀</span><div><strong>Smart Campaigns</strong><small>Aktif kampanyalar</small></div>';
+  box.appendChild(heading);
 
   campaigns.forEach(c=>{
     const card=document.createElement('div');
