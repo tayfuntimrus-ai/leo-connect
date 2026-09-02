@@ -2483,6 +2483,18 @@ main{
 
 
 
+
+/* ==================================================
+   PROFILE CONTROL CENTER — CONNECTION FIRST UI
+================================================== */
+.profile-control-center{margin:0 0 18px;padding:20px;border:1px solid #c59a5238;border-radius:20px;background:linear-gradient(145deg,#15120d,#0d0d0d);box-shadow:0 18px 50px rgba(0,0,0,.24)}
+.pcc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.pcc-head h3{margin:6px 0 4px;font-size:19px}.pcc-head p{margin:0;color:#777;font-size:10px;line-height:1.5}.pcc-badge{padding:6px 9px;border-radius:999px;border:1px solid #c59a5240;background:#c59a5212;color:#e0bd7b;font-size:8px;font-weight:900;white-space:nowrap}
+.pcc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:16px}.pcc-card{min-height:132px;text-align:left;border:1px solid #292929;background:#101010;color:#fff;border-radius:15px;padding:15px;cursor:pointer;transition:.18s}.pcc-card:hover{transform:translateY(-2px);border-color:#c59a5260;background:#141414}.pcc-icon{display:grid;place-items:center;width:35px;height:35px;border-radius:11px;background:#c59a5212;border:1px solid #c59a5230;font-size:17px;margin-bottom:12px}.pcc-card strong{display:block;font-size:11px}.pcc-card small{display:block;color:#666;font-size:9px;line-height:1.45;margin-top:5px;min-height:27px}.pcc-card b{display:block;color:#e0bd7b;font-size:9px;margin-top:9px}
+.pcc-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.pcc-panel{margin-top:12px;padding:15px;border:1px solid #292929;border-radius:15px;background:#0b0b0b}.pcc-panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.pcc-panel-head strong{font-size:12px}.pcc-panel-head span{font-size:9px;color:#666}.pcc-conn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pcc-conn{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px;border:1px solid #292929;border-radius:12px;background:#101010}.pcc-conn-main{display:flex;align-items:center;gap:9px;min-width:0}.pcc-conn-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#171717}.pcc-conn-main strong{display:block;font-size:10px}.pcc-conn-main small{display:block;color:#666;font-size:8px;margin-top:2px;max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pcc-connect{border:1px solid #3b3322;background:#17130c;color:#e0bd7b;border-radius:9px;padding:7px 9px;font-size:8px;font-weight:900;cursor:pointer;white-space:nowrap}.pcc-connect.on{border-color:#3f6f4e;background:#102016;color:#70d08d}
+.pcc-theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.pcc-theme{padding:12px;border:1px solid #292929;border-radius:12px;background:#101010;color:#fff;text-align:left;cursor:pointer}.pcc-theme strong{display:block;font-size:10px}.pcc-theme small{display:block;color:#666;font-size:8px;margin-top:4px}.pcc-theme.active{border-color:#c59a5270;background:#c59a5212}.pcc-custom{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}.pcc-custom input{flex:1;min-width:140px;border:1px solid #292929;border-radius:9px;background:#101010;color:#fff;padding:9px;font-size:9px}.pcc-custom button{border:1px solid #c59a5250;background:#c59a5212;color:#e0bd7b;border-radius:9px;padding:9px 11px;font-size:9px;font-weight:800}
+@media(max-width:900px){.pcc-grid{grid-template-columns:1fr 1fr}.pcc-conn-grid{grid-template-columns:1fr 1fr}.pcc-theme-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.pcc-head{display:block}.pcc-badge{display:inline-block;margin-top:10px}.pcc-grid,.pcc-conn-grid,.pcc-theme-grid{grid-template-columns:1fr}.pcc-actions .action{flex:1}}
+
 </style>
 </style>
 
@@ -3120,6 +3132,40 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
   id="profile"
   class="box"
 >
+
+<div id="profileControlCenter" class="profile-control-center">
+  <div class="pcc-head">
+    <div>
+      <div class="eyebrow">PROFİL MERKEZİ</div>
+      <h3>İşletme Profilini Yönet</h3>
+      <p>Temel bilgiler, bağlantılar, ödeme ve görünümü tek yerden düzenle.</p>
+    </div>
+    <span class="pcc-badge">MÜŞTERİ PROFİLİ</span>
+  </div>
+
+  <div class="pcc-grid">
+    <button type="button" class="pcc-card" onclick="openProfileGroup('info')">
+      <span class="pcc-icon">🏢</span><strong>İşletme Bilgileri</strong><small>Ad, kategori, açıklama, telefon, adres, saatler</small><b>Düzenle →</b>
+    </button>
+    <button type="button" class="pcc-card" onclick="openProfileGroup('connections')">
+      <span class="pcc-icon">🔗</span><strong>Dijital Bağlantılar</strong><small>Instagram, Facebook, TikTok, Google, Website ve diğerleri</small><b>Hesapları Bağla →</b>
+    </button>
+    <button type="button" class="pcc-card" onclick="openProfileGroup('payment')">
+      <span class="pcc-icon">₺</span><strong>Ödeme Bilgileri</strong><small>IBAN ve hesap sahibi bilgileri</small><b>Düzenle →</b>
+    </button>
+    <button type="button" class="pcc-card" onclick="openProfileGroup('appearance')">
+      <span class="pcc-icon">✦</span><strong>Görünüm & Tema</strong><small>4 premium tema ve profil tasarımı</small><b>Tema Seç →</b>
+    </button>
+  </div>
+
+  <div class="pcc-actions">
+    <button type="button" class="action gold" onclick="save()">✓ Tüm Profil Bilgilerini Kaydet</button>
+    <a id="pccPublicProfile" class="action" target="_blank" rel="noopener">👁 Müşteri Profilini Aç</a>
+  </div>
+
+  <div id="profileConnectionPanel" class="pcc-panel" style="display:none"></div>
+</div>
+
 
   <div class="box-head">
 
@@ -6586,6 +6632,112 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 
 
 
+
+
+<script id="leo-profile-connections-v1">
+(function(){
+  const names={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website'};
+  const icons={instagram:'📸',facebook:'f',tiktok:'🎵',youtube:'▶',linkedin:'in',x:'𝕏',whatsapp:'💬',google:'G',website:'🌐'};
+  const legacyMap={instagram:'instagram',tiktok:'tiktok',whatsapp:'whatsapp',google:'google_review',website:'website'};
+  const esc2=v=>String(v??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+  let settings={allowed_platforms:{},social_links:{},custom_links:[]};
+
+  async function loadSettings(){
+    try{
+      const data=await api('/api/business-v2-settings');
+      if(data&&!data.error){settings=data;window.leoProfileSettings=data;renderConnections();}
+    }catch(e){console.warn('Profile connection settings:',e)}
+  }
+  function publicUrl(){
+    return document.getElementById('headerProfile')?.href||'';
+  }
+  function renderConnections(){
+    const panel=document.getElementById('profileConnectionPanel'); if(!panel)return;
+    const allowed=settings.allowed_platforms||{};
+    const links=settings.social_links||{};
+    const platforms=Object.keys(names).filter(k=>allowed[k]!==false);
+    panel.innerHTML=`
+      <div class="pcc-panel-head"><div><strong>🔗 Dijital Bağlantılar</strong><span>Bağla dediğinde müşteri profilinde görünür.</span></div><button type="button" class="action" onclick="closeProfileGroup()">Kapat</button></div>
+      <div class="pcc-conn-grid">
+        ${platforms.map(k=>{
+          const item=links[k]||{};
+          const url=item.url||'';
+          return `<div class="pcc-conn"><div class="pcc-conn-main"><div class="pcc-conn-icon">${icons[k]}</div><div><strong>${names[k]}</strong><small>${esc2(url||'Bağlantı eklenmedi')}</small></div></div><button type="button" class="pcc-connect ${url?'on':''}" onclick="connectProfilePlatform('${k}')">${url?'Düzenle':'Hesabı Bağla'}</button></div>`;
+        }).join('')}
+      </div>
+      <div class="pcc-custom"><input id="pccCustomTitle" placeholder="Özel bağlantı adı (Yemeksepeti, Getir...)"><input id="pccCustomUrl" placeholder="Bağlantı adresi"><button type="button" onclick="addProfileCustomLink()">＋ Özel Bağlantı Ekle</button></div>
+      ${(settings.custom_links||[]).length?`<div style="margin-top:10px;display:grid;gap:6px">${settings.custom_links.map((x,i)=>`<div class="pcc-conn"><div class="pcc-conn-main"><div class="pcc-conn-icon">${esc2(x.icon||'🔗')}</div><div><strong>${esc2(x.title)}</strong><small>${esc2(x.url)}</small></div></div><button type="button" class="pcc-connect" onclick="removeProfileCustomLink(${i})">Sil</button></div>`).join('')}</div>`:''}
+    `;
+  }
+  window.openProfileGroup=function(group){
+    const panel=document.getElementById('profileConnectionPanel'); if(!panel)return;
+    panel.style.display='block';
+    if(group==='connections'){renderConnections();panel.scrollIntoView({behavior:'smooth',block:'center'});return;}
+    if(group==='info'){document.querySelector('#profile .form-grid')?.scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('name')?.focus();return;}
+    if(group==='payment'){document.getElementById('iban')?.scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('iban')?.focus();return;}
+    if(group==='appearance'){
+      panel.innerHTML=`<div class="pcc-panel-head"><div><strong>✦ Görünüm & Tema</strong><span>4 premium tema arasından seçim yap.</span></div><button type="button" class="action" onclick="closeProfileGroup()">Kapat</button></div>
+      <div class="pcc-theme-grid">
+        <button type="button" class="pcc-theme" onclick="selectProfileTheme('midnight-gold')"><strong>Midnight Gold</strong><small>Siyah / altın premium</small></button>
+        <button type="button" class="pcc-theme" onclick="selectProfileTheme('obsidian')"><strong>Obsidian</strong><small>Ultra dark / tech</small></button>
+        <button type="button" class="pcc-theme" onclick="selectProfileTheme('champagne')"><strong>Champagne</strong><small>Sıcak / lüks</small></button>
+        <button type="button" class="pcc-theme" onclick="selectProfileTheme('pure-light')"><strong>Pure Light</strong><small>Aydınlık / premium</small></button>
+      </div>
+      <div class="pcc-actions" style="margin-top:10px"><button type="button" class="action" onclick="document.getElementById('profileDesign')?.scrollIntoView({behavior:'smooth',block:'start'})">Detaylı Profil Tasarımını Aç →</button></div>`;
+      panel.style.display='block';panel.scrollIntoView({behavior:'smooth',block:'center'});return;
+    }
+  };
+  window.closeProfileGroup=function(){const p=document.getElementById('profileConnectionPanel');if(p)p.style.display='none';};
+  window.connectProfilePlatform=async function(type){
+    const label=names[type]||type;
+    const current=settings.social_links?.[type]?.url||document.getElementById(legacyMap[type]||'')?.value||'';
+    const value=prompt((current?'Düzenle: ':'Bağla: ')+label+' bağlantısını gir:',current);
+    if(value===null)return;
+    const url=value.trim();
+    if(!url)return;
+    const next={...(settings.social_links||{})};
+    next[type]={url,enabled:true,label};
+    try{
+      const result=await api('/api/business-social-links',{method:'PUT',body:JSON.stringify({social_links:next})});
+      settings.social_links=result.social_links||next;
+      if(legacyMap[type]&&document.getElementById(legacyMap[type])) document.getElementById(legacyMap[type]).value=url;
+      if(legacyMap[type]==='google_review') currentBusiness.google_review=url;
+      if(legacyMap[type]) await saveLegacyField(type,url);
+      renderConnections();showToast(label+' bağlantısı kaydedildi.');
+    }catch(e){showToast(e.message||'Bağlantı kaydedilemedi.');}
+  };
+  async function saveLegacyField(type,url){
+    const field=legacyMap[type]; if(!field)return;
+    const b=currentBusiness||{};
+    const payload={name:b.name||'',category:b.category||'',description:b.description||'',phone:b.phone||'',whatsapp:b.whatsapp||'',address:b.address||'',instagram:b.instagram||'',tiktok:b.tiktok||'',google_review:b.google_review||'',website:b.website||'',menu:b.menu||'',iban:b.iban||'',iban_holder:b.iban_holder||'',hours:b.hours||'',logo_url:b.logo_url||''};
+    payload[field]=url;
+    const r=await api('/api/me',{method:'PUT',body:JSON.stringify(payload)});
+    if(r&&!r.error)currentBusiness={...currentBusiness,...r};
+  }
+  window.addProfileCustomLink=async function(){
+    const title=document.getElementById('pccCustomTitle')?.value.trim(),url=document.getElementById('pccCustomUrl')?.value.trim();
+    if(!title||!url){showToast('Özel bağlantı adı ve adresi gerekli.');return;}
+    const next=[...(settings.custom_links||[]),{title,url,icon:'🔗',enabled:true,sort_order:(settings.custom_links||[]).length}].slice(0,20);
+    try{const r=await api('/api/business-custom-links',{method:'PUT',body:JSON.stringify({custom_links:next})});settings.custom_links=r.custom_links||next;renderConnections();showToast('Özel bağlantı eklendi.');}catch(e){showToast(e.message||'Özel bağlantı eklenemedi.');}
+  };
+  window.removeProfileCustomLink=async function(index){
+    const next=(settings.custom_links||[]).filter((_,i)=>i!==index);
+    try{const r=await api('/api/business-custom-links',{method:'PUT',body:JSON.stringify({custom_links:next})});settings.custom_links=r.custom_links||next;renderConnections();showToast('Özel bağlantı kaldırıldı.');}catch(e){showToast(e.message||'Bağlantı silinemedi.');}
+  };
+  window.selectProfileTheme=async function(theme){
+    try{
+      const r=await api('/api/business-theme',{method:'PUT',body:JSON.stringify({theme,accent_color:'#D4AF37'})});
+      if(typeof loadProfileDesign==='function') await loadProfileDesign();
+      if(typeof updateDesignPreview==='function') updateDesignPreview();
+      showToast((r.theme_name||theme)+' teması seçildi.');
+    }catch(e){showToast(e.message||'Tema kaydedilemedi.');}
+  };
+  const originalLoad=window.load;
+  if(typeof originalLoad==='function'){
+    window.load=async function(){await originalLoad.apply(this,arguments);await loadSettings();const p=document.getElementById('pccPublicProfile');const h=document.getElementById('headerProfile');if(p&&h)p.href=h.href;};
+  }
+})();
+</script>
 
 <script id="leo-business-final-js">
 (function(){
