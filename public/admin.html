@@ -875,36 +875,32 @@ async function showBusinessCardManager(btn){
 }
 function newCardPerson(){
   document.getElementById('modalTitle').textContent='💳 Yeni Business Card Kişisi';
-  document.getElementById('modalBody').innerHTML=`<div class="form-grid"><div class="form-field full"><label>AD SOYAD</label><input id="cp_name" name="card_person_name" autocomplete="name" required placeholder="Örn. Tayfun Timrus"></div><div class="form-field"><label>GİRİŞ E-POSTASI (OPSİYONEL)</label><input id="cp_email" name="card_person_email" type="email" autocomplete="email" placeholder="kart sahibi giriş yapacaksa"></div><div class="form-field"><label>GEÇİCİ ŞİFRE (OPSİYONEL)</label><input id="cp_password" name="card_person_password" type="password" autocomplete="new-password" placeholder="En az 8 karakter"></div></div><div class="section-sub" style="margin-top:12px">Kişi oluşturulduktan sonra hangi alanları düzenleyebileceğini ayrıca belirleyebilirsin.</div><div class="modal-actions"><button type="button" class="btn primary" onclick="createCardPerson()">Kişiyi Oluştur</button><button type="button" class="btn" onclick="closeModal()">Vazgeç</button></div>`;
+  document.getElementById('modalBody').innerHTML=`<div class="form-grid"><div class="form-field full"><label>AD SOYAD</label><input id="cp_name" name="card_person_name" autocomplete="name" required placeholder="Örn. Tayfun Timrus"></div><div class="form-field"><label>GİRİŞ E-POSTASI (OPSİYONEL)</label><input id="cp_email" name="card_person_email" type="email" autocomplete="email" placeholder="kart sahibi giriş yapacaksa"></div><div class="form-field"><label>GEÇİCİ ŞİFRE (OPSİYONEL)</label><input id="cp_password" name="card_person_password" type="password" autocomplete="new-password" placeholder="En az 8 karakter"></div></div><div class="section-sub" style="margin-top:12px">Kişi oluşturulduktan sonra hangi alanları düzenleyebileceğini ayrıca belirleyebilirsin.</div><div class="modal-actions"><button type="button" class="btn primary" onclick="createCardPerson(event)">Kişiyi Oluştur</button><button type="button" class="btn" onclick="closeModal()">Vazgeç</button></div>`;
   openModal();
   setTimeout(()=>document.getElementById('cp_name')?.focus(),50);
 }
-function getVisibleFieldValue(id){
-  const nodes=[...document.querySelectorAll('#'+id)];
-  const visible=nodes.find(el=>el && el.offsetParent!==null);
-  const el=visible || nodes[0];
-  return el ? String(el.value ?? '').trim() : '';
-}
-async function createCardPerson(){
-  const name=getVisibleFieldValue('cp_name');
-  const email=getVisibleFieldValue('cp_email');
-  const password=(()=>{
-    const nodes=[...document.querySelectorAll('#cp_password')];
-    const el=nodes.find(x=>x && x.offsetParent!==null) || nodes[0];
-    return el ? String(el.value ?? '') : '';
-  })();
+async function createCardPerson(event){
+  const button = event?.currentTarget;
+  const modal = button?.closest('.modal') || document.getElementById('modalBody');
+  const nameInput = modal?.querySelector('input[name="card_person_name"]');
+  const emailInput = modal?.querySelector('input[name="card_person_email"]');
+  const passwordInput = modal?.querySelector('input[name="card_person_password"]');
+
+  const name = String(nameInput?.value || '').trim();
+  const email = String(emailInput?.value || '').trim();
+  const password = String(passwordInput?.value || '');
+
   if(!name){
     showToast('Ad Soyad gerekli.');
-    const el=[...document.querySelectorAll('#cp_name')].find(x=>x && x.offsetParent!==null) || document.querySelector('#cp_name');
-    el?.focus();
+    nameInput?.focus();
     return;
   }
-  if(password && password.length<8){
+  if(password && password.length < 8){
     showToast('Şifre en az 8 karakter olmalı.');
-    const el=[...document.querySelectorAll('#cp_password')].find(x=>x && x.offsetParent!==null) || document.querySelector('#cp_password');
-    el?.focus();
+    passwordInput?.focus();
     return;
   }
+
   try{
     await api('/api/admin/card-people',{
       method:'POST',
@@ -918,7 +914,9 @@ async function createCardPerson(){
     closeModal();
     showToast('Business Card kişisi oluşturuldu.');
     await showBusinessCardManager();
-  }catch(e){showToast(e.message)}
+  }catch(e){
+    showToast(e.message);
+  }
 }
 async function editCardPerson(id){
   try{const d=await api('/api/admin/card-people/'+id),p=d.person||{},data=p.data||{},perms=p.permissions||{};document.getElementById('modalTitle').textContent='💳 Business Card • '+(data.person_name||'Kişi');document.getElementById('modalBody').innerHTML=`<div class="detail-box"><small>PUBLIC KART</small><strong style="display:block;margin-top:5px;word-break:break-all">/card/${esc(p.slug||'')}</strong></div><div class="form-grid" style="margin-top:14px"><div class="form-field"><label>E-POSTA</label><input id="cp_edit_email" value="${esc(p.email||'')}"></div><div class="form-field"><label>YENİ ŞİFRE</label><input id="cp_edit_password" type="password" placeholder="Değiştirmek istemiyorsan boş bırak"></div></div><div class="section-sub" style="margin:14px 0 8px"><strong>Alan bazlı işlem yetkileri</strong><br>Kapalı alan kişi tarafından değiştirilemez ve public kartta gösterilmez.</div><div class="permission-grid">${CARD_PERSON_FIELDS.map(([k,l])=>`<div class="permission-card"><div><strong>${esc(l)}</strong><span>${data[k]?'İçerik mevcut':'İçerik henüz girilmedi'}</span></div><label class="switch"><input class="cp-perm" data-field="${k}" type="checkbox" ${perms[k]===true?'checked':''}><span class="slider"></span></label></div>`).join('')}</div><div class="permission-card" style="margin-top:12px"><div><strong>Kart aktif</strong><span>Public kartı erişilebilir yapar.</span></div><label class="switch"><input id="cp_enabled" type="checkbox" ${p.enabled?'checked':''}><span class="slider"></span></label></div><div class="modal-actions"><button class="btn primary" onclick="saveCardPerson(${Number(id)})">Kaydet</button><button class="btn" onclick="deleteCardPerson(${Number(id)})">Kişiyi Sil</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal();}catch(e){showToast(e.message)}
