@@ -1210,6 +1210,43 @@ body{
   .dynamic-gallery{grid-template-columns:repeat(2,1fr);}
 }
 
+
+.review-booster{
+  margin:18px 0;
+  padding:20px;
+  border-radius:18px;
+  border:1px solid #c59a5245;
+  background:linear-gradient(145deg,#151515,#090909);
+  box-shadow:0 18px 45px #0008;
+  text-align:center;
+}
+.review-booster.hidden{display:none}
+.review-booster-icon{
+  width:46px;height:46px;margin:0 auto 10px;
+  display:grid;place-items:center;border-radius:14px;
+  border:1px solid #c59a5260;color:#e0bd7b;font-size:21px;
+}
+.review-booster-title{font-size:17px;font-weight:900}
+.review-booster-text{margin:7px auto 0;max-width:480px;color:#8a8a8a;font-size:10px;line-height:1.6}
+.review-booster-stars{display:flex;justify-content:center;gap:6px;margin-top:17px}
+.review-star{
+  width:40px;height:40px;border-radius:12px;border:1px solid #3b3b3b;
+  background:#111;color:#e0bd7b;font-size:21px;cursor:pointer;
+}
+.review-star:hover{border-color:#c59a52;background:#1a1a1a}
+.review-booster-message{margin-top:13px;color:#777;font-size:9px;line-height:1.6}
+.review-google-button,.review-whatsapp-button{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-top:13px;min-height:40px;padding:9px 14px;border-radius:10px;
+  text-decoration:none;font-size:10px;font-weight:900;
+}
+.review-google-button{background:linear-gradient(135deg,#c59a52,#9e7738);color:#fff}
+.review-whatsapp-button{border:1px solid #3b3b3b;background:#111;color:#ddd;margin-left:7px}
+@media(max-width:430px){
+  .review-star{width:35px;height:35px}
+  .review-whatsapp-button{margin-left:0}
+}
+
 </style>
 
 </head>
@@ -1802,6 +1839,17 @@ body{
 
 
 
+
+<section id="reviewBooster" class="review-booster hidden">
+  <div class="review-booster-icon">★</div>
+  <div id="reviewBoosterTitle" class="review-booster-title">Deneyimini bizimle paylaş</div>
+  <div id="reviewBoosterText" class="review-booster-text">Memnun kaldıysan Google’da bizi değerlendir.</div>
+  <div id="reviewBoosterStars" class="review-booster-stars"></div>
+  <div id="reviewBoosterMessage" class="review-booster-message"></div>
+  <div id="reviewBoosterActions"></div>
+</section>
+
+
 <!-- ==================================================
      FOOTER
 ================================================== -->
@@ -1823,6 +1871,98 @@ body{
 
 <script>
 
+
+
+/* ==================================================
+   REVIEW BOOSTER
+================================================== */
+
+function trackReviewEvent(type){
+  try{
+    const slug = business?.slug;
+    if(!slug) return;
+    fetch("/api/event/" + encodeURIComponent(slug),{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({type,source:source || "direct",nfc_code:nfcCode || ""})
+    }).catch(()=>{});
+  }catch(_){}
+}
+
+function renderReviewBooster(){
+  const cfg = business?.review_booster || {};
+  const box = document.getElementById("reviewBooster");
+  if(!box || cfg.enabled !== true) return;
+
+  const google = safeUrl(business.google_review);
+  const whatsapp = safeUrl(business.whatsapp);
+  if(!google && !whatsapp) return;
+
+  box.classList.remove("hidden");
+  const title = document.getElementById("reviewBoosterTitle");
+  const text = document.getElementById("reviewBoosterText");
+  const stars = document.getElementById("reviewBoosterStars");
+  if(title) title.textContent = cfg.title || "Deneyimini bizimle paylaş";
+  if(text) text.textContent = cfg.text || "";
+  if(stars){
+    stars.innerHTML = "";
+    for(let i=1;i<=5;i++){
+      const b=document.createElement("button");
+      b.type="button";
+      b.className="review-star";
+      b.textContent="☆";
+      b.setAttribute("aria-label",i+" yıldız");
+      b.onclick=()=>handleReviewRating(i);
+      stars.appendChild(b);
+    }
+  }
+  trackReviewEvent("review_open");
+}
+
+function handleReviewRating(rating){
+  const cfg = business?.review_booster || {};
+  const msg=document.getElementById("reviewBoosterMessage");
+  const actions=document.getElementById("reviewBoosterActions");
+  if(msg) msg.textContent="";
+  if(actions) actions.innerHTML="";
+
+  const threshold = Number(cfg.threshold || 4);
+  const google = safeUrl(business.google_review);
+  const whatsapp = safeUrl(business.whatsapp);
+
+  if(rating >= threshold && google){
+    trackReviewEvent("review_positive");
+    if(msg) msg.textContent = cfg.success_title || "Teşekkürler!";
+    const a=document.createElement("a");
+    a.className="review-google-button";
+    a.href=google;
+    a.target="_blank";
+    a.rel="noopener";
+    a.textContent="★ Google'da Değerlendir";
+    if(actions) actions.appendChild(a);
+    return;
+  }
+
+  trackReviewEvent("review_feedback");
+  if(msg) msg.textContent = cfg.low_text || "Yaşadığın sorunu bize ilet, seninle ilgilenelim.";
+  if(whatsapp){
+    const a=document.createElement("a");
+    a.className="review-whatsapp-button";
+    a.href=whatsapp;
+    a.target="_blank";
+    a.rel="noopener";
+    a.textContent="💬 Bize Ulaş";
+    if(actions) actions.appendChild(a);
+  }else if(google){
+    const a=document.createElement("a");
+    a.className="review-google-button";
+    a.href=google;
+    a.target="_blank";
+    a.rel="noopener";
+    a.textContent="★ Değerlendir";
+    if(actions) actions.appendChild(a);
+  }
+}
 
 /* ==================================================
    GLOBAL
