@@ -8,6 +8,7 @@ const QRCode = require('qrcode');
 const { Pool } = require('pg');
 const path = require('path');
 const crypto = require('crypto');
+const { createWebsiteCmsRouter } = require('./LEO-CONNECT-WEBSITE-CMS-MODULE-V1');
 
 const app = express();
 
@@ -611,7 +612,8 @@ async function initDatabase() {
     ON profile_designs(business_id)
   `);
 
-  console.log('PostgreSQL + NFC Tag Management hazır.');
+  await websiteCms.initWebsiteCmsDatabase();
+  console.log('PostgreSQL + NFC Tag Management + Website CMS hazır.');
 }
 
 
@@ -684,6 +686,13 @@ function adminAuth(req, res, next) {
     });
   }
 }
+
+
+/* =========================================================
+   WEBSITE CMS — SEPARATE CORPORATE WEBSITE
+========================================================= */
+const websiteCms = createWebsiteCmsRouter({ pool, adminAuth });
+app.use(websiteCms.router);
 
 
 /* =========================================================
