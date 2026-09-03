@@ -808,6 +808,37 @@ function createWebsiteCmsRouter({ pool, adminAuth }) {
         ON CONFLICT(section_key) DO NOTHING
       `, [key, title, subtitle, description, sort]);
     }
+
+    // İlk açılışta örnek içerikler oluştur. Sonrasında admin panelinden tamamen değiştirilebilir.
+    const seedItems = {
+      hero: [
+        {key:'hero-main',title:'İşletmenizi tek dokunuşla dijitale taşıyın.',short:'QR ve NFC ile müşterilerinizi doğru dijital deneyime saniyeler içinde ulaştırın.',description:'QR ve NFC teknolojisiyle işletmenizin profilini, menüsünü, sosyal hesaplarını, iletişim kanallarını ve kampanyalarını tek noktada birleştirin.',button:'Hemen Başla',url:'#contact',sort:0,content:{badge:'LEO CONNECT • QR + NFC'}}
+      ],
+      platform: [
+        {key:'qr-profile',title:'QR Profil',short:'İşletmenizin tüm dijital bilgileri tek QR kodda.',description:'Profil, menü, konum, iletişim ve dijital bağlantılar tek deneyimde.',sort:0},
+        {key:'nfc',title:'NFC Deneyimi',short:'Telefonu yaklaştır, dijital profile anında ulaş.',description:'Temassız ve hızlı müşteri deneyimi için NFC.',sort:10},
+        {key:'analytics',title:'Akıllı Analytics',short:'Tarama ve etkileşimleri tek panelden takip edin.',description:'QR, NFC ve profil etkileşimlerini merkezi admin panelinden izleyin.',sort:20}
+      ],
+      'how-it-works': [
+        {key:'step-1',title:'Kur',short:'İşletmenizi ve dijital bağlantılarınızı oluşturun.',description:'Bilgilerinizi girin ve dijital profilinizi hazırlayın.',sort:0},
+        {key:'step-2',title:'Yerleştir',short:'QR ve NFC çözümlerini işletmenizin uygun noktalarına yerleştirin.',description:'Masa, kasa, vitrin veya giriş alanlarında kullanın.',sort:10},
+        {key:'step-3',title:'Büyüt',short:'Etkileşimleri izleyin, deneyimi sürekli geliştirin.',description:'Analytics verileriyle müşterinizin davranışını anlayın.',sort:20}
+      ],
+      stands: [
+        {key:'masa-standi',title:'Masa Standı',short:'Premium QR + NFC masa standı.',description:'Müşterinin masadan tek dokunuşla dijital profilinize ulaşmasını sağlar. Fotoğraf, detay ve örnekleri admin panelinden ekleyebilirsiniz.',sort:0},
+        {key:'nfc-etiket',title:'NFC Etiket',short:'Kompakt ve hızlı NFC çözümü.',description:'Markanıza özel NFC etiketleri farklı yüzeylerde kullanın.',sort:10},
+        {key:'ozel-tasarim',title:'Özel Tasarım',short:'Markanıza özel fiziksel çözüm.',description:'İhtiyacınıza göre özel QR + NFC uygulamaları.',sort:20}
+      ]
+    };
+    for (const [sectionKey, items] of Object.entries(seedItems)) {
+      const sec = await pool.query(`SELECT id FROM site_sections WHERE section_key=$1 LIMIT 1`, [sectionKey]);
+      if (!sec.rows.length) continue;
+      for (const item of items) {
+        const exists = await pool.query(`SELECT id FROM site_items WHERE section_id=$1 AND item_key=$2 LIMIT 1`, [sec.rows[0].id, item.key]);
+        if (exists.rows.length) continue;
+        await pool.query(`INSERT INTO site_items(section_id,item_key,title,short_text,description,image_url,button_text,button_url,enabled,featured,sort_order,content) VALUES($1,$2,$3,$4,$5,$6,$7,$8,TRUE,FALSE,$9,$10::jsonb)`, [sec.rows[0].id,item.key,item.title,item.short,item.description||'',item.image_url||'',item.button||'',item.url||'',item.sort,JSON.stringify(item.content||{})]);
+      }
+    }
   }
 
   // -------------------------------------------------------
