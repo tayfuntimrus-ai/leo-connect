@@ -40,8 +40,8 @@ a{color:inherit;text-decoration:none}
 .avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--gold2);color:#17130a;font-weight:800}
 .admin-row{display:flex;gap:10px;align-items:center}.admin-name{font-weight:700;font-size:13px}.admin-mail{font-size:10px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis}
 .online{color:var(--accent);font-size:10px;margin-top:7px}.online i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);margin-right:5px}
-.main{min-width:0}
-.topbar{height:82px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(14px);position:sticky;top:0;z-index:15}
+.main{min-width:0;position:relative}
+.topbar{--topbar-h:82px;height:var(--topbar-h);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(14px);position:sticky;top:0;z-index:15}
 .top-actions{display:flex;align-items:center;gap:9px}
 .tool{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:11px;padding:10px 12px}
 .tool:hover{border-color:rgba(var(--accent-rgb),.45)}
@@ -74,7 +74,7 @@ a{color:inherit;text-decoration:none}
 @media(max-width:720px){.form-grid,.analytics-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.tag-row{grid-template-columns:1fr}}
 
 .business-page{display:none;padding:30px 34px 50px;max-width:1500px;margin:auto}
-.business-page.show{display:block}
+.business-page.show{display:block;position:fixed;top:var(--topbar-h);bottom:0;left:0;right:0;min-height:0;overflow:auto;background:var(--bg);z-index:10}
 .backbar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
 .back-btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;padding:10px 13px}
 .business-hero{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,var(--panel),var(--panel2));box-shadow:var(--shadow)}
@@ -104,7 +104,7 @@ a{color:inherit;text-decoration:none}
 @media(max-width:720px){.business-page{padding:20px 14px 80px}.business-hero{align-items:flex-start;flex-direction:column}.hero-actions{justify-content:flex-start}.business-hero-logo{width:62px;height:62px}.business-hero h2{font-size:23px}.biz-stat-grid{grid-template-columns:1fr 1fr}.profile-editor,.info-grid{grid-template-columns:1fr}.profile-editor .full{grid-column:auto}.analytics-cards{grid-template-columns:1fr}}
 
 
-.global-page{display:none;padding:30px 34px 55px;max-width:1500px;margin:auto}.global-page.show{display:block}.global-head{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:18px}.global-head h2{margin:7px 0 5px;font-size:30px}.global-head p{margin:0;color:var(--muted);font-size:12px}.global-grid{display:grid;gap:12px}.global-card{border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));border-radius:16px;padding:16px}.global-row{display:flex;justify-content:space-between;align-items:center;gap:15px}.global-main{display:flex;align-items:center;gap:12px;min-width:0}.global-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(var(--accent-rgb),.10);border:1px solid rgba(var(--accent-rgb),.2);color:var(--accent);font-size:20px}.global-name{font-weight:800;font-size:13px}.global-sub{font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all}.permission-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}.permission-card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)}.permission-card strong{display:block;font-size:12px}.permission-card span{display:block;color:var(--muted);font-size:9px;margin-top:4px}.switch{position:relative;width:48px;height:27px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;border-radius:30px;background:var(--line);transition:.2s;cursor:pointer}.slider:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:2px;border-radius:50%;background:#777;transition:.2s}.switch input:checked+.slider{background:rgba(var(--accent-rgb),.25);border:1px solid rgba(var(--accent-rgb),.45)}.switch input:checked+.slider:before{transform:translateX(20px);background:var(--accent)}.global-table{width:100%;border-collapse:collapse;margin-top:12px}.global-table th{font-size:9px;color:var(--muted);letter-spacing:1px;text-align:left;padding:12px;border-bottom:1px solid var(--line)}.global-table td{padding:12px;border-bottom:1px solid var(--line);font-size:11px}.global-table tr:last-child td{border-bottom:0}@media(max-width:720px){.global-page{padding:20px 14px 80px}.permission-grid{grid-template-columns:1fr}.global-head{align-items:flex-start;flex-direction:column}}
+.global-page{display:none;padding:30px 34px 55px;max-width:1500px;margin:auto}.global-page.show{display:block;position:fixed;top:var(--topbar-h);bottom:0;left:0;right:0;min-height:0;overflow:auto;background:var(--bg);z-index:10}.global-head{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:18px}.global-head h2{margin:7px 0 5px;font-size:30px}.global-head p{margin:0;color:var(--muted);font-size:12px}.global-grid{display:grid;gap:12px}.global-card{border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));border-radius:16px;padding:16px}.global-row{display:flex;justify-content:space-between;align-items:center;gap:15px}.global-main{display:flex;align-items:center;gap:12px;min-width:0}.global-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(var(--accent-rgb),.10);border:1px solid rgba(var(--accent-rgb),.2);color:var(--accent);font-size:20px}.global-name{font-weight:800;font-size:13px}.global-sub{font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all}.permission-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}.permission-card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)}.permission-card strong{display:block;font-size:12px}.permission-card span{display:block;color:var(--muted);font-size:9px;margin-top:4px}.switch{position:relative;width:48px;height:27px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;border-radius:30px;background:var(--line);transition:.2s;cursor:pointer}.slider:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:2px;border-radius:50%;background:#777;transition:.2s}.switch input:checked+.slider{background:rgba(var(--accent-rgb),.25);border:1px solid rgba(var(--accent-rgb),.45)}.switch input:checked+.slider:before{transform:translateX(20px);background:var(--accent)}.global-table{width:100%;border-collapse:collapse;margin-top:12px}.global-table th{font-size:9px;color:var(--muted);letter-spacing:1px;text-align:left;padding:12px;border-bottom:1px solid var(--line)}.global-table td{padding:12px;border-bottom:1px solid var(--line);font-size:11px}.global-table tr:last-child td{border-bottom:0}@media(max-width:720px){.global-page{padding:20px 14px 80px}.permission-grid{grid-template-columns:1fr}.global-head{align-items:flex-start;flex-direction:column}}
 
 
 .analytics-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}
@@ -120,7 +120,7 @@ a{color:inherit;text-decoration:none}
 .toast{position:fixed;right:20px;bottom:20px;background:var(--panel);border:1px solid rgba(var(--accent-rgb),.4);box-shadow:var(--shadow);padding:12px 15px;border-radius:12px;font-size:11px;display:none;z-index:80}.toast.show{display:block}
 .login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 50% 10%,rgba(var(--accent-rgb),.10),transparent 38%),var(--bg)}.login-card{width:min(520px,100%);padding:35px;border:1px solid var(--line);background:var(--panel);border-radius:24px;box-shadow:var(--shadow)}.login-logo{text-align:center;font-size:45px}.login h2{text-align:center;letter-spacing:3px;margin:13px 0 4px}.login p{text-align:center;color:var(--muted);font-size:11px;margin:0 0 27px}.field{margin-bottom:13px}.field label{display:block;font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;margin-bottom:6px}.field input{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);outline:none}.field input:focus{border-color:rgba(var(--accent-rgb),.55)}.login .btn{width:100%;padding:13px;margin-top:4px}.error{color:var(--danger);font-size:11px;margin-top:10px;text-align:center;min-height:15px}
 @media(max-width:1100px){.app{grid-template-columns:78px 1fr}.sidebar{padding:18px 10px}.brand{justify-content:center}.brand div:last-child,.nav-title,.nav button span,.admin-card .admin-mail,.admin-card .online,.admin-card .admin-name{display:none}.nav button{justify-content:center}.admin-card{padding:10px}.admin-row{justify-content:center}.cards{grid-template-columns:repeat(2,1fr)}.grid-main{grid-template-columns:1fr}}
-@media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;border-right:0;border-top:1px solid var(--line);padding:7px 8px}.brand,.admin-card,.nav-title{display:none}.nav{display:flex;justify-content:space-around}.nav button{padding:9px;flex:1}.nav button span{display:none}.main{padding-bottom:62px}.topbar{height:auto;padding:12px 14px}.top-actions{margin-left:auto}.colors label{display:none}.content{padding:22px 14px}.hero{align-items:start}.hero h1{font-size:31px}.status{display:none}.cards{grid-template-columns:1fr 1fr;gap:9px}.stat{min-height:125px;padding:14px}.stat-value{font-size:26px}.grid-main{margin-top:10px}.section-head{display:block}.search{margin-top:12px}.search input{width:100%}.summary-grid{grid-template-columns:1fr 1fr}.summary-item{padding:10px 0;border-right:0;border-bottom:1px solid var(--line)}.detail-grid{grid-template-columns:1fr}.topbar .tool:first-child{display:none}}
+@media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;border-right:0;border-top:1px solid var(--line);padding:7px 8px}.brand,.admin-card,.nav-title{display:none}.nav{display:flex;justify-content:space-around}.nav button{padding:9px;flex:1}.nav button span{display:none}.main{padding-bottom:62px}.topbar{--topbar-h:58px;height:var(--topbar-h);padding:12px 14px}.top-actions{margin-left:auto}.colors label{display:none}.content{padding:22px 14px}.hero{align-items:start}.hero h1{font-size:31px}.status{display:none}.cards{grid-template-columns:1fr 1fr;gap:9px}.stat{min-height:125px;padding:14px}.stat-value{font-size:26px}.grid-main{margin-top:10px}.section-head{display:block}.search{margin-top:12px}.search input{width:100%}.summary-grid{grid-template-columns:1fr 1fr}.summary-item{padding:10px 0;border-right:0;border-bottom:1px solid var(--line)}.detail-grid{grid-template-columns:1fr}.topbar .tool:first-child{display:none}}
 
 .live-center{margin-top:16px}
 .live-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
@@ -147,81 +147,183 @@ a{color:inherit;text-decoration:none}
 @media(max-width:900px){.live-kpis{grid-template-columns:repeat(2,1fr)}.live-layout{grid-template-columns:1fr}}
 @media(max-width:520px){.live-kpis{grid-template-columns:1fr 1fr}.live-item{padding:11px 12px}}
 
-/* LEO CONNECT MOBILE FINAL UX V3 */
-@media (max-width:720px){
-  html,body{width:100%;max-width:100%;overflow-x:hidden}
-  /* Mobile: hide desktop sidebar and override inline display:grid from #app */
-  .app{display:block !important;width:100% !important;min-width:0 !important}
-  .sidebar{display:none !important}
-  .main{display:block;width:100% !important;min-width:0 !important;max-width:100vw;overflow:hidden;padding-bottom:72px}
-  .topbar{width:100% !important;min-width:0 !important;max-width:100vw;height:auto;min-height:64px;padding:10px 12px;gap:8px;overflow-x:auto}
-  .top-actions{width:100%;display:flex;justify-content:flex-end;gap:6px;flex-wrap:nowrap;min-width:max-content}
-  .topbar .mode{padding:6px 8px}
-  .topbar .tool{padding:9px 10px;font-size:11px;white-space:nowrap}
-  .colors{display:flex;align-items:center;gap:5px;flex:0 0 auto}
-  .colors label{display:none}
-  .content{width:100% !important;max-width:none !important;min-width:0 !important;margin:0;padding:20px 12px 40px}
-  .hero{width:100%;margin-bottom:18px}
-  .hero h1{font-size:29px;line-height:1.05;margin:5px 0 8px}
-  .hero p{max-width:100%;font-size:11px;line-height:1.5}
-  .cards{width:100%;grid-template-columns:1fr 1fr;gap:8px}
-  .stat{min-width:0;padding:13px;border-radius:14px;min-height:112px}
-  .stat-value{font-size:24px}
-  .stat-label{font-size:8px;white-space:normal}
-  .stat-note{font-size:8px}
-  .grid-main{width:100%;grid-template-columns:1fr;gap:10px}
-  .card{min-width:0;max-width:100%}
-  .section-head{padding:15px 14px 12px;align-items:flex-start}
-  .section-head h3{font-size:14px}
-  .search{width:100%}
-  .search input{width:100%;min-width:0}
-  .table-wrap,.table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .table{min-width:620px}
-  .summary-grid{grid-template-columns:1fr 1fr}
-  .summary-item{min-width:0}
-  .live-center{width:100%;margin-top:12px}
-  .live-head{align-items:flex-start}
-  .live-title{font-size:14px}
-  .live-sub{line-height:1.45}
-  .live-kpis{width:100%;grid-template-columns:1fr 1fr;gap:8px}
-  .live-kpi{min-width:0;padding:12px}
-  .live-kpi strong{font-size:22px}
-  .live-layout{width:100%;grid-template-columns:1fr;gap:10px}
-  .live-feed,.live-insight{min-width:0;width:100%}
-  .live-item{width:100%;min-width:0}
-  .analytics-toolbar{width:100%}
-  .analytics-grid{width:100%;grid-template-columns:1fr 1fr}
-  .analytics-two{width:100%;grid-template-columns:1fr}
-  .business-page,.global-page{width:100%;max-width:none;padding:18px 12px 70px}
-  .business-hero,.global-card,.analytics-box{width:100%;min-width:0}
-  .business-hero{padding:15px}
-  .business-hero-left{width:100%;min-width:0}
-  .business-hero h2{font-size:21px}
-  .hero-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
-  .hero-actions .btn{width:100%}
-  .business-tabs{width:100%;padding-bottom:3px}
-  .permission-grid{grid-template-columns:1fr}
-  .permission-card{width:100%;min-width:0}
-  .modal{width:calc(100vw - 24px);max-width:calc(100vw - 24px)}
-}
+/* PREMIUM PRODUCT CMS */
+.product-cms{display:grid;gap:14px}.product-hero{display:grid;grid-template-columns:1fr 1fr;gap:12px}.product-field{background:linear-gradient(145deg,#111414,#0b0d0d);border:1px solid var(--line);border-radius:14px;padding:13px}.product-field label{display:block;font-size:10px;font-weight:900;letter-spacing:1px;color:var(--muted);margin-bottom:7px}.product-field input,.product-field textarea{width:100%;box-sizing:border-box;background:#090b0b;color:var(--text);border:1px solid #29302d;border-radius:10px;padding:11px 12px;font:inherit;outline:none}.product-field textarea{min-height:105px;resize:vertical}.product-field.full{grid-column:1/-1}.product-preview{margin-top:9px;height:180px;border:1px dashed #303735;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);background:#090b0b}.product-preview img{width:100%;height:100%;object-fit:cover}.product-help{font-size:11px;color:var(--muted);line-height:1.5;margin-top:7px}.product-switches{display:flex;gap:18px;flex-wrap:wrap;padding:4px 0}.product-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:#0b0e0e;font-size:12px}.product-chip input{accent-color:var(--gold)}.product-section-note{padding:14px 16px;border:1px solid rgba(214,173,91,.18);background:linear-gradient(135deg,rgba(214,173,91,.08),rgba(255,255,255,.02));border-radius:14px;color:var(--muted);font-size:12px;line-height:1.6}.cms-easy-item.product-row{min-height:86px}.product-thumb-wrap{width:82px;height:64px;border-radius:10px;overflow:hidden;background:#080a0a;border:1px solid var(--line);flex:0 0 auto}.product-thumb-wrap img{width:100%;height:100%;object-fit:cover}.product-thumb-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#6f7773;font-size:18px}.product-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}.product-meta span{font-size:10px;color:var(--muted);padding:4px 7px;border:1px solid var(--line);border-radius:999px}.product-modal{max-width:900px!important}
+@media(max-width:720px){.product-hero{grid-template-columns:1fr}.product-field.full{grid-column:auto}.product-thumb-wrap{width:64px;height:56px}.product-cms{gap:10px}}
 
-/* Extra-small phones */
-@media (max-width:390px){
-  .content{padding-left:10px;padding-right:10px}
-  .cards{grid-template-columns:1fr}
-  .analytics-grid{grid-template-columns:1fr 1fr}
-  .live-kpis{grid-template-columns:1fr 1fr}
-  .hero-actions{grid-template-columns:1fr}
-  .top-actions .colors{display:none}
-}
+.nested-products-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0 10px}.nested-products{display:grid;gap:9px}.nested-product-card{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:14px;padding:10px}.nested-thumb{width:72px;height:62px;border-radius:10px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);overflow:hidden}.nested-thumb img{width:100%;height:100%;object-fit:cover}.nested-main{min-width:0}.nested-main strong{display:block}.nested-main>span{display:block;color:var(--muted);font-size:12px;margin-top:4px}.nested-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}@media(max-width:700px){.nested-product-card{grid-template-columns:58px 1fr}.nested-thumb{width:58px;height:52px}.nested-actions{grid-column:1/-1;justify-content:flex-start}}
 
+<style>.cms-subpanel{border:1px solid var(--line);border-radius:16px;padding:0 14px;background:rgba(255,255,255,.018)}.cms-subpanel>summary{list-style:none}.cms-subpanel>summary::-webkit-details-marker{display:none}
+<style>
+/* LEO CMS V2.1: İletişim artık Site Ayarları > İletişim Merkezi üzerinden yönetilir.
+   Eski section kartını arayüzden gizle; veriyi silme. */
+.leo-legacy-contact-section{display:none!important}
+</style>
+</style>
+</style>
+<style id="leo-layout-vars">:root{--topbar-h:82px}@media(max-width:720px){:root{--topbar-h:58px}}</style>
+<style id="leo-fit-fix">
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+.app,.main{min-width:0;width:100%;max-width:100%}
+.content,.business-page,.global-page{box-sizing:border-box;width:100%;max-width:1500px;min-width:0}
+.business-page.show,.global-page.show{overflow-x:hidden;overflow-y:auto;box-sizing:border-box}
+.cards,.grid-main,.biz-stat-grid,.biz-columns,.analytics-grid,.analytics-two,.analytics-cards,.permission-grid,.form-grid,.info-grid{min-width:0}
+.analytics-two{grid-template-columns:minmax(0,1.55fr) minmax(0,.95fr)}
+.analytics-box,.analytics-kpi,.analytics-card,.biz-section,.global-card,.permission-card{min-width:0;box-sizing:border-box}
+.analytics-box-head,.global-row,.business-hero,.section-head{min-width:0}
+.analytics-box-head>*,.global-row>*,.business-hero>*{min-width:0}
+.analytics-box-head span,.global-sub,.biz-mail,.section-sub{overflow-wrap:anywhere;word-break:break-word}
+.analytics-table,.global-table{width:100%;max-width:100%;table-layout:auto}
+.table-wrap{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:1200px){.analytics-two{grid-template-columns:1fr}.biz-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.content,.business-page,.global-page{width:100%;max-width:100%;padding-left:14px;padding-right:14px}.analytics-grid,.analytics-cards{grid-template-columns:1fr 1fr}.analytics-two{grid-template-columns:1fr}.biz-stat-grid{grid-template-columns:1fr 1fr}.global-row{flex-wrap:wrap}.business-hero{flex-wrap:wrap}.permission-card{width:100%}}
+@media(max-width:480px){.analytics-grid,.analytics-cards,.biz-stat-grid{grid-template-columns:1fr}.analytics-kpi strong,.analytics-card strong{font-size:22px}.analytics-box-head{padding:14px}.global-row{align-items:flex-start}.hero-actions{width:100%;flex-wrap:wrap}.hero-actions .btn{flex:1 1 auto}}
+</style>
+<style id="leo-real-brand-logo">
+.leo-lion-logo{display:inline-block;width:100%;height:100%;background-image:url("data:image/png;base64,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");background-repeat:no-repeat;background-position:center;background-size:78% 78%;filter:none}
+.login-logo .leo-lion-logo{width:74px;height:74px;background-size:contain}
+.brand-mark .leo-lion-logo{width:42px;height:42px;background-size:contain}
+</style>
+
+<style id="leo-mobile-root-fix">
+/* LEO CONNECT — MOBILE ROOT LAYOUT FIX
+   Force the app shell to use the real device viewport.
+   This intentionally does not alter desktop layout. */
+@media screen and (max-width:720px){
+  html{
+    width:100%!important;
+    min-width:100%!important;
+    max-width:100%!important;
+    overflow-x:hidden!important;
+  }
+  body{
+    width:100vw!important;
+    min-width:100vw!important;
+    max-width:100vw!important;
+    margin:0!important;
+    padding:0!important;
+    overflow-x:hidden!important;
+  }
+  #app.app{
+    display:block!important;
+    position:relative!important;
+    width:100vw!important;
+    min-width:100vw!important;
+    max-width:100vw!important;
+    margin:0!important;
+    padding:0!important;
+    overflow-x:hidden!important;
+  }
+  #app.app > .sidebar{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    top:auto!important;
+    width:100vw!important;
+    min-width:0!important;
+    max-width:none!important;
+    box-sizing:border-box!important;
+  }
+  #app.app > .main{
+    display:block!important;
+    width:100vw!important;
+    min-width:0!important;
+    max-width:100vw!important;
+    margin:0!important;
+    padding:0 0 68px!important;
+    box-sizing:border-box!important;
+    overflow-x:hidden!important;
+  }
+  #app.app .topbar{
+    width:100vw!important;
+    max-width:100vw!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+  }
+  #app.app .content,
+  #app.app .business-page,
+  #app.app .global-page{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+  }
+  #app.app .business-page.show,
+  #app.app .global-page.show{
+    left:0!important;
+    right:0!important;
+    width:100vw!important;
+    max-width:100vw!important;
+    box-sizing:border-box!important;
+  }
+  #app.app img,
+  #app.app svg,
+  #app.app canvas,
+  #app.app video{
+    max-width:100%!important;
+  }
+  #app.app .cards,
+  #app.app .grid-main,
+  #app.app .biz-stat-grid,
+  #app.app .biz-columns,
+  #app.app .analytics-grid,
+  #app.app .analytics-two,
+  #app.app .analytics-cards,
+  #app.app .permission-grid,
+  #app.app .form-grid,
+  #app.app .info-grid{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
+<style id="leo-mobile-nav-final">
+@media(max-width:720px){
+  html,body{width:100%;min-width:0;overflow-x:hidden}
+  #app{width:100vw;min-width:0;max-width:100vw}
+  .main{width:100vw;min-width:0;max-width:100vw;overflow-x:hidden}
+  .topbar{width:100vw;box-sizing:border-box;overflow:hidden;padding:8px 10px}
+  .topbar .top-actions{width:100%;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:6px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .topbar .top-actions::-webkit-scrollbar{display:none}
+  .topbar .tool{flex:0 0 auto;padding:8px 10px;font-size:11px}
+  .topbar .colors{flex:0 0 auto;display:flex;align-items:center;gap:5px}
+  .topbar .swatch{flex:0 0 20px;width:20px;height:20px}
+  .sidebar{display:flex!important;position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:100vw!important;height:68px!important;box-sizing:border-box!important;padding:6px 5px!important;border-right:0!important;border-top:1px solid var(--line)!important;background:color-mix(in srgb,var(--sidebar) 94%,transparent)!important;backdrop-filter:blur(16px);z-index:100!important}
+  .sidebar .brand,.sidebar .admin-card,.sidebar .nav-title{display:none!important}
+  .sidebar .nav{display:flex!important;flex:1 1 100%;width:100%;height:100%;justify-content:space-between;align-items:stretch;gap:2px}
+  .sidebar .nav:nth-of-type(2){display:none!important}
+  .sidebar .nav button{display:flex!important;flex:1 1 0!important;min-width:0!important;width:auto!important;height:100%!important;padding:5px 2px!important;margin:0!important;justify-content:center!important;align-items:center!important;flex-direction:column!important;gap:3px!important;border-radius:10px!important;color:var(--muted)!important}
+  .sidebar .nav button .nav-icon{display:block!important;width:auto!important;height:20px!important;line-height:20px!important;font-size:16px!important;flex:0 0 20px!important;text-align:center!important}
+  .sidebar .nav button>span:last-child{display:block!important;font-size:8px!important;line-height:10px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%!important}
+  .sidebar .nav button.active{color:var(--text)!important;background:rgba(var(--accent-rgb),.10)!important;border-color:rgba(var(--accent-rgb),.35)!important}
+  .main{padding-bottom:78px!important}
+  .content,.business-page,.global-page{box-sizing:border-box!important;width:100%!important;max-width:100%!important}
+}
+</style>
+
+<style>
+.cms-wrap{display:grid;gap:14px}.cms-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}.cms-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.cms-head h3{margin:0}.cms-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.cms-field{display:grid;gap:6px}.cms-field.full{grid-column:1/-1}.cms-field label{font-size:10px;letter-spacing:1.1px;color:var(--muted);font-weight:800}.cms-field input,.cms-field textarea,.cms-field select{width:100%;box-sizing:border-box;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:11px;padding:11px 12px;outline:none}.cms-field textarea{min-height:100px;resize:vertical}.cms-section{border:1px solid var(--line);border-radius:15px;padding:14px;background:var(--panel2)}.cms-section-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.cms-items{display:grid;gap:9px;margin-top:12px}.cms-item{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);background:var(--panel);border-radius:13px;padding:11px}.cms-item-main{min-width:0}.cms-item-main strong{display:block}.cms-item-main span{display:block;color:var(--muted);font-size:11px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cms-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.cms-kicker{font-size:10px;color:var(--accent);letter-spacing:1.5px;font-weight:900}.cms-empty{padding:12px;color:var(--muted);font-size:12px}.cms-check{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--text)}.cms-check input{width:16px;height:16px}@media(max-width:720px){.cms-grid{grid-template-columns:1fr}.cms-field.full{grid-column:auto}.cms-head,.cms-section-top{display:block}.cms-actions{margin-top:10px;justify-content:flex-start}.cms-item{display:block}.cms-item .cms-actions{margin-top:8px}}
+</style>
+
+<style id="cms-easy-ui">
+.cms-easy-note{padding:14px 16px;border:1px solid rgba(212,175,55,.18);background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(255,255,255,.02));border-radius:14px;color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:14px}.cms-easy-note strong{color:var(--text)}
+.cms-section.easy{border:1px solid rgba(255,255,255,.08);border-radius:16px;margin-bottom:12px;overflow:hidden;background:rgba(255,255,255,.018)}
+.cms-section.easy .cms-section-top{padding:15px 16px;align-items:center}.cms-section.easy .cms-section-top strong{font-size:16px}.cms-easy-items{padding:0 12px 12px}.cms-easy-item{display:flex;align-items:center;gap:12px;padding:12px 13px;margin-top:8px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:rgba(0,0,0,.14)}.cms-easy-thumb{width:54px;height:54px;border-radius:10px;object-fit:cover;background:#171717;flex:0 0 54px;border:1px solid rgba(255,255,255,.08)}.cms-easy-main{min-width:0;flex:1}.cms-easy-main strong{display:block;margin-bottom:4px}.cms-easy-main span{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cms-easy-actions{display:flex;gap:6px;flex-wrap:wrap}.cms-empty-action{padding:12px;color:var(--muted);font-size:13px}
+.cms-quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.cms-quick-card{padding:15px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.02)}.cms-quick-card label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}.cms-quick-card input,.cms-quick-card textarea{width:100%}.cms-preview{margin-top:8px;min-height:90px;border:1px dashed rgba(255,255,255,.12);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#101010;color:var(--muted);font-size:12px}.cms-preview img{display:block;width:100%;max-height:220px;object-fit:cover}.cms-help{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.4}
+@media(max-width:720px){.cms-quick-grid{grid-template-columns:1fr}.cms-easy-item{align-items:flex-start;flex-wrap:wrap}.cms-easy-actions{width:100%;justify-content:flex-end}.cms-easy-thumb{width:48px;height:48px;flex-basis:48px}}
 </style>
 </head>
 <body data-accent="gold">
 
 <div id="loginScreen" class="login">
   <div class="login-card">
-    <div class="login-logo">🦁</div>
+    <div class="login-logo"><span class="leo-lion-logo" aria-label="LEO CONNECT"></span></div>
     <h2>LEO CONNECT</h2>
     <p>COMMAND CENTER • ADMIN ACCESS</p>
     <div class="field"><label>ADMIN E-POSTA</label><input id="loginEmail" type="email" autocomplete="username" placeholder="admin@leoconnect.com.tr"></div>
@@ -233,14 +335,16 @@ a{color:inherit;text-decoration:none}
 
 <div id="app" class="app" style="display:none">
   <aside class="sidebar">
-    <div class="brand"><div class="brand-mark">🦁</div><div><strong>LEO CONNECT</strong><small>COMMAND CENTER</small></div></div>
+    <div class="brand"><div class="brand-mark"><span class="leo-lion-logo" aria-hidden="true"></span></div><div><strong>LEO CONNECT</strong><small>COMMAND CENTER</small></div></div>
     <div class="nav-title">ANA MENÜ</div>
     <nav class="nav">
-      <button class="active" onclick="setActive(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
-      <button onclick="focusBusinesses();setActive(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
+      <button class="active" onclick="showOverview(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
+      <button onclick="showBusinessesManager(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
       <button onclick="showNFCManager(this)"><span class="nav-icon">◉</span><span>NFC Etiketleri</span></button>
       <button onclick="showQRManager(this)"><span class="nav-icon">▣</span><span>QR Merkezi</span></button>
-      <button onclick="focusAnalytics()"><span class="nav-icon">⌁</span><span>Analytics</span></button>
+      <button onclick="showBusinessCardManager(this)"><span class="nav-icon">💳</span><span>Business Card</span></button>
+      <button onclick="focusAnalytics(this)"><span class="nav-icon">⌁</span><span>Analytics</span></button>
+      <button onclick="showWebsiteCMS(this)"><span class="nav-icon">🌐</span><span>Ana Site</span></button>
     </nav>
     <div class="nav-title">SİSTEM</div>
     <nav class="nav">
@@ -387,6 +491,7 @@ let adminToken=localStorage.getItem("admin_token")||"";
 let allBusinesses=[];
 let overview={};
 let currentBusiness=null;
+let currentBusinessV2Settings=null;
 
 let liveTimer=null;
 const liveLabels={profile_view:'Profil görüntülendi',qr_scan:'QR tarandı',qr:'QR etkileşimi',nfc:'NFC dokunuldu',phone:'Telefon tıklandı',whatsapp:'WhatsApp açıldı',instagram:'Instagram açıldı',tiktok:'TikTok açıldı',google_review:'Google yorum açıldı',website:'Website açıldı',menu:'Menü açıldı',location:'Konum açıldı',iban:'IBAN görüntülendi',share:'Profil paylaşıldı'};
@@ -489,7 +594,7 @@ function renderBusinesses(list=allBusinesses){
   if(!list.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty">İşletme bulunamadı.</div></td></tr>';return}
   tbody.innerHTML=list.map(b=>`
     <tr>
-      <td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td>
+      <td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display=&quot;none&quot;"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td>
       <td class="accent">${esc(b.category||"—")}</td>
       <td>${n(b.profile_views)}</td><td>${n(b.qr_scans)}</td><td>${n(b.nfc_scans)}</td>
       <td><span class="badge">${n(b.nfc_tags)} NFC</span></td>
@@ -528,9 +633,44 @@ function filterBusinesses(){
   const q=document.getElementById("businessSearch").value.toLowerCase().trim();
   renderBusinesses(allBusinesses.filter(b=>(b.name+" "+b.email+" "+b.category).toLowerCase().includes(q)));
 }
-function focusBusinesses(){document.getElementById("businessSection").scrollIntoView({behavior:"smooth",block:"start"})}
-function focusAnalytics(){focusBusinesses();showToast("Bir işletme seçip Analytics sekmesini açabilirsin.")}
-function setActive(btn){document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}
+async function showBusinessesManager(btn){
+  if(btn)setActive(btn);
+  showGlobalPage("İşletmeler","Tüm işletmeleri merkezi çalışma alanında yönet.",'<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
+  try{
+    if(!allBusinesses.length){const d=await api("/api/admin/businesses");allBusinesses=d.businesses||d||[];}
+    document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div class="global-row"><div><h3>🏢 İşletme Merkezi</h3><div class="sub">İşletme kayıtları, profil, QR, NFC ve yetkileri buradan yönet.</div></div><button class="btn primary" onclick="newBusiness()">＋ İşletme Ekle</button></div><div class="table-wrap" style="margin-top:14px"><table class="table" style="min-width:760px"><thead><tr><th>İŞLETME</th><th>KATEGORİ</th><th>PROFİL</th><th>QR</th><th>NFC</th><th>ETİKET</th><th>İŞLEM</th></tr></thead><tbody>${allBusinesses.length?allBusinesses.map(b=>`<tr><td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display=&quot;none&quot;"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td><td class="accent">${esc(b.category||"—")}</td><td>${n(b.profile_views)}</td><td>${n(b.qr_scans)}</td><td>${n(b.nfc_scans)}</td><td><span class="badge">${n(b.nfc_tags)} NFC</span></td><td><button class="btn primary" onclick="openBusiness(${Number(b.id)})">Detay ›</button></td></tr>`).join(""):'<tr><td colspan="7"><div class="empty">İşletme bulunamadı.</div></td></tr>'}</tbody></table></div></section>`;
+  }catch(e){document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
+}
+function showOverview(btn){
+  if(btn)setActive(btn);
+  currentBusiness=null;
+  document.getElementById("globalPage").classList.remove("show");
+  document.getElementById("businessPage").classList.remove("show");
+  document.querySelector(".content").style.display="";
+  window.scrollTo(0,0);
+}
+function focusBusinesses(btn){showBusinessesManager(btn);}
+async function focusAnalytics(btn){
+  if(btn)setActive(btn);
+  try{
+    if(!allBusinesses.length){const d=await api("/api/admin/businesses");allBusinesses=d.businesses||d||[];}
+    const rows=allBusinesses||[];
+    const cards=rows.length?rows.map(b=>{
+      const logo=esc(b.logo_url||"");
+      const name=esc(b.name||"İsimsiz");
+      const category=esc(b.category||"—");
+      return '<div class="global-card"><div class="global-row"><div class="global-main"><img src="'+logo+'" style="width:44px;height:44px;border-radius:12px;object-fit:cover;border:1px solid var(--line);background:var(--panel2)" onerror="this.style.display=&quot;none&quot;"><div><div class="global-name">'+name+'</div><div class="global-sub">'+category+' • Profil '+n(b.profile_views)+' • QR '+n(b.qr_scans)+' • NFC '+n(b.nfc_scans)+'</div></div></div><button class="btn primary" onclick="openBusinessAnalytics('+Number(b.id)+')">Analytics\'i Aç ›</button></div></div>';
+    }).join(""):'<div class="empty">İşletme bulunamadı.</div>';
+    showGlobalPage("Analytics","Merkezi analiz alanı.",'<section class="card biz-section"><div class="global-row"><div><h3>Analytics Merkezi</h3><div class="sub">Bir işletme seçerek detaylı performans, QR, NFC ve etkileşim analizini aç.</div></div></div><div class="global-grid" style="margin-top:15px">'+cards+'</div></section>');
+  }catch(e){showGlobalPage("Analytics","Merkezi analiz alanı.",'<div class="global-card"><div class="empty">'+esc(e.message||"Analytics yüklenemedi.")+'</div></div>')}
+}
+async function openBusinessAnalytics(id){
+  await openBusiness(id);
+  const b=document.querySelector('[data-tab="analytics"]');
+  if(b)switchBizTab("analytics",b);
+  window.scrollTo(0,0);
+}
+function setActive(btn){document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));if(btn)btn.classList.add("active")}
 function openModal(){document.getElementById("modalBg").classList.add("show")}
 function closeModal(){document.getElementById("modalBg").classList.remove("show")}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2800)}
@@ -540,25 +680,27 @@ async function copyText(text){try{await navigator.clipboard.writeText(text);show
 async function openBusiness(id){
   try{
     const d=await api("/api/admin/business/"+id);
-    currentBusiness={...d.business,permissions:d.permissions||{profile:true,qr:false,nfc:false,analytics:false},nfc_tags:d.nfc_tags||[]};
+    try{currentBusinessV2Settings=await api("/api/admin/business/"+id+"/v2-settings")}catch(e){currentBusinessV2Settings=null}
+    currentBusiness={...d.business,permissions:d.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:d.nfc_tags||[]};
     document.querySelector(".content").style.display="none";
+    document.getElementById("globalPage").classList.remove("show");
     document.getElementById("businessPage").classList.add("show");
     renderBusinessPage();
-    window.scrollTo({top:0,behavior:"smooth"});
+    window.scrollTo(0,0);
   }catch(e){showToast(e.message)}
 }
 function closeBusinessPage(){
   currentBusiness=null;
   document.getElementById("businessPage").classList.remove("show");
   document.querySelector(".content").style.display="";
-  window.scrollTo({top:0,behavior:"smooth"});
+  window.scrollTo(0,0);
 }
 function renderBusinessPage(){
   const b=currentBusiness,tags=b.nfc_tags||[];
   document.getElementById("businessHero").innerHTML=`
     <div class="business-hero">
       <div class="business-hero-left">
-        <img class="business-hero-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'">
+        <img class="business-hero-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display=&quot;none&quot;">
         <div><div class="eyebrow">İŞLETME YÖNETİMİ</div><h2>${esc(b.name||"İsimsiz")}</h2><p>${esc(b.category||"—")} • /p/${esc(b.slug||"")}</p></div>
       </div>
       <div class="hero-actions">
@@ -663,7 +805,8 @@ async function saveBusinessPage(){
     showToast("İşletme profili güncellendi.");
     await loadAll();
     const d=await api("/api/admin/business/"+id);
-    currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false},nfc_tags:d.nfc_tags||[]};
+    try{currentBusinessV2Settings=await api("/api/admin/business/"+id+"/v2-settings")}catch(e){currentBusinessV2Settings=null}
+    currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:d.nfc_tags||[]};
     renderBusinessPage();
   }catch(e){showToast(e.message)}
 }
@@ -705,7 +848,7 @@ async function createNFC(businessId){
     const d=await api("/api/admin/nfc-tags",{method:"POST",body:JSON.stringify({business_id:businessId,name,placement})});
     closeModal();showToast("NFC etiketi oluşturuldu.");
     const fresh=await api("/api/admin/business/"+businessId);
-    currentBusiness={...fresh.business,permissions:fresh.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false},nfc_tags:fresh.nfc_tags||[]};
+    currentBusiness={...fresh.business,permissions:fresh.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:fresh.nfc_tags||[]};
     renderBusinessPage();
     switchBizTab("nfc",document.querySelector('[data-tab=nfc]'));
     if(d.url)showCreatedNFC(d.url,d);
@@ -733,7 +876,7 @@ async function saveNFCPage(id,businessId){
   try{
     await api("/api/admin/nfc-tags/"+id,{method:"PUT",body:JSON.stringify(body)});
     closeModal();showToast("NFC etiketi güncellendi.");
-    const d=await api("/api/admin/business/"+businessId);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
+    const d=await api("/api/admin/business/"+businessId);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
   }catch(e){showToast(e.message)}
 }
 async function deleteNFCPage(id){
@@ -741,7 +884,7 @@ async function deleteNFCPage(id){
   try{
     await api("/api/admin/nfc-tags/"+id,{method:"DELETE"});
     showToast("NFC etiketi silindi.");
-    const d=await api("/api/admin/business/"+currentBusiness.id);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
+    const d=await api("/api/admin/business/"+currentBusiness.id);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
     switchBizTab("nfc",document.querySelector('[data-tab=nfc]'));
   }catch(e){showToast(e.message)}
 }
@@ -816,7 +959,7 @@ async function loadBizAnalytics(){
 }
 
 function renderBizPermissions(){
-  const b=currentBusiness, p=b.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false};
+  const b=currentBusiness, p=b.permissions||{profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,card:false};
   document.getElementById("bizPermissions").innerHTML=`
     <section class="card biz-section">
       <h3>Erişim İzinleri</h3>
@@ -828,20 +971,65 @@ function renderBizPermissions(){
         <div class="permission-card"><div><strong>Analytics</strong><span>İşletme istatistiklerini görüntüleme</span></div><label class="switch"><input id="perm_analytics" type="checkbox" ${p.analytics?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>🟢 Canlı Takip</strong><span>Son müşteri hareketlerini canlı olarak görüntüleme</span></div><label class="switch"><input id="perm_live" type="checkbox" ${p.live?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>🧠 LEO AI Insights</strong><span>Yapay zekâ destekli işletme raporlarını görüntüleme</span></div><label class="switch"><input id="perm_ai" type="checkbox" ${p.ai?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>⭐ Review Booster</strong><span>Müşterileri Google yorumuna yönlendirme ve memnuniyet akışı</span></div><label class="switch"><input id="perm_review" type="checkbox" ${p.review?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>🚀 Smart Campaigns</strong><span>Kampanya oluşturma, zamanlama ve müşteri profilinde yayınlama</span></div><label class="switch"><input id="perm_campaign" type="checkbox" ${p.campaign?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>💳 Digital Business Card</strong><span>İşletmenin dijital kartvizit modülünü kullanabilsin</span></div><label class="switch"><input id="perm_card" type="checkbox" ${p.card?'checked':''}><span class="slider"></span></label></div>
       </div>
       <div class="modal-actions"><button class="btn primary" onclick="saveBusinessPermissions()">İzinleri Kaydet</button></div>
       <div class="section-sub" style="margin-top:10px">🔒 QR ve NFC varsayılan olarak kapalıdır. Sen açmadıkça işletme panelinde görünmez ve ilgili API'lere erişemez.</div>
+    </section>
+    <section class="card biz-section" style="margin-top:14px">
+      <h3>🎨 Profil Görünümü & Bağlantı Yetkileri</h3>
+      <div class="sub">İşletmenin tema değiştirme hakkını ve hangi dijital bağlantı türlerinin kullanılabileceğini buradan belirle.</div>
+      <div class="permission-grid" style="margin-top:14px">
+        <div class="permission-card"><div><strong>Tema Değiştirme</strong><span>İşletme panelinde 4 tema arasından seçim yapabilsin</span></div><label class="switch"><input id="perm_profile_theme" type="checkbox" ${currentBusinessV2Settings?.theme_permission!==false?'checked':''}><span class="slider"></span></label></div>
+        ${[['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['youtube','YouTube'],['linkedin','LinkedIn'],['x','X'],['whatsapp','WhatsApp'],['google','Google'],['website','Website'],['yemeksepeti','Yemeksepeti'],['getir','Getir'],['trendyol-yemek','Trendyol Yemek'],['migros-yemek','Migros Yemek'],['rezervasyon','Rezervasyon'],['bilet','Bilet / Etkinlik'],['menu','Online Menü'],['location','Konum'],['tripadvisor','Tripadvisor'],['booking','Booking'],['telegram','Telegram'],['email','E-posta']].map(([k,l])=>`<div class="permission-card"><div><strong>${l}</strong><span>Profil bağlantısı olarak kullanılabilsin</span></div><label class="switch"><input id="perm_social_${k}" type="checkbox" ${currentBusinessV2Settings?.allowed_platforms?.[k]!==false?'checked':''}><span class="slider"></span></label></div>`).join('')}
+      </div>
+      <div style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)">
+        <div style="font-size:11px;font-weight:800">İşletmenin Aktif Teması</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px">Admin buradan işletmenin müşteriye görünen profil temasını doğrudan seçebilir.</div>
+        <div class="permission-grid" style="margin-top:10px">
+          ${[['midnight-gold','Midnight Gold','Siyah / altın'],['obsidian','Obsidian','Ultra dark / tech'],['champagne','Champagne','Sıcak / lüks'],['pure-light','Pure Light','Aydınlık / premium']].map(([k,l,d])=>`<button type="button" class="btn ${currentBusinessV2Settings?.theme===k?'primary':''}" onclick="adminSetBusinessTheme('${k}')">${l}<span style="display:block;font-size:8px;opacity:.7;margin-top:3px">${d}</span></button>`).join('')}
+        </div>
+      </div>
+      <div class="modal-actions"><button class="btn primary" onclick="saveBusinessV2ProfilePermissions()">Profil Yetkilerini Kaydet</button></div>
     </section>`;
 }
 async function saveBusinessPermissions(){
   const id=currentBusiness.id;
-  const permissions={profile:document.getElementById("perm_profile").checked,qr:document.getElementById("perm_qr").checked,nfc:document.getElementById("perm_nfc").checked,analytics:document.getElementById("perm_analytics").checked,live:document.getElementById("perm_live").checked,ai:document.getElementById("perm_ai").checked};
+  const permissions={profile:document.getElementById("perm_profile").checked,qr:document.getElementById("perm_qr").checked,nfc:document.getElementById("perm_nfc").checked,analytics:document.getElementById("perm_analytics").checked,live:document.getElementById("perm_live").checked,ai:document.getElementById("perm_ai").checked,review:document.getElementById("perm_review").checked,campaign:document.getElementById("perm_campaign").checked,card:document.getElementById("perm_card").checked};
   try{
     const d=await api("/api/admin/business/"+id+"/permissions",{method:"PUT",body:JSON.stringify(permissions)});
     currentBusiness.permissions=d.permissions||permissions;
     showToast("Erişim izinleri güncellendi.");
     renderBusinessPage();
     switchBizTab("permissions",document.querySelector('[data-tab=permissions]'));
+  }catch(e){showToast(e.message)}
+}
+
+
+
+async function adminSetBusinessTheme(theme){
+  if(!currentBusiness)return;
+  try{
+    const d=await api("/api/admin/business/"+currentBusiness.id+"/theme",{method:"PUT",body:JSON.stringify({theme,accent_color:"#D4AF37"})});
+    currentBusinessV2Settings={...(currentBusinessV2Settings||{}),theme:d.theme||theme,accent_color:d.accent_color||"#D4AF37"};
+    showToast((d.theme_name||theme)+" teması işletmeye uygulandı.");
+    renderBizPermissions();
+  }catch(e){showToast(e.message)}
+}
+
+async function saveBusinessV2ProfilePermissions(){
+  if(!currentBusiness)return;
+  try{
+    const allowed={};
+    ['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google','website','yemeksepeti','getir','trendyol-yemek','migros-yemek','rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email'].forEach(k=>allowed[k]=document.getElementById('perm_social_'+k)?.checked!==false);
+    const themeAllowed=document.getElementById('perm_profile_theme')?.checked!==false;
+    const d=await api("/api/admin/business/"+currentBusiness.id+"/theme-permission",{method:"PUT",body:JSON.stringify({allowed:themeAllowed})});
+    const s=await api("/api/admin/business/"+currentBusiness.id+"/social-platform-permissions",{method:"PUT",body:JSON.stringify({allowed_platforms:allowed})});
+    currentBusinessV2Settings={...(currentBusinessV2Settings||{}),theme_permission:d.theme_permission!==false,allowed_platforms:s.allowed_platforms||allowed};
+    showToast("Profil görünüm ve bağlantı yetkileri kaydedildi.");
+    renderBizPermissions();
   }catch(e){showToast(e.message)}
 }
 
@@ -875,7 +1063,7 @@ async function showQR(id){
 function closeGlobalPage(){
   document.getElementById("globalPage").classList.remove("show");
   document.querySelector(".content").style.display="";
-  window.scrollTo({top:0,behavior:"smooth"});
+  window.scrollTo(0,0);
 }
 function showGlobalPage(title,subtitle,html){
   document.querySelector(".content").style.display="none";
@@ -885,7 +1073,7 @@ function showGlobalPage(title,subtitle,html){
   document.getElementById("globalSubtitle").textContent=subtitle;
   document.getElementById("globalContent").innerHTML=html;
   document.getElementById("globalPage").classList.add("show");
-  window.scrollTo({top:0,behavior:"smooth"});
+  window.scrollTo(0,0);
 }
 async function showNFCManager(btn){
   if(btn)setActive(btn);
@@ -911,6 +1099,56 @@ async function deleteGlobalNFC(id){
   if(!confirm("Bu NFC etiketini silmek istediğine emin misin?"))return;
   try{await api("/api/admin/nfc-tags/"+id,{method:"DELETE"});showToast("NFC etiketi silindi.");await showNFCManager();}catch(e){showToast(e.message)}
 }
+
+const CARD_PERSON_FIELDS=[
+ ['display_name','Kart Başlığı'],['person_name','Ad Soyad'],['job_title','Unvan'],['company','Şirket / Kurum'],
+ ['phone','Telefon'],['whatsapp','WhatsApp'],['email','E-posta'],['website','Web Sitesi'],['address','Adres'],
+ ['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['linkedin','LinkedIn'],['youtube','YouTube'],['x','X / Twitter'],
+ ['photo_url','Profil Fotoğrafı'],['cover_url','Kapak Görseli'],['bio','Hakkımda'],['note','Not / Kısa Açıklama']
+];
+async function showBusinessCardManager(btn){
+  if(btn)setActive(btn);
+  showGlobalPage('Business Card','İşletmelerden bağımsız kişisel dijital kartvizitleri yönet.','<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
+  try{
+    const d=await api('/api/admin/card-people'), rows=Array.isArray(d.people)?d.people:[];
+    document.getElementById('globalContent').innerHTML=`
+      <section class="card biz-section">
+        <div class="global-row"><div><h3>💳 Kişisel Business Card Merkezi</h3><div class="sub">Her kişi bağımsız bir karta sahiptir. İşletme kaydı gerekmez.</div></div><button class="btn primary" onclick="newCardPerson()">＋ Kişi Ekle</button></div>
+        <div class="global-grid" style="margin-top:15px">${rows.length?rows.map(p=>{const count=CARD_PERSON_FIELDS.filter(([k])=>p.permissions?.[k]===true).length; const d=p.data||{};return `<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">👤</div><div><div class="global-name">${esc(d.person_name||d.display_name||'İsimsiz')}</div><div class="global-sub">${esc(d.company||'Kişisel Kart')} • /card/${esc(p.slug||'')}</div><div class="global-sub">${p.email?esc(p.email)+' • ':''}${count}/${CARD_PERSON_FIELDS.length} alan yetkili</div></div></div><div class="modal-actions"><span class="badge">${p.enabled?'AKTİF':'KAPALI'}</span><button class="btn primary" onclick="editCardPerson(${Number(p.id)})">Yönet</button>${p.enabled?`<button class="btn" onclick="window.open('/card/${encodeURIComponent(p.slug||'')}','_blank')">Kartı Gör ↗</button>`:''}</div></div></div>`}).join(''):'<div class="empty">Henüz Business Card kişisi oluşturulmadı.</div>'}</div>
+      </section>`;
+  }catch(e){document.getElementById('globalContent').innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
+}
+function newCardPerson(){
+  document.getElementById('modalTitle').textContent='💳 Yeni Business Card Kişisi';
+  document.getElementById('modalBody').innerHTML=`<div class="form-grid"><div class="form-field full"><label>AD SOYAD</label><input id="cp_name" name="card_person_name" autocomplete="name" required placeholder="Örn. Tayfun Timrus"></div><div class="form-field"><label>GİRİŞ E-POSTASI (OPSİYONEL)</label><input id="cp_email" name="card_person_email" type="email" autocomplete="email" placeholder="kart sahibi giriş yapacaksa"></div><div class="form-field"><label>GEÇİCİ ŞİFRE (OPSİYONEL)</label><input id="cp_password" name="card_person_password" type="password" autocomplete="new-password" placeholder="En az 8 karakter"></div></div><div class="section-sub" style="margin-top:12px">Kişi oluşturulduktan sonra hangi alanları düzenleyebileceğini ayrıca belirleyebilirsin.</div><div class="modal-actions"><button type="button" class="btn primary" onclick="createCardPerson(this)">Kişiyi Oluştur</button><button type="button" class="btn" onclick="closeModal()">Vazgeç</button></div>`;
+  openModal();
+  setTimeout(()=>document.getElementById('cp_name')?.focus(),50);
+}
+async function createCardPerson(button){
+  const modal=button?.closest('.modal') || document.getElementById('modalBody');
+  const nameInput=modal?.querySelector('#cp_name');
+  const emailInput=modal?.querySelector('#cp_email');
+  const passwordInput=modal?.querySelector('#cp_password');
+  const name=(nameInput?.value || '').trim();
+  const email=(emailInput?.value || '').trim();
+  const password=passwordInput?.value || '';
+  if(!name){showToast('Ad Soyad gerekli.');nameInput?.focus();return}
+  if(password && password.length<8){showToast('Şifre en az 8 karakter olmalı.');passwordInput?.focus();return}
+  try{
+    await api('/api/admin/card-people',{method:'POST',body:JSON.stringify({email,password,data:{person_name:name,display_name:name},enabled:true})});
+    closeModal();
+    showToast('Business Card kişisi oluşturuldu.');
+    await showBusinessCardManager();
+  }catch(e){showToast(e.message)}
+}
+async function editCardPerson(id){
+  try{const d=await api('/api/admin/card-people/'+id),p=d.person||{},data=p.data||{},perms=p.permissions||{};document.getElementById('modalTitle').textContent='💳 Business Card • '+(data.person_name||'Kişi');document.getElementById('modalBody').innerHTML=`<div class="detail-box"><small>PUBLIC KART</small><strong style="display:block;margin-top:5px;word-break:break-all">/card/${esc(p.slug||'')}</strong></div><div class="form-grid" style="margin-top:14px"><div class="form-field"><label>E-POSTA</label><input id="cp_edit_email" value="${esc(p.email||'')}"></div><div class="form-field"><label>YENİ ŞİFRE</label><input id="cp_edit_password" type="password" placeholder="Değiştirmek istemiyorsan boş bırak"></div></div><div class="section-sub" style="margin:14px 0 8px"><strong>Alan bazlı işlem yetkileri</strong><br>Kapalı alan kişi tarafından değiştirilemez ve public kartta gösterilmez.</div><div class="permission-grid">${CARD_PERSON_FIELDS.map(([k,l])=>`<div class="permission-card"><div><strong>${esc(l)}</strong><span>${data[k]?'İçerik mevcut':'İçerik henüz girilmedi'}</span></div><label class="switch"><input class="cp-perm" data-field="${k}" type="checkbox" ${perms[k]===true?'checked':''}><span class="slider"></span></label></div>`).join('')}</div><div class="permission-card" style="margin-top:12px"><div><strong>Kart aktif</strong><span>Public kartı erişilebilir yapar.</span></div><label class="switch"><input id="cp_enabled" type="checkbox" ${p.enabled?'checked':''}><span class="slider"></span></label></div><div class="modal-actions"><button class="btn primary" onclick="saveCardPerson(${Number(id)})">Kaydet</button><button class="btn" onclick="deleteCardPerson(${Number(id)})">Kişiyi Sil</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal();}catch(e){showToast(e.message)}
+}
+async function saveCardPerson(id){
+  try{const d=await api('/api/admin/card-people/'+id),existing=d.person||{},permissions={};document.querySelectorAll('.cp-perm').forEach(x=>permissions[x.dataset.field]=x.checked===true);const data={...(existing.data||{})};await api('/api/admin/card-people/'+id,{method:'PUT',body:JSON.stringify({email:document.getElementById('cp_edit_email').value.trim(),password:document.getElementById('cp_edit_password').value,enabled:document.getElementById('cp_enabled').checked,data,permissions})});closeModal();showToast('Business Card yetkileri güncellendi.');await showBusinessCardManager();}catch(e){showToast(e.message)}
+}
+async function deleteCardPerson(id){if(!confirm('Bu kişisel Business Card kaydını silmek istediğine emin misin?'))return;try{await api('/api/admin/card-people/'+id,{method:'DELETE'});closeModal();showToast('Kişisel kart silindi.');await showBusinessCardManager();}catch(e){showToast(e.message)}}
+
 async function showQRManager(btn){
   if(btn)setActive(btn);
   showGlobalPage("QR Merkezi","Tüm işletmelerin mevcut QR kodlarını tek merkezden yönet.",'<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
@@ -919,6 +1157,188 @@ async function showQRManager(btn){
     document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div><h3>Merkezi QR Yönetimi</h3><div class="sub">Mevcut slug ve QR adresleri korunur.</div></div><div class="global-grid" style="margin-top:15px">${biz.length?biz.map(b=>`<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">▣</div><div><div class="global-name">${esc(b.name||"İsimsiz")}</div><div class="global-sub">${esc(b.category||"—")} • /p/${esc(b.slug||"")} • ${n(b.qr_scans)} tarama</div></div></div><div class="modal-actions"><button class="btn primary" onclick="showQR(${Number(b.id)})">QR'ı Gör</button><button class="btn" onclick="openBusiness(${Number(b.id)})">İşletmeye Git</button></div></div>`).join(""):'<div class="empty">İşletme bulunamadı.</div>'}</div></section>`;
   }catch(e){document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
 }
+
+async function showWebsiteCMS(btn){
+  if(btn)setActive(btn);
+  showGlobalPage("Ana Site Yönetimi","leoconnect.com.tr kurumsal web sitesinin tüm içeriğini buradan yönet.",'<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
+  try{await renderWebsiteCMS()}catch(e){document.getElementById('globalContent').innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
+}
+async function renderWebsiteCMS(){
+  const [sd,ss]=await Promise.all([api('/api/admin/website/settings'),api('/api/admin/website/sections')]);
+  const settings=sd.settings||{}; const sections=ss.sections||[];
+  const settingsFields=['site_name','site_tagline','seo_title','seo_description','favicon_url','logo_url','primary_color','secondary_color','contact_email','contact_phone','contact_whatsapp','contact_instagram','contact_facebook','contact_linkedin','contact_website','contact_address','contact_map_url','contact_hours','footer_text'];
+  const labels={site_name:'Site adı',site_tagline:'Slogan',seo_title:'SEO başlığı',seo_description:'SEO açıklaması',favicon_url:'Favicon URL',logo_url:'Logo URL',primary_color:'Ana renk',secondary_color:'Arka plan rengi',contact_email:'E-posta',contact_phone:'Telefon',contact_whatsapp:'WhatsApp',contact_instagram:'Instagram',contact_facebook:'Facebook',contact_linkedin:'LinkedIn',contact_website:'Web sitesi',contact_address:'Adres',contact_map_url:'Google Maps / Harita linki',contact_hours:'Çalışma saatleri',footer_text:'Footer metni'};
+  document.getElementById('globalContent').innerHTML=`<div class="cms-wrap">
+    <div class="cms-easy-note"><strong>🦁 Buradan sitenin içeriğini yönetiyorsun.</strong><br>Teknik ayarlara girmene gerek yok. Bir bölümün içeriğini değiştirmek için <b>Düzenle</b>, yeni kategori eklemek için <b>＋ Kategori Ekle</b>, kategorinin içine ürün eklemek için <b>Yönet → ＋ Ürün Ekle</b> kullan.</div>
+    <section class="cms-card"><div class="cms-head"><div><div class="cms-kicker">WEBSITE YÖNETİMİ</div><h3>Site Ayarları</h3><div class="sub">Ana sitenin marka, iletişim, SEO ve footer bilgilerini buradan yönet.</div></div><button class="btn primary" onclick="saveWebsiteSettings()">Değişiklikleri Kaydet</button></div><div style="margin-top:14px;display:grid;gap:14px">
+      <details open class="cms-subpanel"><summary style="cursor:pointer;color:var(--text);font-weight:800;padding:10px 2px">🎯 Marka & Görünüm</summary><div class="cms-grid" style="margin-top:8px">${['site_name','site_tagline','logo_url','favicon_url','primary_color','secondary_color'].map(k=>`<div class="cms-field"><label>${labels[k]}</label><input id="cms_set_${k}" value="${esc(settings[k]||'')}"></div>`).join('')}</div></details>
+      <details open class="cms-subpanel"><summary style="cursor:pointer;color:var(--text);font-weight:800;padding:10px 2px">📞 İletişim Merkezi</summary><div class="cms-grid" style="margin-top:8px">${['contact_phone','contact_whatsapp','contact_email','contact_website','contact_instagram','contact_facebook','contact_linkedin','contact_address','contact_map_url','contact_hours'].map(k=>`<div class="cms-field ${k==='contact_address'||k==='contact_map_url'||k==='contact_hours'?'full':''}"><label>${labels[k]}</label>${k==='contact_address'||k==='contact_hours'?`<textarea id="cms_set_${k}">${esc(settings[k]||'')}</textarea>`:`<input id="cms_set_${k}" value="${esc(settings[k]||'')}">`}</div>`).join('')}</div><div class="cms-easy-note" style="margin-top:10px"><strong>Canlı sitede otomatik kullanılır.</strong><br>Telefon, WhatsApp, e-posta, sosyal hesaplar, adres, harita ve çalışma saatleri İletişim sayfasına yansır.</div></details>
+      <details class="cms-subpanel"><summary style="cursor:pointer;color:var(--text);font-weight:800;padding:10px 2px">🔎 SEO & Footer</summary><div class="cms-grid" style="margin-top:8px">${['seo_title','seo_description','footer_text'].map(k=>`<div class="cms-field full"><label>${labels[k]}</label><textarea id="cms_set_${k}">${esc(settings[k]||'')}</textarea></div>`).join('')}</div></details>
+    </div></section>
+    <section class="cms-card"><div class="cms-head"><div><div class="cms-kicker">SİTE İÇERİĞİ</div><h3>Bölümler</h3><div class="sub">Standlar, platform, nasıl çalışır ve diğer alanlar.</div></div><button class="btn" onclick="newWebsiteSection()">＋ Bölüm Ekle</button></div><div style="margin-top:14px">${sections.map(section=>`<div class="cms-section easy"><div class="cms-section-top"><div><strong>${esc(section.title||section.section_key)}</strong><div class="sub" style="margin-top:4px">${esc(section.subtitle||section.description||'')}</div></div><div class="cms-actions"><span class="badge">${section.enabled?'YAYINDA':'GİZLİ'}</span><button class="btn" onclick="editWebsiteSection(${Number(section.id)})">Bölümü Düzenle</button><button class="btn primary" onclick="newWebsiteItem(${Number(section.id)})">${section.section_key==='stands'?'＋ Kategori Ekle':'＋ İçerik'}</button></div></div><div id="cms_items_${Number(section.id)}" class="cms-easy-items"><div class="cms-empty-action">İçerikler yükleniyor…</div></div></div>`).join('')}</div></section>
+    <section class="cms-card"><div class="cms-head"><div><div class="cms-kicker">ÖNİZLEME</div><h3>Siteyi Gör</h3><div class="sub">Kaydettiğin içerikleri canlı sitede kontrol et.</div></div><button class="btn primary" onclick="window.open('/', '_blank')">Siteyi Aç ↗</button></div></section>
+  </div>`;
+  await Promise.all(sections.map(async s=>{try{const d=await api('/api/admin/website/sections/'+s.id+'/items');const el=document.getElementById('cms_items_'+s.id);const items=d.items||[];if(!el)return;el.innerHTML=items.length?items.map(i=>renderWebsiteItemRow(i,s)).join(''):'<div class="cms-empty-action">Bu bölümde henüz içerik yok. <button class="btn primary" style="margin-left:8px" onclick="newWebsiteItem('+Number(s.id)+')">'+(s.section_key==='stands'?'＋ İlk Ürünü Ekle':'＋ İlk İçeriği Ekle')+'</button></div>'}catch(e){const el=document.getElementById('cms_items_'+s.id);if(el)el.innerHTML='<div class="cms-empty-action">İçerikler alınamadı.</div>'}}));
+}
+function cmsInput(id,label,value,full=false){return `<div class="cms-field ${full?'full':''}"><label>${label}</label><input id="${id}" value="${esc(value||'')}"></div>`}
+function cmsArea(id,label,value,full=true){return `<div class="cms-field ${full?'full':''}"><label>${label}</label><textarea id="${id}">${esc(value||'')}</textarea></div>`}
+async function saveWebsiteSettings(){
+  const keys=['site_name','site_tagline','seo_title','seo_description','favicon_url','logo_url','primary_color','secondary_color','contact_email','contact_phone','contact_whatsapp','contact_instagram','contact_facebook','contact_linkedin','contact_website','contact_address','contact_map_url','contact_hours','footer_text'];
+  const body=Object.fromEntries(keys.map(k=>[k,document.getElementById('cms_set_'+k)?.value||'']));
+  try{await api('/api/admin/website/settings',{method:'PUT',body:JSON.stringify(body)});showToast('Ana site ayarları kaydedildi.');await renderWebsiteCMS()}catch(e){showToast(e.message)}
+}
+async function newWebsiteSection(){
+  document.getElementById('modalTitle').textContent='Yeni Site Bölümü';
+  document.getElementById('modalBody').innerHTML=`<div class="cms-grid">${cmsInput('ws_key','Bölüm anahtarı','custom-section')}${cmsInput('ws_title','Başlık','Yeni Bölüm')}${cmsInput('ws_sub','Alt başlık','')}${cmsInput('ws_sort','Sıra','100')}${cmsArea('ws_desc','Açıklama','')}<label class="cms-check"><input id="ws_enabled" type="checkbox" checked> Yayında</label></div><div class="modal-actions"><button class="btn primary" onclick="createWebsiteSection()">Oluştur</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal();
+}
+async function createWebsiteSection(){try{await api('/api/admin/website/sections',{method:'POST',body:JSON.stringify({section_key:document.getElementById('ws_key').value,title:document.getElementById('ws_title').value,subtitle:document.getElementById('ws_sub').value,description:document.getElementById('ws_desc').value,sort_order:Number(document.getElementById('ws_sort').value),enabled:document.getElementById('ws_enabled').checked})});closeModal();showToast('Bölüm oluşturuldu.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+async function editWebsiteSection(id){const d=await api('/api/admin/website/sections');const s=(d.sections||[]).find(x=>Number(x.id)===Number(id));if(!s)return;document.getElementById('modalTitle').textContent='Bölüm Düzenle';document.getElementById('modalBody').innerHTML=`<div class="cms-grid">${cmsInput('es_title','Başlık',s.title)}${cmsInput('es_sub','Alt başlık',s.subtitle)}${cmsInput('es_sort','Sıra',s.sort_order)}${cmsArea('es_desc','Açıklama',s.description)}<label class="cms-check"><input id="es_enabled" type="checkbox" ${s.enabled?'checked':''}> Yayında</label></div><div class="modal-actions"><button class="btn primary" onclick="updateWebsiteSection(${id})">Kaydet</button><button class="btn" onclick="deleteWebsiteSection(${id})">Bölümü Sil</button></div>`;openModal()}
+async function updateWebsiteSection(id){try{await api('/api/admin/website/sections/'+id,{method:'PUT',body:JSON.stringify({title:document.getElementById('es_title').value,subtitle:document.getElementById('es_sub').value,description:document.getElementById('es_desc').value,sort_order:Number(document.getElementById('es_sort').value),enabled:document.getElementById('es_enabled').checked})});closeModal();showToast('Bölüm kaydedildi.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+async function deleteWebsiteSection(id){if(!confirm('Bu bölümü ve içindeki içerikleri silmek istediğine emin misin?'))return;try{await api('/api/admin/website/sections/'+id,{method:'DELETE'});closeModal();showToast('Bölüm silindi.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+function websiteSlug(value){return String(value||'').toLowerCase().trim().replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,70)||('icerik-'+Date.now())}
+function imagePreview(inputId,previewId){const v=document.getElementById(inputId)?.value?.trim()||'';const el=document.getElementById(previewId);if(!el)return;el.innerHTML=v?`<img src="${esc(v)}" onerror="this.parentElement.innerHTML='<span>Görsel açılamadı. URL\'yi kontrol et.</span>'" alt="">`:'<span>Görsel önizlemesi burada görünecek</span>'}
+function productContent(found){
+  const c=(found&&found.content&&typeof found.content==='object'&&!Array.isArray(found.content))?found.content:{};
+  return {price:String(c.price||''),material:String(c.material||''),dimensions:String(c.dimensions||''),color:String(c.color||''),badge:String(c.badge||''),gallery:Array.isArray(c.gallery)?c.gallery.filter(Boolean):[],features:Array.isArray(c.features)?c.features.filter(Boolean):[]};
+}
+function productGalleryText(c){return (c.gallery||[]).join('\n')}
+function productFeaturesText(c){return (c.features||[]).join('\n')}
+function productForm(prefix,found){
+  const c=productContent(found), title=found?.title||'', short=found?.short_text||'', desc=found?.description||'', image=found?.image_url||'', btn=found?.button_text||'Detayları İncele', url=found?.button_url||'#';
+  return `<div class="product-cms">
+    <div class="product-section-note"><strong>🦁 Ürün vitrini</strong><br>Bu ürünü ana sitendeki vitrine ekliyorsun. Ana fotoğraf, galeri ve ürün özelliklerini doldurman yeterli. Teknik alanlarla uğraşmana gerek yok.</div>
+    <div class="product-hero">
+      <div class="product-field"><label>ÜRÜN ADI</label><input id="${prefix}_title" value="${esc(title)}" placeholder="Örn. Premium Ahşap Masa Standı"></div>
+      <div class="product-field"><label>VİTRİN ETİKETİ</label><input id="${prefix}_badge" value="${esc(c.badge)}" placeholder="Örn. Premium • En Çok Tercih Edilen"></div>
+      <div class="product-field full"><label>KISA AÇIKLAMA</label><input id="${prefix}_short" value="${esc(short)}" placeholder="Kartta görünecek kısa açıklama"></div>
+      <div class="product-field full"><label>DETAYLI AÇIKLAMA</label><textarea id="${prefix}_desc" placeholder="Ürünün müşteriye anlatılmasını istediğin tüm detayları yaz…">${esc(desc)}</textarea></div>
+      <div class="product-field full"><label>ANA FOTOĞRAF</label><input id="${prefix}_image" value="${esc(image)}" placeholder="Görsel bağlantısını yapıştır" oninput="imagePreview('${prefix}_image','${prefix}_preview')"><div id="${prefix}_preview" class="product-preview">${image?`<img src="${esc(image)}" onerror="this.parentElement.innerHTML='<span>Görsel açılamadı.</span>'" alt="">`:'<span>Ana ürün görseli burada görünecek</span>'}</div></div>
+      <div class="product-field full"><label>FOTOĞRAF GALERİSİ — HER SATIRA 1 GÖRSEL</label><textarea id="${prefix}_gallery" placeholder="https://...\nhttps://...\nhttps://...">${esc(productGalleryText(c))}</textarea><div class="product-help">Birden fazla ürün fotoğrafını burada alt alta ekleyebilirsin.</div></div>
+      <div class="product-field"><label>FİYAT (İSTEĞE BAĞLI)</label><input id="${prefix}_price" value="${esc(c.price)}" placeholder="Örn. Teklif Al"></div>
+      <div class="product-field"><label>MALZEME</label><input id="${prefix}_material" value="${esc(c.material)}" placeholder="Örn. Ahşap / Pleksi"></div>
+      <div class="product-field"><label>ÖLÇÜ</label><input id="${prefix}_dimensions" value="${esc(c.dimensions)}" placeholder="Örn. 10 × 15 cm"></div>
+      <div class="product-field"><label>RENK</label><input id="${prefix}_color" value="${esc(c.color)}" placeholder="Örn. Siyah / Şeffaf / Ahşap"></div>
+      <div class="product-field full"><label>ÖZELLİKLER — HER SATIRA 1 ÖZELLİK</label><textarea id="${prefix}_features" placeholder="QR + NFC destekli\nPremium malzeme\nKolay temizlenebilir">${esc(productFeaturesText(c))}</textarea></div>
+      <div class="product-field"><label>BUTON YAZISI</label><input id="${prefix}_btn" value="${esc(btn)}" placeholder="Detayları İncele"></div>
+      <div class="product-field"><label>BUTON / İLETİŞİM LİNKİ</label><input id="${prefix}_url" value="${esc(url)}" placeholder="#contact veya https://..."></div>
+    </div>
+    <div class="product-switches"><label class="product-chip"><input id="${prefix}_enabled" type="checkbox" ${found?.enabled!==false?'checked':''}> Yayında</label><label class="product-chip"><input id="${prefix}_featured" type="checkbox" ${found?.featured?'checked':''}> ⭐ Öne çıkar</label></div>
+  </div>`;
+}
+function collectProduct(prefix){
+  const gallery=(document.getElementById(prefix+'_gallery')?.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,20);
+  const features=(document.getElementById(prefix+'_features')?.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,30);
+  return {title:document.getElementById(prefix+'_title')?.value.trim()||'',short_text:document.getElementById(prefix+'_short')?.value.trim()||'',description:document.getElementById(prefix+'_desc')?.value.trim()||'',image_url:document.getElementById(prefix+'_image')?.value.trim()||'',button_text:document.getElementById(prefix+'_btn')?.value.trim()||'Detayları İncele',button_url:document.getElementById(prefix+'_url')?.value.trim()||'#contact',enabled:document.getElementById(prefix+'_enabled')?.checked!==false,featured:document.getElementById(prefix+'_featured')?.checked===true,content:{price:document.getElementById(prefix+'_price')?.value.trim()||'',material:document.getElementById(prefix+'_material')?.value.trim()||'',dimensions:document.getElementById(prefix+'_dimensions')?.value.trim()||'',color:document.getElementById(prefix+'_color')?.value.trim()||'',badge:document.getElementById(prefix+'_badge')?.value.trim()||'',gallery,features}};
+}
+function standCategoryContent(item){
+  const c=(item&&item.content&&typeof item.content==='object'&&!Array.isArray(item.content))?item.content:{};
+  return {products:Array.isArray(c.products)?c.products:[]};
+}
+function renderStandCategoryRow(i){
+  const c=standCategoryContent(i), count=c.products.length;
+  return `<div class="cms-easy-item product-row">
+    <div class="product-thumb-wrap">${i.image_url?`<img src="${esc(i.image_url)}" onerror="this.style.display='none'" alt="">`:'<div class="product-thumb-empty">＋</div>'}</div>
+    <div class="cms-easy-main"><strong>${esc(i.title||'Kategori')}</strong><span>${esc(i.short_text||'Ürün kategorisi')}</span><div class="product-meta"><span>🛍️ ${count} ürün</span>${i.featured?'<span>⭐ Öne çıkan</span>':''}</div></div>
+    <div class="cms-easy-actions"><span class="badge">${i.enabled?'YAYINDA':'GİZLİ'}</span><button class="btn primary" onclick="manageStandCategory(${Number(i.id)})">Yönet</button><button class="btn" onclick="deleteWebsiteItem(${Number(i.id)})">Sil</button></div>
+  </div>`;
+}
+function renderWebsiteItemRow(i,s){
+  const isProduct=s.section_key==='stands';
+  if(isProduct) return renderStandCategoryRow(i);
+  return `<div class="cms-easy-item"><div class="cms-easy-main"><strong>${esc(i.title||'İçerik')}</strong><span>${esc(i.short_text||i.description||'Açıklama eklenmemiş.')}</span></div><div class="cms-easy-actions"><span class="badge">${i.enabled?'YAYINDA':'GİZLİ'}</span><button class="btn" onclick="editWebsiteItem(${Number(i.id)})">Düzenle</button><button class="btn" onclick="deleteWebsiteItem(${Number(i.id)})">Sil</button></div></div>`;
+}
+function productEntryForm(prefix,p={}){
+  const c={price:'',material:'',dimensions:'',color:'',badge:'',gallery:[],features:[],...(p.content||{})};
+  const gallery=Array.isArray(c.gallery)?c.gallery:[], features=Array.isArray(c.features)?c.features:[];
+  return `<div class="product-cms nested-product-form">
+    <div class="product-hero">
+      <div class="product-field"><label>ÜRÜN ADI</label><input id="${prefix}_title" value="${esc(p.title||'')}" placeholder="Örn. Premium Siyah Masa Standı"></div>
+      <div class="product-field"><label>VİTRİN ETİKETİ</label><input id="${prefix}_badge" value="${esc(c.badge||'')}" placeholder="Premium • Yeni"></div>
+      <div class="product-field full"><label>KISA AÇIKLAMA</label><input id="${prefix}_short" value="${esc(p.short_text||'')}" placeholder="Vitrinde görünecek kısa açıklama"></div>
+      <div class="product-field full"><label>DETAYLI AÇIKLAMA</label><textarea id="${prefix}_desc" placeholder="Ürünü müşteriye anlat…">${esc(p.description||'')}</textarea></div>
+      <div class="product-field full"><label>ANA FOTOĞRAF URL</label><input id="${prefix}_image" value="${esc(p.image_url||'')}" oninput="imagePreview('${prefix}_image','${prefix}_preview')"><div id="${prefix}_preview" class="product-preview">${p.image_url?`<img src="${esc(p.image_url)}" alt="">`:'<span>Fotoğraf önizlemesi</span>'}</div></div>
+      <div class="product-field full"><label>GALERİ — HER SATIRA 1 FOTOĞRAF URL</label><textarea id="${prefix}_gallery" placeholder="https://...">${esc(gallery.join('\n'))}</textarea></div>
+      <div class="product-field"><label>FİYAT</label><input id="${prefix}_price" value="${esc(c.price||'')}" placeholder="Teklif Al"></div>
+      <div class="product-field"><label>MALZEME</label><input id="${prefix}_material" value="${esc(c.material||'')}" placeholder="Pleksi / Ahşap"></div>
+      <div class="product-field"><label>ÖLÇÜ</label><input id="${prefix}_dimensions" value="${esc(c.dimensions||'')}" placeholder="10 × 15 cm"></div>
+      <div class="product-field"><label>RENK</label><input id="${prefix}_color" value="${esc(c.color||'')}" placeholder="Siyah / Şeffaf"></div>
+      <div class="product-field full"><label>ÖZELLİKLER — HER SATIRA 1 ÖZELLİK</label><textarea id="${prefix}_features" placeholder="QR + NFC destekli\nPremium malzeme">${esc(features.join('\n'))}</textarea></div>
+      <div class="product-field"><label>BUTON YAZISI</label><input id="${prefix}_btn" value="${esc(p.button_text||'Detayları İncele')}" placeholder="Detayları İncele"></div>
+      <div class="product-field"><label>BUTON LİNKİ</label><input id="${prefix}_url" value="${esc(p.button_url||'#contact')}" placeholder="#contact"></div>
+    </div>
+    <div class="product-switches"><label class="product-chip"><input id="${prefix}_enabled" type="checkbox" ${p.enabled!==false?'checked':''}> Yayında</label><label class="product-chip"><input id="${prefix}_featured" type="checkbox" ${p.featured?'checked':''}> ⭐ Öne çıkar</label></div>
+  </div>`;
+}
+function collectNestedProduct(prefix){
+  const gallery=(document.getElementById(prefix+'_gallery')?.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,20);
+  const features=(document.getElementById(prefix+'_features')?.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,30);
+  return {id:'prod-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),title:document.getElementById(prefix+'_title')?.value.trim()||'',short_text:document.getElementById(prefix+'_short')?.value.trim()||'',description:document.getElementById(prefix+'_desc')?.value.trim()||'',image_url:document.getElementById(prefix+'_image')?.value.trim()||'',button_text:document.getElementById(prefix+'_btn')?.value.trim()||'Detayları İncele',button_url:document.getElementById(prefix+'_url')?.value.trim()||'#contact',enabled:document.getElementById(prefix+'_enabled')?.checked!==false,featured:document.getElementById(prefix+'_featured')?.checked===true,content:{price:document.getElementById(prefix+'_price')?.value.trim()||'',material:document.getElementById(prefix+'_material')?.value.trim()||'',dimensions:document.getElementById(prefix+'_dimensions')?.value.trim()||'',color:document.getElementById(prefix+'_color')?.value.trim()||'',badge:document.getElementById(prefix+'_badge')?.value.trim()||'',gallery,features}};
+}
+async function manageStandCategory(id){
+  const found=await findWebsiteItem(id); if(!found)return;
+  const item=found.item, c=standCategoryContent(item);
+  document.getElementById('modalTitle').textContent=(item.title||'Kategori')+' • Ürünler';
+  const products=c.products||[];
+  document.getElementById('modalBody').innerHTML=`<div class="cms-easy-note"><strong>🦁 ${esc(item.title||'Kategori')}</strong><br>Bu vitrinin içine ürünlerini tek tek ekle. Her ürünün fotoğrafı, galerisi, açıklaması ve özellikleri ayrı olur.</div>
+  <div class="nested-products-head"><strong>Ürünler (${products.length})</strong><button class="btn primary" onclick="addProductToStandCategory(${id})">＋ Ürün Ekle</button></div>
+  <div id="nestedProducts" class="nested-products">${products.length?products.map((p,idx)=>renderNestedProductCard(p,idx,id)).join(''):'<div class="cms-empty-action">Henüz ürün yok. <button class="btn primary" onclick="addProductToStandCategory('+id+')">＋ İlk Ürünü Ekle</button></div>'}</div>
+  <div class="modal-actions"><button class="btn" onclick="closeModal()">Kapat</button></div>`;
+  openModal();
+}
+function renderNestedProductCard(p,idx,categoryId){
+  const c=p.content||{};
+  return `<div class="nested-product-card"><div class="nested-thumb">${p.image_url?`<img src="${esc(p.image_url)}" alt="">`:'＋'}</div><div class="nested-main"><strong>${esc(p.title||'İsimsiz ürün')}</strong><span>${esc(p.short_text||'Açıklama yok')}</span><div class="product-meta">${c.material?`<span>${esc(c.material)}</span>`:''}${c.dimensions?`<span>${esc(c.dimensions)}</span>`:''}${Array.isArray(c.gallery)&&c.gallery.length?`<span>📷 ${c.gallery.length} foto</span>`:''}</div></div><div class="nested-actions"><span class="badge">${p.enabled!==false?'YAYINDA':'GİZLİ'}</span><button class="btn" onclick="editNestedProduct(${categoryId},${idx})">Düzenle</button><button class="btn" onclick="deleteNestedProduct(${categoryId},${idx})">Sil</button></div></div>`;
+}
+async function getStandCategory(id){const f=await findWebsiteItem(id);return f}
+async function addProductToStandCategory(categoryId){
+  const found=await getStandCategory(categoryId); if(!found)return;
+  document.getElementById('modalTitle').textContent='Yeni Ürün Ekle';
+  document.getElementById('modalBody').innerHTML=productEntryForm('np')+`<div class="modal-actions"><button class="btn primary" onclick="saveNewNestedProduct(${categoryId})">Ürünü Vitrine Ekle</button><button class="btn" onclick="manageStandCategory(${categoryId})">Geri</button></div>`;
+  openModal();
+}
+async function saveNewNestedProduct(categoryId){
+  const p=collectNestedProduct('np'); if(!p.title){showToast('Ürün adı gerekli.');return}
+  const found=await getStandCategory(categoryId); if(!found)return;
+  const c=standCategoryContent(found.item); c.products=[...(c.products||[]),p];
+  try{await api('/api/admin/website/items/'+categoryId,{method:'PUT',body:JSON.stringify({item_key:found.item.item_key,title:found.item.title,short_text:found.item.short_text,description:found.item.description,image_url:found.item.image_url,button_text:found.item.button_text,button_url:found.item.button_url,enabled:found.item.enabled,featured:found.item.featured,sort_order:found.item.sort_order,content:c})});showToast('Ürün vitrine eklendi.');await manageStandCategory(categoryId)}catch(e){showToast(e.message)}
+}
+async function editNestedProduct(categoryId,idx){
+  const found=await getStandCategory(categoryId); if(!found)return; const p=standCategoryContent(found.item).products[idx]; if(!p)return;
+  document.getElementById('modalTitle').textContent='Ürünü Düzenle';
+  document.getElementById('modalBody').innerHTML=productEntryForm('ep',p)+`<div class="modal-actions"><button class="btn primary" onclick="saveNestedProductEdit(${categoryId},${idx})">Değişiklikleri Kaydet</button><button class="btn" onclick="deleteNestedProduct(${categoryId},${idx})">Ürünü Sil</button><button class="btn" onclick="manageStandCategory(${categoryId})">Geri</button></div>`;openModal();
+}
+async function saveNestedProductEdit(categoryId,idx){
+  const p=collectNestedProduct('ep'); if(!p.title){showToast('Ürün adı gerekli.');return}
+  const found=await getStandCategory(categoryId); if(!found)return; const c=standCategoryContent(found.item); const old=c.products[idx]; p.id=old?.id||p.id; c.products[idx]=p;
+  try{await api('/api/admin/website/items/'+categoryId,{method:'PUT',body:JSON.stringify({item_key:found.item.item_key,title:found.item.title,short_text:found.item.short_text,description:found.item.description,image_url:found.item.image_url,button_text:found.item.button_text,button_url:found.item.button_url,enabled:found.item.enabled,featured:found.item.featured,sort_order:found.item.sort_order,content:c})});showToast('Ürün güncellendi.');await manageStandCategory(categoryId)}catch(e){showToast(e.message)}
+}
+async function deleteNestedProduct(categoryId,idx){if(!confirm('Bu ürünü vitrinden kaldırmak istediğine emin misin?'))return;const found=await getStandCategory(categoryId);if(!found)return;const c=standCategoryContent(found.item);c.products.splice(idx,1);try{await api('/api/admin/website/items/'+categoryId,{method:'PUT',body:JSON.stringify({item_key:found.item.item_key,title:found.item.title,short_text:found.item.short_text,description:found.item.description,image_url:found.item.image_url,button_text:found.item.button_text,button_url:found.item.button_url,enabled:found.item.enabled,featured:found.item.featured,sort_order:found.item.sort_order,content:c})});showToast('Ürün silindi.');await manageStandCategory(categoryId)}catch(e){showToast(e.message)}}
+
+async function findWebsiteItem(id){const sections=await api('/api/admin/website/sections');for(const s of (sections.sections||[])){const d=await api('/api/admin/website/sections/'+s.id+'/items');const found=(d.items||[]).find(x=>Number(x.id)===Number(id));if(found)return {item:found,section:s}}return null}
+async function newWebsiteItem(sectionId){
+  const sections=await api('/api/admin/website/sections');const section=(sections.sections||[]).find(x=>Number(x.id)===Number(sectionId));
+  if(section?.section_key==='stands'){
+    document.getElementById('modalTitle').textContent='Yeni Stand Kategorisi';document.getElementById('modalBody').innerHTML=`<div class="cms-grid">${cmsInput('cat_title','Kategori adı','Masa Standları')}${cmsInput('cat_short','Kısa açıklama','Masa ve masaüstü ürünleri')}${cmsArea('cat_desc','Kategori açıklaması','Bu kategorideki ürünleri müşterilerinize sergileyin.')}${cmsInput('cat_image','Kapak görseli URL','')}${cmsInput('cat_sort','Sıra','0')}<label class="cms-check"><input id="cat_enabled" type="checkbox" checked> Yayında</label></div><div class="modal-actions"><button class="btn primary" onclick="createStandCategory(${sectionId})">Kategoriyi Oluştur</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal();return;
+  }
+  document.getElementById('modalTitle').textContent='Yeni İçerik Ekle';
+  document.getElementById('modalBody').innerHTML=`<div class="cms-quick-grid"><div class="cms-quick-card"><label>BAŞLIK</label><input id="wi_title" placeholder="Başlık"></div><div class="cms-quick-card"><label>KISA AÇIKLAMA</label><input id="wi_short" placeholder="Kısa açıklama"></div><div class="cms-quick-card" style="grid-column:1/-1"><label>DETAYLI AÇIKLAMA</label><textarea id="wi_desc"></textarea></div><div class="cms-quick-card" style="grid-column:1/-1"><label>GÖRSEL LİNKİ</label><input id="wi_image" oninput="imagePreview('wi_image','wi_preview')"><div id="wi_preview" class="cms-preview"><span>Görsel önizlemesi</span></div></div><div class="cms-quick-card"><label>BUTON YAZISI</label><input id="wi_btn" placeholder="Detayları Gör"></div><div class="cms-quick-card"><label>BUTON LİNKİ</label><input id="wi_url" placeholder="#contact"></div><label class="cms-check"><input id="wi_enabled" type="checkbox" checked> Yayında</label><label class="cms-check"><input id="wi_featured" type="checkbox"> Öne çıkar</label></div><div class="modal-actions"><button class="btn primary" onclick="createWebsiteItem(${sectionId})">Kaydet</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal();
+}
+async function createStandCategory(sectionId){try{const title=document.getElementById('cat_title').value.trim();if(!title){showToast('Kategori adı gerekli.');return}const body={item_key:websiteSlug(title),title,short_text:document.getElementById('cat_short').value,description:document.getElementById('cat_desc').value,image_url:document.getElementById('cat_image').value,button_text:'Kategoriyi İncele',button_url:'#stands',sort_order:Number(document.getElementById('cat_sort').value)||0,enabled:document.getElementById('cat_enabled').checked,featured:false,content:{type:'category',products:[]}};await api('/api/admin/website/sections/'+sectionId+'/items',{method:'POST',body:JSON.stringify(body)});closeModal();showToast('Kategori oluşturuldu.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+async function createWebsiteProduct(sectionId){const p=collectProduct('wi');if(!p.title){showToast('Ürün adı gerekli.');return}try{await api('/api/admin/website/sections/'+sectionId+'/items',{method:'POST',body:JSON.stringify({item_key:websiteSlug(p.title),...p,sort_order:0})});closeModal();showToast('Ürün vitrinde yayınlandı.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+async function createWebsiteItem(sectionId){try{const title=document.getElementById('wi_title').value.trim();if(!title){showToast('Başlık gerekli.');return}await api('/api/admin/website/sections/'+sectionId+'/items',{method:'POST',body:JSON.stringify({item_key:websiteSlug(title),title,short_text:document.getElementById('wi_short').value,description:document.getElementById('wi_desc').value,image_url:document.getElementById('wi_image').value,button_text:document.getElementById('wi_btn').value,button_url:document.getElementById('wi_url').value,sort_order:0,enabled:document.getElementById('wi_enabled').checked,featured:document.getElementById('wi_featured').checked})});closeModal();showToast('İçerik kaydedildi.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+async function editWebsiteItem(id){const found=await findWebsiteItem(id);if(!found)return;const i=found.item,s=found.section;if(s.section_key==='stands'){
+  document.getElementById('modalTitle').textContent='Ürünü Yönet';document.getElementById('modalBody').innerHTML=productForm('ei',i)+`<div class="modal-actions"><button class="btn primary" onclick="updateWebsiteProduct(${id})">Değişiklikleri Kaydet</button><button class="btn" onclick="deleteWebsiteItem(${id})">Ürünü Sil</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal();return;
+}
+  document.getElementById('modalTitle').textContent='İçeriği Düzenle';document.getElementById('modalBody').innerHTML=`<div class="cms-quick-grid"><div class="cms-quick-card"><label>BAŞLIK</label><input id="ei_title" value="${esc(i.title)}"></div><div class="cms-quick-card"><label>KISA AÇIKLAMA</label><input id="ei_short" value="${esc(i.short_text)}"></div><div class="cms-quick-card" style="grid-column:1/-1"><label>DETAYLI AÇIKLAMA</label><textarea id="ei_desc">${esc(i.description)}</textarea></div><div class="cms-quick-card" style="grid-column:1/-1"><label>GÖRSEL LİNKİ</label><input id="ei_image" value="${esc(i.image_url)}" oninput="imagePreview('ei_image','ei_preview')"><div id="ei_preview" class="cms-preview">${i.image_url?`<img src="${esc(i.image_url)}" alt="">`:'<span>Görsel önizlemesi</span>'}</div></div><div class="cms-quick-card"><label>BUTON YAZISI</label><input id="ei_btn" value="${esc(i.button_text)}"></div><div class="cms-quick-card"><label>BUTON LİNKİ</label><input id="ei_url" value="${esc(i.button_url)}"></div><label class="cms-check"><input id="ei_enabled" type="checkbox" ${i.enabled?'checked':''}> Yayında</label><label class="cms-check"><input id="ei_featured" type="checkbox" ${i.featured?'checked':''}> Öne çıkar</label></div><div class="modal-actions"><button class="btn primary" onclick="updateWebsiteItem(${id})">Kaydet</button><button class="btn" onclick="deleteWebsiteItem(${id})">Sil</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal()}
+async function updateWebsiteProduct(id){const p=collectProduct('ei');if(!p.title){showToast('Ürün adı gerekli.');return}try{const found=await findWebsiteItem(id);await api('/api/admin/website/items/'+id,{method:'PUT',body:JSON.stringify({item_key:found.item.item_key||websiteSlug(p.title),...p,sort_order:found.item.sort_order||0})});closeModal();showToast('Ürün güncellendi.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+async function updateWebsiteItem(id){try{const title=document.getElementById('ei_title').value.trim();if(!title){showToast('Başlık gerekli.');return}await api('/api/admin/website/items/'+id,{method:'PUT',body:JSON.stringify({item_key:websiteSlug(title),title,short_text:document.getElementById('ei_short').value,description:document.getElementById('ei_desc').value,image_url:document.getElementById('ei_image').value,button_text:document.getElementById('ei_btn').value,button_url:document.getElementById('ei_url').value,enabled:document.getElementById('ei_enabled').checked,featured:document.getElementById('ei_featured').checked})});closeModal();showToast('İçerik güncellendi.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+async function deleteWebsiteItem(id){if(!confirm('Bu içeriği silmek istediğine emin misin?'))return;try{await api('/api/admin/website/items/'+id,{method:'DELETE'});closeModal();showToast('Silindi.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+
+async function newWebsiteMedia(){document.getElementById('modalTitle').textContent='Görsel Ekle';document.getElementById('modalBody').innerHTML=`<div class="cms-grid">${cmsInput('wm_title','Başlık','')}${cmsInput('wm_url','Görsel URL','')}${cmsInput('wm_alt','Alt metin','')}${cmsInput('wm_sort','Sıra','0')}</div><div class="sub" style="margin-top:8px">Şimdilik görsel URL ile ekleniyor; medya yükleme depolamasını sonraki adımda bağlayacağız.</div><div class="modal-actions"><button class="btn primary" onclick="createWebsiteMedia()">Kaydet</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;openModal()}
+async function createWebsiteMedia(){try{await api('/api/admin/website/media',{method:'POST',body:JSON.stringify({title:document.getElementById('wm_title').value,file_url:document.getElementById('wm_url').value,alt_text:document.getElementById('wm_alt').value,sort_order:Number(document.getElementById('wm_sort').value)})});closeModal();showToast('Görsel kaydedildi.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+async function editWebsiteMedia(id){const d=await api('/api/admin/website/media');const m=(d.media||[]).find(x=>Number(x.id)===Number(id));if(!m)return;document.getElementById('modalTitle').textContent='Görsel Düzenle';document.getElementById('modalBody').innerHTML=`<div class="cms-grid">${cmsInput('em_title','Başlık',m.title)}${cmsInput('em_url','Görsel URL',m.file_url)}${cmsInput('em_alt','Alt metin',m.alt_text)}${cmsInput('em_sort','Sıra',m.sort_order)}</div><div class="modal-actions"><button class="btn primary" onclick="updateWebsiteMedia(${id})">Kaydet</button><button class="btn" onclick="deleteWebsiteMedia(${id})">Sil</button></div>`;openModal()}
+async function updateWebsiteMedia(id){try{await api('/api/admin/website/media/'+id,{method:'PUT',body:JSON.stringify({title:document.getElementById('em_title').value,file_url:document.getElementById('em_url').value,alt_text:document.getElementById('em_alt').value,sort_order:Number(document.getElementById('em_sort').value)})});closeModal();showToast('Görsel güncellendi.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
+async function deleteWebsiteMedia(id){if(!confirm('Bu görseli silmek istediğine emin misin?'))return;try{await api('/api/admin/website/media/'+id,{method:'DELETE'});closeModal();showToast('Görsel silindi.');await renderWebsiteCMS()}catch(e){showToast(e.message)}}
 
 function toggleTheme(){
   document.body.classList.toggle("light");
@@ -947,3 +1367,15 @@ if(adminToken){showApp();loadAll()}
 </script>
 </body>
 </html>
+<script>
+(function legacyContactSweep(){
+  function sweep(){
+    document.querySelectorAll('[class*="site-section-card"],[class*="section-card"]').forEach(function(el){
+      var t=(el.innerText||'').trim().toLowerCase();
+      if(t.startsWith('iletişim\n') || t.includes('leo connect hakkında bilgi alın')) el.classList.add('leo-legacy-contact-section');
+    });
+  }
+  document.addEventListener('DOMContentLoaded',sweep);
+  setTimeout(sweep,800); setTimeout(sweep,1800);
+})();
+</script>
