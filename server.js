@@ -366,7 +366,10 @@ function nfcTagPublic(row) {
     code: row.code,
     url,
     is_active: row.is_active,
-    tap_count: Number(row.tap_count || 0),
+    tap_count: Number(row.tap_count || row.nfc_count || 0),
+    qr_count: Number(row.qr_count || 0),
+    nfc_count: Number(row.nfc_count || row.tap_count || 0),
+    total_count: Number(row.total_count || ((Number(row.qr_count || 0)) + (Number(row.nfc_count || row.tap_count || 0)))),
     last_tap: row.last_tap || null,
     created_at: row.created_at,
     updated_at: row.updated_at
@@ -611,8 +614,7 @@ async function initDatabase() {
     ON profile_designs(business_id)
   `);
 
-  await websiteCms.initWebsiteCmsDatabase();
-  console.log('PostgreSQL + NFC Tag Management + Website CMS hazır.');
+  console.log('PostgreSQL + NFC Tag Management hazır.');
 }
 
 
@@ -685,745 +687,6 @@ function adminAuth(req, res, next) {
     });
   }
 }
-
-
-/* =========================================================
-   WEBSITE CMS — SEPARATE CORPORATE WEBSITE
-   Tek dosya entegrasyonu — harici modül gerektirmez
-========================================================= */
-function createWebsiteCmsRouter({ pool, adminAuth }) {
-  if (!pool) throw new Error('Website CMS: pool gerekli');
-  if (!adminAuth) throw new Error('Website CMS: adminAuth gerekli');
-
-  const router = express.Router();
-
-  // -------------------------------------------------------
-  // DATABASE
-  // -------------------------------------------------------
-  async function initWebsiteCmsDatabase() {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS site_settings (
-        id INTEGER PRIMARY KEY DEFAULT 1,
-        site_name TEXT NOT NULL DEFAULT 'LEO CONNECT',
-        site_tagline TEXT NOT NULL DEFAULT '',
-        seo_title TEXT NOT NULL DEFAULT '',
-        seo_description TEXT NOT NULL DEFAULT '',
-        favicon_url TEXT NOT NULL DEFAULT '',
-        logo_url TEXT NOT NULL DEFAULT '',
-        primary_color TEXT NOT NULL DEFAULT '#D6AD5B',
-        secondary_color TEXT NOT NULL DEFAULT '#080A0F',
-        contact_email TEXT NOT NULL DEFAULT '',
-        contact_phone TEXT NOT NULL DEFAULT '',
-        contact_whatsapp TEXT NOT NULL DEFAULT '',
-        contact_instagram TEXT NOT NULL DEFAULT '',
-        contact_facebook TEXT NOT NULL DEFAULT '',
-        contact_linkedin TEXT NOT NULL DEFAULT '',
-        contact_website TEXT NOT NULL DEFAULT '',
-        contact_address TEXT NOT NULL DEFAULT '',
-        contact_map_url TEXT NOT NULL DEFAULT '',
-        contact_hours TEXT NOT NULL DEFAULT '',
-        footer_text TEXT NOT NULL DEFAULT '',
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    await pool.query(`
-      INSERT INTO site_settings(id)
-      VALUES(1)
-      ON CONFLICT(id) DO NOTHING
-    `);
-
-    // Website CMS V2: existing installations get the new contact fields automatically.
-    for (const column of [
-      ['contact_facebook',"TEXT NOT NULL DEFAULT ''"],
-      ['contact_linkedin',"TEXT NOT NULL DEFAULT ''"],
-      ['contact_website',"TEXT NOT NULL DEFAULT ''"],
-      ['contact_address',"TEXT NOT NULL DEFAULT ''"],
-      ['contact_map_url',"TEXT NOT NULL DEFAULT ''"],
-      ['contact_hours',"TEXT NOT NULL DEFAULT ''"]
-    ]) {
-      await pool.query(`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS ${column[0]} ${column[1]}`);
-    }
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS site_sections (
-        id SERIAL PRIMARY KEY,
-        section_key TEXT NOT NULL UNIQUE,
-        title TEXT NOT NULL DEFAULT '',
-        subtitle TEXT NOT NULL DEFAULT '',
-        description TEXT NOT NULL DEFAULT '',
-        enabled BOOLEAN NOT NULL DEFAULT TRUE,
-        sort_order INTEGER NOT NULL DEFAULT 0,
-        settings JSONB NOT NULL DEFAULT '{}'::jsonb,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS site_items (
-        id SERIAL PRIMARY KEY,
-        section_id INTEGER NOT NULL
-          REFERENCES site_sections(id)
-          ON DELETE CASCADE,
-        item_key TEXT NOT NULL DEFAULT '',
-        title TEXT NOT NULL DEFAULT '',
-        short_text TEXT NOT NULL DEFAULT '',
-        description TEXT NOT NULL DEFAULT '',
-        image_url TEXT NOT NULL DEFAULT '',
-        button_text TEXT NOT NULL DEFAULT '',
-        button_url TEXT NOT NULL DEFAULT '',
-        enabled BOOLEAN NOT NULL DEFAULT TRUE,
-        featured BOOLEAN NOT NULL DEFAULT FALSE,
-        sort_order INTEGER NOT NULL DEFAULT 0,
-        content JSONB NOT NULL DEFAULT '{}'::jsonb,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_site_items_section
-      ON site_items(section_id, sort_order, id)
-    `);
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS site_media (
-        id SERIAL PRIMARY KEY,
-        title TEXT NOT NULL DEFAULT '',
-        file_url TEXT NOT NULL,
-        alt_text TEXT NOT NULL DEFAULT '',
-        media_type TEXT NOT NULL DEFAULT 'image',
-        enabled BOOLEAN NOT NULL DEFAULT TRUE,
-        sort_order INTEGER NOT NULL DEFAULT 0,
-        metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_site_media_sort
-      ON site_media(sort_order, id)
-    `);
-
-    // İlk kurulum için ana bölümleri hazırla.
-    const sections = [
-      ['hero', 'Hero', 'LEO CONNECT', 'İşletmenizin dijital kimliği.', 0],
-      ['platform', 'Platform', 'Bir QR’dan çok daha fazlası.', 'LEO CONNECT platform özellikleri.', 10],
-      ['how-it-works', 'Nasıl Çalışır?', 'Fiziksel temas. Dijital deneyim.', '', 20],
-      ['stands', 'Standlar', 'QR & NFC deneyimini fiziksel alana taşıyın.', '', 30],
-      ['contact', 'İletişim', 'LEO CONNECT hakkında bilgi alın.', '', 40],
-      ['footer', 'Footer', 'LEO CONNECT', '', 50]
-    ];
-
-    for (const [key, title, subtitle, description, sort] of sections) {
-      await pool.query(`
-        INSERT INTO site_sections(
-          section_key,title,subtitle,description,sort_order
-        )
-        VALUES($1,$2,$3,$4,$5)
-        ON CONFLICT(section_key) DO NOTHING
-      `, [key, title, subtitle, description, sort]);
-    }
-
-    // V3 Content Studio: mevcut web sitesinde sabit duran metinleri de CMS'e al.
-    // Sağdaki değerler sadece eksik alanları doldurur; admin'de yapılmış değişiklikler ezilmez.
-    const contentDefaults = {
-      hero: {
-        home_intro_eyebrow:'LEO CONNECT NEDİR?',
-        home_intro_title:'Fiziksel işletmenizi dijital bir deneyime dönüştürün.',
-        home_intro_text:'LEO CONNECT; QR, NFC, dijital profil, bağlantılar, kampanyalar ve işletme yönetimini tek bir sistemde buluşturur. Müşterinizin ihtiyaç duyduğu bilgiye ulaşması için gereken adımları azaltır.',
-        home_intro_link:'Platformu keşfet →',
-        home_trust:[
-          {title:'Fizikselden dijitale',text:'tek bağlantı deneyimi'},
-          {title:'İşletmenize özel',text:'yönetilebilir dijital profil'},
-          {title:'QR + NFC',text:'müşterinin temas noktası'},
-          {title:'Ölçülebilir',text:'etkileşim ve analiz'}
-        ],
-        home_stats:[
-          {no:'01',title:'Tek Profil',text:'İletişim, sosyal medya, konum ve diğer bağlantılar tek noktada.'},
-          {no:'02',title:'Akıllı Temas',text:'QR ve NFC ile fiziksel ürününüz doğrudan dijital dünyanıza bağlanır.'},
-          {no:'03',title:'Merkezi Yönetim',text:'İşletme bilgilerinizi ve dijital deneyiminizi panelden güncelleyin.'},
-          {no:'04',title:'Gelişebilir Sistem',text:'Kampanya, yorum, analiz ve yeni dijital bağlantılarla büyür.'}
-        ],
-        home_products_eyebrow:'ÜRÜNLER',home_products_title:'Markanıza uygun fiziksel deneyimi seçin.',home_products_button:'Tüm ürünler',
-        home_cta_eyebrow:'LEO CONNECT',home_cta_title:'İşletmenizin dijital temas noktalarını yeniden tasarlayalım.',
-        home_cta_text:'İhtiyacınızı anlatın; QR, NFC ve fiziksel ürünlerden oluşan size özel deneyimi birlikte planlayalım.',
-        home_cta_primary:'Projenizi Konuşalım →',home_cta_secondary:'Ürünleri İncele'
-      },
-      platform: {
-        home_eyebrow:'PLATFORM',home_button:'Tüm platformu gör →',
-        platform_panel_1_eyebrow:'TEK DENEYİM',platform_panel_1_title:'QR + NFC + profil.',platform_panel_1_text:'Müşterinin fiziksel bir noktadan dijital dünyanıza geçişini mümkün olduğunca kısa ve anlaşılır hale getirin.',
-        platform_panel_2_eyebrow:'ÖLÇÜLEBİLİR',platform_panel_2_title:'Etkileşimi görün.',platform_panel_2_text:'İşletme panelinizde QR, NFC ve dijital temas noktalarından gelen hareketleri takip edin.'
-      },
-      'how-it-works': {
-        how_eyebrow:'NASIL ÇALIŞIR?',how_action:'Nasıl çalıştığını detaylı incele →',
-        how_bottom_eyebrow:'İŞLETME DENEYİMİ',how_bottom_title:'Kurulumdan sonra yönetim sizde.',
-        how_bottom_text:'Profil bilgileri, dijital bağlantılar, kampanyalar, QR/NFC erişimleri ve analizler işletme paneliniz üzerinden yönetilebilir.',
-        how_bottom_primary:'Bilgi Al',how_bottom_secondary:'Ürünleri Gör'
-      },
-      contact: {
-        contact_card_eyebrow:'BİRLİKTE TASARLAYALIM',contact_card_title:'İşletmeniz için doğru çözümü oluşturalım.',
-        contact_card_text:'İhtiyacınızı, ürün tipini ve kullanım alanını anlatın. Size uygun LEO CONNECT deneyimini birlikte planlayalım.',
-        contact_button:"WhatsApp'tan Yaz",contact_info_eyebrow:'İLETİŞİM BİLGİLERİ'
-      },
-      footer: {footer_right:'QR • NFC • Dijital Deneyim'}
-    };
-    for (const [sectionKey, defaults] of Object.entries(contentDefaults)) {
-      await pool.query(`UPDATE site_sections SET settings = $2::jsonb || COALESCE(settings,'{}'::jsonb), updated_at=CURRENT_TIMESTAMP WHERE section_key=$1`, [sectionKey, JSON.stringify(defaults)]);
-    }
-
-    // İlk açılışta örnek içerikler oluştur. Sonrasında admin panelinden tamamen değiştirilebilir.
-    const seedItems = {
-      hero: [
-        {key:'hero-main',title:'İşletmenizi tek dokunuşla dijitale taşıyın.',short:'QR ve NFC ile müşterilerinizi doğru dijital deneyime saniyeler içinde ulaştırın.',description:'QR ve NFC teknolojisiyle işletmenizin profilini, menüsünü, sosyal hesaplarını, iletişim kanallarını ve kampanyalarını tek noktada birleştirin.',button:'Hemen Başla',url:'#contact',sort:0,content:{badge:'LEO CONNECT • QR + NFC'}}
-      ],
-      platform: [
-        {key:'qr-profile',title:'QR Profil',short:'İşletmenizin tüm dijital bilgileri tek QR kodda.',description:'Profil, menü, konum, iletişim ve dijital bağlantılar tek deneyimde.',sort:0},
-        {key:'nfc',title:'NFC Deneyimi',short:'Telefonu yaklaştır, dijital profile anında ulaş.',description:'Temassız ve hızlı müşteri deneyimi için NFC.',sort:10},
-        {key:'analytics',title:'Akıllı Analytics',short:'Tarama ve etkileşimleri tek panelden takip edin.',description:'QR, NFC ve profil etkileşimlerini merkezi admin panelinden izleyin.',sort:20}
-      ],
-      'how-it-works': [
-        {key:'step-1',title:'Kur',short:'İşletmenizi ve dijital bağlantılarınızı oluşturun.',description:'Bilgilerinizi girin ve dijital profilinizi hazırlayın.',sort:0},
-        {key:'step-2',title:'Yerleştir',short:'QR ve NFC çözümlerini işletmenizin uygun noktalarına yerleştirin.',description:'Masa, kasa, vitrin veya giriş alanlarında kullanın.',sort:10},
-        {key:'step-3',title:'Büyüt',short:'Etkileşimleri izleyin, deneyimi sürekli geliştirin.',description:'Analytics verileriyle müşterinizin davranışını anlayın.',sort:20}
-      ],
-      stands: [
-        {key:'masa-standi',title:'Masa Standı',short:'Premium QR + NFC masa standı.',description:'Müşterinin masadan tek dokunuşla dijital profilinize ulaşmasını sağlar. Fotoğraf, detay ve örnekleri admin panelinden ekleyebilirsiniz.',sort:0},
-        {key:'nfc-etiket',title:'NFC Etiket',short:'Kompakt ve hızlı NFC çözümü.',description:'Markanıza özel NFC etiketleri farklı yüzeylerde kullanın.',sort:10},
-        {key:'ozel-tasarim',title:'Özel Tasarım',short:'Markanıza özel fiziksel çözüm.',description:'İhtiyacınıza göre özel QR + NFC uygulamaları.',sort:20}
-      ]
-    };
-    for (const [sectionKey, items] of Object.entries(seedItems)) {
-      const sec = await pool.query(`SELECT id FROM site_sections WHERE section_key=$1 LIMIT 1`, [sectionKey]);
-      if (!sec.rows.length) continue;
-      for (const item of items) {
-        const exists = await pool.query(`SELECT id FROM site_items WHERE section_id=$1 AND item_key=$2 LIMIT 1`, [sec.rows[0].id, item.key]);
-        if (exists.rows.length) continue;
-        await pool.query(`INSERT INTO site_items(section_id,item_key,title,short_text,description,image_url,button_text,button_url,enabled,featured,sort_order,content) VALUES($1,$2,$3,$4,$5,$6,$7,$8,TRUE,FALSE,$9,$10::jsonb)`, [sec.rows[0].id,item.key,item.title,item.short,item.description||'',item.image_url||'',item.button||'',item.url||'',item.sort,JSON.stringify(item.content||{})]);
-      }
-    }
-  }
-
-  // -------------------------------------------------------
-  // NORMALIZATION
-  // -------------------------------------------------------
-  function normalizeJson(value, fallback = {}) {
-    if (typeof value === 'string') {
-      try { value = JSON.parse(value); } catch (_) { value = fallback; }
-    }
-    return value && typeof value === 'object' && !Array.isArray(value)
-      ? value
-      : fallback;
-  }
-
-  function cleanText(value, max = 5000) {
-    return String(value ?? '').trim().slice(0, max);
-  }
-
-  function sectionOut(row) {
-    return {
-      ...row,
-      enabled: row.enabled === true,
-      settings: normalizeJson(row.settings, {})
-    };
-  }
-
-  function itemOut(row) {
-    return {
-      ...row,
-      enabled: row.enabled === true,
-      featured: row.featured === true,
-      content: normalizeJson(row.content, {})
-    };
-  }
-
-  // -------------------------------------------------------
-  // ADMIN — SETTINGS
-  // -------------------------------------------------------
-  router.get('/api/admin/website/settings', adminAuth, async (req, res) => {
-    try {
-      const r = await pool.query(`SELECT * FROM site_settings WHERE id=1`);
-      res.json({ settings: r.rows[0] || null });
-    } catch (e) {
-      console.error('WEBSITE SETTINGS GET ERROR:', e);
-      res.status(500).json({ error: 'Ana site ayarları alınamadı' });
-    }
-  });
-
-  router.put('/api/admin/website/settings', adminAuth, async (req, res) => {
-    try {
-      const b = req.body || {};
-      const r = await pool.query(`
-        UPDATE site_settings
-        SET
-          site_name=$1,
-          site_tagline=$2,
-          seo_title=$3,
-          seo_description=$4,
-          favicon_url=$5,
-          logo_url=$6,
-          primary_color=$7,
-          secondary_color=$8,
-          contact_email=$9,
-          contact_phone=$10,
-          contact_whatsapp=$11,
-          contact_instagram=$12,
-          contact_facebook=$13,
-          contact_linkedin=$14,
-          contact_website=$15,
-          contact_address=$16,
-          contact_map_url=$17,
-          contact_hours=$18,
-          footer_text=$19,
-          updated_at=CURRENT_TIMESTAMP
-        WHERE id=1
-        RETURNING *
-      `, [
-        cleanText(b.site_name, 120) || 'LEO CONNECT',
-        cleanText(b.site_tagline, 300),
-        cleanText(b.seo_title, 160),
-        cleanText(b.seo_description, 320),
-        cleanText(b.favicon_url, 2000),
-        cleanText(b.logo_url, 2000),
-        cleanText(b.primary_color, 30) || '#D6AD5B',
-        cleanText(b.secondary_color, 30) || '#080A0F',
-        cleanText(b.contact_email, 200),
-        cleanText(b.contact_phone, 80),
-        cleanText(b.contact_whatsapp, 80),
-        cleanText(b.contact_instagram, 200),
-        cleanText(b.contact_facebook, 200),
-        cleanText(b.contact_linkedin, 200),
-        cleanText(b.contact_website, 500),
-        cleanText(b.contact_address, 500),
-        cleanText(b.contact_map_url, 2000),
-        cleanText(b.contact_hours, 1000),
-        cleanText(b.footer_text, 500)
-      ]);
-
-      res.json({ settings: r.rows[0] });
-    } catch (e) {
-      console.error('WEBSITE SETTINGS UPDATE ERROR:', e);
-      res.status(500).json({ error: 'Ana site ayarları kaydedilemedi' });
-    }
-  });
-
-  // -------------------------------------------------------
-  // ADMIN — SECTIONS
-  // -------------------------------------------------------
-  router.get('/api/admin/website/sections', adminAuth, async (req, res) => {
-    try {
-      const r = await pool.query(`
-        SELECT *
-        FROM site_sections
-        ORDER BY sort_order ASC, id ASC
-      `);
-      res.json({ sections: r.rows.map(sectionOut) });
-    } catch (e) {
-      console.error('WEBSITE SECTIONS GET ERROR:', e);
-      res.status(500).json({ error: 'Ana site bölümleri alınamadı' });
-    }
-  });
-
-  router.post('/api/admin/website/sections', adminAuth, async (req, res) => {
-    try {
-      const b = req.body || {};
-      const key = cleanText(b.section_key, 80)
-        .toLowerCase()
-        .replace(/[^a-z0-9_-]+/g, '-');
-
-      if (!key) {
-        return res.status(400).json({ error: 'Bölüm anahtarı gerekli' });
-      }
-
-      const r = await pool.query(`
-        INSERT INTO site_sections(
-          section_key,title,subtitle,description,enabled,sort_order,settings
-        )
-        VALUES($1,$2,$3,$4,$5,$6,$7::jsonb)
-        RETURNING *
-      `, [
-        key,
-        cleanText(b.title, 160),
-        cleanText(b.subtitle, 300),
-        cleanText(b.description, 5000),
-        b.enabled !== false,
-        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 100,
-        JSON.stringify(normalizeJson(b.settings, {}))
-      ]);
-
-      res.status(201).json({ section: sectionOut(r.rows[0]) });
-    } catch (e) {
-      console.error('WEBSITE SECTION CREATE ERROR:', e);
-      res.status(500).json({
-        error: e.code === '23505'
-          ? 'Bu bölüm anahtarı zaten kullanılıyor'
-          : 'Bölüm oluşturulamadı'
-      });
-    }
-  });
-
-  router.put('/api/admin/website/sections/:id', adminAuth, async (req, res) => {
-    try {
-      const id = Number(req.params.id);
-      if (!Number.isInteger(id) || id <= 0) {
-        return res.status(400).json({ error: 'Geçersiz bölüm ID' });
-      }
-
-      const b = req.body || {};
-      const r = await pool.query(`
-        UPDATE site_sections
-        SET
-          title=$1,
-          subtitle=$2,
-          description=$3,
-          enabled=$4,
-          sort_order=$5,
-          settings=$6::jsonb,
-          updated_at=CURRENT_TIMESTAMP
-        WHERE id=$7
-        RETURNING *
-      `, [
-        cleanText(b.title, 160),
-        cleanText(b.subtitle, 300),
-        cleanText(b.description, 5000),
-        b.enabled !== false,
-        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 100,
-        JSON.stringify(normalizeJson(b.settings, {})),
-        id
-      ]);
-
-      if (!r.rows.length) {
-        return res.status(404).json({ error: 'Bölüm bulunamadı' });
-      }
-
-      res.json({ section: sectionOut(r.rows[0]) });
-    } catch (e) {
-      console.error('WEBSITE SECTION UPDATE ERROR:', e);
-      res.status(500).json({ error: 'Bölüm güncellenemedi' });
-    }
-  });
-
-  router.delete('/api/admin/website/sections/:id', adminAuth, async (req, res) => {
-    try {
-      const id = Number(req.params.id);
-      const r = await pool.query(
-        `DELETE FROM site_sections WHERE id=$1 RETURNING id`,
-        [id]
-      );
-
-      if (!r.rows.length) {
-        return res.status(404).json({ error: 'Bölüm bulunamadı' });
-      }
-
-      res.json({ success: true });
-    } catch (e) {
-      console.error('WEBSITE SECTION DELETE ERROR:', e);
-      res.status(500).json({ error: 'Bölüm silinemedi' });
-    }
-  });
-
-  // -------------------------------------------------------
-  // ADMIN — ITEMS
-  // -------------------------------------------------------
-  router.get('/api/admin/website/sections/:sectionId/items', adminAuth, async (req, res) => {
-    try {
-      const sectionId = Number(req.params.sectionId);
-      const r = await pool.query(`
-        SELECT *
-        FROM site_items
-        WHERE section_id=$1
-        ORDER BY sort_order ASC, id ASC
-      `, [sectionId]);
-
-      res.json({ items: r.rows.map(itemOut) });
-    } catch (e) {
-      console.error('WEBSITE ITEMS GET ERROR:', e);
-      res.status(500).json({ error: 'Site içerikleri alınamadı' });
-    }
-  });
-
-  router.post('/api/admin/website/sections/:sectionId/items', adminAuth, async (req, res) => {
-    try {
-      const sectionId = Number(req.params.sectionId);
-      const exists = await pool.query(
-        `SELECT id FROM site_sections WHERE id=$1 LIMIT 1`,
-        [sectionId]
-      );
-
-      if (!exists.rows.length) {
-        return res.status(404).json({ error: 'Bölüm bulunamadı' });
-      }
-
-      const b = req.body || {};
-      const r = await pool.query(`
-        INSERT INTO site_items(
-          section_id,item_key,title,short_text,description,image_url,
-          button_text,button_url,enabled,featured,sort_order,content
-        )
-        VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12::jsonb)
-        RETURNING *
-      `, [
-        sectionId,
-        cleanText(b.item_key, 80),
-        cleanText(b.title, 160),
-        cleanText(b.short_text, 500),
-        cleanText(b.description, 5000),
-        cleanText(b.image_url, 2000),
-        cleanText(b.button_text, 100),
-        cleanText(b.button_url, 2000),
-        b.enabled !== false,
-        b.featured === true,
-        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 0,
-        JSON.stringify(normalizeJson(b.content, {}))
-      ]);
-
-      res.status(201).json({ item: itemOut(r.rows[0]) });
-    } catch (e) {
-      console.error('WEBSITE ITEM CREATE ERROR:', e);
-      res.status(500).json({ error: 'Site içeriği oluşturulamadı' });
-    }
-  });
-
-  router.put('/api/admin/website/items/:id', adminAuth, async (req, res) => {
-    try {
-      const id = Number(req.params.id);
-      const b = req.body || {};
-
-      const r = await pool.query(`
-        UPDATE site_items
-        SET
-          item_key=$1,
-          title=$2,
-          short_text=$3,
-          description=$4,
-          image_url=$5,
-          button_text=$6,
-          button_url=$7,
-          enabled=$8,
-          featured=$9,
-          sort_order=$10,
-          content=$11::jsonb,
-          updated_at=CURRENT_TIMESTAMP
-        WHERE id=$12
-        RETURNING *
-      `, [
-        cleanText(b.item_key, 80),
-        cleanText(b.title, 160),
-        cleanText(b.short_text, 500),
-        cleanText(b.description, 5000),
-        cleanText(b.image_url, 2000),
-        cleanText(b.button_text, 100),
-        cleanText(b.button_url, 2000),
-        b.enabled !== false,
-        b.featured === true,
-        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 0,
-        JSON.stringify(normalizeJson(b.content, {})),
-        id
-      ]);
-
-      if (!r.rows.length) {
-        return res.status(404).json({ error: 'Site içeriği bulunamadı' });
-      }
-
-      res.json({ item: itemOut(r.rows[0]) });
-    } catch (e) {
-      console.error('WEBSITE ITEM UPDATE ERROR:', e);
-      res.status(500).json({ error: 'Site içeriği güncellenemedi' });
-    }
-  });
-
-  router.delete('/api/admin/website/items/:id', adminAuth, async (req, res) => {
-    try {
-      const id = Number(req.params.id);
-      const r = await pool.query(
-        `DELETE FROM site_items WHERE id=$1 RETURNING id`,
-        [id]
-      );
-
-      if (!r.rows.length) {
-        return res.status(404).json({ error: 'Site içeriği bulunamadı' });
-      }
-
-      res.json({ success: true });
-    } catch (e) {
-      console.error('WEBSITE ITEM DELETE ERROR:', e);
-      res.status(500).json({ error: 'Site içeriği silinemedi' });
-    }
-  });
-
-  // -------------------------------------------------------
-  // ADMIN — MEDIA
-  // -------------------------------------------------------
-  router.get('/api/admin/website/media', adminAuth, async (req, res) => {
-    try {
-      const r = await pool.query(`
-        SELECT *
-        FROM site_media
-        ORDER BY sort_order ASC, id DESC
-      `);
-      res.json({ media: r.rows });
-    } catch (e) {
-      console.error('WEBSITE MEDIA GET ERROR:', e);
-      res.status(500).json({ error: 'Site medyaları alınamadı' });
-    }
-  });
-
-  router.post('/api/admin/website/media', adminAuth, async (req, res) => {
-    try {
-      const b = req.body || {};
-      const url = cleanText(b.file_url, 2000);
-
-      if (!url) {
-        return res.status(400).json({ error: 'Medya URL gerekli' });
-      }
-
-      const r = await pool.query(`
-        INSERT INTO site_media(
-          title,file_url,alt_text,media_type,enabled,sort_order,metadata
-        )
-        VALUES($1,$2,$3,$4,$5,$6,$7::jsonb)
-        RETURNING *
-      `, [
-        cleanText(b.title, 160),
-        url,
-        cleanText(b.alt_text, 300),
-        cleanText(b.media_type, 40) || 'image',
-        b.enabled !== false,
-        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 0,
-        JSON.stringify(normalizeJson(b.metadata, {}))
-      ]);
-
-      res.status(201).json({ media: r.rows[0] });
-    } catch (e) {
-      console.error('WEBSITE MEDIA CREATE ERROR:', e);
-      res.status(500).json({ error: 'Medya kaydedilemedi' });
-    }
-  });
-
-  router.put('/api/admin/website/media/:id', adminAuth, async (req, res) => {
-    try {
-      const id = Number(req.params.id);
-      const b = req.body || {};
-
-      const r = await pool.query(`
-        UPDATE site_media
-        SET
-          title=$1,
-          file_url=$2,
-          alt_text=$3,
-          media_type=$4,
-          enabled=$5,
-          sort_order=$6,
-          metadata=$7::jsonb,
-          updated_at=CURRENT_TIMESTAMP
-        WHERE id=$8
-        RETURNING *
-      `, [
-        cleanText(b.title, 160),
-        cleanText(b.file_url, 2000),
-        cleanText(b.alt_text, 300),
-        cleanText(b.media_type, 40) || 'image',
-        b.enabled !== false,
-        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 0,
-        JSON.stringify(normalizeJson(b.metadata, {})),
-        id
-      ]);
-
-      if (!r.rows.length) {
-        return res.status(404).json({ error: 'Medya bulunamadı' });
-      }
-
-      res.json({ media: r.rows[0] });
-    } catch (e) {
-      console.error('WEBSITE MEDIA UPDATE ERROR:', e);
-      res.status(500).json({ error: 'Medya güncellenemedi' });
-    }
-  });
-
-  router.delete('/api/admin/website/media/:id', adminAuth, async (req, res) => {
-    try {
-      const id = Number(req.params.id);
-      const r = await pool.query(
-        `DELETE FROM site_media WHERE id=$1 RETURNING id`,
-        [id]
-      );
-
-      if (!r.rows.length) {
-        return res.status(404).json({ error: 'Medya bulunamadı' });
-      }
-
-      res.json({ success: true });
-    } catch (e) {
-      console.error('WEBSITE MEDIA DELETE ERROR:', e);
-      res.status(500).json({ error: 'Medya silinemedi' });
-    }
-  });
-
-  // -------------------------------------------------------
-  // PUBLIC — READ ONLY
-  // -------------------------------------------------------
-  router.get('/api/public/website', async (req, res) => {
-    try {
-      const settingsQ = await pool.query(`
-        SELECT *
-        FROM site_settings
-        WHERE id=1
-      `);
-
-      const sectionsQ = await pool.query(`
-        SELECT *
-        FROM site_sections
-        WHERE enabled=TRUE
-        ORDER BY sort_order ASC, id ASC
-      `);
-
-      const itemsQ = await pool.query(`
-        SELECT i.*
-        FROM site_items i
-        INNER JOIN site_sections s ON s.id=i.section_id
-        WHERE i.enabled=TRUE
-          AND s.enabled=TRUE
-        ORDER BY i.section_id ASC, i.sort_order ASC, i.id ASC
-      `);
-
-      const mediaQ = await pool.query(`
-        SELECT *
-        FROM site_media
-        WHERE enabled=TRUE
-        ORDER BY sort_order ASC, id ASC
-      `);
-
-      const itemsBySection = {};
-      for (const row of itemsQ.rows) {
-        if (!itemsBySection[row.section_id]) itemsBySection[row.section_id] = [];
-        itemsBySection[row.section_id].push(itemOut(row));
-      }
-
-      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-      res.set('Pragma', 'no-cache');
-      res.set('Expires', '0');
-      res.json({
-        settings: settingsQ.rows[0] || null,
-        sections: sectionsQ.rows.map(row => ({
-          ...sectionOut(row),
-          items: itemsBySection[row.id] || []
-        })),
-        media: mediaQ.rows
-      });
-    } catch (e) {
-      console.error('PUBLIC WEBSITE GET ERROR:', e);
-      res.status(500).json({ error: 'Ana site içeriği alınamadı' });
-    }
-  });
-
-  return { router, initWebsiteCmsDatabase };
-}
-
-
-const websiteCms = createWebsiteCmsRouter({ pool, adminAuth });
-app.use(websiteCms.router);
 
 
 /* =========================================================
@@ -4480,11 +3743,32 @@ app.get('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, res
             AND e.type='nfc'
           ),0)::int AS tap_count,
 
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type='qr_scan'
+          ),0)::int AS qr_count,
+
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type='nfc'
+          ),0)::int AS nfc_count,
+
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type IN ('nfc','qr_scan')
+          ),0)::int AS total_count,
+
           (
             SELECT MAX(e.created_at)
             FROM events e
             WHERE e.nfc_tag_id=t.id
-            AND e.type='nfc'
+            AND e.type IN ('nfc','qr_scan')
           ) AS last_tap
 
         FROM nfc_tags t
@@ -4594,6 +3878,25 @@ app.get(
 
 
 /*
+   TABLE / POINT QR
+   Uses the existing NFC tag URL; no second QR database is created.
+*/
+app.get('/api/nfc-tags/:id/qr', auth, requireBusinessPermission('nfc'), async (req, res) => {
+  try {
+    const id=Number(req.params.id);
+    if(!Number.isInteger(id)||id<=0) return res.status(400).json({error:'Geçersiz NFC etiketi'});
+    const result=await pool.query(`SELECT id,business_id,name,placement,code,is_active FROM nfc_tags WHERE id=$1 AND business_id=$2 LIMIT 1`,[id,req.user.id]);
+    if(!result.rows.length) return res.status(404).json({error:'NFC etiketi bulunamadı'});
+    const baseUrl=process.env.PUBLIC_URL||process.env.RENDER_EXTERNAL_URL||`${req.protocol}://${req.get('host')}`;
+    const url=`${baseUrl}/p/nfc/${result.rows[0].code}?source=qr`;
+    const qr=await QRCode.toDataURL(url,{width:900,margin:2,errorCorrectionLevel:'H'});
+    res.set('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');res.set('Pragma','no-cache');res.set('Expires','0');
+    res.json({...result.rows[0],url,qr});
+  } catch(error) {console.error('BUSINESS NFC QR ERROR:',error);res.status(500).json({error:'Masa / nokta QR kodu oluşturulamadı'});}
+});
+
+
+/*
    CREATE TAG
 */
 
@@ -4603,7 +3906,8 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
 
     const {
       name,
-      placement
+      placement,
+      is_active
     } = req.body;
 
     const tagName =
@@ -4611,6 +3915,11 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
 
     const tagPlacement =
       String(placement || '').trim();
+
+    const active =
+      typeof is_active === 'boolean'
+        ? is_active
+        : true;
 
     if (!tagName) {
 
@@ -4674,7 +3983,7 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
           $2,
           $3,
           $4,
-          TRUE
+          $5
         )
 
         RETURNING *
@@ -4683,7 +3992,8 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
           req.user.id,
           tagName,
           tagPlacement,
-          code
+          code,
+          active
         ]
       );
 
@@ -5140,9 +4450,7 @@ app.get(
 
       }
 
-      /*
-        Önce profil görüntüleme.
-      */
+      const isQr = String(req.query.source || '').toLowerCase() === 'qr';
 
       await pool.query(
         `
@@ -5156,20 +4464,16 @@ app.get(
         VALUES(
           $1,
           'profile_view',
-          'nfc',
-          $2
+          $2,
+          $3
         )
         `,
         [
           tag.business_id,
+          isQr ? 'qr' : 'nfc',
           tag.tag_id
         ]
       );
-
-
-      /*
-        Sonra gerçek NFC tap.
-      */
 
       await pool.query(
         `
@@ -5182,13 +4486,15 @@ app.get(
 
         VALUES(
           $1,
-          'nfc',
-          'nfc',
-          $2
+          $2,
+          $3,
+          $4
         )
         `,
         [
           tag.business_id,
+          isQr ? 'qr_scan' : 'nfc',
+          isQr ? 'qr' : 'nfc',
           tag.tag_id
         ]
       );
