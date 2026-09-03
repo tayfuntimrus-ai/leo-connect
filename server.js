@@ -716,6 +716,12 @@ function createWebsiteCmsRouter({ pool, adminAuth }) {
         contact_phone TEXT NOT NULL DEFAULT '',
         contact_whatsapp TEXT NOT NULL DEFAULT '',
         contact_instagram TEXT NOT NULL DEFAULT '',
+        contact_facebook TEXT NOT NULL DEFAULT '',
+        contact_linkedin TEXT NOT NULL DEFAULT '',
+        contact_website TEXT NOT NULL DEFAULT '',
+        contact_address TEXT NOT NULL DEFAULT '',
+        contact_map_url TEXT NOT NULL DEFAULT '',
+        contact_hours TEXT NOT NULL DEFAULT '',
         footer_text TEXT NOT NULL DEFAULT '',
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -726,6 +732,18 @@ function createWebsiteCmsRouter({ pool, adminAuth }) {
       VALUES(1)
       ON CONFLICT(id) DO NOTHING
     `);
+
+    // Website CMS V2: existing installations get the new contact fields automatically.
+    for (const column of [
+      ['contact_facebook',"TEXT NOT NULL DEFAULT ''"],
+      ['contact_linkedin',"TEXT NOT NULL DEFAULT ''"],
+      ['contact_website',"TEXT NOT NULL DEFAULT ''"],
+      ['contact_address',"TEXT NOT NULL DEFAULT ''"],
+      ['contact_map_url',"TEXT NOT NULL DEFAULT ''"],
+      ['contact_hours',"TEXT NOT NULL DEFAULT ''"]
+    ]) {
+      await pool.query(`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS ${column[0]} ${column[1]}`);
+    }
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS site_sections (
@@ -905,7 +923,13 @@ function createWebsiteCmsRouter({ pool, adminAuth }) {
           contact_phone=$10,
           contact_whatsapp=$11,
           contact_instagram=$12,
-          footer_text=$13,
+          contact_facebook=$13,
+          contact_linkedin=$14,
+          contact_website=$15,
+          contact_address=$16,
+          contact_map_url=$17,
+          contact_hours=$18,
+          footer_text=$19,
           updated_at=CURRENT_TIMESTAMP
         WHERE id=1
         RETURNING *
@@ -922,6 +946,12 @@ function createWebsiteCmsRouter({ pool, adminAuth }) {
         cleanText(b.contact_phone, 80),
         cleanText(b.contact_whatsapp, 80),
         cleanText(b.contact_instagram, 200),
+        cleanText(b.contact_facebook, 200),
+        cleanText(b.contact_linkedin, 200),
+        cleanText(b.contact_website, 500),
+        cleanText(b.contact_address, 500),
+        cleanText(b.contact_map_url, 2000),
+        cleanText(b.contact_hours, 1000),
         cleanText(b.footer_text, 500)
       ]);
 
@@ -1324,7 +1354,9 @@ function createWebsiteCmsRouter({ pool, adminAuth }) {
         itemsBySection[row.section_id].push(itemOut(row));
       }
 
-      res.set('Cache-Control', 'no-store');
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
       res.json({
         settings: settingsQ.rows[0] || null,
         sections: sectionsQ.rows.map(row => ({
