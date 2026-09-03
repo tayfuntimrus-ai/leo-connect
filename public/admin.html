@@ -1,4 +1,3 @@
-```
 <!doctype html>
 <html lang="tr">
 <head>
@@ -1167,10 +1166,18 @@ async function showWebsiteCMS(btn){
 async function renderWebsiteCMS(){
   const [sd,ss]=await Promise.all([api('/api/admin/website/settings'),api('/api/admin/website/sections')]);
   const settings=sd.settings||{};
-  const sections=(ss.sections||[]).filter(section=>{
-    const key=String(section?.section_key||'').trim().toLowerCase();
-    const title=String(section?.title||'').trim().toLowerCase();
-    return key!=='contact' && title!=='iletişim' && title!=='iletisim';
+  const rawSections=Array.isArray(ss.sections)?ss.sections:[];
+  const sections=rawSections.filter(section=>{
+    const key=String(section?.section_key||'').trim().toLocaleLowerCase('tr-TR');
+    const title=String(section?.title||'').trim().toLocaleLowerCase('tr-TR');
+    const subtitle=String(section?.subtitle||'').trim().toLocaleLowerCase('tr-TR');
+    const description=String(section?.description||'').trim().toLocaleLowerCase('tr-TR');
+    return !['contact','iletisim','iletişim'].includes(key)
+      && !['iletisim','iletişim'].includes(title)
+      && !title.includes('iletişim')
+      && !title.includes('iletisim')
+      && !subtitle.includes('leo connect hakkında bilgi alın')
+      && !description.includes('leo connect hakkında bilgi alın');
   });
   const settingsFields=['site_name','site_tagline','seo_title','seo_description','favicon_url','logo_url','primary_color','secondary_color','contact_email','contact_phone','contact_whatsapp','contact_instagram','contact_facebook','contact_linkedin','contact_website','contact_address','contact_map_url','contact_hours','footer_text'];
   const labels={site_name:'Site adı',site_tagline:'Slogan',seo_title:'SEO başlığı',seo_description:'SEO açıklaması',favicon_url:'Favicon URL',logo_url:'Logo URL',primary_color:'Ana renk',secondary_color:'Arka plan rengi',contact_email:'E-posta',contact_phone:'Telefon',contact_whatsapp:'WhatsApp',contact_instagram:'Instagram',contact_facebook:'Facebook',contact_linkedin:'LinkedIn',contact_website:'Web sitesi',contact_address:'Adres',contact_map_url:'Google Maps / Harita linki',contact_hours:'Çalışma saatleri',footer_text:'Footer metni'};
@@ -1184,11 +1191,6 @@ async function renderWebsiteCMS(){
     <section class="cms-card"><div class="cms-head"><div><div class="cms-kicker">SİTE İÇERİĞİ</div><h3>Bölümler</h3><div class="sub">Standlar, platform, nasıl çalışır ve diğer alanlar.</div></div><button class="btn" onclick="newWebsiteSection()">＋ Bölüm Ekle</button></div><div style="margin-top:14px">${sections.map(section=>`<div class="cms-section easy"><div class="cms-section-top"><div><strong>${esc(section.title||section.section_key)}</strong><div class="sub" style="margin-top:4px">${esc(section.subtitle||section.description||'')}</div></div><div class="cms-actions"><span class="badge">${section.enabled?'YAYINDA':'GİZLİ'}</span><button class="btn" onclick="editWebsiteSection(${Number(section.id)})">Bölümü Düzenle</button><button class="btn primary" onclick="newWebsiteItem(${Number(section.id)})">${section.section_key==='stands'?'＋ Kategori Ekle':'＋ İçerik'}</button></div></div><div id="cms_items_${Number(section.id)}" class="cms-easy-items"><div class="cms-empty-action">İçerikler yükleniyor…</div></div></div>`).join('')}</div></section>
     <section class="cms-card"><div class="cms-head"><div><div class="cms-kicker">ÖNİZLEME</div><h3>Siteyi Gör</h3><div class="sub">Kaydettiğin içerikleri canlı sitede kontrol et.</div></div><button class="btn primary" onclick="window.open('/', '_blank')">Siteyi Aç ↗</button></div></section>
   </div>`;
-  // LEGACY CONTACT HARD STOP: eski İletişim section kartı API'den farklı bir key ile gelse bile gösterilmesin.
-  document.querySelectorAll('#globalContent .cms-section').forEach(el=>{
-    const title=String(el.querySelector('.cms-section-top strong')?.textContent||'').trim().toLowerCase();
-    if(title==='iletişim' || title==='iletisim') el.remove();
-  });
   await Promise.all(sections.map(async s=>{try{const d=await api('/api/admin/website/sections/'+s.id+'/items');const el=document.getElementById('cms_items_'+s.id);const items=d.items||[];if(!el)return;el.innerHTML=items.length?items.map(i=>renderWebsiteItemRow(i,s)).join(''):'<div class="cms-empty-action">Bu bölümde henüz içerik yok. <button class="btn primary" style="margin-left:8px" onclick="newWebsiteItem('+Number(s.id)+')">'+(s.section_key==='stands'?'＋ İlk Ürünü Ekle':'＋ İlk İçeriği Ekle')+'</button></div>'}catch(e){const el=document.getElementById('cms_items_'+s.id);if(el)el.innerHTML='<div class="cms-empty-action">İçerikler alınamadı.</div>'}}));
 }
 function cmsInput(id,label,value,full=false){return `<div class="cms-field ${full?'full':''}"><label>${label}</label><input id="${id}" value="${esc(value||'')}"></div>`}
@@ -1376,18 +1378,33 @@ document.getElementById("loginPassword").addEventListener("keydown",e=>{if(e.key
 restoreTheme();
 if(adminToken){showApp();loadAll()}
 </script>
-</body>
-</html>
-<script>
-(function legacyContactSweep(){
-  function sweep(){
-    document.querySelectorAll('[class*="site-section-card"],[class*="section-card"]').forEach(function(el){
-      var t=(el.innerText||'').trim().toLowerCase();
-      if(t.startsWith('iletişim\n') || t.includes('leo connect hakkında bilgi alın')) el.classList.add('leo-legacy-contact-section');
+<script id="leo-contact-hard-stop">
+(function(){
+  function removeLegacyContactCards(){
+    const root=document.getElementById('globalContent');
+    if(!root) return;
+    root.querySelectorAll('.cms-section').forEach(function(el){
+      const title=(el.querySelector('.cms-section-top strong')?.textContent||'')
+        .trim().toLocaleLowerCase('tr-TR');
+      const subtitle=(el.querySelector('.cms-section-top .sub')?.textContent||'')
+        .trim().toLocaleLowerCase('tr-TR');
+      if(title==='iletişim' || title==='iletisim' ||
+         title.includes('iletişim') || title.includes('iletisim') ||
+         subtitle.includes('leo connect hakkında bilgi alın')){
+        el.remove();
+      }
     });
   }
-  document.addEventListener('DOMContentLoaded',sweep);
-  setTimeout(sweep,800); setTimeout(sweep,1800);
+  document.addEventListener('DOMContentLoaded',removeLegacyContactCards);
+  setTimeout(removeLegacyContactCards,300);
+  setTimeout(removeLegacyContactCards,1000);
+  setTimeout(removeLegacyContactCards,2000);
+  const root=document.getElementById('globalContent');
+  if(root){
+    new MutationObserver(removeLegacyContactCards).observe(root,{childList:true,subtree:true});
+  }
 })();
 </script>
-```
+
+</body>
+</html>
