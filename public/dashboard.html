@@ -2543,6 +2543,9 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
 .logo-placeholder .leo-lion-logo{width:54px;height:54px}
 .preview-logo .leo-lion-logo{width:54px;height:54px}
 </style>
+<style id="leo-table-code-style">
+.table-code-panel{margin-top:18px;border:1px solid #292929;border-radius:20px;background:#0d0d0d;padding:18px}.table-code-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}.table-code-head h3{margin:0;font-size:16px}.table-code-head p{margin:5px 0 0;color:#777;font-size:10px;line-height:1.55}.table-code-refresh{border:1px solid #303030;background:#151515;color:#ddd;border-radius:9px;padding:8px 11px;font-size:10px;font-weight:800;cursor:pointer}.table-code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.table-code-item{display:grid;grid-template-columns:82px 1fr;gap:13px;padding:13px;border:1px solid #292929;border-radius:15px;background:#101010;min-width:0}.table-code-qr{width:82px;height:82px;border-radius:10px;background:#fff;object-fit:contain;padding:5px;box-sizing:border-box}.table-code-qr.loading{opacity:.65}.table-code-main{min-width:0}.table-code-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.table-code-name{font-size:13px;font-weight:900;color:#eee;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.table-code-place{margin-top:4px;color:#999;font-size:10px}.table-code-url{margin-top:8px;color:#666;font-size:9px;line-height:1.45;word-break:break-all}.table-code-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.table-code-actions button{border:1px solid #292929;background:#151515;color:#ddd;border-radius:8px;padding:6px 8px;font-size:9px;font-weight:800;cursor:pointer}.table-code-actions .gold{background:var(--gold);border-color:var(--gold);color:#090909}.table-code-status{font-size:8px;font-weight:900;padding:5px 7px;border-radius:999px;white-space:nowrap}.table-code-status.on{background:#18351f;color:#8fe0a0;border:1px solid #285b35}.table-code-status.off{background:#211616;color:#d88f8f;border:1px solid #4d2929}.table-code-empty{padding:20px;text-align:center;color:#666;border:1px dashed #292929;border-radius:13px;font-size:10px}.table-code-note{margin-top:10px;color:#666;font-size:9px;line-height:1.5}@media(max-width:760px){.table-code-grid{grid-template-columns:1fr}.table-code-item{grid-template-columns:72px 1fr}.table-code-qr{width:72px;height:72px}}
+</style>
 </head>
 
 
@@ -3618,7 +3621,11 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
 
     </div>
 
-
+    <div id="tableCodesPanel" class="table-code-panel">
+      <div class="table-code-head"><div><div class="eyebrow">MASA / NOKTA KODLARI</div><h3>İşletmene özel QR + NFC kodları</h3><p>Admin panelinde oluşturulan masa, kasa, menü veya diğer NFC noktaları burada otomatik görünür.</p></div><button type="button" class="table-code-refresh" onclick="loadBusinessTableCodes(true)">↻ Yenile</button></div>
+      <div id="tableCodesList" class="table-code-grid"><div class="table-code-empty">Masa / nokta kodları yükleniyor...</div></div>
+      <div class="table-code-note">Bu bölüm mevcut NFC etiket kayıtlarını kullanır. Admin tarafından yapılan ad, konum veya aktiflik değişiklikleri yenileme sonrası burada da aynı şekilde görünür.</div>
+    </div>
 
   </div>
 
@@ -6798,6 +6805,28 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
     showBusinessSection('overview');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+<script id="leo-business-table-codes">
+(function(){
+  function escTC(v){const d=document.createElement('div');d.textContent=String(v==null?'':v);return d.innerHTML;}
+  function tcUrl(t){return t?.url||('/p/nfc/'+encodeURIComponent(t?.code||''));}
+  window.loadBusinessTableCodes=async function(){
+    const list=document.getElementById('tableCodesList');if(!list)return;list.innerHTML='<div class="table-code-empty">Masa / nokta kodları yükleniyor...</div>';
+    try{
+      const tags=await api('/api/nfc-tags?fresh='+Date.now(),{cache:'no-store'});
+      const rows=Array.isArray(tags)?tags:(tags?.nfc_tags||[]);
+      if(!rows.length){list.innerHTML='<div class="table-code-empty">Henüz masa / nokta kodu oluşturulmamış.</div>';return;}
+      list.innerHTML=rows.map(t=>{const url=tcUrl(t);return `<article class="table-code-item"><img id="tableCodeQr_${Number(t.id)}" class="table-code-qr loading" alt="${escTC(t.name||'NFC QR')} QR"><div class="table-code-main"><div class="table-code-top"><div class="table-code-name">${escTC(t.name||'NFC Etiketi')}</div><span class="table-code-status ${t.is_active!==false?'on':'off'}">${t.is_active!==false?'AKTİF':'PASİF'}</span></div><div class="table-code-place">📍 ${escTC(t.placement||'Konum belirtilmemiş')} · ${Number(t.tap_count||0)} dokunuş</div><div class="table-code-url">${escTC(url)}</div><div class="table-code-actions"><button type="button" class="gold" onclick="copyBusinessTableCode(${JSON.stringify(url)})">URL Kopyala</button><button type="button" onclick="openBusinessTableCode(${JSON.stringify(url)})">Test Et ↗</button><button type="button" onclick="downloadBusinessTableQR(${Number(t.id)},${JSON.stringify(t.name||'masa-kodu')})">QR İndir</button></div></div></article>`}).join('');
+      rows.forEach(t=>loadOneTableCodeQR(t.id));
+    }catch(e){list.innerHTML='<div class="table-code-empty">'+escTC(e.message||'Masa / nokta kodları alınamadı.')+'</div>';}
+  };
+  async function loadOneTableCodeQR(id){const img=document.getElementById('tableCodeQr_'+Number(id));if(!img)return;try{const d=await api('/api/nfc-tags/'+Number(id)+'/qr?fresh='+Date.now(),{cache:'no-store'});if(d?.qr){img.src=d.qr;img.classList.remove('loading');img.dataset.qr=d.qr;}}catch(e){img.classList.remove('loading');img.alt='QR alınamadı';}}
+  window.copyBusinessTableCode=async function(url){try{await navigator.clipboard.writeText(url);showToast('Masa / nokta URL’si kopyalandı.');}catch(e){showToast('URL kopyalanamadı.');}};
+  window.openBusinessTableCode=function(url){window.open(url,'_blank','noopener');};
+  window.downloadBusinessTableQR=function(id,name){const img=document.getElementById('tableCodeQr_'+Number(id));if(!img?.dataset?.qr){showToast('QR henüz hazır değil, bir saniye sonra tekrar dene.');return;}const a=document.createElement('a');a.href=img.dataset.qr;a.download='leo-connect-'+String(name||'masa-kodu').replace(/[^a-z0-9ğüşöçıİĞÜŞÖÇ_-]+/gi,'-').toLowerCase()+'.png';a.click();};
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&document.getElementById('tableCodesPanel'))loadBusinessTableCodes();});
+  window.addEventListener('focus',()=>{if(document.getElementById('tableCodesPanel')?.offsetParent!==null)loadBusinessTableCodes();});
 })();
 </script>
 </body>
