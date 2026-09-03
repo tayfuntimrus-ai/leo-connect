@@ -8,7 +8,6 @@ const QRCode = require('qrcode');
 const { Pool } = require('pg');
 const path = require('path');
 const crypto = require('crypto');
-const { createWebsiteCmsRouter } = require('./LEO-CONNECT-WEBSITE-CMS-MODULE-V1');
 
 const app = express();
 
@@ -690,7 +689,629 @@ function adminAuth(req, res, next) {
 
 /* =========================================================
    WEBSITE CMS — SEPARATE CORPORATE WEBSITE
+   Tek dosya entegrasyonu — harici modül gerektirmez
 ========================================================= */
+function createWebsiteCmsRouter({ pool, adminAuth }) {
+  if (!pool) throw new Error('Website CMS: pool gerekli');
+  if (!adminAuth) throw new Error('Website CMS: adminAuth gerekli');
+
+  const router = express.Router();
+
+  // -------------------------------------------------------
+  // DATABASE
+  // -------------------------------------------------------
+  async function initWebsiteCmsDatabase() {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS site_settings (
+        id INTEGER PRIMARY KEY DEFAULT 1,
+        site_name TEXT NOT NULL DEFAULT 'LEO CONNECT',
+        site_tagline TEXT NOT NULL DEFAULT '',
+        seo_title TEXT NOT NULL DEFAULT '',
+        seo_description TEXT NOT NULL DEFAULT '',
+        favicon_url TEXT NOT NULL DEFAULT '',
+        logo_url TEXT NOT NULL DEFAULT '',
+        primary_color TEXT NOT NULL DEFAULT '#D6AD5B',
+        secondary_color TEXT NOT NULL DEFAULT '#080A0F',
+        contact_email TEXT NOT NULL DEFAULT '',
+        contact_phone TEXT NOT NULL DEFAULT '',
+        contact_whatsapp TEXT NOT NULL DEFAULT '',
+        contact_instagram TEXT NOT NULL DEFAULT '',
+        footer_text TEXT NOT NULL DEFAULT '',
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      INSERT INTO site_settings(id)
+      VALUES(1)
+      ON CONFLICT(id) DO NOTHING
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS site_sections (
+        id SERIAL PRIMARY KEY,
+        section_key TEXT NOT NULL UNIQUE,
+        title TEXT NOT NULL DEFAULT '',
+        subtitle TEXT NOT NULL DEFAULT '',
+        description TEXT NOT NULL DEFAULT '',
+        enabled BOOLEAN NOT NULL DEFAULT TRUE,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        settings JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS site_items (
+        id SERIAL PRIMARY KEY,
+        section_id INTEGER NOT NULL
+          REFERENCES site_sections(id)
+          ON DELETE CASCADE,
+        item_key TEXT NOT NULL DEFAULT '',
+        title TEXT NOT NULL DEFAULT '',
+        short_text TEXT NOT NULL DEFAULT '',
+        description TEXT NOT NULL DEFAULT '',
+        image_url TEXT NOT NULL DEFAULT '',
+        button_text TEXT NOT NULL DEFAULT '',
+        button_url TEXT NOT NULL DEFAULT '',
+        enabled BOOLEAN NOT NULL DEFAULT TRUE,
+        featured BOOLEAN NOT NULL DEFAULT FALSE,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        content JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_site_items_section
+      ON site_items(section_id, sort_order, id)
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS site_media (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL DEFAULT '',
+        file_url TEXT NOT NULL,
+        alt_text TEXT NOT NULL DEFAULT '',
+        media_type TEXT NOT NULL DEFAULT 'image',
+        enabled BOOLEAN NOT NULL DEFAULT TRUE,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_site_media_sort
+      ON site_media(sort_order, id)
+    `);
+
+    // İlk kurulum için ana bölümleri hazırla.
+    const sections = [
+      ['hero', 'Hero', 'LEO CONNECT', 'İşletmenizin dijital kimliği.', 0],
+      ['platform', 'Platform', 'Bir QR’dan çok daha fazlası.', 'LEO CONNECT platform özellikleri.', 10],
+      ['how-it-works', 'Nasıl Çalışır?', 'Fiziksel temas. Dijital deneyim.', '', 20],
+      ['stands', 'Standlar', 'QR & NFC deneyimini fiziksel alana taşıyın.', '', 30],
+      ['contact', 'İletişim', 'LEO CONNECT hakkında bilgi alın.', '', 40],
+      ['footer', 'Footer', 'LEO CONNECT', '', 50]
+    ];
+
+    for (const [key, title, subtitle, description, sort] of sections) {
+      await pool.query(`
+        INSERT INTO site_sections(
+          section_key,title,subtitle,description,sort_order
+        )
+        VALUES($1,$2,$3,$4,$5)
+        ON CONFLICT(section_key) DO NOTHING
+      `, [key, title, subtitle, description, sort]);
+    }
+  }
+
+  // -------------------------------------------------------
+  // NORMALIZATION
+  // -------------------------------------------------------
+  function normalizeJson(value, fallback = {}) {
+    if (typeof value === 'string') {
+      try { value = JSON.parse(value); } catch (_) { value = fallback; }
+    }
+    return value && typeof value === 'object' && !Array.isArray(value)
+      ? value
+      : fallback;
+  }
+
+  function cleanText(value, max = 5000) {
+    return String(value ?? '').trim().slice(0, max);
+  }
+
+  function sectionOut(row) {
+    return {
+      ...row,
+      enabled: row.enabled === true,
+      settings: normalizeJson(row.settings, {})
+    };
+  }
+
+  function itemOut(row) {
+    return {
+      ...row,
+      enabled: row.enabled === true,
+      featured: row.featured === true,
+      content: normalizeJson(row.content, {})
+    };
+  }
+
+  // -------------------------------------------------------
+  // ADMIN — SETTINGS
+  // -------------------------------------------------------
+  router.get('/api/admin/website/settings', adminAuth, async (req, res) => {
+    try {
+      const r = await pool.query(`SELECT * FROM site_settings WHERE id=1`);
+      res.json({ settings: r.rows[0] || null });
+    } catch (e) {
+      console.error('WEBSITE SETTINGS GET ERROR:', e);
+      res.status(500).json({ error: 'Ana site ayarları alınamadı' });
+    }
+  });
+
+  router.put('/api/admin/website/settings', adminAuth, async (req, res) => {
+    try {
+      const b = req.body || {};
+      const r = await pool.query(`
+        UPDATE site_settings
+        SET
+          site_name=$1,
+          site_tagline=$2,
+          seo_title=$3,
+          seo_description=$4,
+          favicon_url=$5,
+          logo_url=$6,
+          primary_color=$7,
+          secondary_color=$8,
+          contact_email=$9,
+          contact_phone=$10,
+          contact_whatsapp=$11,
+          contact_instagram=$12,
+          footer_text=$13,
+          updated_at=CURRENT_TIMESTAMP
+        WHERE id=1
+        RETURNING *
+      `, [
+        cleanText(b.site_name, 120) || 'LEO CONNECT',
+        cleanText(b.site_tagline, 300),
+        cleanText(b.seo_title, 160),
+        cleanText(b.seo_description, 320),
+        cleanText(b.favicon_url, 2000),
+        cleanText(b.logo_url, 2000),
+        cleanText(b.primary_color, 30) || '#D6AD5B',
+        cleanText(b.secondary_color, 30) || '#080A0F',
+        cleanText(b.contact_email, 200),
+        cleanText(b.contact_phone, 80),
+        cleanText(b.contact_whatsapp, 80),
+        cleanText(b.contact_instagram, 200),
+        cleanText(b.footer_text, 500)
+      ]);
+
+      res.json({ settings: r.rows[0] });
+    } catch (e) {
+      console.error('WEBSITE SETTINGS UPDATE ERROR:', e);
+      res.status(500).json({ error: 'Ana site ayarları kaydedilemedi' });
+    }
+  });
+
+  // -------------------------------------------------------
+  // ADMIN — SECTIONS
+  // -------------------------------------------------------
+  router.get('/api/admin/website/sections', adminAuth, async (req, res) => {
+    try {
+      const r = await pool.query(`
+        SELECT *
+        FROM site_sections
+        ORDER BY sort_order ASC, id ASC
+      `);
+      res.json({ sections: r.rows.map(sectionOut) });
+    } catch (e) {
+      console.error('WEBSITE SECTIONS GET ERROR:', e);
+      res.status(500).json({ error: 'Ana site bölümleri alınamadı' });
+    }
+  });
+
+  router.post('/api/admin/website/sections', adminAuth, async (req, res) => {
+    try {
+      const b = req.body || {};
+      const key = cleanText(b.section_key, 80)
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, '-');
+
+      if (!key) {
+        return res.status(400).json({ error: 'Bölüm anahtarı gerekli' });
+      }
+
+      const r = await pool.query(`
+        INSERT INTO site_sections(
+          section_key,title,subtitle,description,enabled,sort_order,settings
+        )
+        VALUES($1,$2,$3,$4,$5,$6,$7::jsonb)
+        RETURNING *
+      `, [
+        key,
+        cleanText(b.title, 160),
+        cleanText(b.subtitle, 300),
+        cleanText(b.description, 5000),
+        b.enabled !== false,
+        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 100,
+        JSON.stringify(normalizeJson(b.settings, {}))
+      ]);
+
+      res.status(201).json({ section: sectionOut(r.rows[0]) });
+    } catch (e) {
+      console.error('WEBSITE SECTION CREATE ERROR:', e);
+      res.status(500).json({
+        error: e.code === '23505'
+          ? 'Bu bölüm anahtarı zaten kullanılıyor'
+          : 'Bölüm oluşturulamadı'
+      });
+    }
+  });
+
+  router.put('/api/admin/website/sections/:id', adminAuth, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({ error: 'Geçersiz bölüm ID' });
+      }
+
+      const b = req.body || {};
+      const r = await pool.query(`
+        UPDATE site_sections
+        SET
+          title=$1,
+          subtitle=$2,
+          description=$3,
+          enabled=$4,
+          sort_order=$5,
+          settings=$6::jsonb,
+          updated_at=CURRENT_TIMESTAMP
+        WHERE id=$7
+        RETURNING *
+      `, [
+        cleanText(b.title, 160),
+        cleanText(b.subtitle, 300),
+        cleanText(b.description, 5000),
+        b.enabled !== false,
+        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 100,
+        JSON.stringify(normalizeJson(b.settings, {})),
+        id
+      ]);
+
+      if (!r.rows.length) {
+        return res.status(404).json({ error: 'Bölüm bulunamadı' });
+      }
+
+      res.json({ section: sectionOut(r.rows[0]) });
+    } catch (e) {
+      console.error('WEBSITE SECTION UPDATE ERROR:', e);
+      res.status(500).json({ error: 'Bölüm güncellenemedi' });
+    }
+  });
+
+  router.delete('/api/admin/website/sections/:id', adminAuth, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const r = await pool.query(
+        `DELETE FROM site_sections WHERE id=$1 RETURNING id`,
+        [id]
+      );
+
+      if (!r.rows.length) {
+        return res.status(404).json({ error: 'Bölüm bulunamadı' });
+      }
+
+      res.json({ success: true });
+    } catch (e) {
+      console.error('WEBSITE SECTION DELETE ERROR:', e);
+      res.status(500).json({ error: 'Bölüm silinemedi' });
+    }
+  });
+
+  // -------------------------------------------------------
+  // ADMIN — ITEMS
+  // -------------------------------------------------------
+  router.get('/api/admin/website/sections/:sectionId/items', adminAuth, async (req, res) => {
+    try {
+      const sectionId = Number(req.params.sectionId);
+      const r = await pool.query(`
+        SELECT *
+        FROM site_items
+        WHERE section_id=$1
+        ORDER BY sort_order ASC, id ASC
+      `, [sectionId]);
+
+      res.json({ items: r.rows.map(itemOut) });
+    } catch (e) {
+      console.error('WEBSITE ITEMS GET ERROR:', e);
+      res.status(500).json({ error: 'Site içerikleri alınamadı' });
+    }
+  });
+
+  router.post('/api/admin/website/sections/:sectionId/items', adminAuth, async (req, res) => {
+    try {
+      const sectionId = Number(req.params.sectionId);
+      const exists = await pool.query(
+        `SELECT id FROM site_sections WHERE id=$1 LIMIT 1`,
+        [sectionId]
+      );
+
+      if (!exists.rows.length) {
+        return res.status(404).json({ error: 'Bölüm bulunamadı' });
+      }
+
+      const b = req.body || {};
+      const r = await pool.query(`
+        INSERT INTO site_items(
+          section_id,item_key,title,short_text,description,image_url,
+          button_text,button_url,enabled,featured,sort_order,content
+        )
+        VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12::jsonb)
+        RETURNING *
+      `, [
+        sectionId,
+        cleanText(b.item_key, 80),
+        cleanText(b.title, 160),
+        cleanText(b.short_text, 500),
+        cleanText(b.description, 5000),
+        cleanText(b.image_url, 2000),
+        cleanText(b.button_text, 100),
+        cleanText(b.button_url, 2000),
+        b.enabled !== false,
+        b.featured === true,
+        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 0,
+        JSON.stringify(normalizeJson(b.content, {}))
+      ]);
+
+      res.status(201).json({ item: itemOut(r.rows[0]) });
+    } catch (e) {
+      console.error('WEBSITE ITEM CREATE ERROR:', e);
+      res.status(500).json({ error: 'Site içeriği oluşturulamadı' });
+    }
+  });
+
+  router.put('/api/admin/website/items/:id', adminAuth, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const b = req.body || {};
+
+      const r = await pool.query(`
+        UPDATE site_items
+        SET
+          item_key=$1,
+          title=$2,
+          short_text=$3,
+          description=$4,
+          image_url=$5,
+          button_text=$6,
+          button_url=$7,
+          enabled=$8,
+          featured=$9,
+          sort_order=$10,
+          content=$11::jsonb,
+          updated_at=CURRENT_TIMESTAMP
+        WHERE id=$12
+        RETURNING *
+      `, [
+        cleanText(b.item_key, 80),
+        cleanText(b.title, 160),
+        cleanText(b.short_text, 500),
+        cleanText(b.description, 5000),
+        cleanText(b.image_url, 2000),
+        cleanText(b.button_text, 100),
+        cleanText(b.button_url, 2000),
+        b.enabled !== false,
+        b.featured === true,
+        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 0,
+        JSON.stringify(normalizeJson(b.content, {})),
+        id
+      ]);
+
+      if (!r.rows.length) {
+        return res.status(404).json({ error: 'Site içeriği bulunamadı' });
+      }
+
+      res.json({ item: itemOut(r.rows[0]) });
+    } catch (e) {
+      console.error('WEBSITE ITEM UPDATE ERROR:', e);
+      res.status(500).json({ error: 'Site içeriği güncellenemedi' });
+    }
+  });
+
+  router.delete('/api/admin/website/items/:id', adminAuth, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const r = await pool.query(
+        `DELETE FROM site_items WHERE id=$1 RETURNING id`,
+        [id]
+      );
+
+      if (!r.rows.length) {
+        return res.status(404).json({ error: 'Site içeriği bulunamadı' });
+      }
+
+      res.json({ success: true });
+    } catch (e) {
+      console.error('WEBSITE ITEM DELETE ERROR:', e);
+      res.status(500).json({ error: 'Site içeriği silinemedi' });
+    }
+  });
+
+  // -------------------------------------------------------
+  // ADMIN — MEDIA
+  // -------------------------------------------------------
+  router.get('/api/admin/website/media', adminAuth, async (req, res) => {
+    try {
+      const r = await pool.query(`
+        SELECT *
+        FROM site_media
+        ORDER BY sort_order ASC, id DESC
+      `);
+      res.json({ media: r.rows });
+    } catch (e) {
+      console.error('WEBSITE MEDIA GET ERROR:', e);
+      res.status(500).json({ error: 'Site medyaları alınamadı' });
+    }
+  });
+
+  router.post('/api/admin/website/media', adminAuth, async (req, res) => {
+    try {
+      const b = req.body || {};
+      const url = cleanText(b.file_url, 2000);
+
+      if (!url) {
+        return res.status(400).json({ error: 'Medya URL gerekli' });
+      }
+
+      const r = await pool.query(`
+        INSERT INTO site_media(
+          title,file_url,alt_text,media_type,enabled,sort_order,metadata
+        )
+        VALUES($1,$2,$3,$4,$5,$6,$7::jsonb)
+        RETURNING *
+      `, [
+        cleanText(b.title, 160),
+        url,
+        cleanText(b.alt_text, 300),
+        cleanText(b.media_type, 40) || 'image',
+        b.enabled !== false,
+        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 0,
+        JSON.stringify(normalizeJson(b.metadata, {}))
+      ]);
+
+      res.status(201).json({ media: r.rows[0] });
+    } catch (e) {
+      console.error('WEBSITE MEDIA CREATE ERROR:', e);
+      res.status(500).json({ error: 'Medya kaydedilemedi' });
+    }
+  });
+
+  router.put('/api/admin/website/media/:id', adminAuth, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const b = req.body || {};
+
+      const r = await pool.query(`
+        UPDATE site_media
+        SET
+          title=$1,
+          file_url=$2,
+          alt_text=$3,
+          media_type=$4,
+          enabled=$5,
+          sort_order=$6,
+          metadata=$7::jsonb,
+          updated_at=CURRENT_TIMESTAMP
+        WHERE id=$8
+        RETURNING *
+      `, [
+        cleanText(b.title, 160),
+        cleanText(b.file_url, 2000),
+        cleanText(b.alt_text, 300),
+        cleanText(b.media_type, 40) || 'image',
+        b.enabled !== false,
+        Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : 0,
+        JSON.stringify(normalizeJson(b.metadata, {})),
+        id
+      ]);
+
+      if (!r.rows.length) {
+        return res.status(404).json({ error: 'Medya bulunamadı' });
+      }
+
+      res.json({ media: r.rows[0] });
+    } catch (e) {
+      console.error('WEBSITE MEDIA UPDATE ERROR:', e);
+      res.status(500).json({ error: 'Medya güncellenemedi' });
+    }
+  });
+
+  router.delete('/api/admin/website/media/:id', adminAuth, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const r = await pool.query(
+        `DELETE FROM site_media WHERE id=$1 RETURNING id`,
+        [id]
+      );
+
+      if (!r.rows.length) {
+        return res.status(404).json({ error: 'Medya bulunamadı' });
+      }
+
+      res.json({ success: true });
+    } catch (e) {
+      console.error('WEBSITE MEDIA DELETE ERROR:', e);
+      res.status(500).json({ error: 'Medya silinemedi' });
+    }
+  });
+
+  // -------------------------------------------------------
+  // PUBLIC — READ ONLY
+  // -------------------------------------------------------
+  router.get('/api/public/website', async (req, res) => {
+    try {
+      const settingsQ = await pool.query(`
+        SELECT *
+        FROM site_settings
+        WHERE id=1
+      `);
+
+      const sectionsQ = await pool.query(`
+        SELECT *
+        FROM site_sections
+        WHERE enabled=TRUE
+        ORDER BY sort_order ASC, id ASC
+      `);
+
+      const itemsQ = await pool.query(`
+        SELECT i.*
+        FROM site_items i
+        INNER JOIN site_sections s ON s.id=i.section_id
+        WHERE i.enabled=TRUE
+          AND s.enabled=TRUE
+        ORDER BY i.section_id ASC, i.sort_order ASC, i.id ASC
+      `);
+
+      const mediaQ = await pool.query(`
+        SELECT *
+        FROM site_media
+        WHERE enabled=TRUE
+        ORDER BY sort_order ASC, id ASC
+      `);
+
+      const itemsBySection = {};
+      for (const row of itemsQ.rows) {
+        if (!itemsBySection[row.section_id]) itemsBySection[row.section_id] = [];
+        itemsBySection[row.section_id].push(itemOut(row));
+      }
+
+      res.set('Cache-Control', 'no-store');
+      res.json({
+        settings: settingsQ.rows[0] || null,
+        sections: sectionsQ.rows.map(row => ({
+          ...sectionOut(row),
+          items: itemsBySection[row.id] || []
+        })),
+        media: mediaQ.rows
+      });
+    } catch (e) {
+      console.error('PUBLIC WEBSITE GET ERROR:', e);
+      res.status(500).json({ error: 'Ana site içeriği alınamadı' });
+    }
+  });
+
+  return { router, initWebsiteCmsDatabase };
+}
+
+
 const websiteCms = createWebsiteCmsRouter({ pool, adminAuth });
 app.use(websiteCms.router);
 
