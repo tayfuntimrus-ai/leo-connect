@@ -2547,7 +2547,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
 .table-code-panel{margin-top:18px;border:1px solid #292929;border-radius:20px;background:#0d0d0d;padding:18px}
 .table-code-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
 .table-code-head h3{margin:0;font-size:17px}.table-code-head p{margin:5px 0 0;color:#777;font-size:10px;line-height:1.55}.table-code-create,.table-code-refresh{border:1px solid #303030;background:#151515;color:#ddd;border-radius:9px;padding:9px 12px;font-size:10px;font-weight:800;cursor:pointer}.table-code-create{background:var(--gold);color:#090909;border-color:var(--gold)}
-.table-code-list{display:grid;gap:9px}.table-code-row{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:11px 12px;border:1px solid #292929;border-radius:14px;background:#101010}.table-code-qr{width:64px;height:64px;border-radius:9px;background:#fff;padding:4px;box-sizing:border-box;object-fit:contain}.table-code-main{min-width:0}.table-code-name-line{display:flex;align-items:center;gap:8px}.table-code-name{font-size:13px;font-weight:900;color:#eee}.table-code-meta{margin-top:4px;color:#888;font-size:9px}.table-code-stat{margin-top:6px;color:#aaa;font-size:10px}.table-code-stat b{color:#eee}.table-code-actions{display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap}.table-code-actions button{border:1px solid #292929;background:#151515;color:#ddd;border-radius:8px;padding:7px 9px;font-size:9px;font-weight:800;cursor:pointer}.table-code-actions .gold{background:var(--gold);border-color:var(--gold);color:#090909}.table-code-actions .danger{border-color:#4a2929;color:#e2a0a0}.table-code-status{font-size:8px;font-weight:900;padding:4px 7px;border-radius:999px;white-space:nowrap}.table-code-status.on{background:#18351f;color:#8fe0a0;border:1px solid #285b35}.table-code-status.off{background:#211616;color:#d88f8f;border:1px solid #4d2929}.table-code-empty{padding:22px;text-align:center;color:#666;border:1px dashed #292929;border-radius:13px;font-size:10px}.table-code-note{margin-top:10px;color:#666;font-size:9px;line-height:1.5}.table-code-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}.table-code-modal-card{width:min(420px,100%);border:1px solid #3a3020;border-radius:18px;background:#12100c;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.45)}.table-code-modal-card h3{margin:0 0 5px;color:#eee;font-size:17px}.table-code-modal-card p{margin:0;color:#888;font-size:10px;line-height:1.5}.table-code-field{display:grid;gap:6px;margin-top:14px}.table-code-field span{font-size:9px;color:#999}.table-code-field input{width:100%;box-sizing:border-box;border:1px solid #303030;background:#080808;color:#eee;border-radius:9px;padding:10px 11px;outline:none;font-size:13px}.table-code-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.table-code-modal-actions button{border:1px solid #292929;background:#151515;color:#ddd;border-radius:8px;padding:8px 11px;font-size:9px;font-weight:800;cursor:pointer}.table-code-modal-actions .gold{background:var(--gold);border-color:var(--gold);color:#090909}@media(max-width:760px){.table-code-row{grid-template-columns:56px 1fr}.table-code-qr{width:56px;height:56px}.table-code-actions{grid-column:1/-1;justify-content:flex-start}.table-code-head{align-items:flex-start;flex-direction:column}}
+.table-code-list{display:grid;gap:9px}.table-code-row{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:11px 12px;border:1px solid #292929;border-radius:14px;background:#101010}.table-code-qr-wrap{width:64px;height:64px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}.table-code-qr-wrap .table-code-qr{width:64px;height:64px;border-radius:9px;background:#fff;padding:4px;box-sizing:border-box;object-fit:contain;display:block}.table-code-qr-wrap span{display:none;color:#999;font-size:8px;font-weight:900}.table-code-qr-wrap.broken span{display:block}.table-code-main{min-width:0}.table-code-name-line{display:flex;align-items:center;gap:8px}.table-code-name{font-size:13px;font-weight:900;color:#eee}.table-code-meta{margin-top:4px;color:#888;font-size:9px}.table-code-stat{margin-top:6px;color:#aaa;font-size:10px}.table-code-stat b{color:#eee}.table-code-actions{display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap}.table-code-actions button{border:1px solid #292929;background:#151515;color:#ddd;border-radius:8px;padding:7px 9px;font-size:9px;font-weight:800;cursor:pointer}.table-code-actions .gold{background:var(--gold);border-color:var(--gold);color:#090909}.table-code-actions .danger{border-color:#4a2929;color:#e2a0a0}.table-code-status{font-size:8px;font-weight:900;padding:4px 7px;border-radius:999px;white-space:nowrap}.table-code-status.on{background:#18351f;color:#8fe0a0;border:1px solid #285b35}.table-code-status.off{background:#211616;color:#d88f8f;border:1px solid #4d2929}.table-code-empty{padding:22px;text-align:center;color:#666;border:1px dashed #292929;border-radius:13px;font-size:10px}.table-code-note{margin-top:10px;color:#666;font-size:9px;line-height:1.5}.table-code-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}.table-code-modal-card{width:min(420px,100%);border:1px solid #3a3020;border-radius:18px;background:#12100c;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.45)}.table-code-modal-card h3{margin:0 0 5px;color:#eee;font-size:17px}.table-code-modal-card p{margin:0;color:#888;font-size:10px;line-height:1.5}.table-code-field{display:grid;gap:6px;margin-top:14px}.table-code-field span{font-size:9px;color:#999}.table-code-field input{width:100%;box-sizing:border-box;border:1px solid #303030;background:#080808;color:#eee;border-radius:9px;padding:10px 11px;outline:none;font-size:13px}.table-code-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.table-code-modal-actions button{border:1px solid #292929;background:#151515;color:#ddd;border-radius:8px;padding:8px 11px;font-size:9px;font-weight:800;cursor:pointer}.table-code-modal-actions .gold{background:var(--gold);border-color:var(--gold);color:#090909}@media(max-width:760px){.table-code-row{grid-template-columns:56px 1fr}.table-code-qr{width:56px;height:56px}.table-code-actions{grid-column:1/-1;justify-content:flex-start}.table-code-head{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 
@@ -6818,20 +6818,22 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 (function(){
   let editingId=null;
   let loadedRows=[];
-  function esc(v){const d=document.createElement('div');d.textContent=String(v==null?'':v);return d.innerHTML;}
+  const esc=v=>{const d=document.createElement('div');d.textContent=String(v==null?'':v);return d.innerHTML;};
+  const attr=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const byId=id=>loadedRows.find(x=>Number(x.id)===Number(id));
   function nextTableNumber(rows){
     const nums=rows.map(r=>{const m=String(r.name||'').match(/^Masa\s*(\d+)$/i);return m?Number(m[1]):0;});
     let n=1;while(nums.includes(n))n++;return n;
   }
   function setModal(show){const el=document.getElementById('tableCodeModal');if(el)el.style.display=show?'flex':'none';}
   window.openBusinessTableCodeForm=function(id){
-    editingId=id||null;
-    const row=loadedRows.find(x=>Number(x.id)===Number(id));
+    editingId=id?Number(id):null;
+    const row=editingId?byId(editingId):null;
     const input=document.getElementById('tableCodeNameInput');
     const title=document.getElementById('tableCodeModalTitle');
     const save=document.getElementById('tableCodeModalSave');
     if(title)title.textContent=editingId?'Masayı Düzenle':'Yeni Masa';
-    if(save)save.textContent=editingId?'Kaydet':'Masayı Oluştur';
+    if(save){save.textContent=editingId?'Kaydet':'Masayı Oluştur';save.disabled=false;}
     if(input)input.value=row?.name||('Masa '+nextTableNumber(loadedRows));
     setModal(true);setTimeout(()=>input?.focus(),60);
   };
@@ -6841,40 +6843,112 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
     if(!name){showToast('Masa adı gerekli.');return;}
     const btn=document.getElementById('tableCodeModalSave');if(btn)btn.disabled=true;
     try{
-      if(editingId){await api('/api/nfc-tags/'+editingId,{method:'PUT',body:JSON.stringify({name,placement:'Masa',is_active:true})});showToast('Masa güncellendi.');}
-      else{await api('/api/nfc-tags',{method:'POST',body:JSON.stringify({name,placement:'Masa',is_active:true})});showToast('Masa oluşturuldu. Admin paneline de yansıdı.');}
+      if(editingId){
+        const row=byId(editingId);
+        await api('/api/nfc-tags/'+editingId,{method:'PUT',body:JSON.stringify({name,placement:'Masa',is_active:row?.is_active!==false})});
+        showToast('Masa güncellendi.');
+      }else{
+        await api('/api/nfc-tags',{method:'POST',body:JSON.stringify({name,placement:'Masa',is_active:true})});
+        showToast('Masa oluşturuldu. Admin paneline de yansıdı.');
+      }
       closeBusinessTableCodeForm();await loadBusinessTableCodes();
     }catch(e){showToast(e?.message||'Masa işlemi başarısız.');}
     finally{if(btn)btn.disabled=false;}
   };
   window.toggleBusinessTableCode=async function(id,active){
-    const row=loadedRows.find(x=>Number(x.id)===Number(id));if(!row)return;
-    try{await api('/api/nfc-tags/'+id,{method:'PUT',body:JSON.stringify({name:row.name,placement:'Masa',is_active:!active})});showToast(!active?'Masa aktifleştirildi.':'Masa pasifleştirildi.');await loadBusinessTableCodes();}catch(e){showToast(e?.message||'Durum değiştirilemedi.');}
+    const row=byId(id);if(!row)return;
+    try{
+      const result=await api('/api/nfc-tags/'+id,{method:'PUT',body:JSON.stringify({name:row.name,placement:'Masa',is_active:!active})});
+      if(result?.error)throw new Error(result.error);
+      showToast(!active?'Masa aktifleştirildi.':'Masa pasifleştirildi.');
+      await loadBusinessTableCodes();
+    }catch(e){showToast(e?.message||'Durum değiştirilemedi.');}
   };
   window.deleteBusinessTableCode=async function(id,name){
     if(!confirm('“'+String(name||'Bu masa')+'” silinsin mi? Bu kayıt admin panelinden de kaldırılır.'))return;
-    try{await api('/api/nfc-tags/'+id,{method:'DELETE'});showToast('Masa silindi.');await loadBusinessTableCodes();}catch(e){showToast(e?.message||'Masa silinemedi.');}
+    try{
+      const result=await api('/api/nfc-tags/'+id,{method:'DELETE'});
+      if(result?.error)throw new Error(result.error);
+      showToast('Masa silindi.');await loadBusinessTableCodes();
+    }catch(e){showToast(e?.message||'Masa silinemedi.');}
   };
-  window.copyBusinessTableCode=async function(url){try{await navigator.clipboard.writeText(url);showToast('NFC bağlantısı kopyalandı.');}catch(e){showToast('Bağlantı kopyalanamadı.');}};
-  window.openBusinessTableCode=function(url){window.open(url,'_blank','noopener');};
-  async function getQR(id){return await api('/api/nfc-tags/'+Number(id)+'/qr?fresh='+Date.now(),{cache:'no-store'});}
+  async function copyText(value){
+    try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);return true;}}catch(e){}
+    try{
+      const ta=document.createElement('textarea');ta.value=value;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');ta.remove();return ok;
+    }catch(e){return false;}
+  }
+  window.copyBusinessTableCode=async function(url){
+    if(await copyText(url))showToast('NFC bağlantısı kopyalandı.');else showToast('Bağlantı kopyalanamadı.');
+  };
+  window.openBusinessTableCode=function(url){window.open(url,'_blank','noopener,noreferrer');};
+  function tableQRImageUrl(code){return code?('/qr/nfc/'+encodeURIComponent(code)+'.png'):'';}
   window.downloadBusinessTableQR=async function(id,name){
-    try{const d=await getQR(id);if(!d?.qr)throw new Error('QR hazır değil');const a=document.createElement('a');a.href=d.qr;a.download='leo-connect-'+String(name||'masa').replace(/[^a-z0-9ğüşöçıİĞÜŞÖÇ_-]+/gi,'-').toLowerCase()+'.png';a.click();}catch(e){showToast(e?.message||'QR indirilemedi.');}
+    try{
+      const row=byId(id);const url=tableQRImageUrl(row?.code);if(!url)throw new Error('QR hazır değil');
+      const response=await fetch(url,{cache:'no-store'});if(!response.ok)throw new Error('QR görseli alınamadı');
+      const blob=await response.blob();const objectUrl=URL.createObjectURL(blob);const a=document.createElement('a');
+      a.href=objectUrl;a.download='leo-connect-'+String(name||'masa').replace(/[^a-z0-9ğüşöçıİĞÜŞÖÇ_-]+/gi,'-').toLowerCase()+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(objectUrl),1200);
+    }catch(e){showToast(e?.message||'QR indirilemedi.');}
   };
+  function qrMarkup(t){
+    const code=String(t.code||'');
+    const qrUrl=tableQRImageUrl(code);
+    const id=Number(t.id);
+    const name=String(t.name||'Masa');
+    const active=t.is_active!==false;
+    const qrCount=Number(t.qr_count||0);
+    const nfcCount=Number(t.nfc_count||t.tap_count||0);
+    const total=Number(t.total_count||qrCount+nfcCount);
+    const url=t.url||('/p/nfc/'+encodeURIComponent(code));
+    return `<article class="table-code-row" data-table-row="${id}">
+      <div class="table-code-qr-wrap"><img id="tableCodeQr_${id}" class="table-code-qr" src="${attr(qrUrl)}" data-qr-src="${attr(qrUrl)}" alt="${attr(name)} QR" decoding="async" referrerpolicy="no-referrer"><span>QR</span></div>
+      <div class="table-code-main"><div class="table-code-name-line"><div class="table-code-name">${esc(name)}</div><span class="table-code-status ${active?'on':'off'}">${active?'AKTİF':'PASİF'}</span></div><div class="table-code-meta">QR: ${qrCount} · NFC: ${nfcCount}</div><div class="table-code-stat">Toplam okutma: <b>${total}</b></div></div>
+      <div class="table-code-actions">
+        <button type="button" class="gold" data-table-action="download" data-id="${id}">QR İndir</button>
+        <button type="button" data-table-action="copy" data-id="${id}">NFC Bağlantısını Kopyala</button>
+        <button type="button" data-table-action="test" data-id="${id}">Test Et ↗</button>
+        <button type="button" data-table-action="edit" data-id="${id}">Düzenle</button>
+        <button type="button" data-table-action="toggle" data-id="${id}" data-active="${active}">${active?'Pasife Al':'Aktifleştir'}</button>
+        <button type="button" class="danger" data-table-action="delete" data-id="${id}">Sil</button>
+      </div>
+    </article>`;
+  }
   window.loadBusinessTableCodes=async function(){
     const list=document.getElementById('tableCodeList');if(!list)return;
     try{
       const tags=await api('/api/nfc-tags?fresh='+Date.now(),{cache:'no-store'});
+      if(tags?.error)throw new Error(tags.error);
       const rows=Array.isArray(tags)?tags:(tags?.nfc_tags||[]);loadedRows=rows;
       if(!rows.length){list.innerHTML='<div class="table-code-empty">Henüz masa eklenmemiş.<br><span style="display:inline-block;margin-top:7px">İlk masayı eklemek için <b>＋ Masa Ekle</b> butonuna bas.</span></div>';return;}
-      list.innerHTML=rows.map(t=>{
-        const url=t.url||('/p/nfc/'+encodeURIComponent(t.code||''));const active=t.is_active!==false;const qrCount=Number(t.qr_count||0),nfcCount=Number(t.nfc_count||t.tap_count||0),total=Number(t.total_count||qrCount+nfcCount);
-        return '<article class="table-code-row"><img id="tableCodeQr_'+Number(t.id)+'" class="table-code-qr" alt="'+esc(t.name||'Masa')+' QR"><div class="table-code-main"><div class="table-code-name-line"><div class="table-code-name">'+esc(t.name||'Masa')+'</div><span class="table-code-status '+(active?'on':'off')+'">'+(active?'AKTİF':'PASİF')+'</span></div><div class="table-code-meta">QR: '+qrCount+' · NFC: '+nfcCount+'</div><div class="table-code-stat">Toplam okutma: <b>'+total+'</b></div></div><div class="table-code-actions"><button type="button" class="gold" onclick="downloadBusinessTableQR('+Number(t.id)+','+JSON.stringify(t.name||'masa')+')">QR İndir</button><button type="button" onclick="copyBusinessTableCode('+JSON.stringify(url)+')">NFC Bağlantısını Kopyala</button><button type="button" onclick="openBusinessTableCode('+JSON.stringify(url)+')">Test Et ↗</button><button type="button" onclick="openBusinessTableCodeForm('+Number(t.id)+')">Düzenle</button><button type="button" onclick="toggleBusinessTableCode('+Number(t.id)+','+active+')">'+(active?'Pasife Al':'Aktifleştir')+'</button><button type="button" class="danger" onclick="deleteBusinessTableCode('+Number(t.id)+','+JSON.stringify(t.name||'Bu masa')+')">Sil</button></div></article>';
-      }).join('');
-      rows.forEach(async t=>{try{const d=await getQR(t.id);const img=document.getElementById('tableCodeQr_'+Number(t.id));if(img&&d?.qr)img.src=d.qr;}catch(e){}});
+      list.innerHTML=rows.map(qrMarkup).join('');
+      list.querySelectorAll('.table-code-qr').forEach(img=>{
+        img.addEventListener('error',function(){
+          if(this.dataset.retry!=='1'){
+            this.dataset.retry='1';
+            setTimeout(()=>{this.src=this.dataset.qrSrc+'?retry=1';},400);
+          }else{
+            this.style.display='none';this.parentElement.classList.add('broken');
+          }
+        },{once:false});
+      });
     }catch(e){list.innerHTML='<div class="table-code-empty">'+esc(e?.message||'Masalar alınamadı.')+'</div>';}
   };
+  function handleTableAction(event){
+    const btn=event.target.closest('[data-table-action]');if(!btn)return;
+    event.preventDefault();event.stopPropagation();
+    const id=Number(btn.dataset.id);const row=byId(id);if(!row)return;
+    const action=btn.dataset.tableAction;
+    if(action==='download')return downloadBusinessTableQR(id,row.name);
+    if(action==='copy')return copyBusinessTableCode(row.url||('/p/nfc/'+encodeURIComponent(row.code||'')));
+    if(action==='test')return openBusinessTableCode(row.url||('/p/nfc/'+encodeURIComponent(row.code||'')));
+    if(action==='edit')return openBusinessTableCodeForm(id);
+    if(action==='toggle')return toggleBusinessTableCode(id,btn.dataset.active==='true');
+    if(action==='delete')return deleteBusinessTableCode(id,row.name);
+  }
   document.addEventListener('DOMContentLoaded',()=>{
+    const list=document.getElementById('tableCodeList');
+    if(list&&!list.dataset.tableEvents){list.dataset.tableEvents='1';list.addEventListener('click',handleTableAction);}
     if(!document.getElementById('tableCodeModal')){
       const m=document.createElement('div');m.id='tableCodeModal';m.className='table-code-modal';m.style.display='none';m.innerHTML='<div class="table-code-modal-card"><h3 id="tableCodeModalTitle">Yeni Masa</h3><p>Bu masa için ayrı QR ve NFC bağlantısı oluşturulacak.</p><label class="table-code-field"><span>Masa adı</span><input id="tableCodeNameInput" maxlength="80" placeholder="Örn. Masa 12"></label><div class="table-code-modal-actions"><button type="button" onclick="closeBusinessTableCodeForm()">Vazgeç</button><button type="button" class="gold" id="tableCodeModalSave" onclick="saveBusinessTableCode()">Masayı Oluştur</button></div></div>';document.body.appendChild(m);
     }
