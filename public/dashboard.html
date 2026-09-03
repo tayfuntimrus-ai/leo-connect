@@ -2549,76 +2549,152 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
 .table-code-head h3{margin:0;font-size:17px}.table-code-head p{margin:5px 0 0;color:#777;font-size:10px;line-height:1.55}.table-code-create,.table-code-refresh{border:1px solid #303030;background:#151515;color:#ddd;border-radius:9px;padding:9px 12px;font-size:10px;font-weight:800;cursor:pointer}.table-code-create{background:var(--gold);color:#090909;border-color:var(--gold)}
 .table-code-list{display:grid;gap:9px}.table-code-row{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:11px 12px;border:1px solid #292929;border-radius:14px;background:#101010}.table-code-qr-wrap{width:64px;height:64px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}.table-code-qr-wrap .table-code-qr{width:64px;height:64px;border-radius:9px;background:#fff;padding:4px;box-sizing:border-box;object-fit:contain;display:block}.table-code-qr-wrap span{display:none;color:#999;font-size:8px;font-weight:900}.table-code-qr-wrap.broken span{display:block}.table-code-main{min-width:0}.table-code-name-line{display:flex;align-items:center;gap:8px}.table-code-name{font-size:13px;font-weight:900;color:#eee}.table-code-meta{margin-top:4px;color:#888;font-size:9px}.table-code-stat{margin-top:6px;color:#aaa;font-size:10px}.table-code-stat b{color:#eee}.table-code-actions{display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap}.table-code-actions button{border:1px solid #292929;background:#151515;color:#ddd;border-radius:8px;padding:7px 9px;font-size:9px;font-weight:800;cursor:pointer}.table-code-actions .gold{background:var(--gold);border-color:var(--gold);color:#090909}.table-code-actions .danger{border-color:#4a2929;color:#e2a0a0}.table-code-status{font-size:8px;font-weight:900;padding:4px 7px;border-radius:999px;white-space:nowrap}.table-code-status.on{background:#18351f;color:#8fe0a0;border:1px solid #285b35}.table-code-status.off{background:#211616;color:#d88f8f;border:1px solid #4d2929}.table-code-empty{padding:22px;text-align:center;color:#666;border:1px dashed #292929;border-radius:13px;font-size:10px}.table-code-note{margin-top:10px;color:#666;font-size:9px;line-height:1.5}.table-code-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}.table-code-modal-card{width:min(420px,100%);border:1px solid #3a3020;border-radius:18px;background:#12100c;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.45)}.table-code-modal-card h3{margin:0 0 5px;color:#eee;font-size:17px}.table-code-modal-card p{margin:0;color:#888;font-size:10px;line-height:1.5}.table-code-field{display:grid;gap:6px;margin-top:14px}.table-code-field span{font-size:9px;color:#999}.table-code-field input{width:100%;box-sizing:border-box;border:1px solid #303030;background:#080808;color:#eee;border-radius:9px;padding:10px 11px;outline:none;font-size:13px}.table-code-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.table-code-modal-actions button{border:1px solid #292929;background:#151515;color:#ddd;border-radius:8px;padding:8px 11px;font-size:9px;font-weight:800;cursor:pointer}.table-code-modal-actions .gold{background:var(--gold);border-color:var(--gold);color:#090909}@media(max-width:760px){.table-code-row{grid-template-columns:56px 1fr}.table-code-qr{width:56px;height:56px}.table-code-actions{grid-column:1/-1;justify-content:flex-start}.table-code-head{align-items:flex-start;flex-direction:column}}
 </style>
+
+<style id="leo-business-final-polish">
+:root{--bc-bg:#080a0f;--bc-panel:#10141b;--bc-panel2:#0d1118;--bc-line:#222936;--bc-soft:#171d26;--bc-gold:#d8ae5a;--bc-gold2:#f1cf86;--bc-text:#f6f7f9;--bc-muted:#8a93a0;--bc-green:#4ade8a}
+body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
+.bc-sidebar{width:252px;padding:22px 14px 16px;background:linear-gradient(180deg,#0b0e14,#080a0f);border-right:1px solid var(--bc-line);gap:13px;box-shadow:18px 0 50px rgba(0,0,0,.14)}
+.bc-brand{padding:1px 7px 18px;border-bottom:1px solid var(--bc-line);gap:11px}.bc-brand-mark{width:42px;height:42px;border-radius:14px}.bc-brand-copy strong{font-size:14px}.bc-brand-copy span{font-size:8px;color:var(--bc-gold2);letter-spacing:.18em;margin-top:4px}
+.bc-nav-label{padding:2px 9px;color:#596272;font-size:8px;font-weight:900;letter-spacing:.16em}.bc-nav{gap:4px}.bc-nav button{font-size:11px;padding:11px 12px;border-radius:11px;gap:11px}.bc-nav button.active{background:linear-gradient(135deg,#c89a44,#8e6728);box-shadow:0 8px 26px rgba(200,154,68,.14)}.bc-icon{font-size:15px!important;width:22px!important;color:#cfd5dc}.bc-nav button.active .bc-icon{color:#fff}
+.bc-divider{height:1px;background:var(--bc-line);margin:3px 6px}.bc-side-actions{display:flex;flex-direction:column;gap:5px}.bc-side-actions button{border:1px solid transparent;background:transparent;color:#9fa8b4;padding:9px 10px;border-radius:9px;text-align:left;font:inherit;font-size:10px;font-weight:750;cursor:pointer}.bc-side-actions button:hover{background:#111720;color:#f4f6f8;border-color:#242c38}.bc-side-actions button span{display:inline-block;width:20px;color:#d1aa62}.bc-side-footer{margin-top:auto;padding:11px;border:1px solid var(--bc-line);border-radius:13px;background:#0e131a}.bc-side-status{display:flex;align-items:center;gap:9px}.bc-status-dot{width:8px;height:8px;border-radius:50%;background:var(--bc-green);box-shadow:0 0 0 4px rgba(74,222,138,.08);display:inline-block;flex:0 0 auto}.bc-side-status strong{display:block;font-size:10px}.bc-side-status small{display:block;margin-top:2px;color:#69727e;font-size:8px}.bc-side-profile{display:block;margin-top:10px;padding-top:9px;border-top:1px solid #202733;color:#d9b96f;text-decoration:none;font-size:9px;font-weight:800}
+.bc-main-shell{margin-left:252px}.bc-topbar{height:74px;padding:0 30px;background:rgba(8,10,15,.84);border-bottom:1px solid var(--bc-line)}.bc-top-left small{font-size:8px;letter-spacing:.18em}.bc-top-left strong{font-size:17px}.bc-top-actions{gap:7px}.bc-top-btn{padding:9px 12px;border-radius:10px;font-size:9px}.bc-page-frame{padding:0 30px 50px}.bc-view{padding-top:26px}
+.bc-section-title-large{margin:0 0 18px}.bc-kicker{color:var(--bc-gold2);font-size:8px;font-weight:900;letter-spacing:.18em}.bc-section-title h1{font-size:28px;margin-top:5px}.bc-section-title p{font-size:11px;max-width:760px;line-height:1.5}.bc-live{display:flex;align-items:center;gap:8px}
+.bc-hero-row{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:20px}.bc-hero-row h1{font-size:31px;margin:5px 0 7px;letter-spacing:-.03em}.bc-hero-row p{margin:0;max-width:650px;color:var(--bc-muted);font-size:11px;line-height:1.55}.bc-hero-actions{display:flex;gap:8px;flex-wrap:wrap}.bc-primary,.bc-ghost{border-radius:10px;padding:10px 13px;font:inherit;font-size:9px;font-weight:900;cursor:pointer;text-decoration:none}.bc-primary{border:1px solid #d5a94f;background:linear-gradient(135deg,#d0a34e,#93692c);color:#fff}.bc-ghost{border:1px solid #2c3440;background:#10151c;color:#d2d7df}
+.bc-kpis{grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;margin-bottom:16px}.bc-kpi{min-height:104px;padding:14px;border-radius:14px;background:linear-gradient(145deg,#111720,#0d1118);border:1px solid var(--bc-line)}.bc-kpi small{font-size:7px;letter-spacing:.12em;color:#7e8795}.bc-kpi strong{font-size:24px;margin:10px 0 3px}.bc-kpi span{font-size:8px;color:#69727f}.bc-kpi-main{border-color:#5c4824;background:linear-gradient(145deg,#16140f,#10141a)}
+.bc-command-panel{padding:17px;border:1px solid var(--bc-line);border-radius:16px;background:linear-gradient(145deg,#10151d,#0d1118);margin-bottom:16px}.bc-panel-title,.bc-card-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px}.bc-panel-title span,.bc-card-head>div>span{display:block;color:#69727f;font-size:7px;letter-spacing:.14em;font-weight:900}.bc-panel-title h2,.bc-card-head h3{margin:4px 0 0;font-size:15px}.bc-panel-title small{color:#68717e;font-size:8px}.bc-command-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:13px}.bc-command-card{min-height:145px;text-align:left;padding:14px;border:1px solid #252d39;border-radius:13px;background:#111720;color:#f2f4f7;cursor:pointer;transition:.16s}.bc-command-card:hover{transform:translateY(-2px);border-color:#8c6a32;background:#151b23}.bc-command-card.featured{background:linear-gradient(145deg,#17150f,#111720);border-color:#5e4a28}.bc-command-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#171f29;border:1px solid #2a3441;color:#e1b75e;font-size:17px;margin-bottom:14px}.bc-command-card strong{display:block;font-size:10px}.bc-command-card small{display:block;margin-top:5px;color:#707988;font-size:8px;line-height:1.45;min-height:36px}.bc-command-card b{display:block;color:#dbb66a;font-size:8px;margin-top:12px}
+.bc-overview-grid{grid-template-columns:1fr 1fr;gap:16px}.bc-overview-card{padding:17px;border-radius:15px;border:1px solid var(--bc-line);background:#0f141c}.bc-card-head button{border:0;background:transparent;color:#dbb56c;font:inherit;font-size:8px;font-weight:800;cursor:pointer}.bc-health-mini{grid-template-columns:84px 1fr;gap:15px;margin-top:14px}.bc-score{width:76px;height:76px}.bc-health-mini strong{font-size:12px}.bc-health-mini p{font-size:9px;margin:6px 0 9px}.bc-health-mini .bc-progress{height:7px}.bc-list{gap:7px;margin-top:13px}.bc-list-item{padding:9px;border-radius:10px}.bc-list-item .li-ico{width:28px;height:28px}.bc-list-item strong{font-size:9px}.bc-list-item span{font-size:8px}
+.bc-profile-intro{display:flex;align-items:center;gap:11px;padding:13px 15px;border:1px solid #4d4026;background:linear-gradient(145deg,#16140f,#10151b);border-radius:14px;margin-bottom:13px}.bc-profile-intro-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#221b0e;color:#dfb765;border:1px solid #624c28;font-size:17px}.bc-profile-intro strong{display:block;font-size:10px}.bc-profile-intro span{display:block;margin-top:3px;color:#777f8b;font-size:8px}.bc-subnav-clean{margin-bottom:12px}.bc-subnav-clean button{padding:8px 11px;font-size:8px}
+.bc-theme-strip{padding:15px;margin-bottom:14px}.bc-theme-choices{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:11px}.bc-theme-choice{min-height:72px;padding:10px;text-align:left;border:1px solid #242c38;border-radius:11px;background:#10151c;color:#fff;cursor:pointer}.bc-theme-choice:hover{border-color:#7e6232}.bc-theme-choice span{display:block;color:#68717d;font-size:7px}.bc-theme-choice strong{display:block;margin-top:4px;font-size:9px}.bc-theme-choice small{display:block;margin-top:3px;color:#69727f;font-size:7px}
+.bc-digital-help{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px;padding:13px 15px;border-radius:14px;border:1px solid #292f38;background:#0f141b}.bc-digital-help strong{display:block;font-size:10px}.bc-digital-help span{display:block;margin-top:3px;color:#777f8a;font-size:8px}.bc-digital-help button{border:0;background:transparent;color:#d8b36b;font:inherit;font-size:8px;font-weight:900;cursor:pointer;white-space:nowrap}
+.bc-stats-notice{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:13px;background:#0f141b;border:1px solid #2a313b;margin-bottom:14px}.bc-stats-notice strong{font-size:9px;color:#e3bd74;white-space:nowrap}.bc-stats-notice span{color:#7e8793;font-size:8px;line-height:1.45}
+.bc-main-shell .box,.bc-main-shell .feature-box,.bc-main-shell .analytics-v3,.bc-main-shell .performance,.bc-main-shell .profile-hero,.bc-main-shell .health,.bc-main-shell .stats{border-color:var(--bc-line)!important;background:linear-gradient(145deg,#11161f,#0d1118)!important;border-radius:15px!important}
+.bc-main-shell input,.bc-main-shell select,.bc-main-shell textarea{border-radius:9px!important}.bc-main-shell .analytics-kpi{border-color:#262e39!important;background:#10151d!important}.bc-main-shell .analytics-box{border-color:#262e39!important;background:#10151d!important}
+@media(max-width:1120px){.bc-kpis{grid-template-columns:repeat(3,1fr)}.bc-command-grid{grid-template-columns:repeat(2,1fr)}.bc-theme-choices{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){.bc-sidebar{width:218px}.bc-main-shell{margin-left:218px}.bc-page-frame{padding:0 17px 50px}.bc-topbar{padding:0 17px}.bc-hero-row{display:block}.bc-hero-actions{margin-top:13px}.bc-overview-grid{grid-template-columns:1fr}.bc-kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.bc-sidebar{display:none}.bc-main-shell{margin-left:0}.bc-page-frame{padding:0 12px 84px}.bc-topbar{height:64px;padding:0 12px}.bc-top-actions .bc-top-btn:not(.gold){display:none}.bc-top-left strong{font-size:15px}.bc-view{padding-top:18px}.bc-hero-row h1{font-size:24px}.bc-kpis{grid-template-columns:1fr 1fr}.bc-command-grid{grid-template-columns:1fr}.bc-theme-choices{grid-template-columns:1fr 1fr}.bc-digital-help{align-items:flex-start;flex-direction:column}.bc-section-title-large{display:block}.bc-section-title-large>.bc-primary,.bc-section-title-large>.bc-ghost,.bc-section-title-large>.bc-live{margin-top:12px}.bc-mobile-nav{position:fixed;z-index:1100;display:grid;grid-template-columns:repeat(5,1fr);left:8px;right:8px;bottom:8px;padding:6px;background:rgba(13,17,24,.97);backdrop-filter:blur(16px);border:1px solid #2a313b;border-radius:15px;box-shadow:0 12px 35px #0009}.bc-mobile-nav button{border:0;background:transparent;color:#7f8793;font:inherit;font-size:7px;font-weight:800;padding:7px 3px;border-radius:9px}.bc-mobile-nav button.active{color:#fff;background:#5e451e}.bc-mobile-nav .mi{display:block;font-size:15px;margin-bottom:3px}.bc-command-card{min-height:125px}.bc-stats-notice{display:block}.bc-stats-notice strong{display:block;margin-bottom:4px}.bc-theme-choice{min-height:84px}}
+</style>
+
 </head>
 
 
 
 <body>
 
-<!-- LEO CONNECT BUSINESS CENTER FINAL UI -->
+<!-- LEO CONNECT BUSINESS CENTER — FINAL SIMPLIFIED UI -->
 <aside class="bc-sidebar" id="bcSidebar">
-  <div class="bc-brand"><div class="bc-brand-mark"><span class="leo-lion-logo" aria-hidden="true"></span></div><div><strong>LEO CONNECT</strong><span>BUSINESS CENTER</span></div></div>
+  <div class="bc-brand">
+    <div class="bc-brand-mark"><span class="leo-lion-logo" aria-hidden="true"></span></div>
+    <div class="bc-brand-copy"><strong>LEO CONNECT</strong><span>BUSINESS CENTER</span></div>
+  </div>
+
+  <div class="bc-nav-label">YÖNETİM</div>
   <nav class="bc-nav">
-    <button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="ico">⌂</span>Genel Bakış</button>
-    <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="ico">👤</span>Profil</button>
-    <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="ico">▦</span>QR & NFC</button>
-    <button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="ico">🚀</span>Kampanyalar</button>
-    <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="ico">▥</span>İstatistikler</button>
+    <button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="ico bc-icon">⌂</span><span>Genel Bakış</span></button>
+    <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="ico bc-icon">⌘</span><span>Profil</span></button>
+    <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="ico bc-icon">▦</span><span>QR & NFC</span></button>
+    <button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="ico bc-icon">✦</span><span>Kampanyalar</span></button>
+    <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="ico bc-icon">▥</span><span>İstatistikler</span></button>
   </nav>
+
   <div class="bc-divider"></div>
-  <div class="bc-side-quick"><strong>HIZLI İŞLEMLER</strong>
-    <button onclick="showBusinessSection('profile')">✎ Profil Düzenle</button>
-    <button onclick="showBusinessSection('digital')">▦ QR & NFC</button>
-    <button onclick="showBusinessSection('campaigns')">＋ Kampanya Oluştur</button>
-    <button onclick="showBusinessSection('stats')">▥ İstatistikleri Gör</button>
+  <div class="bc-nav-label">HIZLI İŞLEM</div>
+  <div class="bc-side-actions">
+    <button type="button" onclick="showBusinessSection('profile');setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),20)"><span>✎</span> Profil düzenle</button>
+    <button type="button" onclick="showBusinessSection('digital')"><span>▦</span> QR / NFC yönet</button>
+    <button type="button" onclick="showBusinessSection('stats')"><span>↗</span> Raporları gör</button>
+  </div>
+
+  <div class="bc-side-footer">
+    <div class="bc-side-status"><span class="bc-status-dot"></span><div><strong>Sistem aktif</strong><small>LEO CONNECT</small></div></div>
+    <a id="bcSidebarProfile" target="_blank" rel="noopener" class="bc-side-profile">Müşteri profilini aç ↗</a>
   </div>
 </aside>
+
 <div class="bc-main-shell">
-  <div class="bc-topbar"><div class="bc-top-left"><small>LEO CONNECT • BUSINESS</small><strong id="bcTopTitle">Genel Bakış</strong></div><div class="bc-top-actions"><a id="bcProfileLink" class="bc-top-btn gold" target="_blank" rel="noopener">👁 Profili Gör</a><a href="/" class="bc-top-btn site">Site</a></div></div>
-  <div class="bc-view bc-view-overview active" data-view="overview">
-    <div class="bc-section-title"><div><h1>Genel Bakış</h1><p>İşletmenin dijital performansını tek ekrandan yönet.</p></div><div class="bc-live">● Sistem aktif</div></div>
-    <div class="bc-kpis">
-      <div class="bc-kpi"><small>PROFİL GÖRÜNTÜLEME</small><strong id="bcKpiProfile">0</strong><span>görüntülenme</span></div>
-      <div class="bc-kpi"><small>QR TARAMALARI</small><strong id="bcKpiQR">0</strong><span>tarama</span></div>
-      <div class="bc-kpi"><small>NFC DOKUNUŞLARI</small><strong id="bcKpiNFC">0</strong><span>dokunma</span></div>
-      <div class="bc-kpi"><small>WHATSAPP</small><strong id="bcKpiWA">0</strong><span>etkileşim</span></div>
-      <div class="bc-kpi"><small>TELEFON</small><strong id="bcKpiPhone">0</strong><span>tıklama</span></div>
-      <div class="bc-kpi"><small>TOPLAM</small><strong id="bcKpiTotal">0</strong><span>etkileşim</span></div>
+  <div class="bc-topbar">
+    <div class="bc-top-left">
+      <small>LEO CONNECT • BUSINESS</small>
+      <strong id="bcTopTitle">Genel Bakış</strong>
     </div>
-    <div class="bc-actions-panel"><div class="bc-actions-head"><strong>HIZLI İŞLEMLER</strong><span>En sık kullanılan işlemler</span></div><div class="bc-action-grid">
-      <button class="bc-action" onclick="showBusinessSection('profile')"><div class="aico">👤</div><strong>Profil Düzenle</strong><span>İşletme bilgilerini güncelle</span></button>
-      <button class="bc-action" onclick="showBusinessSection('digital')"><div class="aico">▦</div><strong>QR & NFC</strong><span>Kod ve bağlantıları yönet</span></button>
-      <button class="bc-action" onclick="showBusinessSection('campaigns')"><div class="aico">🚀</div><strong>Kampanya Oluştur</strong><span>Yeni kampanya yayınla</span></button>
-      <button class="bc-action" onclick="showBusinessSection('stats')"><div class="aico">▥</div><strong>İstatistikleri Gör</strong><span>Detaylı performansı incele</span></button>
-      <button class="bc-action" onclick="copyProfileLink()"><div class="aico">🔗</div><strong>Linki Kopyala</strong><span>Profil bağlantısını paylaş</span></button>
-    </div></div>
-    <div class="bc-overview-grid">
-      <div class="bc-overview-card"><h3>PROFİL SAĞLIK DURUMU <span class="bc-mini-link" onclick="showBusinessSection('profile')">Profili Düzenle →</span></h3><div class="bc-health-mini"><div id="bcScore" class="bc-score"><strong id="bcScoreText">0</strong></div><div><strong id="bcHealthTitle">Profil kontrol ediliyor</strong><p id="bcHealthMsg">Profil bilgileri analiz ediliyor...</p><div class="bc-progress"><i id="bcHealthFill"></i></div></div></div></div>
-      <div class="bc-overview-card"><h3>SON HAREKETLER <span class="bc-mini-link" onclick="showBusinessSection('stats')">Tümünü Gör →</span></h3><div id="bcLiveMini" class="bc-list"><div class="bc-list-item"><div class="li-ico">⏳</div><div><strong>Aktiviteler yükleniyor</strong><span>Canlı hareketler hazırlanıyor</span></div></div></div></div>
+    <div class="bc-top-actions">
+      <a id="bcProfileLink" class="bc-top-btn gold" target="_blank" rel="noopener">Müşteri Profilini Gör</a>
+      <button class="bc-top-btn" type="button" onclick="copyProfileLink()">Linki Kopyala</button>
     </div>
   </div>
-  <div class="bc-view" data-view="profile">
-    <div class="bc-section-title"><div><h1>Profil</h1><p>İşletme bilgileri ve müşteri profilinin görünümünü yönet.</p></div></div>
-    <div class="bc-subnav"><button class="active" onclick="bcScrollTo('profile')">İşletme Bilgileri</button><button onclick="bcScrollTo('profileDesign')">Görünüm & Tema</button></div><div class="bc-actions-panel" style="margin-bottom:16px"><div class="bc-actions-head"><strong>GÖRÜNÜM & TEMA</strong><span>Profilinin müşteri tarafındaki görünümünü seç</span></div><div class="bc-action-grid" style="grid-template-columns:repeat(4,1fr)"><button class="bc-action" onclick="bcSelectTheme('midnight-gold')"><div class="aico">🌙</div><strong>Midnight Gold</strong><span>Siyah / altın premium</span></button><button class="bc-action" onclick="bcSelectTheme('obsidian')"><div class="aico">⬛</div><strong>Obsidian</strong><span>Ultra dark / tech</span></button><button class="bc-action" onclick="bcSelectTheme('champagne')"><div class="aico">🥂</div><strong>Champagne</strong><span>Sıcak lüks</span></button><button class="bc-action" onclick="bcSelectTheme('pure-light')"><div class="aico">☀️</div><strong>Pure Light</strong><span>Aydınlık premium</span></button></div></div>
-    <div id="bcProfileMount"></div><div id="bcDesignMount"></div>
-  </div>
-  <div class="bc-view" data-view="digital">
-    <div class="bc-section-title"><div><h1>QR & NFC</h1><p>Müşterilerin işletmene tek tarama veya tek dokunuşla ulaşsın.</p></div></div>
-    <div id="bcDigitalMount"></div>
-  </div>
-  <div class="bc-view" data-view="campaigns">
-    <div class="bc-section-title"><div><h1>Kampanyalar</h1><p>Smart Campaigns ile kampanyalarını tek merkezden yönet.</p></div><button class="bc-top-btn gold" type="button" onclick="openCampaignEditor()">＋ Yeni Kampanya</button></div>
-    <div id="bcCampaignMount"></div>
-  </div>
-  <div class="bc-view" data-view="stats">
-    <div class="bc-section-title"><div><h1>İstatistikler</h1><p>Performans, canlı hareketler, AI içgörüleri ve Review Booster.</p></div></div>
-    <div id="bcStatsMount"></div>
+
+  <div class="bc-page-frame">
+    <div class="bc-view bc-view-overview active" data-view="overview">
+      <div class="bc-hero-row">
+        <div>
+          <div class="bc-kicker">İŞLETME YÖNETİM MERKEZİ</div>
+          <h1>Hoş geldin. <span id="bcWelcomeName">İşletme</span></h1>
+          <p>İşletmenin profilini, QR/NFC kodlarını ve performansını tek yerden yönet.</p>
+        </div>
+        <div class="bc-hero-actions">
+          <button type="button" class="bc-primary" onclick="showBusinessSection('digital')">+ QR / NFC Yönet</button>
+          <a id="bcProfileHero" class="bc-ghost" target="_blank" rel="noopener">Profili Gör ↗</a>
+        </div>
+      </div>
+
+      <div class="bc-kpis">
+        <div class="bc-kpi bc-kpi-main"><small>PROFİL GÖRÜNTÜLEME</small><strong id="bcKpiProfile">0</strong><span>toplam görüntüleme</span></div>
+        <div class="bc-kpi"><small>QR TARAMA</small><strong id="bcKpiQR">0</strong><span>QR etkileşimi</span></div>
+        <div class="bc-kpi"><small>NFC DOKUNUŞ</small><strong id="bcKpiNFC">0</strong><span>NFC etkileşimi</span></div>
+        <div class="bc-kpi"><small>WHATSAPP</small><strong id="bcKpiWA">0</strong><span>iletişim tıklaması</span></div>
+        <div class="bc-kpi"><small>TELEFON</small><strong id="bcKpiPhone">0</strong><span>arama tıklaması</span></div>
+        <div class="bc-kpi"><small>TOPLAM</small><strong id="bcKpiTotal">0</strong><span>toplam aksiyon</span></div>
+      </div>
+
+      <section class="bc-command-panel">
+        <div class="bc-panel-title"><div><span>HIZLI BAŞLANGIÇ</span><h2>Bugün ne yapmak istiyorsun?</h2></div><small>En önemli işlemler burada.</small></div>
+        <div class="bc-command-grid">
+          <button class="bc-command-card featured" type="button" onclick="showBusinessSection('profile')"><span class="bc-command-icon">⌘</span><strong>Profilimi düzenle</strong><small>İşletme bilgileri, dijital bağlantılar, ödeme ve görünüm</small><b>Düzenle →</b></button>
+          <button class="bc-command-card" type="button" onclick="showBusinessSection('digital')"><span class="bc-command-icon">▦</span><strong>QR & NFC</strong><small>Ana kodlarını ve masa QR/NFC kodlarını yönet</small><b>Kodları yönet →</b></button>
+          <button class="bc-command-card" type="button" onclick="showBusinessSection('stats')"><span class="bc-command-icon">▥</span><strong>İstatistikler</strong><small>QR, NFC, profil ve müşteri aksiyonlarını incele</small><b>Raporları aç →</b></button>
+          <button class="bc-command-card" type="button" onclick="showBusinessSection('campaigns')"><span class="bc-command-icon">✦</span><strong>Kampanyalar</strong><small>Smart Campaigns içeriklerini oluştur ve düzenle</small><b>Kampanya yönet →</b></button>
+        </div>
+      </section>
+
+      <div class="bc-overview-grid">
+        <div class="bc-overview-card bc-overview-health"><div class="bc-card-head"><div><span>PROFİL DURUMU</span><h3>Profil sağlık skoru</h3></div><button type="button" onclick="showBusinessSection('profile')">Profili düzenle →</button></div><div class="bc-health-mini"><div id="bcScore" class="bc-score"><strong id="bcScoreText">0</strong></div><div><strong id="bcHealthTitle">Profil kontrol ediliyor</strong><p id="bcHealthMsg">Profil bilgileri analiz ediliyor...</p><div class="bc-progress"><i id="bcHealthFill"></i></div></div></div></div>
+        <div class="bc-overview-card"><div class="bc-card-head"><div><span>SON HAREKETLER</span><h3>Canlı aktivite</h3></div><button type="button" onclick="showBusinessSection('stats')">Tümünü gör →</button></div><div id="bcLiveMini" class="bc-list"><div class="bc-list-item"><div class="li-ico">…</div><div><strong>Aktiviteler yükleniyor</strong><span>Son hareketler hazırlanıyor</span></div></div></div></div>
+      </div>
+    </div>
+
+    <div class="bc-view" data-view="profile">
+      <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">PROFİL MERKEZİ</div><h1>Profil</h1><p>İşletme bilgilerinden dijital bağlantılara ve müşteri profilinin tasarımına kadar her şeyi tek yerden yönet.</p></div><a id="bcProfileProfilePage" class="bc-ghost" target="_blank" rel="noopener">Müşteri profilini gör ↗</a></div>
+      <div class="bc-profile-intro"><div class="bc-profile-intro-icon">⌘</div><div><strong>Profilinin 4 ana alanı</strong><span>İşletme bilgileri → Dijital bağlantılar → Ödeme → Görünüm & tasarım</span></div></div>
+      <div class="bc-subnav bc-subnav-clean"><button class="active" onclick="bcScrollTo('profile')">İşletme Bilgileri</button><button onclick="bcScrollTo('profileDesign')">Görünüm & Tema</button></div>
+      <div class="bc-actions-panel bc-theme-strip"><div class="bc-actions-head"><strong>GÖRÜNÜM & TEMA</strong><span>4 premium tema</span></div><div class="bc-theme-choices"><button class="bc-theme-choice" onclick="bcSelectTheme('midnight-gold')"><span>01</span><strong>Midnight Gold</strong><small>Siyah / altın premium</small></button><button class="bc-theme-choice" onclick="bcSelectTheme('obsidian')"><span>02</span><strong>Obsidian</strong><small>Ultra dark / tech</small></button><button class="bc-theme-choice" onclick="bcSelectTheme('champagne')"><span>03</span><strong>Champagne</strong><small>Sıcak / lüks</small></button><button class="bc-theme-choice" onclick="bcSelectTheme('pure-light')"><span>04</span><strong>Pure Light</strong><small>Aydınlık / premium</small></button></div></div>
+      <div id="bcProfileMount"></div><div id="bcDesignMount"></div>
+    </div>
+
+    <div class="bc-view" data-view="digital">
+      <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">DİJİTAL ERİŞİM</div><h1>QR & NFC</h1><p>İşletmenin ana kodlarını ve masa bazlı QR/NFC kodlarını tek merkezden yönet.</p></div><button class="bc-primary" type="button" onclick="loadBusinessTableCodes(true)">↻ Yenile</button></div>
+      <div class="bc-digital-help"><div><strong>1 ana profil + sınırsız masa</strong><span>Ana QR/NFC işletmenin genel profilini açar. Masalar bölümünde Masa 1, Masa 2… şeklinde özel kodlar oluşturulur.</span></div><button type="button" onclick="loadBusinessTableCodes(true)">Kodları yenile →</button></div>
+      <div id="bcDigitalMount"></div>
+    </div>
+
+    <div class="bc-view" data-view="campaigns">
+      <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">PAZARLAMA</div><h1>Kampanyalar</h1><p>Smart Campaigns içeriklerini oluştur, düzenle ve yayınla.</p></div><button class="bc-primary" type="button" onclick="openCampaignEditor()">＋ Yeni Kampanya</button></div>
+      <div id="bcCampaignMount"></div>
+    </div>
+
+    <div class="bc-view" data-view="stats">
+      <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">PERFORMANS MERKEZİ</div><h1>İstatistikler</h1><p>Gerçek etkileşim kayıtlarını dönem bazında incele; QR ve NFC masa performansını takip et.</p></div><div class="bc-live"><span class="bc-status-dot"></span> Canlı veri</div></div>
+      <div class="bc-stats-notice"><strong>Rapor mantığı</strong><span>QR ve NFC tek bir masa kaydına bağlıdır. Böylece hangi masanın ne kadar kullanıldığını aynı raporda görebilirsin.</span></div>
+      <div id="bcStatsMount"></div>
+    </div>
   </div>
 </div>
-<div class="bc-mobile-nav"><button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="mi">⌂</span>Genel</button><button data-bc="profile" onclick="showBusinessSection('profile')"><span class="mi">👤</span>Profil</button><button data-bc="digital" onclick="showBusinessSection('digital')"><span class="mi">▦</span>QR/NFC</button><button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="mi">🚀</span>Kampanya</button><button data-bc="stats" onclick="showBusinessSection('stats')"><span class="mi">▥</span>İstatistik</button></div>
 
-
-
+<div class="bc-mobile-nav">
+  <button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="mi">⌂</span>Genel</button>
+  <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="mi">⌘</span>Profil</button>
+  <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="mi">▦</span>QR/NFC</button>
+  <button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="mi">✦</span>Kampanya</button>
+  <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="mi">▥</span>İstatistik</button>
+</div>
 
 <!-- ==================================================
      LOADING
@@ -6806,9 +6882,20 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
   }
   function syncLive(){const src=document.getElementById('liveActivityList'),dst=document.getElementById('bcLiveMini');if(!src||!dst)return;const items=[...src.querySelectorAll('.feature-item')].slice(0,5);if(!items.length)return;dst.innerHTML=items.map(x=>`<div class="bc-list-item"><div class="li-ico">⚡</div><div><strong>${x.querySelector('strong')?.textContent||'Aktivite'}</strong><span>Son hareket</span></div><div class="li-right">●</div></div>`).join('');}
   function boot(){
-    const profileLink=document.getElementById('headerProfile');const topLink=document.getElementById('bcProfileLink');if(profileLink&&topLink){const obs=new MutationObserver(()=>{if(profileLink.href)topLink.href=profileLink.href});obs.observe(profileLink,{attributes:true,attributeFilter:['href']});if(profileLink.href)topLink.href=profileLink.href;}
-    setInterval(()=>{syncKpis();syncLive();},700);
-    // Keep original V1 main functions alive; only reorganize their existing DOM.
+    const profileLink=document.getElementById('headerProfile');
+    const topLink=document.getElementById('bcProfileLink');
+    const sideLink=document.getElementById('bcSidebarProfile');
+    const heroLink=document.getElementById('bcProfileHero');
+    const profilePageLink=document.getElementById('bcProfileProfilePage');
+    const welcomeName=document.getElementById('bcWelcomeName');
+    const syncProfileLinks=()=>{
+      if(profileLink && profileLink.href){
+        [topLink,sideLink,heroLink,profilePageLink].forEach(el=>{if(el)el.href=profileLink.href});
+      }
+      if(welcomeName && currentBusiness?.name) welcomeName.textContent=currentBusiness.name;
+    };
+    if(profileLink){const obs=new MutationObserver(syncProfileLinks);obs.observe(profileLink,{attributes:true,attributeFilter:['href']});}
+    setInterval(()=>{syncKpis();syncLive();syncProfileLinks();},700);
     showBusinessSection('overview');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
