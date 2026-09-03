@@ -4041,6 +4041,18 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
         </div>
 
         <div class="design-field">
+          <label>İŞLETME MARKASI</label>
+          <div class="design-toggle">
+            <span>Müşteri profilinde işletme logosu ve adını göster</span>
+            <label class="switch">
+              <input id="design_business_brand_enabled" type="checkbox" onchange="updateDesignPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+          <div class="design-help">Açıkken üstte LEO CONNECT yerine işletmenin logosu ve adı görünür. Kapalıyken LEO CONNECT görünümü korunur.</div>
+        </div>
+
+        <div class="design-field">
           <label>DUYURU DURUMU</label>
           <div class="design-toggle">
             <span>Duyuruyu göster</span>
@@ -5529,6 +5541,7 @@ function getDesignForm(){
     accent_color: safeDesignColor(val("design_accent")),
     cover_url: val("design_cover_url"),
     cover_position: val("design_cover_position") || "center",
+    business_brand_enabled: checked("design_business_brand_enabled"),
     announcement_text: val("design_announcement_text"),
     announcement_enabled: checked("design_announcement_enabled"),
     campaign_title: val("design_campaign_title"),
@@ -5581,6 +5594,7 @@ function loadDesignIntoForm(data){
   setDesignField("design_gallery", gallery.map(item => typeof item === "string" ? item : item?.url || "").filter(Boolean).join("\n"));
 
   const checks = [
+    ["design_business_brand_enabled", profileDesign.business_brand_enabled !== false],
     ["design_announcement_enabled", profileDesign.announcement_enabled],
     ["design_campaign_enabled", profileDesign.campaign_enabled],
     ["design_featured_enabled", profileDesign.featured_enabled],
@@ -5631,21 +5645,21 @@ function updateDesignPreview(){
     /* BUSINESS */
     const name = document.getElementById("previewName");
     const category = document.getElementById("previewCategory");
+    const brandOn = data.business_brand_enabled !== false;
 
     if(name){
-      name.textContent = currentBusiness?.name || "İşletme";
+      name.textContent = brandOn ? (currentBusiness?.name || "İşletme") : "LEO CONNECT";
     }
 
     if(category){
-      category.textContent =
-        (currentBusiness?.category || "İŞLETME").toUpperCase();
+      category.style.display = "none";
     }
 
     /* LOGO */
     const logo = document.getElementById("previewLogo");
 
     if(logo){
-      const logoUrl = currentBusiness?.logo_url || "";
+      const logoUrl = brandOn ? (currentBusiness?.logo_url || "") : "";
 
       logo.innerHTML = logoUrl
         ? `<img src="${esc(logoUrl)}" alt="">`
