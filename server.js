@@ -1,4896 +1,7050 @@
-require('dotenv').config();
+<!doctype html>
+<html lang="tr">
 
-const express = require('express');
-const cors = require('cors');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const QRCode = require('qrcode');
-const { Pool } = require('pg');
-const path = require('path');
-const crypto = require('crypto');
+<head>
 
-const app = express();
+<meta charset="utf-8">
 
-const PORT = process.env.PORT || 10000;
-const SECRET = process.env.JWT_SECRET || 'leo-connect-change-this-secret';
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+>
 
-app.use(cors());
-app.use(express.json({ limit: '2mb' }));
-app.use(express.urlencoded({ extended: true }));
+<meta
+  name="theme-color"
+  content="#080808"
+>
 
-app.use(express.static(path.join(__dirname, 'public')));
+<meta
+  name="description"
+  content="LEO CONNECT Business Center"
+>
 
+<title>LEO CONNECT — Business Center</title>
 
-/* =========================================================
-   DATABASE
-========================================================= */
+<style>
 
-if (!process.env.DATABASE_URL) {
-  console.error('DATABASE_URL bulunamadı.');
-  process.exit(1);
+:root{
+
+  --gold:#c59a52;
+  --gold-light:#e0bd7b;
+  --gold-soft:#c59a5218;
+
+  --black:#080808;
+  --dark:#101010;
+  --dark-2:#151515;
+  --dark-3:#1c1c1c;
+
+  --white:#fff;
+  --muted:#888;
+  --muted-2:#555;
+
+  --border:#292929;
+  --border-light:#383838;
+
+  --green:#45c27a;
+  --red:#d85c5c;
+
+  --shadow:
+    0 25px 70px rgba(0,0,0,.42);
+
 }
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl:
-    process.env.NODE_ENV === 'production'
-      ? { rejectUnauthorized: false }
-      : false
-});
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function slugify(value) {
-  return String(value || '')
-    .toLowerCase()
-    .trim()
-    .replace(/ğ/g, 'g')
-    .replace(/ü/g, 'u')
-    .replace(/ş/g, 's')
-    .replace(/ı/g, 'i')
-    .replace(/ö/g, 'o')
-    .replace(/ç/g, 'c')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 80);
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
 
-
-function createNfcCode() {
-  return crypto.randomBytes(12).toString('hex');
+html{
+  scroll-behavior:smooth;
 }
 
+body{
 
-function publicBusiness(row) {
-  if (!row) return null;
-  const allowed = normalizeAllowedPlatforms(row.social_platform_permissions);
-  const legacyAllowed = {
-    instagram: allowed.instagram !== false,
-    tiktok: allowed.tiktok !== false,
-    whatsapp: allowed.whatsapp !== false,
-    google_review: allowed.google !== false,
-    website: allowed.website !== false,
-    menu: allowed.menu !== false,
-    address: allowed.location !== false
-  };
-  const social = normalizeSocialLinks(row.social_links);
-  const filteredSocial = Object.fromEntries(
-    Object.entries(social).filter(([key,item]) => allowed[key] !== false && item && item.url)
-  );
-  return {
-    id: row.id, name: row.name, slug: row.slug, email: row.email,
-    category: row.category || '', description: row.description || '', phone: row.phone || '',
-    whatsapp: legacyAllowed.whatsapp ? (row.whatsapp || '') : '',
-    address: legacyAllowed.address ? (row.address || '') : '',
-    instagram: legacyAllowed.instagram ? (row.instagram || '') : '',
-    tiktok: legacyAllowed.tiktok ? (row.tiktok || '') : '',
-    google_review: legacyAllowed.google_review ? (row.google_review || '') : '',
-    website: legacyAllowed.website ? (row.website || '') : '',
-    menu: legacyAllowed.menu ? (row.menu || '') : '',
-    iban: row.iban || '', iban_holder: row.iban_holder || '', hours: row.hours || '', logo_url: row.logo_url || '',
-    social_links: filteredSocial, custom_links: normalizeCustomLinks(row.custom_links),
-    social_platform_permissions: allowed, created_at: row.created_at
-  };
+  margin:0;
+
+  min-height:100vh;
+
+  background:
+
+    radial-gradient(
+      circle at 85% -5%,
+      #c59a5218,
+      transparent 28%
+    ),
+
+    radial-gradient(
+      circle at 0% 55%,
+      #c59a5208,
+      transparent 25%
+    ),
+
+    #080808;
+
+  color:#fff;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  overflow-x:hidden;
+
 }
 
-
-
-const LEO_V2_THEMES = {
-  'midnight-gold': { name:'Midnight Gold', description:'Siyah + altın, ana premium tema' },
-  'obsidian': { name:'Obsidian', description:'Ultra koyu, modern ve teknolojik tema' },
-  'champagne': { name:'Champagne', description:'Sıcak, zarif ve lüks tema' },
-  'pure-light': { name:'Pure Light', description:'Aydınlık, temiz ve premium tema' }
-};
-
-const LEO_V2_SOCIAL_PLATFORMS = ['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google','website','yemeksepeti','getir','trendyol-yemek','migros-yemek','rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email'];
-const LEO_V2_DEFAULT_ALLOWED_PLATFORMS = Object.fromEntries(LEO_V2_SOCIAL_PLATFORMS.map(k=>[k,true]));
-function normalizeAllowedPlatforms(value){
-  let raw=value;
-  if(typeof raw==='string'){ try{raw=JSON.parse(raw)}catch(_){raw={};} }
-  raw=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
-  return Object.fromEntries(LEO_V2_SOCIAL_PLATFORMS.map(k=>[k,raw[k]!==false]));
+button,
+input,
+textarea{
+  font-family:inherit;
 }
 
-function normalizeSocialLinks(value){
-  let raw=value;
-  if(typeof raw==='string'){ try{ raw=JSON.parse(raw); }catch(_){ raw={}; } }
-  raw=raw && typeof raw==='object' && !Array.isArray(raw) ? raw : {};
-  const out={};
-  for(const key of LEO_V2_SOCIAL_PLATFORMS){
-    const item=raw[key];
-    if(typeof item==='string') out[key]={url:item.trim().slice(0,2000),enabled:true};
-    else if(item && typeof item==='object') out[key]={url:String(item.url||'').trim().slice(0,2000),enabled:item.enabled!==false,label:String(item.label||'').trim().slice(0,80)};
-  }
-  return out;
-}
-
-function normalizeCustomLinks(value){
-  let raw=value;
-  if(typeof raw==='string'){ try{ raw=JSON.parse(raw); }catch(_){ raw=[]; } }
-  if(!Array.isArray(raw)) return [];
-  return raw.slice(0,20).map((item,i)=>({
-    id:String(item?.id || `custom-${i+1}`),
-    title:String(item?.title || '').trim().slice(0,80),
-    url:String(item?.url || '').trim().slice(0,2000),
-    icon:String(item?.icon || '🔗').trim().slice(0,8),
-    enabled:item?.enabled!==false,
-    sort_order:Number.isFinite(Number(item?.sort_order)) ? Number(item.sort_order) : i
-  })).filter(x=>x.title && x.url);
-}
-
-const DYNAMIC_PROFILE_DEFAULTS = {
-  theme: 'midnight-gold',
-  accent_color: '#D4AF37',
-  cover_url: '',
-  cover_position: 'center',
-  announcement_text: '',
-  announcement_enabled: false,
-  campaign_title: '',
-  campaign_text: '',
-  campaign_image_url: '',
-  campaign_button_text: '',
-  campaign_button_url: '',
-  campaign_enabled: false,
-  featured_title: '',
-  featured_text: '',
-  featured_image_url: '',
-  featured_button_text: '',
-  featured_button_url: '',
-  featured_enabled: false,
-  gallery: [],
-  video_url: '',
-  video_enabled: false
-};
-
-function normalizeProfileDesign(row) {
-  if (!row) return { ...DYNAMIC_PROFILE_DEFAULTS };
-  return {
-    ...DYNAMIC_PROFILE_DEFAULTS,
-    ...row,
-    gallery: Array.isArray(row.gallery) ? row.gallery : []
-  };
-}
-
-async function getPublicProfileDesign(businessId) {
-  const result = await pool.query(
-    `SELECT theme,accent_color,cover_url,cover_position,
-            announcement_text,announcement_enabled,
-            campaign_title,campaign_text,campaign_image_url,campaign_button_text,campaign_button_url,campaign_enabled,
-            featured_title,featured_text,featured_image_url,featured_button_text,featured_button_url,featured_enabled,
-            gallery,video_url,video_enabled
-     FROM profile_designs
-     WHERE business_id=$1
-     LIMIT 1`,
-    [businessId]
-  );
-  return normalizeProfileDesign(result.rows[0]);
+button,
+a{
+  -webkit-user-select:none;
+  user-select:none;
 }
 
 
-const REVIEW_BOOSTER_DEFAULTS = {
-  enabled: false,
-  title: 'Deneyimini bizimle paylaş',
-  text: 'Memnun kaldıysan Google’da bizi değerlendir. Bir sorun yaşadıysan doğrudan bize ulaş.',
-  threshold: 4,
-  low_title: 'Bunu duymak isteriz',
-  low_text: 'Yaşadığın sorunu bize ilet, seninle ilgilenelim.',
-  success_title: 'Teşekkürler!',
-  success_text: 'Değerlendirmen bizim için çok değerli.'
-};
-
-function normalizeReviewBooster(row) {
-  if (!row) return { ...REVIEW_BOOSTER_DEFAULTS };
-  return {
-    ...REVIEW_BOOSTER_DEFAULTS,
-    ...row,
-    enabled: row.enabled === true,
-    threshold: Math.min(5, Math.max(1, Number(row.threshold) || 4))
-  };
-}
-
-async function getReviewBooster(businessId) {
-  const result = await pool.query(
-    `SELECT enabled,title,text,threshold,low_title,low_text,success_title,success_text
-     FROM review_boosters WHERE business_id=$1 LIMIT 1`,
-    [businessId]
-  );
-  return normalizeReviewBooster(result.rows[0]);
-}
-
-
-/* =========================================================
-   V2 — INDEPENDENT PERSONAL BUSINESS CARD
-========================================================= */
-const CARD_PERSON_FIELDS = [
-  'display_name','person_name','job_title','company','phone','whatsapp','email','website','address',
-  'instagram','facebook','tiktok','linkedin','youtube','x','photo_url','cover_url','bio','note'
-];
-const CARD_PERSON_LABELS = {
-  display_name:'Kart Başlığı', person_name:'Ad Soyad', job_title:'Unvan', company:'Şirket / Kurum',
-  phone:'Telefon', whatsapp:'WhatsApp', email:'E-posta', website:'Web Sitesi', address:'Adres',
-  instagram:'Instagram', facebook:'Facebook', tiktok:'TikTok', linkedin:'LinkedIn', youtube:'YouTube', x:'X / Twitter',
-  photo_url:'Profil Fotoğrafı', cover_url:'Kapak Görseli', bio:'Hakkımda', note:'Not / Kısa Açıklama'
-};
-const CARD_PERSON_DEFAULT_DATA = Object.fromEntries(CARD_PERSON_FIELDS.map(k=>[k,'']));
-const CARD_PERSON_DEFAULT_PERMISSIONS = Object.fromEntries(CARD_PERSON_FIELDS.map(k=>[k,false]));
-function normalizeCardPerson(row){
-  const data={...CARD_PERSON_DEFAULT_DATA,...(row?.data||{})};
-  const permissions={...CARD_PERSON_DEFAULT_PERMISSIONS,...(row?.permissions||{})};
-  for(const key of CARD_PERSON_FIELDS){ data[key]=String(data[key]??''); permissions[key]=permissions[key]===true; }
-  return {id:row?.id||null,slug:row?.slug||'',enabled:row?.enabled===true,email:row?.email||'',data,permissions,field_labels:CARD_PERSON_LABELS};
-}
-async function getCardPerson(id){
-  const r=await pool.query(`SELECT id,slug,email,enabled,data,permissions FROM card_people WHERE id=$1 LIMIT 1`,[id]);
-  return normalizeCardPerson(r.rows[0]);
-}
-function cardPersonAuth(req,res,next){
-  try{
-    const header=req.headers.authorization||'';
-    if(!header.startsWith('Bearer ')) return res.status(401).json({error:'Kart sahibi oturumu gerekli'});
-    const decoded=jwt.verify(header.substring(7),SECRET);
-    if(!decoded?.id || decoded.role!=='card_person') return res.status(403).json({error:'Kart sahibi yetkisi gerekli'});
-    req.cardPerson=decoded; next();
-  }catch(e){ return res.status(401).json({error:'Kart sahibi oturumu geçersiz veya süresi dolmuş'}); }
-}
-
-const BUSINESS_PROFILE_FIELDS = [
-  'name','category','description','phone','whatsapp','address',
-  'instagram','tiktok','google_review','website','menu',
-  'hours','iban','iban_holder','logo_url'
-];
-
-const BUSINESS_PROFILE_FIELD_LABELS = {
-  name:'İşletme Adı',
-  category:'Kategori',
-  description:'İşletme Açıklaması',
-  phone:'Telefon',
-  whatsapp:'WhatsApp',
-  address:'Konum / Google Maps',
-  instagram:'Instagram',
-  tiktok:'TikTok',
-  google_review:'Google Yorum',
-  website:'Web Sitesi',
-  menu:'Menü',
-  hours:'Çalışma Saatleri',
-  iban:'IBAN',
-  iban_holder:'IBAN Sahibi',
-  logo_url:'Logo Görseli'
-};
-
-function businessProfileFieldPermissions(row) {
-  let raw = row?.profile_field_permissions;
-  if (typeof raw === 'string') {
-    try { raw = JSON.parse(raw); } catch (_) { raw = {}; }
-  }
-  raw = raw && typeof raw === 'object' ? raw : {};
-  const result = {};
-  for (const key of BUSINESS_PROFILE_FIELDS) result[key] = raw[key] === false ? false : true;
-  return result;
-}
-
-function publicBusinessWithFieldPermissions(row) {
-  const profile = publicBusiness(row);
-  const permissions = businessProfileFieldPermissions(row);
-
-  for (const key of BUSINESS_PROFILE_FIELDS) {
-    if (!permissions[key]) profile[key] = '';
-  }
-
-  return profile;
-}
-
-function businessPermissions(row) {
-  return {
-    profile: row?.dashboard_profile !== false,
-    qr: row?.dashboard_qr === true,
-    nfc: row?.dashboard_nfc === true,
-    analytics: row?.dashboard_analytics === true,
-    live: row?.dashboard_live === true,
-    ai: row?.dashboard_ai === true,
-    review: row?.dashboard_review === true,
-    campaign: row?.dashboard_campaign === true,
-    profile_theme: row?.profile_theme_permission !== false,
-    profile_fields: businessProfileFieldPermissions(row)
-  };
-}
-
-function requireBusinessPermission(permission) {
-  return async (req, res, next) => {
-    try {
-      if (req.user?.role === 'admin') return next();
-      const result = await pool.query(
-        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign
-         FROM businesses WHERE id=$1 LIMIT 1`,
-        [req.user.id]
-      );
-      if (!result.rows.length) {
-        return res.status(404).json({ error: 'İşletme bulunamadı' });
-      }
-      const permissions = businessPermissions(result.rows[0]);
-      if (!permissions[permission]) {
-        return res.status(403).json({
-          error: 'Bu alan için admin izni gerekli',
-          permission,
-          permissions
-        });
-      }
-      next();
-    } catch (error) {
-      console.error('BUSINESS PERMISSION ERROR:', error);
-      res.status(500).json({ error: 'Erişim kontrolü yapılamadı' });
-    }
-  };
-}
-
-
-function nfcTagPublic(row) {
-  if (!row) return null;
-
-  const baseUrl =
-    process.env.PUBLIC_URL ||
-    process.env.RENDER_EXTERNAL_URL ||
-    '';
-
-  const url = baseUrl
-    ? `${baseUrl}/p/nfc/${row.code}`
-    : `/p/nfc/${row.code}`;
-
-  return {
-    id: row.id,
-    business_id: row.business_id,
-    name: row.name,
-    placement: row.placement || '',
-    code: row.code,
-    url,
-    is_active: row.is_active,
-    tap_count: Number(row.tap_count || row.nfc_count || 0),
-    qr_count: Number(row.qr_count || 0),
-    nfc_count: Number(row.nfc_count || row.tap_count || 0),
-    total_count: Number(row.total_count || ((Number(row.qr_count || 0)) + (Number(row.nfc_count || row.tap_count || 0)))),
-    last_tap: row.last_tap || null,
-    created_at: row.created_at,
-    updated_at: row.updated_at
-  };
-}
-
-
-/* =========================================================
-   DATABASE INIT
-========================================================= */
-
-async function initDatabase() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS businesses (
-      id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL,
-      slug TEXT UNIQUE NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      category TEXT DEFAULT '',
-      description TEXT DEFAULT '',
-      phone TEXT DEFAULT '',
-      whatsapp TEXT DEFAULT '',
-      address TEXT DEFAULT '',
-      instagram TEXT DEFAULT '',
-      tiktok TEXT DEFAULT '',
-      google_review TEXT DEFAULT '',
-      website TEXT DEFAULT '',
-      menu TEXT DEFAULT '',
-      iban TEXT DEFAULT '',
-      iban_holder TEXT DEFAULT '',
-      hours TEXT DEFAULT '',
-      logo_url TEXT DEFAULT '',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-
-  await pool.query(`
-    ALTER TABLE businesses
-      ADD COLUMN IF NOT EXISTS dashboard_profile BOOLEAN NOT NULL DEFAULT TRUE,
-      ADD COLUMN IF NOT EXISTS dashboard_qr BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS dashboard_nfc BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS dashboard_analytics BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS dashboard_live BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS dashboard_ai BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS profile_field_permissions JSONB NOT NULL DEFAULT '{}'::jsonb,
-      ADD COLUMN IF NOT EXISTS profile_theme_permission BOOLEAN NOT NULL DEFAULT TRUE,
-      ADD COLUMN IF NOT EXISTS social_links JSONB NOT NULL DEFAULT '{}'::jsonb,
-      ADD COLUMN IF NOT EXISTS custom_links JSONB NOT NULL DEFAULT '[]'::jsonb,
-      ADD COLUMN IF NOT EXISTS social_platform_permissions JSONB NOT NULL DEFAULT '{}'::jsonb
-  `);
-
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS events (
-      id SERIAL PRIMARY KEY,
-      business_id INTEGER NOT NULL,
-      type TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-
-  /*
-    NFC TAGS
-  */
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS nfc_tags (
-      id SERIAL PRIMARY KEY,
-      business_id INTEGER NOT NULL
-        REFERENCES businesses(id)
-        ON DELETE CASCADE,
-
-      name TEXT NOT NULL,
-      placement TEXT DEFAULT '',
-      code TEXT UNIQUE NOT NULL,
-
-      is_active BOOLEAN NOT NULL DEFAULT TRUE,
-
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-
-  /*
-    Eski events tablosuna NFC tag bağlantısı ekle.
-  */
-
-  await pool.query(`
-    ALTER TABLE events
-    ADD COLUMN IF NOT EXISTS nfc_tag_id INTEGER
-    REFERENCES nfc_tags(id)
-    ON DELETE SET NULL
-  `);
-
-
-  await pool.query(`
-    ALTER TABLE events
-    ADD COLUMN IF NOT EXISTS source TEXT DEFAULT ''
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_events_source
-    ON events(source)
-  `);
-
-
-  /*
-    Performans için indexler.
-  */
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_events_business_id
-    ON events(business_id)
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_events_type
-    ON events(type)
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_events_nfc_tag_id
-    ON events(nfc_tag_id)
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_nfc_tags_business_id
-    ON nfc_tags(business_id)
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_nfc_tags_code
-    ON nfc_tags(code)
-  `);
-
-
-
-  /* V2 — INDEPENDENT PERSONAL BUSINESS CARDS */
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS card_people (
-      id SERIAL PRIMARY KEY,
-      slug TEXT NOT NULL UNIQUE,
-      email TEXT UNIQUE,
-      password_hash TEXT,
-      enabled BOOLEAN NOT NULL DEFAULT TRUE,
-      data JSONB NOT NULL DEFAULT '{}'::jsonb,
-      permissions JSONB NOT NULL DEFAULT '{}'::jsonb,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  await pool.query(`CREATE INDEX IF NOT EXISTS idx_card_people_slug ON card_people(slug)`);
-
-  /* V2 — DYNAMIC PROFILE DESIGN */
-
-  /* V2 — REVIEW BOOSTER */
-  await pool.query(`
-    ALTER TABLE businesses
-      ADD COLUMN IF NOT EXISTS dashboard_review BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS dashboard_campaign BOOLEAN NOT NULL DEFAULT FALSE
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS review_boosters (
-      id SERIAL PRIMARY KEY,
-      business_id INTEGER NOT NULL UNIQUE REFERENCES businesses(id) ON DELETE CASCADE,
-      enabled BOOLEAN NOT NULL DEFAULT FALSE,
-      title TEXT NOT NULL DEFAULT 'Deneyimini bizimle paylaş',
-      text TEXT NOT NULL DEFAULT 'Memnun kaldıysan Google’da bizi değerlendir. Bir sorun yaşadıysan doğrudan bize ulaş.',
-      threshold INTEGER NOT NULL DEFAULT 4,
-      low_title TEXT NOT NULL DEFAULT 'Bunu duymak isteriz',
-      low_text TEXT NOT NULL DEFAULT 'Yaşadığın sorunu bize ilet, seninle ilgilenelim.',
-      success_title TEXT NOT NULL DEFAULT 'Teşekkürler!',
-      success_text TEXT NOT NULL DEFAULT 'Değerlendirmen bizim için çok değerli.',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_review_boosters_business_id
-    ON review_boosters(business_id)
-  `);
-
-  /* V2 — SMART CAMPAIGNS */
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS campaigns (
-      id SERIAL PRIMARY KEY,
-      business_id INTEGER NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
-      title TEXT NOT NULL,
-      text TEXT DEFAULT '',
-      image_url TEXT DEFAULT '',
-      button_text TEXT DEFAULT '',
-      button_url TEXT DEFAULT '',
-      starts_at TIMESTAMP NULL,
-      ends_at TIMESTAMP NULL,
-      enabled BOOLEAN NOT NULL DEFAULT TRUE,
-      priority INTEGER NOT NULL DEFAULT 0,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  await pool.query(`CREATE INDEX IF NOT EXISTS idx_campaigns_business_id ON campaigns(business_id)`);
-  await pool.query(`CREATE INDEX IF NOT EXISTS idx_campaigns_active_window ON campaigns(enabled,starts_at,ends_at)`);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS profile_designs (
-      id SERIAL PRIMARY KEY,
-      business_id INTEGER NOT NULL UNIQUE REFERENCES businesses(id) ON DELETE CASCADE,
-      theme TEXT NOT NULL DEFAULT 'midnight-gold',
-      accent_color TEXT NOT NULL DEFAULT '#D4AF37',
-      cover_url TEXT DEFAULT '',
-      cover_position TEXT DEFAULT 'center',
-      announcement_text TEXT DEFAULT '',
-      announcement_enabled BOOLEAN NOT NULL DEFAULT FALSE,
-      campaign_title TEXT DEFAULT '',
-      campaign_text TEXT DEFAULT '',
-      campaign_image_url TEXT DEFAULT '',
-      campaign_button_text TEXT DEFAULT '',
-      campaign_button_url TEXT DEFAULT '',
-      campaign_enabled BOOLEAN NOT NULL DEFAULT FALSE,
-      featured_title TEXT DEFAULT '',
-      featured_text TEXT DEFAULT '',
-      featured_image_url TEXT DEFAULT '',
-      featured_button_text TEXT DEFAULT '',
-      featured_button_url TEXT DEFAULT '',
-      featured_enabled BOOLEAN NOT NULL DEFAULT FALSE,
-      gallery JSONB NOT NULL DEFAULT '[]'::jsonb,
-      video_url TEXT DEFAULT '',
-      video_enabled BOOLEAN NOT NULL DEFAULT FALSE,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_profile_designs_business_id
-    ON profile_designs(business_id)
-  `);
-
-  console.log('PostgreSQL + NFC Tag Management hazır.');
-}
-
-
-/* =========================================================
-   AUTH
-========================================================= */
-
-function auth(req, res, next) {
-  try {
-    const header = req.headers.authorization || '';
-
-    if (!header.startsWith('Bearer ')) {
-      return res.status(401).json({
-        error: 'Yetkilendirme gerekli'
-      });
-    }
-
-    const token = header.substring(7);
-
-    const decoded = jwt.verify(token, SECRET);
-
-    if (!decoded || !decoded.id) {
-      return res.status(401).json({
-        error: 'Geçersiz token'
-      });
-    }
-
-    req.user = decoded;
-
-    next();
-
-  } catch (error) {
-    return res.status(401).json({
-      error: 'Oturum geçersiz veya süresi dolmuş'
-    });
-  }
-}
-
-
-function adminAuth(req, res, next) {
-  try {
-    const header = req.headers.authorization || '';
-
-    if (!header.startsWith('Bearer ')) {
-      return res.status(401).json({
-        error: 'Admin yetkisi gerekli'
-      });
-    }
-
-    const token = header.substring(7);
-
-    const decoded = jwt.verify(token, SECRET);
-
-    if (
-      !decoded ||
-      decoded.role !== 'admin'
-    ) {
-      return res.status(403).json({
-        error: 'Admin yetkisi gerekli'
-      });
-    }
-
-    req.admin = decoded;
-
-    next();
-
-  } catch (error) {
-    return res.status(401).json({
-      error: 'Admin oturumu geçersiz'
-    });
-  }
-}
-
-
-/* =========================================================
-   HEALTH
-========================================================= */
-
-app.get('/api/health', async (req, res) => {
-  try {
-
-    await pool.query('SELECT 1');
-
-    res.json({
-      ok: true,
-      version: '3.9-access-control',
-      database: 'postgresql',
-      nfc_tags: true
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      ok: false,
-      error: 'Veritabanı bağlantı hatası'
-    });
-  }
-});
-
-
-/* =========================================================
-   ADMIN LOGIN
-========================================================= */
-
-app.post('/api/admin/login', async (req, res) => {
-
-  try {
-
-    const {
-      email,
-      password
-    } = req.body;
-
-    const adminEmail =
-      process.env.ADMIN_EMAIL || '';
-
-    const adminPassword =
-      process.env.ADMIN_PASSWORD || '';
-
-    if (!adminEmail || !adminPassword) {
-
-      return res.status(503).json({
-        error: 'Admin hesabı henüz yapılandırılmadı'
-      });
-
-    }
-
-    if (
-      String(email || '').trim().toLowerCase() !==
-      String(adminEmail).trim().toLowerCase() ||
-      String(password || '') !==
-      String(adminPassword)
-    ) {
-
-      return res.status(401).json({
-        error: 'Admin e-posta veya şifre hatalı'
-      });
-
-    }
-
-    const token = jwt.sign(
-      {
-        role: 'admin',
-        email: adminEmail
-      },
-      SECRET,
-      {
-        expiresIn: '7d'
-      }
-    );
-
-    res.json({
-      token,
-      admin: {
-        email: adminEmail
-      }
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Admin girişi sırasında hata oluştu'
-    });
-
-  }
-
-});
-
-
-
-/* =========================================================
-   ADMIN LIVE ACTIVITY
-========================================================= */
-app.get('/api/admin/live-activity', adminAuth, async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT
-        e.id,
-        e.type,
-        e.source,
-        e.nfc_tag_id,
-        e.created_at,
-        b.id AS business_id,
-        b.name AS business_name,
-        b.slug AS business_slug,
-        t.name AS nfc_name,
-        t.placement AS nfc_placement
-      FROM events e
-      LEFT JOIN businesses b ON b.id = e.business_id
-      LEFT JOIN nfc_tags t ON t.id = e.nfc_tag_id
-      ORDER BY e.created_at DESC
-      LIMIT 30
-    `);
-    const stats = await pool.query(`
-      SELECT
-        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '24 hours')::int AS last_24h,
-        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '15 minutes')::int AS last_15m,
-        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '60 minutes')::int AS last_60m
-      FROM events
-    `);
-    res.json({activities: result.rows, stats: stats.rows[0] || {last_24h:0,last_15m:0,last_60m:0}});
-  } catch (error) {
-    console.error('LIVE ACTIVITY ERROR:', error);
-    res.status(500).json({error:'Canlı aktiviteler alınamadı'});
-  }
-});
-
-/* =========================================================
-   ADMIN OVERVIEW
-========================================================= */
-
-app.get('/api/admin/overview', adminAuth, async (req, res) => {
-
-  try {
-
-    const businesses = await pool.query(`
-      SELECT COUNT(*)::int AS count
-      FROM businesses
-    `);
-
-    const events = await pool.query(`
-      SELECT COUNT(*)::int AS count
-      FROM events
-    `);
-
-    const profiles = await pool.query(`
-      SELECT COUNT(*)::int AS count
-      FROM events
-      WHERE type='profile_view'
-    `);
-
-    const qr = await pool.query(`
-      SELECT COUNT(*)::int AS count
-      FROM events
-      WHERE type IN ('qr_scan','qr')
-    `);
-
-    const nfc = await pool.query(`
-      SELECT COUNT(*)::int AS count
-      FROM events
-      WHERE type='nfc'
-    `);
-
-    const whatsapp = await pool.query(`
-      SELECT COUNT(*)::int AS count
-      FROM events
-      WHERE type='whatsapp'
-    `);
-
-    const phone = await pool.query(`
-      SELECT COUNT(*)::int AS count
-      FROM events
-      WHERE type='phone'
-    `);
-
-    const nfcTags = await pool.query(`
-      SELECT COUNT(*)::int AS count
-      FROM nfc_tags
-    `);
-
-    res.json({
-
-      businesses:
-        businesses.rows[0].count,
-
-      events:
-        events.rows[0].count,
-
-      profile_views:
-        profiles.rows[0].count,
-
-      qr_scans:
-        qr.rows[0].count,
-
-      nfc_scans:
-        nfc.rows[0].count,
-
-      whatsapp_clicks:
-        whatsapp.rows[0].count,
-
-      phone_clicks:
-        phone.rows[0].count,
-
-      nfc_tags:
-        nfcTags.rows[0].count
-
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Genel istatistikler alınamadı'
-    });
-
-  }
-
-});
-
-
-/* =========================================================
-   ADMIN BUSINESSES
-========================================================= */
-
-app.get('/api/admin/businesses', adminAuth, async (req, res) => {
-
-  try {
-
-    const result = await pool.query(`
-      SELECT
-
-        b.id,
-        b.name,
-        b.slug,
-        b.email,
-        b.category,
-        b.phone,
-        b.dashboard_profile,
-        b.dashboard_qr,
-        b.dashboard_nfc,
-        b.dashboard_analytics,
-        b.created_at,
-
-        COALESCE((
-          SELECT COUNT(*)
-          FROM events e
-          WHERE e.business_id = b.id
-          AND e.type = 'profile_view'
-        ),0)::int AS profile_views,
-
-        COALESCE((
-          SELECT COUNT(*)
-          FROM events e
-          WHERE e.business_id = b.id
-          AND e.type IN ('qr_scan','qr')
-        ),0)::int AS qr_scans,
-
-        COALESCE((
-          SELECT COUNT(*)
-          FROM events e
-          WHERE e.business_id = b.id
-          AND e.type = 'nfc'
-        ),0)::int AS nfc_scans,
-
-        COALESCE((
-          SELECT COUNT(*)
-          FROM events e
-          WHERE e.business_id = b.id
-          AND e.type = 'whatsapp'
-        ),0)::int AS whatsapp_clicks,
-
-        COALESCE((
-          SELECT COUNT(*)
-          FROM events e
-          WHERE e.business_id = b.id
-          AND e.type = 'phone'
-        ),0)::int AS phone_clicks,
-
-        COALESCE((
-          SELECT COUNT(*)
-          FROM nfc_tags t
-          WHERE t.business_id = b.id
-        ),0)::int AS nfc_tags
-
-      FROM businesses b
-
-      ORDER BY b.id DESC
-    `);
-
-    res.json(result.rows);
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'İşletmeler alınamadı'
-    });
-
-  }
-
-});
-
-
-/* =========================================================
-   ADMIN BUSINESS CREATE
-========================================================= */
-
-app.post('/api/admin/businesses', adminAuth, async (req, res) => {
-
-  try {
-
-    const {
-      name,
-      email,
-      password,
-      category
-    } = req.body || {};
-
-    const businessName = String(name || '').trim();
-    const normalizedEmail = String(email || '').trim().toLowerCase();
-    const businessPassword = String(password || '');
-
-    if (!businessName || !normalizedEmail || businessPassword.length < 8) {
-      return res.status(400).json({
-        error: 'İşletme adı, e-posta ve en az 8 karakter şifre gerekli'
-      });
-    }
-
-    const existing = await pool.query(
-      `SELECT id FROM businesses WHERE email=$1 LIMIT 1`,
-      [normalizedEmail]
-    );
-
-    if (existing.rows.length) {
-      return res.status(409).json({ error: 'Bu e-posta zaten kayıtlı' });
-    }
-
-    const base = slugify(businessName) || 'business';
-    let slug = base;
-    let n = 1;
-
-    while (true) {
-      const check = await pool.query(
-        `SELECT id FROM businesses WHERE slug=$1 LIMIT 1`,
-        [slug]
-      );
-      if (!check.rows.length) break;
-      n++;
-      slug = `${base}-${n}`;
-    }
-
-    const passwordHash = await bcrypt.hash(businessPassword, 12);
-
-    const result = await pool.query(`
-      INSERT INTO businesses(
-        name,
-        slug,
-        email,
-        password_hash,
-        category,
-        dashboard_profile,
-        dashboard_qr,
-        dashboard_nfc,
-        dashboard_analytics,
-        dashboard_live,
-        dashboard_ai
-      )
-      VALUES($1,$2,$3,$4,$5,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE)
-      RETURNING *
-    `, [
-      businessName,
-      slug,
-      normalizedEmail,
-      passwordHash,
-      String(category || '').trim()
-    ]);
-
-    res.status(201).json({
-      success: true,
-      business: publicBusiness(result.rows[0]),
-      permissions: businessPermissions(result.rows[0])
-    });
-
-  } catch (error) {
-
-    console.error('ADMIN BUSINESS CREATE ERROR:', error);
-
-    res.status(500).json({
-      error: 'İşletme oluşturulamadı'
-    });
-
-  }
-
-});
-
-
-/* =========================================================
-   ADMIN BUSINESS DETAIL
-========================================================= */
-
-app.get(
-  '/api/admin/business/:id',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const id = Number(req.params.id);
-
-      const result = await pool.query(
-        `
-        SELECT *
-        FROM businesses
-        WHERE id=$1
-        `,
-        [id]
-      );
-
-      if (!result.rows.length) {
-
-        return res.status(404).json({
-          error: 'İşletme bulunamadı'
-        });
-
-      }
-
-      const business = result.rows[0];
-
-      const tags = await pool.query(`
-        SELECT
-          t.id,
-          t.name,
-          t.placement,
-          t.code,
-          t.is_active,
-          t.created_at,
-          t.updated_at,
-
-          COALESCE((
-            SELECT COUNT(*)
-            FROM events e
-            WHERE e.nfc_tag_id = t.id
-            AND e.type='nfc'
-          ),0)::int AS tap_count,
-
-          (
-            SELECT MAX(e.created_at)
-            FROM events e
-            WHERE e.nfc_tag_id = t.id
-            AND e.type='nfc'
-          ) AS last_tap
-
-        FROM nfc_tags t
-
-        WHERE t.business_id=$1
-
-        ORDER BY t.id DESC
-      `, [id]);
-
-      res.json({
-        business: publicBusiness(business),
-        permissions: businessPermissions(business),
-        nfc_tags: tags.rows.map(nfcTagPublic)
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).json({
-        error: 'İşletme bilgileri alınamadı'
-      });
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   ADMIN BUSINESS PERMISSIONS
-========================================================= */
-
-app.get('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_theme_permission, profile_field_permissions
-      FROM businesses WHERE id=$1 LIMIT 1
-    `, [Number(req.params.id)]);
-    if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
-    res.json({ permissions: businessPermissions(result.rows[0]) });
-  } catch (error) {
-    console.error('ADMIN PERMISSIONS GET ERROR:', error);
-    res.status(500).json({ error: 'İzinler alınamadı' });
-  }
-});
-
-app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
-  try {
-    const id = Number(req.params.id);
-    const body = req.body || {};
-    const profile = body.profile !== false;
-    const qr = body.qr === true;
-    const nfc = body.nfc === true;
-    const analytics = body.analytics === true;
-    const live = body.live === true;
-    const ai = body.ai === true;
-    const review = body.review === true;
-    const campaign = body.campaign === true;
-
-    const current = await pool.query(
-      `SELECT profile_field_permissions FROM businesses WHERE id=$1 LIMIT 1`,
-      [id]
-    );
-    if (!current.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
-
-    const incomingFields = body.profile_fields && typeof body.profile_fields === 'object'
-      ? body.profile_fields
-      : {};
-    const profile_fields = businessProfileFieldPermissions(current.rows[0]);
-    const profile_theme = body.profile_theme !== undefined
-      ? body.profile_theme === true
-      : current.rows[0].profile_theme_permission !== false;
-    for (const key of BUSINESS_PROFILE_FIELDS) {
-      if (Object.prototype.hasOwnProperty.call(incomingFields, key)) {
-        profile_fields[key] = incomingFields[key] === true;
-      }
-    }
-
-    const result = await pool.query(`
-      UPDATE businesses
-      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7, dashboard_campaign=$8, profile_theme_permission=$9, profile_field_permissions=$10::jsonb
-      WHERE id=$11
-      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_theme_permission, profile_field_permissions
-    `, [profile, qr, nfc, analytics, live, ai, review, campaign, profile_theme, JSON.stringify(profile_fields), id]);
-
-    if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
-    res.json({ success: true, permissions: businessPermissions(result.rows[0]) });
-  } catch (error) {
-    console.error('ADMIN PERMISSIONS UPDATE ERROR:', error);
-    res.status(500).json({ error: 'İzinler güncellenemedi' });
-  }
-});
-
-
-
-/* =========================================================
-   INDEPENDENT PERSONAL BUSINESS CARD API
-========================================================= */
-app.get('/api/admin/card-people', adminAuth, async (req,res)=>{
-  try{
-    const r=await pool.query(`SELECT id,slug,email,enabled,data,permissions,created_at,updated_at FROM card_people ORDER BY created_at DESC`);
-    res.json({people:r.rows.map(x=>normalizeCardPerson(x))});
-  }catch(e){console.error('ADMIN CARD PEOPLE LIST ERROR:',e);res.status(500).json({error:'Business Card kişileri alınamadı'});}
-});
-app.post('/api/admin/card-people', adminAuth, async (req,res)=>{
-  try{
-    const body=req.body||{}, name=String(body.person_name||body.display_name||'').trim();
-    if(!name) return res.status(400).json({error:'Ad Soyad gerekli'});
-    const base=slugify(name)||'kart';
-    let slug=base, i=2;
-    while((await pool.query(`SELECT 1 FROM card_people WHERE slug=$1 LIMIT 1`,[slug])).rows.length) slug=`${base}-${i++}`;
-    const data={...CARD_PERSON_DEFAULT_DATA};
-    for(const k of CARD_PERSON_FIELDS) if(Object.prototype.hasOwnProperty.call(body.data||{},k)) data[k]=String(body.data[k]??'').trim();
-    data.person_name=data.person_name||name;
-    const permissions={...CARD_PERSON_DEFAULT_PERMISSIONS};
-    for(const k of CARD_PERSON_FIELDS) if(body.permissions&&Object.prototype.hasOwnProperty.call(body.permissions,k)) permissions[k]=body.permissions[k]===true;
-    const email=String(body.email||'').trim().toLowerCase()||null;
-    let passwordHash=null;
-    if(body.password) passwordHash=await bcrypt.hash(String(body.password),10);
-    const r=await pool.query(`INSERT INTO card_people(slug,email,password_hash,enabled,data,permissions) VALUES($1,$2,$3,$4,$5::jsonb,$6::jsonb) RETURNING id,slug,email,enabled,data,permissions,created_at,updated_at`,[slug,email,passwordHash,body.enabled!==false,JSON.stringify(data),JSON.stringify(permissions)]);
-    res.status(201).json({person:normalizeCardPerson(r.rows[0])});
-  }catch(e){console.error('ADMIN CARD PERSON CREATE ERROR:',e);res.status(500).json({error:e.code==='23505'?'E-posta veya slug zaten kullanılıyor':'Business Card kişisi oluşturulamadı'});}
-});
-app.get('/api/admin/card-people/:id', adminAuth, async (req,res)=>{
-  try{const p=await getCardPerson(Number(req.params.id));if(!p.id)return res.status(404).json({error:'Kişi bulunamadı'});res.json({person:p});}
-  catch(e){res.status(500).json({error:'Business Card kişisi alınamadı'});}
-});
-app.put('/api/admin/card-people/:id', adminAuth, async (req,res)=>{
-  try{
-    const id=Number(req.params.id), current=await getCardPerson(id); if(!current.id)return res.status(404).json({error:'Kişi bulunamadı'});
-    const body=req.body||{}, data={...current.data}, permissions={...current.permissions};
-    if(body.data&&typeof body.data==='object') for(const k of CARD_PERSON_FIELDS) if(Object.prototype.hasOwnProperty.call(body.data,k)) data[k]=String(body.data[k]??'').trim();
-    if(body.permissions&&typeof body.permissions==='object') for(const k of CARD_PERSON_FIELDS) if(Object.prototype.hasOwnProperty.call(body.permissions,k)) permissions[k]=body.permissions[k]===true;
-    const enabled=body.enabled===true;
-    let passwordHash=null;
-    if(body.password) passwordHash=await bcrypt.hash(String(body.password),10);
-    const r=await pool.query(`UPDATE card_people SET email=$1,enabled=$2,data=$3::jsonb,permissions=$4::jsonb,password_hash=COALESCE($5,password_hash),updated_at=CURRENT_TIMESTAMP WHERE id=$6 RETURNING id,slug,email,enabled,data,permissions,created_at,updated_at`,[String(body.email??current.email).trim().toLowerCase()||null,enabled,JSON.stringify(data),JSON.stringify(permissions),passwordHash,id]);
-    res.json({person:normalizeCardPerson(r.rows[0])});
-  }catch(e){console.error('ADMIN CARD PERSON UPDATE ERROR:',e);res.status(500).json({error:'Business Card kişisi güncellenemedi'});}
-});
-app.delete('/api/admin/card-people/:id', adminAuth, async (req,res)=>{
-  try{const r=await pool.query(`DELETE FROM card_people WHERE id=$1 RETURNING id`,[Number(req.params.id)]);if(!r.rows.length)return res.status(404).json({error:'Kişi bulunamadı'});res.json({success:true});}
-  catch(e){res.status(500).json({error:'Business Card kişisi silinemedi'});}
-});
-
-app.post('/api/card-login', async (req,res)=>{
-  try{
-    const email=String(req.body?.email||'').trim().toLowerCase(), password=String(req.body?.password||'');
-    const r=await pool.query(`SELECT * FROM card_people WHERE email=$1 AND enabled=TRUE LIMIT 1`,[email]);
-    if(!r.rows.length || !r.rows[0].password_hash) return res.status(401).json({error:'E-posta veya şifre hatalı'});
-    if(!await bcrypt.compare(password,r.rows[0].password_hash)) return res.status(401).json({error:'E-posta veya şifre hatalı'});
-    const p=r.rows[0], token=jwt.sign({id:p.id,email:p.email,role:'card_person'},SECRET,{expiresIn:'30d'});
-    res.json({token,person:normalizeCardPerson(p)});
-  }catch(e){res.status(500).json({error:'Kart girişi yapılamadı'});}
-});
-app.get('/api/card/me', cardPersonAuth, async (req,res)=>{try{const p=await getCardPerson(req.cardPerson.id);if(!p.id)return res.status(404).json({error:'Kart bulunamadı'});res.json({person:p});}catch(e){res.status(500).json({error:'Kart bilgileri alınamadı'});}});
-app.put('/api/card/me', cardPersonAuth, async (req,res)=>{
-  try{
-    const current=await getCardPerson(req.cardPerson.id); if(!current.id)return res.status(404).json({error:'Kart bulunamadı'});
-    const data={...current.data};
-    for(const k of CARD_PERSON_FIELDS){if(Object.prototype.hasOwnProperty.call(req.body||{},k)){if(current.permissions[k]!==true)return res.status(403).json({error:`${CARD_PERSON_LABELS[k]} alanı için admin izni gerekli`,permission:`card_${k}`});data[k]=String(req.body[k]??'').trim();}}
-    const r=await pool.query(`UPDATE card_people SET data=$1::jsonb,updated_at=CURRENT_TIMESTAMP WHERE id=$2 RETURNING id,slug,email,enabled,data,permissions`,[JSON.stringify(data),current.id]);
-    res.json({person:normalizeCardPerson(r.rows[0])});
-  }catch(e){res.status(500).json({error:'Kart bilgileri kaydedilemedi'});}
-});
-
-app.get('/card/:slug', async (req,res)=>{
-  try{
-    const r=await pool.query(`SELECT id,slug,enabled,data,permissions FROM card_people WHERE slug=$1 LIMIT 1`,[String(req.params.slug||'')]);
-    if(!r.rows.length || r.rows[0].enabled!==true)return res.status(404).send('Business Card bulunamadı');
-    return res.sendFile(path.join(__dirname,'public','business-card.html'));
-  }catch(e){console.error('PUBLIC CARD ERROR:',e);res.status(500).send('Business Card açılamadı');}
-});
-app.get('/api/public-card/:slug', async (req,res)=>{
-  try{
-    const r=await pool.query(`SELECT id,slug,enabled,data,permissions FROM card_people WHERE slug=$1 LIMIT 1`,[String(req.params.slug||'')]);
-    if(!r.rows.length || r.rows[0].enabled!==true)return res.status(404).json({error:'Business Card bulunamadı'});
-    const p=normalizeCardPerson(r.rows[0]), filtered={};
-    for(const k of CARD_PERSON_FIELDS) if(p.permissions[k]===true) filtered[k]=p.data[k];
-    res.json({card:{slug:p.slug,enabled:true,data:filtered,permissions:p.permissions,field_labels:CARD_PERSON_LABELS}});
-  }catch(e){res.status(500).json({error:'Business Card alınamadı'});}
-});
-
-app.get('/card-login',(req,res)=>res.sendFile(path.join(__dirname,'public','card-login.html')));
-app.get('/card-dashboard',(req,res)=>res.sendFile(path.join(__dirname,'public','card-dashboard.html')));
-
-/* =========================================================
-   ADMIN BUSINESS ANALYTICS
-========================================================= */
-
-app.get(
-  '/api/admin/business/:id/analytics',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const businessId = Number(req.params.id);
-      if (!Number.isInteger(businessId) || businessId <= 0) {
-        return res.status(400).json({ error: 'Geçersiz işletme ID' });
-      }
-
-      const period = ['today','7d','30d','all'].includes(req.query.period)
-        ? req.query.period
-        : 'all';
-
-      let periodWhere = 'business_id=$1';
-      const params = [businessId];
-
-      if (period === 'today') {
-        periodWhere += ` AND created_at >= CURRENT_DATE`;
-      } else if (period === '7d') {
-        periodWhere += ` AND created_at >= CURRENT_TIMESTAMP - INTERVAL '7 days'`;
-      } else if (period === '30d') {
-        periodWhere += ` AND created_at >= CURRENT_TIMESTAMP - INTERVAL '30 days'`;
-      }
-
-      const totals = await pool.query(`
-        SELECT
-          COUNT(*)::int AS total_events,
-          COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
-          COUNT(*) FILTER (WHERE type='qr_scan')::int AS qr_scans,
-          COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
-          COUNT(*) FILTER (WHERE type='phone')::int AS phone_clicks,
-          COUNT(*) FILTER (WHERE type='whatsapp')::int AS whatsapp_clicks,
-          COUNT(*) FILTER (WHERE type='instagram')::int AS instagram_clicks,
-          COUNT(*) FILTER (WHERE type='tiktok')::int AS tiktok_clicks,
-          COUNT(*) FILTER (WHERE type='google_review')::int AS google_review_clicks,
-          COUNT(*) FILTER (WHERE type='website')::int AS website_clicks,
-          COUNT(*) FILTER (WHERE type='menu')::int AS menu_clicks
-        FROM events
-        WHERE ${periodWhere}
-      `, params);
-
-      const daily = await pool.query(`
-        SELECT
-          DATE(created_at) AS date,
-          COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
-          COUNT(*) FILTER (WHERE type='qr_scan')::int AS qr_scans,
-          COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
-          COUNT(*)::int AS total_events
-        FROM events
-        WHERE ${periodWhere}
-        GROUP BY DATE(created_at)
-        ORDER BY date ASC
-        LIMIT 366
-      `, params);
-
-      const hourly = await pool.query(`
-        SELECT
-          EXTRACT(HOUR FROM created_at)::int AS hour,
-          COUNT(*)::int AS events,
-          COUNT(*) FILTER (WHERE type='qr_scan')::int AS qr_scans,
-          COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
-          COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views
-        FROM events
-        WHERE ${periodWhere}
-        GROUP BY EXTRACT(HOUR FROM created_at)
-        ORDER BY hour ASC
-      `, params);
-
-      const eventTypes = await pool.query(`
-        SELECT type, COUNT(*)::int AS count
-        FROM events
-        WHERE ${periodWhere}
-        GROUP BY type
-        ORDER BY count DESC, type ASC
-      `, params);
-
-      const topNfc = await pool.query(`
-        SELECT
-          t.id,
-          t.name,
-          t.placement,
-          t.code,
-          t.is_active,
-          COUNT(e.id)::int AS taps,
-          MAX(e.created_at) AS last_tap
-        FROM nfc_tags t
-        LEFT JOIN events e
-          ON e.nfc_tag_id=t.id
-          AND e.type='nfc'
-          AND ${periodWhere.replace('business_id=$1', 'e.business_id=$1').replace('created_at', 'e.created_at')}
-        WHERE t.business_id=$1
-        GROUP BY t.id, t.name, t.placement, t.code, t.is_active
-        ORDER BY taps DESC, t.id ASC
-        LIMIT 10
-      `, params);
-
-      res.json({
-        success: true,
-        period,
-        totals: totals.rows[0] || {},
-        daily: daily.rows,
-        hourly: hourly.rows,
-        event_types: eventTypes.rows,
-        top_nfc: topNfc.rows
-      });
-
-    } catch (error) {
-
-      console.error('ADMIN ANALYTICS ERROR:', error);
-
-      res.status(500).json({
-        error: 'Analitik verileri alınamadı'
-      });
-
-    }
-
-  }
-);
 
 /* ==================================================
-   ADMIN NFC MANAGEMENT
+   HEADER
 ================================================== */
 
-/* =========================
-   ADMIN NFC LIST
-========================= */
+header{
 
-app.get(
-  '/api/admin/nfc-tags',
-  adminAuth,
-  async (req, res) => {
+  position:sticky;
 
-    try {
+  top:0;
 
-      const result =
-        await pool.query(`
-          SELECT
+  z-index:100;
 
-            n.id,
-            n.business_id,
-            n.name,
-            n.placement,
-            n.code,
-            n.is_active,
-            n.created_at,
-            n.updated_at,
+  min-height:72px;
 
-            b.name AS business_name,
-            b.slug AS business_slug,
+  display:flex;
 
-            COALESCE((
-              SELECT COUNT(*)
-              FROM events e
-              WHERE
-                e.nfc_tag_id = n.id
-                AND e.type = 'nfc'
-            ), 0)::int AS tap_count,
+  align-items:center;
 
-            (
-              SELECT MAX(e.created_at)
-              FROM events e
-              WHERE
-                e.nfc_tag_id = n.id
-                AND e.type = 'nfc'
-            ) AS last_tap
+  justify-content:space-between;
 
-          FROM nfc_tags n
+  gap:15px;
 
-          INNER JOIN businesses b
-            ON b.id = n.business_id
+  padding:
+    12px 28px;
 
-          ORDER BY
-            n.id DESC
-        `);
+  background:#090909eF;
 
-      const tags =
-        result.rows.map(
-          tag => ({
+  backdrop-filter:blur(22px);
 
-            ...tag,
+  border-bottom:
+    1px solid var(--border);
 
-            url:
-              `${req.protocol}://${req.get('host')}/p/nfc/${tag.code}`
+}
 
-          })
-        );
+.brand{
 
-      res.json(tags);
+  display:flex;
 
-    } catch (error) {
+  align-items:center;
 
-      console.error(
-        'ADMIN NFC LIST ERROR:',
-        error
-      );
+  gap:12px;
 
-      res
-        .status(500)
-        .json({
-          error:
-            'NFC etiketleri alınamadı'
-        });
+  min-width:0;
 
-    }
+}
 
-  }
-);
+.brand-icon{
 
+  width:43px;
 
-/* =========================
-   ADMIN NFC CREATE
-========================= */
+  height:43px;
 
-app.post(
-  '/api/admin/nfc-tags',
-  adminAuth,
-  async (req, res) => {
+  flex:none;
 
-    try {
+  display:grid;
 
-      const {
-        business_id,
-        name,
-        placement
-      } = req.body;
+  place-items:center;
 
-      if (!business_id) {
+  border-radius:14px;
 
-        return res
-          .status(400)
-          .json({
-            error:
-              'İşletme seçilmesi gerekli'
-          });
+  background:
 
-      }
-
-      const business =
-        await pool.query(
-          `
-          SELECT
-            id,
-            name,
-            slug
-          FROM businesses
-          WHERE id=$1
-          `,
-          [
-            business_id
-          ]
-        );
-
-      if (!business.rows.length) {
-
-        return res
-          .status(404)
-          .json({
-            error:
-              'İşletme bulunamadı'
-          });
-
-      }
-
-      const code =
-        crypto
-          .randomBytes(12)
-          .toString('hex');
-
-      const result =
-        await pool.query(
-          `
-          INSERT INTO nfc_tags(
-            business_id,
-            name,
-            placement,
-            code,
-            is_active
-          )
-
-          VALUES(
-            $1,
-            $2,
-            $3,
-            $4,
-            true
-          )
-
-          RETURNING
-            id,
-            business_id,
-            name,
-            placement,
-            code,
-            is_active,
-            created_at,
-            updated_at
-          `,
-          [
-            business_id,
-            String(name || 'NFC Etiketi')
-              .trim(),
-
-            String(
-              placement || 'Diğer'
-            ).trim(),
-
-            code
-          ]
-        );
-
-      const tag =
-        result.rows[0];
-
-      res.status(201).json({
-
-        ...tag,
-
-        business_name:
-          business.rows[0].name,
-
-        business_slug:
-          business.rows[0].slug,
-
-        url:
-          `${req.protocol}://${req.get('host')}/p/nfc/${tag.code}`
-
-      });
-
-    } catch (error) {
-
-      console.error(
-        'ADMIN NFC CREATE ERROR:',
-        error
-      );
-
-      res
-        .status(500)
-        .json({
-          error:
-            'NFC etiketi oluşturulamadı'
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN NFC DETAIL
-========================= */
-
-app.get(
-  '/api/admin/nfc-tags/:id',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-
-            n.id,
-            n.business_id,
-            n.name,
-            n.placement,
-            n.code,
-            n.is_active,
-            n.created_at,
-            n.updated_at,
-
-            b.name AS business_name,
-            b.slug AS business_slug,
-
-            COALESCE((
-              SELECT COUNT(*)
-              FROM events e
-              WHERE
-                e.nfc_tag_id = n.id
-                AND e.type='nfc'
-            ),0)::int AS tap_count,
-
-            (
-              SELECT MAX(e.created_at)
-              FROM events e
-              WHERE
-                e.nfc_tag_id=n.id
-                AND e.type='nfc'
-            ) AS last_tap
-
-          FROM nfc_tags n
-
-          INNER JOIN businesses b
-            ON b.id=n.business_id
-
-          WHERE n.id=$1
-          `,
-          [
-            req.params.id
-          ]
-        );
-
-      if (!result.rows.length) {
-
-        return res
-          .status(404)
-          .json({
-            error:
-              'NFC etiketi bulunamadı'
-          });
-
-      }
-
-      const tag =
-        result.rows[0];
-
-      res.json({
-
-        ...tag,
-
-        url:
-          `${req.protocol}://${req.get('host')}/p/nfc/${tag.code}`
-
-      });
-
-    } catch (error) {
-
-      console.error(
-        'ADMIN NFC DETAIL ERROR:',
-        error
-      );
-
-      res
-        .status(500)
-        .json({
-          error:
-            'NFC etiketi alınamadı'
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN NFC UPDATE
-========================= */
-
-app.put(
-  '/api/admin/nfc-tags/:id',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const {
-        name,
-        placement,
-        is_active
-      } = req.body;
-
-      const result =
-        await pool.query(
-          `
-          UPDATE nfc_tags
-
-          SET
-
-            name =
-              COALESCE($1, name),
-
-            placement =
-              COALESCE($2, placement),
-
-            is_active =
-              COALESCE($3, is_active),
-
-            updated_at =
-              CURRENT_TIMESTAMP
-
-          WHERE id=$4
-
-          RETURNING
-            id,
-            business_id,
-            name,
-            placement,
-            code,
-            is_active,
-            created_at,
-            updated_at
-          `,
-          [
-            name,
-            placement,
-            typeof is_active === 'boolean'
-              ? is_active
-              : null,
-            req.params.id
-          ]
-        );
-
-      if (!result.rows.length) {
-
-        return res
-          .status(404)
-          .json({
-            error:
-              'NFC etiketi bulunamadı'
-          });
-
-      }
-
-      const tag =
-        result.rows[0];
-
-      res.json({
-
-        ...tag,
-
-        url:
-          `${req.protocol}://${req.get('host')}/p/nfc/${tag.code}`
-
-      });
-
-    } catch (error) {
-
-      console.error(
-        'ADMIN NFC UPDATE ERROR:',
-        error
-      );
-
-      res
-        .status(500)
-        .json({
-          error:
-            'NFC etiketi güncellenemedi'
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN NFC DELETE
-========================= */
-
-app.delete(
-  '/api/admin/nfc-tags/:id',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          DELETE FROM nfc_tags
-
-          WHERE id=$1
-
-          RETURNING id
-          `,
-          [
-            req.params.id
-          ]
-        );
-
-      if (!result.rows.length) {
-
-        return res
-          .status(404)
-          .json({
-            error:
-              'NFC etiketi bulunamadı'
-          });
-
-      }
-
-      res.json({
-        ok: true
-      });
-
-    } catch (error) {
-
-      console.error(
-        'ADMIN NFC DELETE ERROR:',
-        error
-      );
-
-      res
-        .status(500)
-        .json({
-          error:
-            'NFC etiketi silinemedi'
-        });
-
-    }
-
-  }
-);
-
-
-/* =========================
-   ADMIN NFC ANALYTICS
-========================= */
-
-app.get(
-  '/api/admin/nfc-tags/:id/analytics',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const tag =
-        await pool.query(
-          `
-          SELECT
-            n.id,
-            n.name,
-            n.placement,
-            n.code,
-            n.is_active,
-            b.name AS business_name
-
-          FROM nfc_tags n
-
-          INNER JOIN businesses b
-            ON b.id=n.business_id
-
-          WHERE n.id=$1
-          `,
-          [
-            req.params.id
-          ]
-        );
-
-      if (!tag.rows.length) {
-
-        return res
-          .status(404)
-          .json({
-            error:
-              'NFC etiketi bulunamadı'
-          });
-
-      }
-
-      const totals =
-        await pool.query(
-          `
-          SELECT
-
-            COUNT(*)::int
-              AS total_taps,
-
-            COUNT(
-              DISTINCT DATE(created_at)
-            )::int
-              AS active_days,
-
-            MAX(created_at)
-              AS last_tap
-
-          FROM events
-
-          WHERE
-            nfc_tag_id=$1
-            AND type='nfc'
-          `,
-          [
-            req.params.id
-          ]
-        );
-
-      const daily =
-        await pool.query(
-          `
-          SELECT
-
-            DATE(created_at)
-              AS day,
-
-            COUNT(*)::int
-              AS taps
-
-          FROM events
-
-          WHERE
-            nfc_tag_id=$1
-            AND type='nfc'
-
-          GROUP BY
-            DATE(created_at)
-
-          ORDER BY
-            day DESC
-
-          LIMIT 30
-          `,
-          [
-            req.params.id
-          ]
-        );
-
-      res.json({
-
-        tag:
-          tag.rows[0],
-
-        totals:
-          totals.rows[0],
-
-        daily:
-          daily.rows
-
-      });
-
-    } catch (error) {
-
-      console.error(
-        'ADMIN NFC ANALYTICS ERROR:',
-        error
-      );
-
-      res
-        .status(500)
-        .json({
-          error:
-            'NFC analizleri alınamadı'
-        });
-
-    }
-
-  }
-);
-
-/* =========================================================
-   ADMIN BUSINESS QR
-========================================================= */
-
-app.get(
-  '/api/admin/business/:id/qr',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const id = Number(req.params.id);
-
-      const result = await pool.query(
-        `
-        SELECT slug
-        FROM businesses
-        WHERE id=$1
-        `,
-        [id]
-      );
-
-      if (!result.rows.length) {
-
-        return res.status(404).json({
-          error: 'İşletme bulunamadı'
-        });
-
-      }
-
-      const baseUrl =
-        process.env.PUBLIC_URL ||
-        process.env.RENDER_EXTERNAL_URL ||
-        `${req.protocol}://${req.get('host')}`;
-
-      const url =
-        `${baseUrl}/p/${result.rows[0].slug}?source=qr`;
-
-      const qr =
-        await QRCode.toDataURL(url, {
-          width: 900,
-          margin: 2,
-          errorCorrectionLevel: 'H'
-        });
-
-      res.json({
-        url,
-        qr
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).json({
-        error: 'QR oluşturulamadı'
-      });
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   ADMIN BUSINESS UPDATE
-========================================================= */
-
-app.put(
-  '/api/admin/business/:id',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const id = Number(req.params.id);
-
-      const {
-        name,
-        category,
-        description,
-        phone,
-        whatsapp,
-        address,
-        instagram,
-        tiktok,
-        google_review,
-        website,
-        menu,
-        iban,
-        iban_holder,
-        hours,
-        logo_url
-      } = req.body;
-
-      if (!name) {
-
-        return res.status(400).json({
-          error: 'İşletme adı gerekli'
-        });
-
-      }
-
-      const current =
-        await pool.query(
-          `
-          SELECT slug
-          FROM businesses
-          WHERE id=$1
-          `,
-          [id]
-        );
-
-      if (!current.rows.length) {
-
-        return res.status(404).json({
-          error: 'İşletme bulunamadı'
-        });
-
-      }
-
-      await pool.query(
-        `
-        UPDATE businesses
-
-        SET
-          name=$1,
-          category=$2,
-          description=$3,
-          phone=$4,
-          whatsapp=$5,
-          address=$6,
-          instagram=$7,
-          tiktok=$8,
-          google_review=$9,
-          website=$10,
-          menu=$11,
-          iban=$12,
-          iban_holder=$13,
-          hours=$14,
-          logo_url=$15
-
-        WHERE id=$16
-        `,
-        [
-          name,
-          category || '',
-          description || '',
-          phone || '',
-          whatsapp || '',
-          address || '',
-          instagram || '',
-          tiktok || '',
-          google_review || '',
-          website || '',
-          menu || '',
-          iban || '',
-          iban_holder || '',
-          hours || '',
-          logo_url || '',
-          id
-        ]
-      );
-
-      const updated =
-        await pool.query(
-          `
-          SELECT *
-          FROM businesses
-          WHERE id=$1
-          `,
-          [id]
-        );
-
-      res.json({
-        business: publicBusiness(updated.rows[0])
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).json({
-        error: 'İşletme güncellenemedi'
-      });
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   ADMIN BUSINESS DELETE
-========================================================= */
-
-app.delete(
-  '/api/admin/business/:id',
-  adminAuth,
-  async (req, res) => {
-
-    try {
-
-      const id = Number(req.params.id);
-
-      const result =
-        await pool.query(
-          `
-          DELETE FROM businesses
-          WHERE id=$1
-          RETURNING id
-          `,
-          [id]
-        );
-
-      if (!result.rows.length) {
-
-        return res.status(404).json({
-          error: 'İşletme bulunamadı'
-        });
-
-      }
-
-      res.json({
-        success: true
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).json({
-        error: 'İşletme silinemedi'
-      });
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   REGISTER
-========================================================= */
-
-app.post('/api/register', async (req, res) => {
-
-  try {
-
-    const {
-      name,
-      email,
-      password,
-      category
-    } = req.body;
-
-    if (
-      !name ||
-      !email ||
-      !password ||
-      password.length < 8
-    ) {
-
-      return res.status(400).json({
-        error:
-          'İşletme adı, e-posta ve 8+ karakter şifre gerekli'
-      });
-
-    }
-
-    const normalizedEmail =
-      String(email).trim().toLowerCase();
-
-    const existing =
-      await pool.query(
-        `
-        SELECT id
-        FROM businesses
-        WHERE email=$1
-        `,
-        [normalizedEmail]
-      );
-
-    if (existing.rows.length) {
-
-      return res.status(409).json({
-        error: 'E-posta zaten kayıtlı'
-      });
-
-    }
-
-    const base =
-      slugify(name) || 'business';
-
-    let sl = base;
-    let n = 1;
-
-    while (true) {
-
-      const check =
-        await pool.query(
-          `
-          SELECT id
-          FROM businesses
-          WHERE slug=$1
-          `,
-          [sl]
-        );
-
-      if (!check.rows.length) {
-        break;
-      }
-
-      n++;
-
-      sl =
-        `${base}-${n}`;
-    }
-
-    const passwordHash =
-      await bcrypt.hash(
-        password,
-        12
-      );
-
-    const result =
-      await pool.query(
-        `
-        INSERT INTO businesses(
-          name,
-          slug,
-          email,
-          password_hash,
-          category
-        )
-
-        VALUES(
-          $1,
-          $2,
-          $3,
-          $4,
-          $5
-        )
-
-        RETURNING *
-        `,
-        [
-          name,
-          sl,
-          normalizedEmail,
-          passwordHash,
-          category || ''
-        ]
-      );
-
-    const business =
-      result.rows[0];
-
-    const token =
-      jwt.sign(
-        {
-          id: business.id,
-          email: business.email,
-          role: 'business'
-        },
-        SECRET,
-        {
-          expiresIn: '30d'
-        }
-      );
-
-    res.status(201).json({
-      token,
-      business: publicBusiness(business)
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Kayıt sırasında hata oluştu'
-    });
-
-  }
-
-});
-
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-app.post('/api/login', async (req, res) => {
-
-  try {
-
-    const {
-      email,
-      password
-    } = req.body;
-
-    if (!email || !password) {
-
-      return res.status(400).json({
-        error: 'E-posta ve şifre gerekli'
-      });
-
-    }
-
-    const normalizedEmail =
-      String(email).trim().toLowerCase();
-
-    const result =
-      await pool.query(
-        `
-        SELECT *
-        FROM businesses
-        WHERE email=$1
-        `,
-        [normalizedEmail]
-      );
-
-    if (!result.rows.length) {
-
-      return res.status(401).json({
-        error: 'E-posta veya şifre hatalı'
-      });
-
-    }
-
-    const business =
-      result.rows[0];
-
-    const valid =
-      await bcrypt.compare(
-        password,
-        business.password_hash
-      );
-
-    if (!valid) {
-
-      return res.status(401).json({
-        error: 'E-posta veya şifre hatalı'
-      });
-
-    }
-
-    const token =
-      jwt.sign(
-        {
-          id: business.id,
-          email: business.email,
-          role: 'business'
-        },
-        SECRET,
-        {
-          expiresIn: '30d'
-        }
-      );
-
-    res.json({
-      token,
-      business: {
-        ...publicBusiness(business),
-        permissions: businessPermissions(business)
-      }
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Giriş sırasında hata oluştu'
-    });
-
-  }
-
-});
-
-
-/* =========================================================
-   ME
-========================================================= */
-
-app.get('/api/me', auth, async (req, res) => {
-
-  try {
-
-    let result =
-      await pool.query(
-        `
-        SELECT *
-        FROM businesses
-        WHERE id=$1
-        `,
-        [req.user.id]
-      );
-
-    /* Eski oturumlarda ID değişmiş olabileceği için e-posta ile güvenli geri dönüş. */
-    if (!result.rows.length && req.user.email) {
-      result = await pool.query(
-        `
-        SELECT *
-        FROM businesses
-        WHERE email=$1
-        LIMIT 1
-        `,
-        [String(req.user.email).trim().toLowerCase()]
-      );
-    }
-
-    if (!result.rows.length) {
-      return res.status(404).json({
-        error: 'İşletme bulunamadı'
-      });
-    }
-
-    const business = result.rows[0];
-
-    res.json({
-      ...publicBusiness(business),
-      permissions: businessPermissions(business)
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Profil alınamadı'
-    });
-
-  }
-
-});
-
-
-/* =========================================================
-   UPDATE ME
-========================================================= */
-
-app.put('/api/me', auth, requireBusinessPermission('profile'), async (req, res) => {
-  try {
-    let currentResult = await pool.query(
-      `SELECT * FROM businesses WHERE id=$1 LIMIT 1`,
-      [req.user.id]
+    radial-gradient(
+      circle at 50% 30%,
+      #202020,
+      #000
     );
 
-    if (!currentResult.rows.length && req.user.email) {
-      currentResult = await pool.query(
-        `SELECT * FROM businesses WHERE email=$1 LIMIT 1`,
-        [String(req.user.email).trim().toLowerCase()]
-      );
-    }
+  border:
+    1px solid #c59a5260;
 
-    if (!currentResult.rows.length) {
-      return res.status(404).json({ error: 'İşletme bulunamadı' });
-    }
+  box-shadow:
+    0 8px 25px #000;
 
-    const current = currentResult.rows[0];
-    const permissions = businessProfileFieldPermissions(current);
-    const body = req.body || {};
+  font-size:22px;
 
-    const valueFor = (key) => {
-      if (permissions[key] && Object.prototype.hasOwnProperty.call(body, key)) {
-        return String(body[key] ?? '').trim();
-      }
-      return String(current[key] ?? '');
-    };
+}
 
-    const values = {};
-    for (const key of BUSINESS_PROFILE_FIELDS) values[key] = valueFor(key);
+.brand-text{
 
-    if (!values.name) {
-      return res.status(400).json({ error: 'İşletme adı gerekli' });
-    }
+  min-width:0;
 
-    await pool.query(
-      `UPDATE businesses SET
-        name=$1, category=$2, description=$3, phone=$4, whatsapp=$5,
-        address=$6, instagram=$7, tiktok=$8, google_review=$9,
-        website=$10, menu=$11, iban=$12, iban_holder=$13,
-        hours=$14, logo_url=$15
-       WHERE id=$16`,
-      [
-        values.name, values.category, values.description, values.phone,
-        values.whatsapp, values.address, values.instagram, values.tiktok,
-        values.google_review, values.website, values.menu, values.iban,
-        values.iban_holder, values.hours, values.logo_url, current.id
-      ]
+}
+
+.brand-text strong{
+
+  display:block;
+
+  font-size:14px;
+
+  letter-spacing:.13em;
+
+}
+
+.brand-text strong span{
+
+  color:var(--gold-light);
+
+}
+
+.brand-text small{
+
+  display:block;
+
+  margin-top:3px;
+
+  color:#5d5d5d;
+
+  font-size:8px;
+
+  letter-spacing:.16em;
+
+}
+
+.header-actions{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+}
+
+.header-button{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  min-height:40px;
+
+  padding:
+    9px 13px;
+
+  border-radius:10px;
+
+  border:
+    1px solid #333;
+
+  background:#151515;
+
+  color:#ddd;
+
+  text-decoration:none;
+
+  font-size:10px;
+
+  font-weight:800;
+
+  cursor:pointer;
+
+}
+
+.header-button.gold{
+
+  background:
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
     );
 
-    const result = await pool.query(
-      `SELECT * FROM businesses WHERE id=$1`,
-      [current.id]
+  border-color:#c59a52;
+
+  color:#fff;
+
+}
+
+
+
+/* ==================================================
+   MAIN
+================================================== */
+
+main{
+
+  width:min(
+    1120px,
+    94%
+  );
+
+  margin:
+    32px auto 80px;
+
+}
+
+
+
+/* ==================================================
+   PAGE HEAD
+================================================== */
+
+.page-head{
+
+  display:flex;
+
+  align-items:flex-end;
+
+  justify-content:space-between;
+
+  gap:20px;
+
+  margin-bottom:22px;
+
+}
+
+.eyebrow{
+
+  color:var(--gold-light);
+
+  font-size:9px;
+
+  font-weight:900;
+
+  letter-spacing:.2em;
+
+}
+
+.page-head h1{
+
+  margin:
+    8px 0 0;
+
+  font-size:36px;
+
+  line-height:1.1;
+
+  letter-spacing:-.025em;
+
+}
+
+.page-head p{
+
+  margin:
+    8px 0 0;
+
+  color:#777;
+
+  font-size:12px;
+
+}
+
+.live{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  color:#aaa;
+
+  font-size:10px;
+
+}
+
+.live-dot{
+
+  width:8px;
+
+  height:8px;
+
+  border-radius:50%;
+
+  background:var(--green);
+
+  box-shadow:
+    0 0 13px #45c27a88;
+
+}
+
+
+
+/* ==================================================
+   PROFILE HERO
+================================================== */
+
+.profile-hero{
+
+  position:relative;
+
+  overflow:hidden;
+
+  margin-bottom:15px;
+
+  padding:27px;
+
+  border-radius:25px;
+
+  border:
+    1px solid #c59a5235;
+
+  background:
+
+    radial-gradient(
+      circle at 90% 15%,
+      #c59a5218,
+      transparent 35%
+    ),
+
+    radial-gradient(
+      circle at 30% 100%,
+      #c59a5207,
+      transparent 30%
+    ),
+
+    linear-gradient(
+      145deg,
+      #181818,
+      #0d0d0d
     );
 
-    res.json({
-      ...publicBusiness(result.rows[0]),
-      permissions: businessPermissions(result.rows[0])
-    });
-  } catch (error) {
-    console.error('BUSINESS PROFILE UPDATE ERROR:', error);
-    res.status(500).json({ error: 'Profil güncellenemedi' });
-  }
-});
+  box-shadow:var(--shadow);
+
+}
+
+.profile-hero::before{
+
+  content:"";
+
+  position:absolute;
+
+  width:260px;
+
+  height:260px;
+
+  right:-160px;
+
+  top:-160px;
+
+  border-radius:50%;
+
+  border:
+    1px solid #c59a5215;
+
+}
+
+.profile-hero-inner{
+
+  position:relative;
+
+  z-index:2;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:20px;
+
+}
+
+.logo-wrap{
+
+  width:94px;
+
+  height:94px;
+
+  flex:none;
+
+  display:grid;
+
+  place-items:center;
+
+  overflow:hidden;
+
+  border-radius:25px;
+
+  background:#050505;
+
+  border:
+    1px solid #c59a5260;
+
+  box-shadow:
+    0 15px 40px #000;
+
+}
+
+.logo-wrap img{
+
+  width:100%;
+
+  height:100%;
+
+  object-fit:cover;
+
+}
+
+.logo-placeholder{
+
+  font-size:36px;
+
+}
+
+.profile-info{
+
+  min-width:0;
+
+}
+
+.profile-info h2{
+
+  margin:0;
+
+  font-size:27px;
+
+  line-height:1.15;
+
+  word-break:break-word;
+
+}
+
+.profile-category{
+
+  display:inline-flex;
+
+  margin-top:8px;
+
+  padding:
+    6px 10px;
+
+  border-radius:999px;
+
+  background:#c59a5212;
+
+  border:
+    1px solid #c59a5230;
+
+  color:var(--gold-light);
+
+  font-size:9px;
+
+  font-weight:800;
+
+}
+
+.profile-description{
+
+  margin:
+    10px 0 0;
+
+  color:#888;
+
+  font-size:11px;
+
+  line-height:1.6;
+
+  max-width:500px;
+
+}
+
+.profile-actions{
+
+  margin-left:auto;
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  justify-content:flex-end;
+
+  gap:8px;
+
+}
+
+.action{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  min-height:40px;
+
+  padding:
+    10px 14px;
+
+  border-radius:10px;
+
+  border:
+    1px solid #333;
+
+  background:#171717;
+
+  color:#fff;
+
+  text-decoration:none;
+
+  font-size:10px;
+
+  font-weight:800;
+
+  cursor:pointer;
+
+  transition:
+    transform .15s,
+    border-color .15s;
+
+}
+
+.action:active{
+  transform:scale(.97);
+}
+
+.action.gold{
+
+  background:
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
+    );
+
+  border-color:#c59a52;
+
+}
 
 
-/* =========================================================
-   V2 FINAL — THEME + SOCIAL/DIGITAL LINKS
-========================================================= */
 
-app.get('/api/business-v2-settings', auth, requireBusinessPermission('profile'), async (req,res)=>{
-  try{
-    res.set('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.set('Pragma','no-cache');
-    res.set('Expires','0');
-    const r=await pool.query(`SELECT id,profile_theme_permission,social_links,custom_links,social_platform_permissions FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
-    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
-    const d=await pool.query(`SELECT theme,accent_color FROM profile_designs WHERE business_id=$1 LIMIT 1`,[req.user.id]);
-    const design=d.rows[0]||{};
-    const theme=LEO_V2_THEMES[design.theme] ? design.theme : 'midnight-gold';
-    res.json({theme,themes:LEO_V2_THEMES,theme_permission:r.rows[0].profile_theme_permission!==false,accent_color:design.accent_color||'#D4AF37',social_links:normalizeSocialLinks(r.rows[0].social_links),custom_links:normalizeCustomLinks(r.rows[0].custom_links),allowed_platforms:normalizeAllowedPlatforms(r.rows[0].social_platform_permissions)});
-  }catch(e){console.error('V2 SETTINGS GET ERROR:',e);res.status(500).json({error:'Profil ayarları alınamadı'});}
-});
+/* ==================================================
+   HEALTH
+================================================== */
 
-app.put('/api/business-theme', auth, requireBusinessPermission('profile'), async (req,res)=>{
-  try{
-    const b=await pool.query(`SELECT profile_theme_permission FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
-    if(!b.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
-    if(b.rows[0].profile_theme_permission===false) return res.status(403).json({error:'Tema değiştirme yetkisi admin tarafından kapatıldı'});
-    const theme=String(req.body?.theme||'').trim();
-    if(!LEO_V2_THEMES[theme]) return res.status(400).json({error:'Geçersiz tema'});
-    const accent=String(req.body?.accent_color||'').trim().slice(0,30)||'#D4AF37';
-    const r=await pool.query(`INSERT INTO profile_designs(business_id,theme,accent_color,updated_at) VALUES($1,$2,$3,CURRENT_TIMESTAMP) ON CONFLICT(business_id) DO UPDATE SET theme=EXCLUDED.theme,accent_color=EXCLUDED.accent_color,updated_at=CURRENT_TIMESTAMP RETURNING theme,accent_color`,[req.user.id,theme,accent]);
-    res.json({theme:r.rows[0].theme,accent_color:r.rows[0].accent_color,theme_name:LEO_V2_THEMES[r.rows[0].theme].name});
-  }catch(e){console.error('BUSINESS THEME UPDATE ERROR:',e);res.status(500).json({error:'Tema kaydedilemedi'});}
-});
+.health{
 
-app.put('/api/business-social-links', auth, requireBusinessPermission('profile'), async (req,res)=>{
-  try{
-    const b=await pool.query(`SELECT social_platform_permissions FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
-    if(!b.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
-    const allowed=normalizeAllowedPlatforms(b.rows[0].social_platform_permissions);
-    const incoming=normalizeSocialLinks(req.body?.social_links||req.body);
-    const existing=normalizeSocialLinks(b.rows[0].social_links);
-    const links={...existing};
-    for(const key of Object.keys(incoming)){
-      if(allowed[key]!==false) links[key]=incoming[key];
-    }
-    const r=await pool.query(`UPDATE businesses SET social_links=$1::jsonb WHERE id=$2 RETURNING social_links`,[JSON.stringify(links),req.user.id]);
-    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
-    res.json({social_links:normalizeSocialLinks(r.rows[0].social_links)});
-  }catch(e){console.error('SOCIAL LINKS UPDATE ERROR:',e);res.status(500).json({error:'Bağlantılar kaydedilemedi'});}
-});
+  display:grid;
 
-app.put('/api/business-custom-links', auth, requireBusinessPermission('profile'), async (req,res)=>{
-  try{
-    const links=normalizeCustomLinks(req.body?.custom_links);
-    const r=await pool.query(`UPDATE businesses SET custom_links=$1::jsonb WHERE id=$2 RETURNING custom_links`,[JSON.stringify(links),req.user.id]);
-    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
-    res.json({custom_links:normalizeCustomLinks(r.rows[0].custom_links)});
-  }catch(e){console.error('CUSTOM LINKS UPDATE ERROR:',e);res.status(500).json({error:'Özel bağlantılar kaydedilemedi'});}
-});
+  grid-template-columns:
+    190px 1fr;
 
-app.get('/api/admin/business/:id/v2-settings', adminAuth, async (req,res)=>{
-  try{
-    const id=Number(req.params.id);
-    const r=await pool.query(`SELECT b.id,b.name,b.profile_theme_permission,b.social_links,b.custom_links,b.social_platform_permissions,COALESCE(pd.theme,'midnight-gold') theme,COALESCE(pd.accent_color,'#D4AF37') accent_color FROM businesses b LEFT JOIN profile_designs pd ON pd.business_id=b.id WHERE b.id=$1 LIMIT 1`,[id]);
-    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
-    const row=r.rows[0];
-    res.json({id:row.id,name:row.name,theme:LEO_V2_THEMES[row.theme]?row.theme:'midnight-gold',themes:LEO_V2_THEMES,theme_permission:row.profile_theme_permission!==false,accent_color:row.accent_color,social_links:normalizeSocialLinks(row.social_links),custom_links:normalizeCustomLinks(row.custom_links),allowed_platforms:normalizeAllowedPlatforms(row.social_platform_permissions)});
-  }catch(e){console.error('ADMIN V2 SETTINGS GET ERROR:',e);res.status(500).json({error:'V2 ayarları alınamadı'});}
-});
+  gap:20px;
 
-app.put('/api/admin/business/:id/theme', adminAuth, async (req,res)=>{
-  try{
-    const id=Number(req.params.id), theme=String(req.body?.theme||'').trim();
-    if(!LEO_V2_THEMES[theme]) return res.status(400).json({error:'Geçersiz tema'});
-    const accent=String(req.body?.accent_color||'').trim().slice(0,30)||'#D4AF37';
-    const r=await pool.query(`INSERT INTO profile_designs(business_id,theme,accent_color,updated_at) VALUES($1,$2,$3,CURRENT_TIMESTAMP) ON CONFLICT(business_id) DO UPDATE SET theme=EXCLUDED.theme,accent_color=EXCLUDED.accent_color,updated_at=CURRENT_TIMESTAMP RETURNING theme,accent_color`,[id,theme,accent]);
-    res.json({theme:r.rows[0].theme,accent_color:r.rows[0].accent_color,theme_name:LEO_V2_THEMES[r.rows[0].theme].name});
-  }catch(e){console.error('ADMIN THEME UPDATE ERROR:',e);res.status(500).json({error:'Tema kaydedilemedi'});}
-});
+  align-items:center;
 
-app.put('/api/admin/business/:id/theme-permission', adminAuth, async (req,res)=>{
-  try{
-    const id=Number(req.params.id), allowed=req.body?.allowed!==false;
-    const r=await pool.query(`UPDATE businesses SET profile_theme_permission=$1 WHERE id=$2 RETURNING id,name,profile_theme_permission`,[allowed,id]);
-    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
-    res.json({id:r.rows[0].id,name:r.rows[0].name,theme_permission:r.rows[0].profile_theme_permission!==false});
-  }catch(e){console.error('ADMIN THEME PERMISSION ERROR:',e);res.status(500).json({error:'Tema yetkisi kaydedilemedi'});}
-});
+  margin-bottom:15px;
 
-app.put('/api/admin/business/:id/social-platform-permissions', adminAuth, async (req,res)=>{
-  try{
-    const id=Number(req.params.id);
-    const allowed=normalizeAllowedPlatforms(req.body?.allowed_platforms||req.body);
-    const r=await pool.query(`UPDATE businesses SET social_platform_permissions=$1::jsonb WHERE id=$2 RETURNING id,name,social_platform_permissions`,[JSON.stringify(allowed),id]);
-    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
-    res.json({id:r.rows[0].id,name:r.rows[0].name,allowed_platforms:normalizeAllowedPlatforms(r.rows[0].social_platform_permissions)});
-  }catch(e){console.error('ADMIN SOCIAL PLATFORM PERMISSION ERROR:',e);res.status(500).json({error:'Bağlantı yetkileri kaydedilemedi'});}
-});
+  padding:22px;
 
+  border-radius:20px;
 
-/* =========================================================
-   QR
-========================================================= */
+  border:
+    1px solid var(--border);
 
-app.get('/api/qr', auth, requireBusinessPermission('qr'), async (req, res) => {
+  background:
+    linear-gradient(
+      145deg,
+      #151515,
+      #0d0d0d
+    );
 
-  try {
+}
 
-    const result =
-      await pool.query(
-        `
-        SELECT slug
-        FROM businesses
-        WHERE id=$1
-        `,
-        [req.user.id]
-      );
+.health-score{
 
-    if (!result.rows.length) {
+  display:flex;
 
-      return res.status(404).json({
-        error: 'İşletme bulunamadı'
-      });
+  align-items:center;
 
-    }
+  gap:15px;
 
-    const baseUrl =
-      process.env.PUBLIC_URL ||
-      process.env.RENDER_EXTERNAL_URL ||
-      `${req.protocol}://${req.get('host')}`;
+}
 
-    const url =
-      `${baseUrl}/p/${result.rows[0].slug}?source=qr`;
+.health-ring{
 
-    const qr =
-      await QRCode.toDataURL(
-        url,
-        {
-          width: 900,
-          margin: 2,
-          errorCorrectionLevel: 'H'
-        }
-      );
+  width:76px;
 
-    res.json({
-      url,
-      qr
-    });
+  height:76px;
 
-  } catch (error) {
+  flex:none;
 
-    console.error(error);
+  display:grid;
 
-    res.status(500).json({
-      error: 'QR oluşturulamadı'
-    });
+  place-items:center;
 
-  }
+  border-radius:50%;
 
-});
+  background:
+    conic-gradient(
+      var(--gold) 0deg,
+      var(--gold) var(--score,0deg),
+      #252525 var(--score,0deg),
+      #252525 360deg
+    );
 
+  position:relative;
 
-/* =========================================================
-   BUSINESS CENTER ANALYTICS V3
-========================================================= */
+}
 
-app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'), async (req, res) => {
-  try {
-    const period = ['today','7d','30d','all'].includes(req.query.period) ? req.query.period : '7d';
-    let where = 'business_id=$1';
-    if (period === 'today') where += " AND created_at >= CURRENT_DATE";
-    if (period === '7d') where += " AND created_at >= NOW() - INTERVAL '7 days'";
-    if (period === '30d') where += " AND created_at >= NOW() - INTERVAL '30 days'";
+.health-ring::after{
 
-    const totals = await pool.query(`
-      SELECT
-        COUNT(*)::int AS total_events,
-        COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
-        COUNT(*) FILTER (WHERE type IN ('qr_scan','qr'))::int AS qr_scans,
-        COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
-        COUNT(*) FILTER (WHERE type='phone')::int AS phone_clicks,
-        COUNT(*) FILTER (WHERE type='whatsapp')::int AS whatsapp_clicks,
-        COUNT(*) FILTER (WHERE type='instagram')::int AS instagram_clicks,
-        COUNT(*) FILTER (WHERE type='tiktok')::int AS tiktok_clicks,
-        COUNT(*) FILTER (WHERE type='google_review')::int AS google_review_clicks,
-        COUNT(*) FILTER (WHERE type='website')::int AS website_clicks,
-        COUNT(*) FILTER (WHERE type='menu')::int AS menu_clicks
-      FROM events WHERE ${where}`,[req.user.id]);
+  content:"";
 
-    const daily = await pool.query(`
-      SELECT TO_CHAR(created_at::date,'YYYY-MM-DD') AS day,
-        COUNT(*)::int AS events,
-        COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
-        COUNT(*) FILTER (WHERE type IN ('qr_scan','qr'))::int AS qr_scans,
-        COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps
-      FROM events WHERE ${where}
-      GROUP BY created_at::date ORDER BY created_at::date ASC`,[req.user.id]);
+  position:absolute;
 
-    const hourly = await pool.query(`
-      SELECT EXTRACT(HOUR FROM created_at)::int AS hour, COUNT(*)::int AS events
-      FROM events WHERE ${where}
-      GROUP BY EXTRACT(HOUR FROM created_at) ORDER BY hour ASC`,[req.user.id]);
+  inset:7px;
 
-    const actions = await pool.query(`
-      SELECT type, COUNT(*)::int AS count FROM events
-      WHERE ${where} GROUP BY type ORDER BY count DESC`,[req.user.id]);
+  border-radius:50%;
 
-    const tags = await pool.query(`
-      SELECT
-        n.id,
-        n.name,
-        n.code,
-        n.placement,
-        COUNT(e.id)::int AS tap_count,
-        MAX(e.created_at) AS last_tap
-      FROM nfc_tags n
-      LEFT JOIN events e
-        ON e.nfc_tag_id = n.id
-       AND e.type = 'nfc'
-      WHERE n.business_id=$1
-      GROUP BY n.id,n.name,n.code,n.placement,n.created_at
-      ORDER BY tap_count DESC, n.created_at DESC
-      LIMIT 10`,[req.user.id]);
+  background:#101010;
 
-    res.json({period, totals: totals.rows[0], daily: daily.rows, hourly: hourly.rows, actions: actions.rows, top_nfc: tags.rows});
-  } catch(error) {
-    console.error('BUSINESS ANALYTICS V3 ERROR:', error);
-    res.status(500).json({error:'Analiz verileri alınamadı'});
-  }
-});
+}
+
+.health-ring strong{
+
+  position:relative;
+
+  z-index:2;
+
+  font-size:18px;
+
+}
+
+.health-copy strong{
+
+  display:block;
+
+  font-size:14px;
+
+}
+
+.health-copy span{
+
+  display:block;
+
+  margin-top:5px;
+
+  color:#666;
+
+  font-size:9px;
+
+}
+
+.health-details{
+
+  min-width:0;
+
+}
+
+.health-bar{
+
+  height:7px;
+
+  overflow:hidden;
+
+  border-radius:999px;
+
+  background:#252525;
+
+}
+
+.health-fill{
+
+  height:100%;
+
+  width:0;
+
+  border-radius:999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9e7738,
+      #e0bd7b
+    );
+
+  transition:width .6s ease;
+
+}
+
+.health-message{
+
+  margin-top:9px;
+
+  color:#777;
+
+  font-size:10px;
+
+}
+
+.missing-list{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:6px;
+
+  margin-top:10px;
+
+}
+
+.missing-item{
+
+  padding:
+    5px 8px;
+
+  border-radius:999px;
+
+  background:#171717;
+
+  border:
+    1px solid #292929;
+
+  color:#777;
+
+  font-size:8px;
+
+}
 
 
-/* =========================================================
-   BUSINESS LIVE ACTIVITY — PERMISSION CONTROLLED
-========================================================= */
-app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), async (req, res) => {
-  try {
-    const limit = Math.min(Math.max(Number(req.query.limit) || 20, 5), 50);
-    const result = await pool.query(`
-      SELECT e.id, e.type, e.source, e.nfc_tag_id, e.created_at,
-             t.name AS nfc_name, t.placement AS nfc_placement
-      FROM events e
-      LEFT JOIN nfc_tags t ON t.id=e.nfc_tag_id
-      WHERE e.business_id=$1
-      ORDER BY e.created_at DESC
-      LIMIT $2
-    `, [req.user.id, limit]);
-    const stats = await pool.query(`
-      SELECT
-        COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '15 minutes')::int AS last_15m,
-        COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '60 minutes')::int AS last_60m,
-        COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE)::int AS today
-      FROM events WHERE business_id=$1
-    `, [req.user.id]);
-    res.json({activities: result.rows, stats: stats.rows[0] || {last_15m:0,last_60m:0,today:0}});
-  } catch(error) {
-    console.error('BUSINESS LIVE ERROR:', error);
-    res.status(500).json({error:'Canlı aktivite alınamadı'});
-  }
-});
 
-/* =========================================================
-   LEO AI INSIGHTS V1 — DATA-DRIVEN BUSINESS REPORTING
-   Rule-based insight engine; no external AI API required.
-========================================================= */
-app.get('/api/business-ai-insights', auth, requireBusinessPermission('ai'), async (req, res) => {
-  try {
-    const period = ['today','7d','30d','all'].includes(req.query.period) ? req.query.period : '7d';
-    let where = 'business_id=$1';
-    if (period === 'today') where += " AND created_at >= CURRENT_DATE";
-    if (period === '7d') where += " AND created_at >= NOW() - INTERVAL '7 days'";
-    if (period === '30d') where += " AND created_at >= NOW() - INTERVAL '30 days'";
-    const params=[req.user.id];
-    const totalsQ=await pool.query(`SELECT
-      COUNT(*)::int total_events,
-      COUNT(*) FILTER(WHERE type='profile_view')::int profile_views,
-      COUNT(*) FILTER(WHERE type IN ('qr_scan','qr'))::int qr,
-      COUNT(*) FILTER(WHERE type='nfc')::int nfc,
-      COUNT(*) FILTER(WHERE type='whatsapp')::int whatsapp,
-      COUNT(*) FILTER(WHERE type='phone')::int phone,
-      COUNT(*) FILTER(WHERE type='instagram')::int instagram,
-      COUNT(*) FILTER(WHERE type='tiktok')::int tiktok,
-      COUNT(*) FILTER(WHERE type='google_review')::int google_review,
-      COUNT(*) FILTER(WHERE type='website')::int website,
-      COUNT(*) FILTER(WHERE type='menu')::int menu,
-      COUNT(*) FILTER(WHERE type='location')::int location,
-      COUNT(*) FILTER(WHERE type='share')::int share
-      FROM events WHERE ${where}`,params);
-    const hourlyQ=await pool.query(`SELECT EXTRACT(HOUR FROM created_at)::int AS hour, COUNT(*)::int AS events FROM events WHERE ${where} GROUP BY 1 ORDER BY events DESC LIMIT 1`,params);
-    const actionsQ=await pool.query(`SELECT type, COUNT(*)::int count FROM events WHERE ${where} GROUP BY type ORDER BY count DESC LIMIT 5`,params);
-    const sourceQ=await pool.query(`SELECT COALESCE(NULLIF(source,''),'direct') source, COUNT(*)::int count FROM events WHERE ${where} GROUP BY 1 ORDER BY count DESC`,params);
-    const t=totalsQ.rows[0]||{};
-    const n=k=>Number(t[k]||0);
-    const profile=n('profile_views'), total=n('total_events'), digital=n('qr')+n('nfc'), contact=n('whatsapp')+n('phone');
-    const actionTotal=Math.max(0,total-profile);
-    const conversion=profile?Math.min(100,actionTotal/profile*100):0;
-    let score=0;
-    if(profile>=20) score+=20; else if(profile>0) score+=10;
-    if(digital>=10) score+=20; else if(digital>0) score+=10;
-    if(contact>=5) score+=20; else if(contact>0) score+=10;
-    if(actionTotal>=20) score+=20; else if(actionTotal>0) score+=10;
-    if((n('whatsapp')+n('phone')+n('instagram')+n('google_review'))>0) score+=20;
-    const peak=hourlyQ.rows[0]||null;
-    const top=actionsQ.rows[0]||null;
-    const strongestSource=sourceQ.rows[0]||null;
-    const insights=[]; const recommendations=[];
-    if(!total){ insights.push('Henüz yeterli etkileşim verisi oluşmadı.'); recommendations.push('Profil bağlantısını QR ve NFC noktalarında daha görünür hale getir.'); }
-    else {
-      if(n('nfc')>n('qr') && digital>0) insights.push(`NFC, QR'a göre daha güçlü dijital temas kanalı olmuş (${n('nfc')} vs ${n('qr')}).`);
-      else if(n('qr')>n('nfc') && digital>0) insights.push(`QR, NFC'ye göre daha fazla dijital temas üretmiş (${n('qr')} vs ${n('nfc')}).`);
-      if(contact>0) insights.push(`Müşteriler ${contact} kez doğrudan iletişim aksiyonu gerçekleştirmiş.`);
-      if(peak) insights.push(`En yoğun saat ${String(Number(peak.hour)).padStart(2,'0')}:00 civarı; ${peak.events} etkileşim kaydedilmiş.`);
-      if(top) insights.push(`En sık kullanılan aksiyon: ${top.type} (${top.count}).`);
-      if(conversion<10 && profile>=10) recommendations.push('Profil ziyaretinden iletişime geçişi artırmak için WhatsApp ve telefon CTA\'larını daha görünür konumlandır.');
-      if(n('nfc')===0 && n('qr')>0) recommendations.push('NFC noktaları eklemek, QR dışında fiziksel temas kanalı oluşturabilir.');
-      if(n('qr')===0 && n('nfc')>0) recommendations.push('QR kodu menü, masa, vitrin veya kartvizitte görünür hale getir.');
-      if(n('google_review')===0 && profile>=20) recommendations.push('Google yorum bağlantısını görünür bir aksiyon olarak öne çıkar.');
-      if(!recommendations.length) recommendations.push('Mevcut en güçlü kanalı koru ve yoğun saatlerde görünürlüğü artır.');
-    }
-    const title=score>=80?'Mükemmel performans':score>=60?'Güçlü performans':score>=40?'Gelişen performans':score>=20?'Veri oluşuyor':'Başlangıç aşaması';
-    res.json({period, generated_at:new Date().toISOString(), score, title, totals:t, conversion:Math.round(conversion*10)/10, peak_hour:peak, strongest_action:top, strongest_source:strongestSource, insights, recommendations});
-  } catch(error) {
-    console.error('BUSINESS AI INSIGHTS ERROR:', error);
-    res.status(500).json({error:'AI içgörü raporu oluşturulamadı'});
-  }
-});
-
-/* =========================================================
+/* ==================================================
    STATS
-========================================================= */
+================================================== */
 
-app.get('/api/stats', auth, async (req, res) => {
+.stats{
 
-  try {
+  display:grid;
 
-    const result =
-      await pool.query(
-        `
-        SELECT
-          COUNT(*)::int AS total_events,
+  grid-template-columns:
+    repeat(6,1fr);
 
-          COUNT(*) FILTER(
-            WHERE type='profile_view'
-          )::int AS profile_views,
+  gap:9px;
 
-          COUNT(*) FILTER(
-            WHERE type IN ('qr_scan','qr')
-          )::int AS qr_scans,
+  margin-bottom:15px;
 
-          COUNT(*) FILTER(
-            WHERE type='nfc'
-          )::int AS nfc_scans,
+}
 
-          COUNT(*) FILTER(
-            WHERE type='whatsapp'
-          )::int AS whatsapp_clicks,
+.stat{
 
-          COUNT(*) FILTER(
-            WHERE type='phone'
-          )::int AS phone_clicks,
+  position:relative;
 
-          COUNT(*) FILTER(
-            WHERE type='instagram'
-          )::int AS instagram_clicks,
+  overflow:hidden;
 
-          COUNT(*) FILTER(
-            WHERE type='tiktok'
-          )::int AS tiktok_clicks,
+  padding:16px;
 
-          COUNT(*) FILTER(
-            WHERE type='website'
-          )::int AS website_clicks,
+  border-radius:16px;
 
-          COUNT(*) FILTER(
-            WHERE type='menu'
-          )::int AS menu_clicks,
+  border:
+    1px solid var(--border);
 
-          COUNT(*) FILTER(
-            WHERE type='google_review'
-          )::int AS google_review_clicks
-
-        FROM events
-
-        WHERE business_id=$1
-        `,
-        [req.user.id]
-      );
-
-    const tags =
-      await pool.query(
-        `
-        SELECT COUNT(*)::int AS count
-        FROM nfc_tags
-        WHERE business_id=$1
-        `,
-        [req.user.id]
-      );
-
-    res.json({
-      ...result.rows[0],
-      nfc_tags: tags.rows[0].count
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'İstatistikler alınamadı'
-    });
-
-  }
-
-});
-
-
-/* =========================================================
-   EVENT
-========================================================= */
-
-app.post('/api/event/:slug', async (req, res) => {
-
-  try {
-
-    const slug =
-      String(req.params.slug || '');
-
-    const type =
-      String(req.body.type || '');
-
-    const source =
-      String(req.body.source || '').toLowerCase();
-
-    const nfcCode =
-      String(req.body.nfc_code || '').trim();
-
-    const allowedTypes = [
-      'profile_view',
-      'qr_scan',
-      'qr',
-      'nfc',
-      'whatsapp',
-      'phone',
-      'instagram',
-      'tiktok',
-      'website',
-      'menu',
-      'google_review',
-      'review_open',
-      'review_positive',
-      'review_feedback',
-      'campaign_view',
-      'campaign_click',
-      'location',
-      'iban',
-      'share'
-    ];
-
-    const allowedSources = ['', 'direct', 'qr', 'nfc'];
-
-    if (!allowedTypes.includes(type)) {
-
-      return res.status(400).json({
-        error: 'Geçersiz event tipi'
-      });
-
-    }
-
-    if (!allowedSources.includes(source)) {
-      return res.status(400).json({
-        error: 'Geçersiz kaynak'
-      });
-    }
-
-    const business =
-      await pool.query(
-        `
-        SELECT id
-        FROM businesses
-        WHERE slug=$1
-        `,
-        [slug]
-      );
-
-    if (!business.rows.length) {
-
-      return res.status(404).json({
-        error: 'İşletme bulunamadı'
-      });
-
-    }
-
-    let nfcTagId = null;
-
-    if (source === 'nfc') {
-      if (!nfcCode) {
-        return res.status(400).json({
-          error: 'NFC kodu gerekli'
-        });
-      }
-
-      const tag = await pool.query(
-        `
-        SELECT id
-        FROM nfc_tags
-        WHERE code=$1
-          AND business_id=$2
-          AND is_active=TRUE
-        LIMIT 1
-        `,
-        [nfcCode, business.rows[0].id]
-      );
-
-      if (!tag.rows.length) {
-        return res.status(400).json({
-          error: 'NFC etiketi doğrulanamadı'
-        });
-      }
-
-      nfcTagId = tag.rows[0].id;
-    }
-
-    await pool.query(
-      `
-      INSERT INTO events(
-        business_id,
-        type,
-        source,
-        nfc_tag_id
-      )
-
-      VALUES(
-        $1,
-        $2,
-        $3,
-        $4
-      )
-      `,
-      [
-        business.rows[0].id,
-        type,
-        source,
-        nfcTagId
-      ]
+  background:
+    linear-gradient(
+      145deg,
+      #151515,
+      #0f0f0f
     );
 
-    res.json({
-      success: true
-    });
+}
 
-  } catch (error) {
+.stat::after{
 
-    console.error(error);
+  content:"";
 
-    res.status(500).json({
-      error: 'Event kaydedilemedi'
-    });
+  position:absolute;
 
-  }
+  width:60px;
 
-});
+  height:60px;
+
+  right:-30px;
+
+  bottom:-30px;
+
+  border-radius:50%;
+
+  background:#c59a5208;
+
+}
+
+.stat small{
+
+  display:block;
+
+  color:#777;
+
+  font-size:8px;
+
+  font-weight:800;
+
+  letter-spacing:.13em;
+
+  margin-bottom:8px;
+
+}
+
+.stat strong{
+
+  display:block;
+
+  color:var(--gold-light);
+
+  font-size:24px;
+
+}
+
+.stat span{
+
+  display:block;
+
+  margin-top:4px;
+
+  color:#555;
+
+  font-size:9px;
+
+}
 
 
 
-/* =========================================================
-   V2 — DYNAMIC PROFILE DESIGN API
-========================================================= */
+/* ==================================================
+   QUICK ACTIONS
+================================================== */
 
-app.get('/api/business-profile-design', auth, requireBusinessPermission('profile'), async (req, res) => {
-  try {
-    let result = await pool.query(
-      `SELECT * FROM profile_designs WHERE business_id=$1 LIMIT 1`,
-      [req.user.id]
+.quick-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(5,1fr);
+
+  gap:9px;
+
+  margin-bottom:15px;
+
+}
+
+.quick{
+
+  min-height:82px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:flex-start;
+
+  justify-content:center;
+
+  gap:7px;
+
+  padding:14px;
+
+  border-radius:15px;
+
+  border:
+    1px solid #292929;
+
+  background:#101010;
+
+  color:#fff;
+
+  text-decoration:none;
+
+  cursor:pointer;
+
+  transition:
+    transform .15s,
+    border-color .15s;
+
+}
+
+.quick:active{
+
+  transform:scale(.98);
+
+}
+
+.quick:hover{
+
+  border-color:#414141;
+
+}
+
+.quick-icon{
+
+  font-size:20px;
+
+}
+
+.quick strong{
+
+  font-size:10px;
+
+}
+
+.quick span{
+
+  color:#555;
+
+  font-size:8px;
+
+}
+
+
+
+/* ==================================================
+   BOX
+================================================== */
+
+.box{
+
+  margin-top:15px;
+
+  padding:25px;
+
+  border-radius:21px;
+
+  border:
+    1px solid var(--border);
+
+  background:
+    linear-gradient(
+      145deg,
+      #141414,
+      #0d0d0d
     );
 
-    if (!result.rows.length) {
-      result = await pool.query(
-        `INSERT INTO profile_designs(business_id) VALUES($1) RETURNING *`,
-        [req.user.id]
-      );
-    }
+}
 
-    res.json(normalizeProfileDesign(result.rows[0]));
-  } catch (error) {
-    console.error('BUSINESS PROFILE DESIGN GET ERROR:', error);
-    res.status(500).json({ error: 'Profil tasarım ayarları alınamadı' });
+.box-head{
+
+  display:flex;
+
+  align-items:flex-start;
+
+  justify-content:space-between;
+
+  gap:15px;
+
+  margin-bottom:20px;
+
+}
+
+.box-head h2{
+
+  margin:
+    7px 0 0;
+
+  font-size:19px;
+
+}
+
+.box-head p{
+
+  margin:
+    5px 0 0;
+
+  color:#777;
+
+  font-size:10px;
+
+  line-height:1.6;
+
+}
+
+
+
+/* ==================================================
+   FORM
+================================================== */
+
+.form-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:13px;
+
+}
+
+.field{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:7px;
+
+}
+
+.field.full{
+
+  grid-column:
+    1 / -1;
+
+}
+
+.field label{
+
+  color:#777;
+
+  font-size:8px;
+
+  font-weight:800;
+
+  letter-spacing:.12em;
+
+}
+
+.field input,
+.field textarea{
+
+  width:100%;
+
+  padding:13px;
+
+  border-radius:10px;
+
+  border:
+    1px solid #292929;
+
+  background:#0b0b0b;
+
+  color:#fff;
+
+  outline:none;
+
+  font-size:12px;
+
+}
+
+.field textarea{
+
+  min-height:105px;
+
+  resize:vertical;
+
+  line-height:1.5;
+
+}
+
+.field input:focus,
+.field textarea:focus{
+
+  border-color:var(--gold);
+
+  box-shadow:
+    0 0 0 3px #c59a5212;
+
+}
+
+.field input::placeholder,
+.field textarea::placeholder{
+
+  color:#4f4f4f;
+
+}
+
+.field-hint{
+
+  color:#555;
+
+  font-size:9px;
+
+  line-height:1.4;
+
+}
+
+
+
+/* ==================================================
+   SAVE
+================================================== */
+
+.save-area{
+
+  display:flex;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  gap:10px;
+
+  margin-top:20px;
+
+  padding-top:18px;
+
+  border-top:
+    1px solid var(--border);
+
+}
+
+.save-button{
+
+  min-height:43px;
+
+  padding:
+    11px 19px;
+
+  border:0;
+
+  border-radius:10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
+    );
+
+  color:#fff;
+
+  font-size:10px;
+
+  font-weight:900;
+
+  cursor:pointer;
+
+}
+
+.save-button.loading{
+
+  opacity:.65;
+
+  pointer-events:none;
+
+}
+
+#message{
+
+  min-height:15px;
+
+  color:var(--gold-light);
+
+  font-size:10px;
+
+}
+
+
+
+/* ==================================================
+   DIGITAL
+================================================== */
+
+.digital-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:14px;
+
+}
+
+.digital-card{
+
+  padding:21px;
+
+  border-radius:17px;
+
+  background:#101010;
+
+  border:
+    1px solid var(--border);
+
+}
+
+.digital-icon{
+
+  width:50px;
+
+  height:50px;
+
+  display:grid;
+
+  place-items:center;
+
+  margin-bottom:14px;
+
+  border-radius:15px;
+
+  background:#000;
+
+  border:
+    1px solid #c59a5235;
+
+  font-size:24px;
+
+}
+
+.digital-card h3{
+
+  margin:0;
+
+  font-size:16px;
+
+}
+
+.digital-card p{
+
+  margin:
+    7px 0 0;
+
+  color:#777;
+
+  font-size:10px;
+
+  line-height:1.6;
+
+}
+
+.qr-image{
+
+  width:220px;
+
+  max-width:100%;
+
+  display:block;
+
+  margin:
+    18px auto;
+
+  padding:6px;
+
+  background:#fff;
+
+  border-radius:10px;
+
+}
+
+.digital-url,
+.nfc-url{
+
+  padding:11px;
+
+  border-radius:10px;
+
+  background:#080808;
+
+  color:#777;
+
+  font-size:8px;
+
+  line-height:1.5;
+
+  word-break:break-all;
+
+  border:
+    1px solid #222;
+
+}
+
+.digital-actions{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:7px;
+
+  margin-top:11px;
+
+}
+
+.nfc-symbol{
+
+  width:62px;
+
+  height:62px;
+
+  display:grid;
+
+  place-items:center;
+
+  margin-bottom:14px;
+
+  border-radius:17px;
+
+  background:#000;
+
+  border:
+    1px solid #c59a5235;
+
+  color:var(--gold-light);
+
+  font-size:28px;
+
+}
+
+.nfc-url{
+
+  margin-top:16px;
+
+  color:#fff;
+
+}
+
+.nfc-status{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:7px;
+
+  margin-top:11px;
+
+  color:#666;
+
+  font-size:9px;
+
+}
+
+.nfc-status .status-dot{
+
+  width:7px;
+
+  height:7px;
+
+}
+
+
+
+/* ==================================================
+   PERFORMANCE
+================================================== */
+
+.performance{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:14px;
+
+}
+
+.performance-card{
+
+  padding:20px;
+
+  border-radius:17px;
+
+  border:
+    1px solid var(--border);
+
+  background:#101010;
+
+}
+
+.performance-head{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  margin-bottom:16px;
+
+}
+
+.performance-head strong{
+
+  font-size:12px;
+
+}
+
+.performance-head span{
+
+  color:#555;
+
+  font-size:8px;
+
+}
+
+.channel{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-top:11px;
+
+}
+
+.channel-icon{
+
+  width:32px;
+
+  height:32px;
+
+  display:grid;
+
+  place-items:center;
+
+  flex:none;
+
+  border-radius:9px;
+
+  background:#080808;
+
+  border:
+    1px solid #242424;
+
+  font-size:13px;
+
+}
+
+.channel-main{
+
+  min-width:0;
+
+  flex:1;
+
+}
+
+.channel-top{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+}
+
+.channel-top strong{
+
+  font-size:9px;
+
+}
+
+.channel-top span{
+
+  color:var(--gold-light);
+
+  font-size:9px;
+
+  font-weight:800;
+
+}
+
+.channel-bar{
+
+  height:5px;
+
+  margin-top:5px;
+
+  overflow:hidden;
+
+  border-radius:999px;
+
+  background:#252525;
+
+}
+
+.channel-fill{
+
+  width:0;
+
+  height:100%;
+
+  border-radius:999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9e7738,
+      #e0bd7b
+    );
+
+  transition:width .5s ease;
+
+}
+
+
+
+/* ==================================================
+   INFO
+================================================== */
+
+.info-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:9px;
+
+}
+
+.info-card{
+
+  min-width:0;
+
+  padding:15px;
+
+  border-radius:14px;
+
+  background:#101010;
+
+  border:
+    1px solid var(--border);
+
+}
+
+.info-card-icon{
+
+  font-size:18px;
+
+  margin-bottom:8px;
+
+}
+
+.info-card strong{
+
+  display:block;
+
+  font-size:10px;
+
+}
+
+.info-card span{
+
+  display:block;
+
+  margin-top:5px;
+
+  color:#666;
+
+  font-size:9px;
+
+  line-height:1.5;
+
+  word-break:break-word;
+
+}
+
+
+
+/* ==================================================
+   TOAST
+================================================== */
+
+.profile-field-locked{opacity:.62;position:relative}.profile-field-locked::after{content:'🔒 Admin tarafından kilitli';display:block;color:var(--muted);font-size:8px;margin-top:5px;letter-spacing:.2px}
+.profile-field-locked input,.profile-field-locked textarea{cursor:not-allowed}
+.toast{
+
+  position:fixed;
+
+  z-index:9999;
+
+  left:50%;
+
+  bottom:
+    calc(22px + env(safe-area-inset-bottom));
+
+  transform:
+    translate(-50%,20px);
+
+  max-width:
+    calc(100% - 30px);
+
+  padding:
+    11px 15px;
+
+  border-radius:999px;
+
+  background:#171717;
+
+  border:
+    1px solid #c59a5245;
+
+  box-shadow:
+    0 15px 45px #000;
+
+  color:#ddd;
+
+  font-size:9px;
+
+  font-weight:800;
+
+  opacity:0;
+
+  pointer-events:none;
+
+  transition:
+    opacity .2s,
+    transform .2s;
+
+}
+
+.toast.show{
+
+  opacity:1;
+
+  transform:
+    translate(-50%,0);
+
+}
+
+
+
+/* ==================================================
+   LOADING
+================================================== */
+
+.loading{
+
+  position:fixed;
+
+  inset:0;
+
+  z-index:10000;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:#080808;
+
+  transition:
+    opacity .3s,
+    visibility .3s;
+
+}
+
+.loading.hide{
+
+  opacity:0;
+
+  visibility:hidden;
+
+}
+
+.loading-lion{
+
+  width:65px;
+
+  height:65px;
+
+  display:grid;
+
+  place-items:center;
+
+  margin:auto;
+
+  border-radius:20px;
+
+  background:#050505;
+
+  border:
+    1px solid #c59a5245;
+
+  font-size:29px;
+
+  animation:
+    loadingPulse 1.3s infinite;
+
+}
+
+@keyframes loadingPulse{
+
+  0%,100%{
+    transform:scale(1);
   }
-});
 
-app.put('/api/business-profile-design', auth, requireBusinessPermission('profile'), async (req, res) => {
-  try {
-    const body = req.body || {};
-    const str = (value, max) => String(value ?? '').trim().slice(0, max);
-    const gallery = Array.isArray(body.gallery)
-      ? body.gallery.slice(0, 30).map(item => {
-          if (typeof item === 'string') return str(item, 2000);
-          if (item && typeof item === 'object') {
-            return { url: str(item.url, 2000), title: str(item.title, 200) };
-          }
-          return '';
-        }).filter(Boolean)
-      : [];
-
-    const values = [
-      req.user.id,
-      str(body.theme, 80) || DYNAMIC_PROFILE_DEFAULTS.theme,
-      str(body.accent_color, 30) || DYNAMIC_PROFILE_DEFAULTS.accent_color,
-      str(body.cover_url, 2000),
-      str(body.cover_position, 50) || 'center',
-      str(body.announcement_text, 1000),
-      body.announcement_enabled === true,
-      str(body.campaign_title, 200),
-      str(body.campaign_text, 2000),
-      str(body.campaign_image_url, 2000),
-      str(body.campaign_button_text, 100),
-      str(body.campaign_button_url, 2000),
-      body.campaign_enabled === true,
-      str(body.featured_title, 200),
-      str(body.featured_text, 2000),
-      str(body.featured_image_url, 2000),
-      str(body.featured_button_text, 100),
-      str(body.featured_button_url, 2000),
-      body.featured_enabled === true,
-      JSON.stringify(gallery),
-      str(body.video_url, 2000),
-      body.video_enabled === true
-    ];
-
-    const result = await pool.query(`
-      INSERT INTO profile_designs(
-        business_id,theme,accent_color,cover_url,cover_position,
-        announcement_text,announcement_enabled,
-        campaign_title,campaign_text,campaign_image_url,campaign_button_text,campaign_button_url,campaign_enabled,
-        featured_title,featured_text,featured_image_url,featured_button_text,featured_button_url,featured_enabled,
-        gallery,video_url,video_enabled,updated_at
-      )
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,CURRENT_TIMESTAMP)
-      ON CONFLICT(business_id) DO UPDATE SET
-        theme=EXCLUDED.theme,
-        accent_color=EXCLUDED.accent_color,
-        cover_url=EXCLUDED.cover_url,
-        cover_position=EXCLUDED.cover_position,
-        announcement_text=EXCLUDED.announcement_text,
-        announcement_enabled=EXCLUDED.announcement_enabled,
-        campaign_title=EXCLUDED.campaign_title,
-        campaign_text=EXCLUDED.campaign_text,
-        campaign_image_url=EXCLUDED.campaign_image_url,
-        campaign_button_text=EXCLUDED.campaign_button_text,
-        campaign_button_url=EXCLUDED.campaign_button_url,
-        campaign_enabled=EXCLUDED.campaign_enabled,
-        featured_title=EXCLUDED.featured_title,
-        featured_text=EXCLUDED.featured_text,
-        featured_image_url=EXCLUDED.featured_image_url,
-        featured_button_text=EXCLUDED.featured_button_text,
-        featured_button_url=EXCLUDED.featured_button_url,
-        featured_enabled=EXCLUDED.featured_enabled,
-        gallery=EXCLUDED.gallery,
-        video_url=EXCLUDED.video_url,
-        video_enabled=EXCLUDED.video_enabled,
-        updated_at=CURRENT_TIMESTAMP
-      RETURNING *
-    `, values);
-
-    res.json(normalizeProfileDesign(result.rows[0]));
-  } catch (error) {
-    console.error('BUSINESS PROFILE DESIGN UPDATE ERROR:', error);
-    res.status(500).json({ error: 'Profil tasarım ayarları kaydedilemedi' });
+  50%{
+    transform:scale(1.05);
   }
-});
+
+}
+
+.loading-text{
+
+  margin-top:12px;
+
+  color:#555;
+
+  font-size:8px;
+
+  font-weight:800;
+
+  letter-spacing:.16em;
+
+}
 
 
-/* =========================================================
-   V2 — SMART CAMPAIGNS API
-========================================================= */
-function normalizeCampaign(row){
-  if(!row) return null;
-  return {
-    id:row.id,
-    business_id:row.business_id,
-    title:String(row.title||''),
-    text:String(row.text||''),
-    image_url:String(row.image_url||''),
-    button_text:String(row.button_text||''),
-    button_url:String(row.button_url||''),
-    starts_at:row.starts_at||null,
-    ends_at:row.ends_at||null,
-    enabled:row.enabled===true,
-    priority:Number(row.priority||0),
-    created_at:row.created_at||null,
-    updated_at:row.updated_at||null
+
+/* ==================================================
+   FOOTER
+================================================== */
+
+.footer{
+
+  margin-top:30px;
+
+  text-align:center;
+
+  color:#373737;
+
+  font-size:8px;
+
+  letter-spacing:.15em;
+
+}
+
+
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media(max-width:1000px){
+
+  .stats{
+    grid-template-columns:
+      repeat(3,1fr);
+  }
+
+  .quick-grid{
+    grid-template-columns:
+      repeat(3,1fr);
+  }
+
+  .profile-hero-inner{
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+
+  .profile-actions{
+    width:100%;
+    margin-left:0;
+    justify-content:flex-start;
+  }
+
+}
+
+@media(max-width:700px){
+
+  header{
+
+    padding:
+      11px 15px;
+
+  }
+
+  .brand-text small{
+    display:none;
+  }
+
+  .header-actions{
+    gap:5px;
+  }
+
+  .header-button{
+    min-height:37px;
+    padding:
+      8px 9px;
+    font-size:8px;
+  }
+
+  main{
+
+    width:92%;
+
+    margin-top:22px;
+
+  }
+
+  .page-head{
+
+    align-items:flex-start;
+
+    flex-direction:column;
+
+  }
+
+  .page-head h1{
+
+    font-size:28px;
+
+  }
+
+  .profile-hero{
+
+    padding:20px;
+
+  }
+
+  .profile-hero-inner{
+
+    display:block;
+
+  }
+
+  .logo-wrap{
+
+    width:78px;
+
+    height:78px;
+
+    margin-bottom:14px;
+
+  }
+
+  .profile-info h2{
+
+    font-size:23px;
+
+  }
+
+  .profile-actions{
+
+    margin-top:17px;
+
+  }
+
+  .action{
+
+    flex:1;
+
+  }
+
+  .health{
+
+    grid-template-columns:1fr;
+
+    gap:16px;
+
+  }
+
+  .stats{
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
+
+  .stat strong{
+
+    font-size:23px;
+
+  }
+
+  .quick-grid{
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
+
+  .box{
+
+    padding:19px;
+
+    border-radius:18px;
+
+  }
+
+  .box-head{
+
+    display:block;
+
+  }
+
+  .form-grid{
+
+    grid-template-columns:1fr;
+
+  }
+
+  .field.full{
+
+    grid-column:auto;
+
+  }
+
+  .digital-grid{
+
+    grid-template-columns:1fr;
+
+  }
+
+  .performance{
+
+    grid-template-columns:1fr;
+
+  }
+
+  .info-grid{
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
+
+}
+
+@media(max-width:430px){
+
+  .brand-icon{
+
+    width:38px;
+
+    height:38px;
+
+    font-size:19px;
+
+  }
+
+  .brand-text strong{
+
+    font-size:11px;
+
+  }
+
+  .header-button{
+
+    font-size:7px;
+
+  }
+
+  .quick{
+
+    min-height:76px;
+
+  }
+
+  .info-grid{
+
+    grid-template-columns:1fr;
+
+  }
+
+}
+
+
+/* ==================================================
+   BUSINESS CENTER V2 — COMMAND BAR
+================================================== */
+.command-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:0 0 22px;
+  padding:14px 16px;
+  border:1px solid #c59a5230;
+  border-radius:18px;
+  background:linear-gradient(135deg,#15120d,#101010 55%,#171717);
+  box-shadow:0 18px 50px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
+}
+.command-left{display:flex;align-items:center;gap:12px;min-width:0}
+.command-badge{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#c59a5218;border:1px solid #c59a5245;font-size:18px}
+.command-copy{min-width:0}
+.command-copy strong{display:block;font-size:13px;letter-spacing:.02em}
+.command-copy span{display:block;color:#8d8d8d;font-size:12px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.command-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.command-btn{border:1px solid #303030;background:#121212;color:#eee;border-radius:11px;padding:9px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}
+.command-btn.gold{border-color:#c59a5260;background:#c59a5214;color:#e0bd7b}
+.command-btn:hover{border-color:#c59a5280;transform:translateY(-1px)}
+.access-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 22px}
+.access-item{padding:12px 13px;border:1px solid #292929;border-radius:14px;background:#101010;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.access-item span:first-child{font-size:12px;color:#8f8f8f}
+.access-state{font-size:11px;font-weight:800;letter-spacing:.05em}
+.access-state.on{color:#62d992}.access-state.off{color:#666}
+@media(max-width:760px){.command-bar{align-items:flex-start;flex-direction:column}.command-actions{width:100%;justify-content:flex-start}.command-btn{flex:1;text-align:center}.access-strip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:430px){.access-strip{grid-template-columns:1fr 1fr}.command-btn{font-size:11px;padding:9px 8px}}
+
+
+/* ==================================================
+   BUSINESS CENTER V3 ANALYTICS
+================================================== */
+.analytics-v3{margin:24px 0;background:linear-gradient(145deg,#111,#0b0b0b);border:1px solid #292929;border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.analytics-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+.analytics-head h2{margin:0;font-size:20px}.analytics-head p{margin:6px 0 0;color:#888;font-size:13px}
+.analytics-periods{display:flex;gap:7px;flex-wrap:wrap}.analytics-periods button{border:1px solid #303030;background:#151515;color:#999;border-radius:999px;padding:8px 13px;cursor:pointer}.analytics-periods button.active{background:#c59a52;color:#080808;border-color:#c59a52;font-weight:800}
+.analytics-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.analytics-kpi{padding:17px;border:1px solid #292929;border-radius:18px;background:#121212}.analytics-kpi small{display:block;color:#777;font-size:10px;letter-spacing:.12em}.analytics-kpi strong{display:block;font-size:28px;margin-top:8px}.analytics-kpi span{color:#888;font-size:12px}
+.analytics-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}.analytics-box{border:1px solid #292929;border-radius:20px;background:#101010;padding:18px}.analytics-box h3{margin:0 0 15px;font-size:14px}.traffic-bars{height:180px;display:flex;align-items:end;gap:5px;overflow:hidden}.traffic-bar-wrap{height:100%;flex:1;min-width:8px;display:flex;align-items:end;justify-content:center}.traffic-bar{width:100%;max-width:22px;border-radius:7px 7px 2px 2px;background:linear-gradient(to top,#8d6b32,#e0bd7b);min-height:3px}.traffic-label{font-size:9px;color:#666;margin-top:7px;text-align:center}.action-row{display:grid;grid-template-columns:100px 1fr 45px;gap:8px;align-items:center;margin:11px 0;font-size:12px}.action-track{height:7px;background:#202020;border-radius:99px;overflow:hidden}.action-fill{height:100%;background:#c59a52;border-radius:99px}.analytics-empty{padding:35px;text-align:center;color:#777}.analytics-locked{padding:20px;border:1px dashed #3a3a3a;border-radius:16px;color:#888;text-align:center}
+@media(max-width:800px){.analytics-kpis{grid-template-columns:repeat(2,1fr)}.analytics-grid{grid-template-columns:1fr}.analytics-head{flex-direction:column}}
+
+/* BUSINESS CENTER FEATURE MODULES */
+.feature-box{margin:0 0 18px;padding:22px;border:1px solid var(--border);border-radius:18px;background:#101010;box-sizing:border-box}
+.feature-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
+.feature-head h2{margin:3px 0 0;font-size:19px}.feature-head p{margin:5px 0 0;color:#777;font-size:10px;line-height:1.6}
+.feature-btn,.feature-periods button{border:1px solid #303030;background:#151515;color:#aaa;border-radius:9px;padding:8px 11px;font-size:10px;font-weight:800;cursor:pointer}
+.feature-periods{display:flex;gap:6px;flex-wrap:wrap}.feature-periods button.active{background:var(--gold);color:#090909;border-color:var(--gold)}
+.feature-status{padding:7px 10px;border-radius:999px;font-size:9px;font-weight:900;white-space:nowrap}.feature-status.on{background:#18351f;color:#8fe0a0;border:1px solid #285b35}.feature-status.off{background:#211616;color:#d88f8f;border:1px solid #4d2929}
+.live-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.live-kpis>div,.ai-mini,.ai-score{padding:14px;border:1px solid #292929;border-radius:13px;background:#0c0c0c}
+.live-kpis small,.ai-mini span,.ai-score span,.review-card small{display:block;color:#666;font-size:8px;letter-spacing:.1em;font-weight:900}.live-kpis strong{display:block;font-size:22px;margin-top:5px}
+.feature-list{display:grid;gap:8px}.feature-item{padding:11px 13px;border:1px solid #252525;border-radius:11px;background:#0b0b0b;color:#aaa;font-size:10px;line-height:1.55}.feature-empty{padding:18px;text-align:center;color:#666;font-size:10px;border:1px dashed #292929;border-radius:11px}
+.ai-score-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px}.ai-score strong{font-size:30px;display:inline-block;margin-right:9px;color:var(--gold-light)}.ai-mini strong{display:block;font-size:15px;margin-top:6px;color:#eee}
+.ai-columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}.ai-columns h3{font-size:12px;margin:0 0 8px}
+.review-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px}.review-card{padding:14px;border:1px solid #292929;border-radius:13px;background:#0c0c0c}.review-card strong,.review-card span,.review-card a{display:block;margin-top:6px;color:#ddd;font-size:11px;line-height:1.5}.review-card span{color:#777}.review-card a{color:var(--gold-light);text-decoration:none;font-weight:800}
+.campaign-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.campaign-card{padding:15px;border:1px solid #292929;border-radius:13px;background:#0c0c0c}.campaign-card h3{margin:0;font-size:14px}.campaign-card p{margin:7px 0;color:#888;font-size:10px;line-height:1.5}.campaign-meta{display:flex;justify-content:space-between;gap:8px;color:#666;font-size:8px;margin-top:9px}.campaign-badge{color:#8fe0a0;font-weight:900}
+@media(max-width:800px){.ai-score-row{grid-template-columns:1fr 1fr}.ai-columns,.review-grid,.campaign-list{grid-template-columns:1fr}}
+@media(max-width:560px){.feature-box{padding:16px}.feature-head{flex-direction:column}.live-kpis strong{font-size:18px}}
+
+
+<style>
+.feature-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.feature-editor{margin-top:14px;padding:14px;border:1px solid #292929;border-radius:14px;background:#0b0b0b}.editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.editor-grid label{display:flex;flex-direction:column;gap:6px}.editor-grid label.full{grid-column:1/-1}.editor-grid label span{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.08em}.editor-grid input,.editor-grid select,.editor-grid textarea{width:100%;box-sizing:border-box;border:1px solid #292929;background:#101010;color:#eee;border-radius:9px;padding:10px;font:inherit}.editor-actions{display:flex;gap:8px;margin-top:12px}.campaign-card{position:relative}.campaign-card .campaign-actions{display:flex;gap:6px;margin-top:10px}.campaign-actions button{border:1px solid #292929;background:#151515;color:#ddd;border-radius:8px;padding:7px 9px;cursor:pointer;font-size:10px}@media(max-width:800px){.editor-grid{grid-template-columns:1fr}.editor-grid label.full{grid-column:auto}.feature-actions{width:100%}}
+/* ==================================================
+   V2 — PROFILE DESIGN CENTER
+================================================== */
+.profile-design-shell{
+  display:grid;
+  grid-template-columns:minmax(0,1.12fr) minmax(320px,.88fr);
+  gap:15px;
+  margin-bottom:15px;
+}
+.design-editor,
+.design-preview-box{
+  min-width:0;
+  padding:22px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:linear-gradient(145deg,#151515,#0d0d0d);
+}
+.design-preview-box{
+  position:sticky;
+  top:92px;
+  height:max-content;
+}
+.design-section-title{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+.design-section-title h3{
+  margin:0;
+  font-size:16px;
+}
+.design-section-title p{
+  margin:6px 0 0;
+  color:#666;
+  font-size:9px;
+  line-height:1.5;
+}
+.design-badge{
+  flex:none;
+  padding:6px 9px;
+  border-radius:999px;
+  border:1px solid #c59a5230;
+  background:#c59a5210;
+  color:var(--gold-light);
+  font-size:8px;
+  font-weight:900;
+}
+.design-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:11px;
+}
+.design-field{
+  min-width:0;
+}
+.design-field.full{
+  grid-column:1/-1;
+}
+.design-field label{
+  display:block;
+  margin-bottom:6px;
+  color:#777;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.13em;
+}
+.design-field input,
+.design-field select,
+.design-field textarea{
+  width:100%;
+  border:1px solid #2d2d2d;
+  border-radius:10px;
+  outline:none;
+  background:#0d0d0d;
+  color:#eee;
+  padding:10px 11px;
+  font-size:10px;
+}
+.design-field textarea{
+  min-height:76px;
+  resize:vertical;
+  line-height:1.5;
+}
+.design-field input:focus,
+.design-field select:focus,
+.design-field textarea:focus{
+  border-color:#c59a5266;
+  box-shadow:0 0 0 3px #c59a5210;
+}
+.design-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:42px;
+  padding:9px 11px;
+  border-radius:10px;
+  border:1px solid #2d2d2d;
+  background:#0d0d0d;
+}
+.design-toggle span{
+  color:#aaa;
+  font-size:9px;
+  font-weight:800;
+}
+.switch{
+  position:relative;
+  width:38px;
+  height:21px;
+  flex:none;
+}
+.switch input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.switch-track{
+  position:absolute;
+  inset:0;
+  border-radius:999px;
+  background:#292929;
+  border:1px solid #3a3a3a;
+  transition:.2s;
+}
+.switch-track::after{
+  content:"";
+  position:absolute;
+  width:15px;
+  height:15px;
+  left:2px;
+  top:2px;
+  border-radius:50%;
+  background:#777;
+  transition:.2s;
+}
+.switch input:checked + .switch-track{
+  background:#c59a5230;
+  border-color:#c59a5270;
+}
+.switch input:checked + .switch-track::after{
+  transform:translateX(17px);
+  background:var(--gold-light);
+}
+.design-color-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.design-color-row input[type=color]{
+  width:42px;
+  height:38px;
+  padding:3px;
+  border-radius:9px;
+  cursor:pointer;
+}
+.design-color-row input[type=text]{
+  flex:1;
+}
+.design-help{
+  margin-top:6px;
+  color:#555;
+  font-size:8px;
+  line-height:1.5;
+}
+.design-save-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:17px;
+}
+.design-save-button{
+  min-height:42px;
+  padding:10px 15px;
+  border:1px solid #c59a52;
+  border-radius:10px;
+  background:linear-gradient(135deg,#c59a52,#9e7738);
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+.design-save-button:active{transform:scale(.98)}
+#designMessage{
+  color:#777;
+  font-size:9px;
+}
+.preview-frame{
+  overflow:hidden;
+  border-radius:18px;
+  border:1px solid #333;
+  background:#070707;
+  box-shadow:0 20px 55px #000;
+}
+.preview-cover{
+  position:relative;
+  height:150px;
+  background:
+    radial-gradient(circle at 80% 20%,#c59a5230,transparent 35%),
+    linear-gradient(145deg,#1d1d1d,#090909);
+  background-size:cover;
+  background-position:center;
+}
+.preview-cover::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 25%,#070707 100%);
+}
+.preview-body{
+  position:relative;
+  margin-top:-35px;
+  padding:0 16px 18px;
+  z-index:2;
+}
+.preview-logo{
+  width:68px;
+  height:68px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border-radius:18px;
+  border:2px solid #c59a5280;
+  background:#050505;
+  box-shadow:0 12px 30px #000;
+  font-size:26px;
+}
+.preview-logo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.preview-name{
+  margin-top:11px;
+  font-size:18px;
+  font-weight:900;
+}
+.preview-category{
+  display:inline-block;
+  margin-top:5px;
+  color:var(--gold-light);
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.preview-announcement,
+.preview-campaign,
+.preview-featured{
+  margin-top:11px;
+  padding:11px;
+  border-radius:12px;
+  border:1px solid #c59a5230;
+  background:#c59a520c;
+}
+.preview-announcement strong,
+.preview-campaign strong,
+.preview-featured strong{
+  display:block;
+  margin-bottom:4px;
+  font-size:9px;
+}
+.preview-announcement span,
+.preview-campaign span,
+.preview-featured span{
+  display:block;
+  color:#888;
+  font-size:8px;
+  line-height:1.5;
+}
+.preview-campaign{
+  background-size:cover;
+  background-position:center;
+  min-height:82px;
+  position:relative;
+  overflow:hidden;
+}
+.preview-campaign::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,#080808e8,#08080872,transparent);
+}
+.preview-campaign > *{position:relative;z-index:1}
+.preview-button{
+  display:inline-flex;
+  margin-top:8px;
+  padding:6px 9px;
+  border-radius:7px;
+  background:linear-gradient(135deg,#c59a52,#9e7738);
+  color:#fff;
+  font-size:7px;
+  font-weight:900;
+}
+.preview-gallery{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:5px;
+  margin-top:11px;
+}
+.preview-gallery div{
+  aspect-ratio:1;
+  overflow:hidden;
+  border-radius:8px;
+  background:#171717;
+  border:1px solid #292929;
+}
+.preview-gallery img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.preview-video{
+  margin-top:11px;
+  padding:10px;
+  border-radius:10px;
+  background:#111;
+  border:1px solid #292929;
+  color:#777;
+  font-size:8px;
+}
+.preview-frame.theme-pure-light{background:#f5f2eb;color:#151515}
+.preview-frame.theme-pure-light .preview-body{color:#151515}
+.preview-frame.theme-pure-light .preview-category{color:#8f6c29}
+.preview-frame.theme-pure-light .preview-announcement,.preview-frame.theme-pure-light .preview-campaign,.preview-frame.theme-pure-light .preview-featured{background:#fff;border-color:#d7c6a1}
+.preview-frame.theme-obsidian{background:#050505}
+.preview-frame.theme-champagne{background:#17120b}
+@media(max-width:820px){
+  .profile-design-shell{grid-template-columns:1fr}
+  .design-preview-box{position:static}
+}
+@media(max-width:520px){
+  .design-editor,.design-preview-box{padding:16px}
+  .design-grid{grid-template-columns:1fr}
+  .design-field.full{grid-column:auto}
+}
+
+
+.review-grid{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:16px;
+}
+.review-preview{
+  min-height:270px;
+  padding:26px 20px;
+  border-radius:18px;
+  border:1px solid #c59a5240;
+  background:radial-gradient(circle at 80% 0%,#c59a5225,transparent 45%),#0a0a0a;
+  text-align:center;
+}
+.review-preview-icon{
+  width:48px;height:48px;margin:0 auto 12px;
+  display:grid;place-items:center;border-radius:15px;
+  border:1px solid #c59a5260;color:#e0bd7b;font-size:22px;
+}
+.review-preview-title{font-size:17px;font-weight:900}
+.review-preview-text{margin-top:8px;color:#888;font-size:10px;line-height:1.6}
+.review-stars{margin-top:22px;font-size:28px;letter-spacing:3px;color:#e0bd7b}
+.review-preview-note{margin-top:15px;color:#555;font-size:8px}
+.live-inline{margin-left:8px;color:#45c27a;font-size:9px;font-weight:900}
+@media(max-width:820px){.review-grid{grid-template-columns:1fr}}
+
+
+
+
+
+/* ==================================================
+   PROFILE CONTROL CENTER — CONNECTION FIRST UI
+================================================== */
+.profile-control-center{margin:0 0 18px;padding:20px;border:1px solid #c59a5238;border-radius:20px;background:linear-gradient(145deg,#15120d,#0d0d0d);box-shadow:0 18px 50px rgba(0,0,0,.24)}
+.pcc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.pcc-head h3{margin:6px 0 4px;font-size:19px}.pcc-head p{margin:0;color:#777;font-size:10px;line-height:1.5}.pcc-badge{padding:6px 9px;border-radius:999px;border:1px solid #c59a5240;background:#c59a5212;color:#e0bd7b;font-size:8px;font-weight:900;white-space:nowrap}
+.pcc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:16px}.pcc-card{min-height:132px;text-align:left;border:1px solid #292929;background:#101010;color:#fff;border-radius:15px;padding:15px;cursor:pointer;transition:.18s}.pcc-card:hover{transform:translateY(-2px);border-color:#c59a5260;background:#141414}.pcc-icon{display:grid;place-items:center;width:35px;height:35px;border-radius:11px;background:#c59a5212;border:1px solid #c59a5230;font-size:17px;margin-bottom:12px}.pcc-card strong{display:block;font-size:11px}.pcc-card small{display:block;color:#666;font-size:9px;line-height:1.45;margin-top:5px;min-height:27px}.pcc-card b{display:block;color:#e0bd7b;font-size:9px;margin-top:9px}
+.pcc-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.pcc-panel{margin-top:12px;padding:15px;border:1px solid #292929;border-radius:15px;background:#0b0b0b}.pcc-panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.pcc-panel-head strong{font-size:12px}.pcc-panel-head span{font-size:9px;color:#666}.pcc-conn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pcc-conn{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px;border:1px solid #292929;border-radius:12px;background:#101010}.pcc-conn-main{display:flex;align-items:center;gap:9px;min-width:0}.pcc-conn-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#171717}.pcc-conn-main strong{display:block;font-size:10px}.pcc-conn-main small{display:block;color:#666;font-size:8px;margin-top:2px;max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pcc-connect{border:1px solid #3b3322;background:#17130c;color:#e0bd7b;border-radius:9px;padding:7px 9px;font-size:8px;font-weight:900;cursor:pointer;white-space:nowrap}.pcc-connect.on{border-color:#3f6f4e;background:#102016;color:#70d08d}
+.pcc-theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.pcc-theme{padding:12px;border:1px solid #292929;border-radius:12px;background:#101010;color:#fff;text-align:left;cursor:pointer}.pcc-theme strong{display:block;font-size:10px}.pcc-theme small{display:block;color:#666;font-size:8px;margin-top:4px}.pcc-theme.active{border-color:#c59a5270;background:#c59a5212}.pcc-custom{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}.pcc-custom input{flex:1;min-width:140px;border:1px solid #292929;border-radius:9px;background:#101010;color:#fff;padding:9px;font-size:9px}.pcc-custom button{border:1px solid #c59a5250;background:#c59a5212;color:#e0bd7b;border-radius:9px;padding:9px 11px;font-size:9px;font-weight:800}
+@media(max-width:900px){.pcc-grid{grid-template-columns:1fr 1fr}.pcc-conn-grid{grid-template-columns:1fr 1fr}.pcc-theme-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.pcc-head{display:block}.pcc-badge{display:inline-block;margin-top:10px}.pcc-grid,.pcc-conn-grid,.pcc-theme-grid{grid-template-columns:1fr}.pcc-actions .action{flex:1}}
+
+</style>
+</style>
+
+
+<style id="leo-business-final-ui">
+:root{--bc-bg:#080a0f;--bc-panel:#10141c;--bc-panel2:#0d1118;--bc-line:#202733;--bc-gold:#d6aa55;--bc-gold2:#f0c979;--bc-text:#f5f7fb;--bc-muted:#8b93a1;--bc-green:#46d88a;--bc-blue:#5ea7ff;--bc-purple:#a678ff}
+html{scroll-behavior:smooth}body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 75% -10%,rgba(214,170,85,.10),transparent 34%),radial-gradient(circle at 10% 30%,rgba(94,167,255,.05),transparent 28%);z-index:-1}
+/* Admin-style shell */
+.bc-sidebar{position:fixed;z-index:1000;left:0;top:0;bottom:0;width:248px;padding:22px 16px;background:linear-gradient(180deg,#0a0d13,#080a0f);border-right:1px solid var(--bc-line);display:flex;flex-direction:column;gap:18px}
+.bc-brand{display:flex;align-items:center;gap:11px;padding:4px 7px 15px;border-bottom:1px solid var(--bc-line)}
+.bc-brand-mark{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#17130b,#0d0f14);border:1px solid #8f6b2c;color:var(--bc-gold2);font-size:22px;box-shadow:0 8px 24px #0008}
+.bc-brand strong{font-size:14px;letter-spacing:.04em}.bc-brand span{display:block;color:var(--bc-gold2);font-size:9px;letter-spacing:.16em;margin-top:3px}
+.bc-nav{display:flex;flex-direction:column;gap:6px}.bc-nav button{width:100%;border:1px solid transparent;background:transparent;color:#aeb5c0;padding:12px 13px;border-radius:11px;display:flex;align-items:center;gap:12px;text-align:left;font:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:.16s}.bc-nav button:hover{background:#111722;color:#fff;border-color:#1f2733}.bc-nav button.active{background:linear-gradient(135deg,#c99b43,#8f6828);color:#fff;border-color:#d6aa55;box-shadow:0 8px 22px #b47f281f}.bc-nav .ico{width:23px;text-align:center;font-size:16px}
+.bc-divider{height:1px;background:var(--bc-line);margin:2px 4px}.bc-side-quick{margin-top:auto;border:1px solid #242b36;background:#0d1118;border-radius:13px;padding:12px}.bc-side-quick strong{font-size:10px;letter-spacing:.08em}.bc-side-quick button{display:block;width:100%;margin-top:8px;padding:9px 10px;border-radius:9px;border:1px solid #272e39;background:#111722;color:#cbd1da;text-align:left;font:inherit;font-size:10px;cursor:pointer}.bc-side-quick button:hover{border-color:#80632f;color:#fff}
+.bc-main-shell{margin-left:248px;min-height:100vh}.bc-topbar{height:72px;position:sticky;top:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(8,10,15,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--bc-line)}.bc-top-left small{display:block;color:var(--bc-gold2);font-size:9px;letter-spacing:.15em;font-weight:900}.bc-top-left strong{display:block;font-size:18px;margin-top:4px}.bc-top-actions{display:flex;gap:8px;align-items:center}.bc-top-btn{border:1px solid #28303b;background:#10151d;color:#d9dee6;border-radius:10px;padding:9px 12px;font:inherit;font-size:10px;font-weight:800;text-decoration:none;cursor:pointer}.bc-top-btn.gold{background:linear-gradient(135deg,#c99b43,#8f6828);border-color:#d6aa55;color:#fff}
+.bc-main-shell main{max-width:none;margin:0;padding:24px 28px 50px}.bc-main-shell .page-head{margin-bottom:18px}.bc-main-shell .command-bar,.bc-main-shell .access-strip{display:none!important}
+.bc-view{display:none}.bc-view.active{display:block}.bc-view-overview.active{display:block}
+.bc-section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:4px 0 16px}.bc-section-title h1{margin:0;font-size:25px}.bc-section-title p{margin:5px 0 0;color:var(--bc-muted);font-size:11px}.bc-section-title .bc-live{color:var(--bc-green);font-size:10px;font-weight:900}
+/* Restyle existing V1 blocks */
+.bc-main-shell .profile-hero,.bc-main-shell .health,.bc-main-shell .stats,.bc-main-shell .box,.bc-main-shell .feature-box,.bc-main-shell .analytics-v3,.bc-main-shell .performance{border-color:var(--bc-line)!important;background:linear-gradient(145deg,#11161f,#0d1118)!important;box-shadow:0 16px 45px #00000022}
+.bc-main-shell .profile-hero{border-radius:16px!important}.bc-main-shell .box,.bc-main-shell .feature-box,.bc-main-shell .analytics-v3{border-radius:15px!important}.bc-main-shell .stat{border-color:#232b37!important;background:#10151d!important;border-radius:13px!important}.bc-main-shell .quick{border-color:#27303b!important;background:#10151d!important;border-radius:13px!important;transition:.16s}.bc-main-shell .quick:hover{transform:translateY(-2px);border-color:#8a682f!important;background:#131a23!important}.bc-main-shell .quick-grid{margin-bottom:18px}
+.bc-main-shell .box-head h2,.bc-main-shell .analytics-head h2{font-size:17px}.bc-main-shell input,.bc-main-shell select,.bc-main-shell textarea{background:#0b0f15!important;border-color:#252e3a!important;color:#f2f4f8!important}.bc-main-shell label span,.bc-main-shell .design-field label,.bc-main-shell .field label{color:#aeb6c2}.bc-main-shell .feature-btn,.bc-main-shell .design-save-button{border-radius:9px!important}
+/* Overview command cards */
+.bc-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:16px}.bc-kpi{position:relative;overflow:hidden;padding:14px;border:1px solid var(--bc-line);border-radius:13px;background:linear-gradient(145deg,#111720,#0d1118)}.bc-kpi:after{content:"";position:absolute;right:-25px;bottom:-30px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,#d6aa5520,transparent 65%)}.bc-kpi small{display:block;color:#89919e;font-size:8px;font-weight:900;letter-spacing:.1em}.bc-kpi strong{display:block;font-size:23px;margin:8px 0 3px}.bc-kpi span{font-size:9px;color:#6f7784}
+.bc-actions-panel{border:1px solid var(--bc-line);border-radius:15px;background:#0f141c;padding:17px;margin-bottom:16px}.bc-actions-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.bc-actions-head strong{font-size:12px}.bc-actions-head span{color:#707987;font-size:9px}.bc-action-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.bc-action{min-height:90px;border:1px solid #242d39;border-radius:12px;background:#111720;color:#e8ebf0;text-decoration:none;padding:13px;cursor:pointer;text-align:left}.bc-action:hover{border-color:#86652f;background:#151b24}.bc-action .aico{font-size:20px;margin-bottom:9px}.bc-action strong{display:block;font-size:10px}.bc-action span{display:block;color:#737c89;font-size:8px;margin-top:4px;line-height:1.4}
+.bc-overview-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.bc-overview-card{border:1px solid var(--bc-line);border-radius:15px;background:#0f141c;padding:17px}.bc-overview-card h3{margin:0 0 13px;font-size:12px}.bc-overview-card .bc-mini-link{float:right;color:var(--bc-gold2);font-size:9px;cursor:pointer}.bc-health-mini{display:grid;grid-template-columns:90px 1fr;gap:16px;align-items:center}.bc-score{width:82px;height:82px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--bc-gold) 0deg,var(--bc-gold) var(--score,0deg),#252b34 var(--score,0deg),#252b34 360deg);position:relative}.bc-score:after{content:"";position:absolute;inset:7px;border-radius:50%;background:#0f141c}.bc-score strong{position:relative;z-index:2;font-size:19px}.bc-health-mini strong{font-size:13px}.bc-health-mini p{font-size:9px;color:#737c89;line-height:1.5}.bc-health-mini .bc-progress{height:7px;background:#252b34;border-radius:99px;overflow:hidden}.bc-health-mini .bc-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#a47732,#e0bd7b);border-radius:99px}
+.bc-list{display:flex;flex-direction:column;gap:8px}.bc-list-item{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid #222a35;background:#111720;border-radius:10px}.bc-list-item .li-ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#18202b;font-size:14px}.bc-list-item strong{display:block;font-size:9px}.bc-list-item span{display:block;color:#737c89;font-size:8px;margin-top:3px}.bc-list-item .li-right{margin-left:auto;color:#bfc6cf;font-size:8px}
+/* section-specific wrappers */
+.bc-subnav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}.bc-subnav button{border:1px solid #252d38;background:#0e131a;color:#aeb6c1;border-radius:9px;padding:8px 11px;font:inherit;font-size:9px;font-weight:800;cursor:pointer}.bc-subnav button.active{border-color:#8a672f;color:#f1c96f;background:#17140e}
+.bc-mobile-nav{display:none}
+@media(max-width:1100px){.bc-kpis{grid-template-columns:repeat(3,1fr)}.bc-action-grid{grid-template-columns:repeat(3,1fr)}.bc-overview-grid{grid-template-columns:1fr}}
+@media(max-width:820px){.bc-sidebar{width:210px}.bc-main-shell{margin-left:210px}.bc-topbar{padding:0 16px}.bc-main-shell main{padding:18px 16px 80px}.bc-kpis{grid-template-columns:repeat(2,1fr)}.bc-action-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.bc-sidebar{display:none}.bc-main-shell{margin-left:0}.bc-topbar{height:64px}.bc-top-left strong{font-size:15px}.bc-top-actions .bc-top-btn.site{display:none}.bc-mobile-nav{position:fixed;z-index:1100;display:grid;grid-template-columns:repeat(5,1fr);left:8px;right:8px;bottom:8px;padding:6px;background:rgba(13,17,24,.96);backdrop-filter:blur(16px);border:1px solid #2a313b;border-radius:15px;box-shadow:0 10px 35px #0009}.bc-mobile-nav button{border:0;background:transparent;color:#7f8793;font:inherit;font-size:8px;font-weight:800;padding:7px 3px;border-radius:9px}.bc-mobile-nav button.active{color:#fff;background:#5f451d}.bc-mobile-nav .mi{display:block;font-size:16px;margin-bottom:3px}.bc-kpis{grid-template-columns:1fr 1fr}.bc-action-grid{grid-template-columns:1fr 1fr}.bc-main-shell .page-head{display:none}.bc-health-mini{grid-template-columns:1fr}.bc-score{margin:auto}.bc-main-shell .profile-hero{margin-top:0}}
+</style>
+<style id="leo-hide-legacy">#legacyBusinessMain{display:none!important}body>header{display:none!important}#legacyBusinessMain > .page-head,#legacyBusinessMain > .command-bar,#legacyBusinessMain > .access-strip{display:none!important}</style>
+<style id="leo-brand-icon-style">
+.pcc-conn-icon{width:42px;height:42px;display:grid;place-items:center;flex:0 0 42px;border-radius:12px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.16);overflow:hidden}.pcc-conn-icon svg{width:28px;height:28px;display:block}.pcc-conn-icon img{width:28px;height:28px;object-fit:contain}.pcc-conn-icon+div{min-width:0}
+</style>
+<style id="leo-real-brand-logo">
+.leo-lion-logo{display:inline-block;width:100%;height:100%;background-image:url("data:image/png;base64,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");background-repeat:no-repeat;background-position:center;background-size:contain}
+.bc-brand-mark .leo-lion-logo{width:34px;height:34px}
+.brand-icon .leo-lion-logo{width:38px;height:38px}
+.command-badge .leo-lion-logo{width:30px;height:30px}
+.loading-lion .leo-lion-logo{width:58px;height:58px}
+.logo-placeholder .leo-lion-logo{width:54px;height:54px}
+.preview-logo .leo-lion-logo{width:54px;height:54px}
+</style>
+<style id="leo-table-code-style">
+.table-code-panel{margin-top:18px;border:1px solid #292929;border-radius:20px;background:#0d0d0d;padding:18px}
+.table-code-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+.table-code-head h3{margin:0;font-size:17px}.table-code-head p{margin:5px 0 0;color:#777;font-size:10px;line-height:1.55}.table-code-create,.table-code-refresh{border:1px solid #303030;background:#151515;color:#ddd;border-radius:9px;padding:9px 12px;font-size:10px;font-weight:800;cursor:pointer}.table-code-create{background:var(--gold);color:#090909;border-color:var(--gold)}
+.table-code-list{display:grid;gap:9px}.table-code-row{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:11px 12px;border:1px solid #292929;border-radius:14px;background:#101010}.table-code-qr-wrap{width:64px;height:64px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}.table-code-qr-wrap .table-code-qr{width:64px;height:64px;border-radius:9px;background:#fff;padding:4px;box-sizing:border-box;object-fit:contain;display:block}.table-code-qr-wrap span{display:none;color:#999;font-size:8px;font-weight:900}.table-code-qr-wrap.broken span{display:block}.table-code-main{min-width:0}.table-code-name-line{display:flex;align-items:center;gap:8px}.table-code-name{font-size:13px;font-weight:900;color:#eee}.table-code-meta{margin-top:4px;color:#888;font-size:9px}.table-code-stat{margin-top:6px;color:#aaa;font-size:10px}.table-code-stat b{color:#eee}.table-code-actions{display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap}.table-code-actions button{border:1px solid #292929;background:#151515;color:#ddd;border-radius:8px;padding:7px 9px;font-size:9px;font-weight:800;cursor:pointer}.table-code-actions .gold{background:var(--gold);border-color:var(--gold);color:#090909}.table-code-actions .danger{border-color:#4a2929;color:#e2a0a0}.table-code-status{font-size:8px;font-weight:900;padding:4px 7px;border-radius:999px;white-space:nowrap}.table-code-status.on{background:#18351f;color:#8fe0a0;border:1px solid #285b35}.table-code-status.off{background:#211616;color:#d88f8f;border:1px solid #4d2929}.table-code-empty{padding:22px;text-align:center;color:#666;border:1px dashed #292929;border-radius:13px;font-size:10px}.table-code-note{margin-top:10px;color:#666;font-size:9px;line-height:1.5}.table-code-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}.table-code-modal-card{width:min(420px,100%);border:1px solid #3a3020;border-radius:18px;background:#12100c;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.45)}.table-code-modal-card h3{margin:0 0 5px;color:#eee;font-size:17px}.table-code-modal-card p{margin:0;color:#888;font-size:10px;line-height:1.5}.table-code-field{display:grid;gap:6px;margin-top:14px}.table-code-field span{font-size:9px;color:#999}.table-code-field input{width:100%;box-sizing:border-box;border:1px solid #303030;background:#080808;color:#eee;border-radius:9px;padding:10px 11px;outline:none;font-size:13px}.table-code-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.table-code-modal-actions button{border:1px solid #292929;background:#151515;color:#ddd;border-radius:8px;padding:8px 11px;font-size:9px;font-weight:800;cursor:pointer}.table-code-modal-actions .gold{background:var(--gold);border-color:var(--gold);color:#090909}@media(max-width:760px){.table-code-row{grid-template-columns:56px 1fr}.table-code-qr{width:56px;height:56px}.table-code-actions{grid-column:1/-1;justify-content:flex-start}.table-code-head{align-items:flex-start;flex-direction:column}}
+</style>
+
+<style id="leo-business-final-polish">
+:root{--bc-bg:#080a0f;--bc-panel:#10141b;--bc-panel2:#0d1118;--bc-line:#222936;--bc-soft:#171d26;--bc-gold:#d8ae5a;--bc-gold2:#f1cf86;--bc-text:#f6f7f9;--bc-muted:#8a93a0;--bc-green:#4ade8a}
+body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
+.bc-sidebar{width:252px;padding:22px 14px 16px;background:linear-gradient(180deg,#0b0e14,#080a0f);border-right:1px solid var(--bc-line);gap:13px;box-shadow:18px 0 50px rgba(0,0,0,.14)}
+.bc-brand{padding:1px 7px 18px;border-bottom:1px solid var(--bc-line);gap:11px}.bc-brand-mark{width:42px;height:42px;border-radius:14px}.bc-brand-copy strong{font-size:14px}.bc-brand-copy span{font-size:8px;color:var(--bc-gold2);letter-spacing:.18em;margin-top:4px}
+.bc-nav-label{padding:2px 9px;color:#596272;font-size:8px;font-weight:900;letter-spacing:.16em}.bc-nav{gap:4px}.bc-nav button{font-size:11px;padding:11px 12px;border-radius:11px;gap:11px}.bc-nav button.active{background:linear-gradient(135deg,#c89a44,#8e6728);box-shadow:0 8px 26px rgba(200,154,68,.14)}.bc-icon{font-size:15px!important;width:22px!important;color:#cfd5dc}.bc-nav button.active .bc-icon{color:#fff}
+.bc-divider{height:1px;background:var(--bc-line);margin:3px 6px}.bc-side-actions{display:flex;flex-direction:column;gap:5px}.bc-side-actions button{border:1px solid transparent;background:transparent;color:#9fa8b4;padding:9px 10px;border-radius:9px;text-align:left;font:inherit;font-size:10px;font-weight:750;cursor:pointer}.bc-side-actions button:hover{background:#111720;color:#f4f6f8;border-color:#242c38}.bc-side-actions button span{display:inline-block;width:20px;color:#d1aa62}.bc-side-footer{margin-top:auto;padding:11px;border:1px solid var(--bc-line);border-radius:13px;background:#0e131a}.bc-side-status{display:flex;align-items:center;gap:9px}.bc-status-dot{width:8px;height:8px;border-radius:50%;background:var(--bc-green);box-shadow:0 0 0 4px rgba(74,222,138,.08);display:inline-block;flex:0 0 auto}.bc-side-status strong{display:block;font-size:10px}.bc-side-status small{display:block;margin-top:2px;color:#69727e;font-size:8px}.bc-side-profile{display:block;margin-top:10px;padding-top:9px;border-top:1px solid #202733;color:#d9b96f;text-decoration:none;font-size:9px;font-weight:800}
+.bc-main-shell{margin-left:252px}.bc-topbar{height:74px;padding:0 30px;background:rgba(8,10,15,.84);border-bottom:1px solid var(--bc-line)}.bc-top-left small{font-size:8px;letter-spacing:.18em}.bc-top-left strong{font-size:17px}.bc-top-actions{gap:7px}.bc-top-btn{padding:9px 12px;border-radius:10px;font-size:9px}.bc-page-frame{padding:0 30px 50px}.bc-view{padding-top:26px}
+.bc-section-title-large{margin:0 0 18px}.bc-kicker{color:var(--bc-gold2);font-size:8px;font-weight:900;letter-spacing:.18em}.bc-section-title h1{font-size:28px;margin-top:5px}.bc-section-title p{font-size:11px;max-width:760px;line-height:1.5}.bc-live{display:flex;align-items:center;gap:8px}
+.bc-hero-row{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:20px}.bc-hero-row h1{font-size:31px;margin:5px 0 7px;letter-spacing:-.03em}.bc-hero-row p{margin:0;max-width:650px;color:var(--bc-muted);font-size:11px;line-height:1.55}.bc-hero-actions{display:flex;gap:8px;flex-wrap:wrap}.bc-primary,.bc-ghost{border-radius:10px;padding:10px 13px;font:inherit;font-size:9px;font-weight:900;cursor:pointer;text-decoration:none}.bc-primary{border:1px solid #d5a94f;background:linear-gradient(135deg,#d0a34e,#93692c);color:#fff}.bc-ghost{border:1px solid #2c3440;background:#10151c;color:#d2d7df}
+.bc-kpis{grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;margin-bottom:16px}.bc-kpi{min-height:104px;padding:14px;border-radius:14px;background:linear-gradient(145deg,#111720,#0d1118);border:1px solid var(--bc-line)}.bc-kpi small{font-size:7px;letter-spacing:.12em;color:#7e8795}.bc-kpi strong{font-size:24px;margin:10px 0 3px}.bc-kpi span{font-size:8px;color:#69727f}.bc-kpi-main{border-color:#5c4824;background:linear-gradient(145deg,#16140f,#10141a)}
+.bc-command-panel{padding:17px;border:1px solid var(--bc-line);border-radius:16px;background:linear-gradient(145deg,#10151d,#0d1118);margin-bottom:16px}.bc-panel-title,.bc-card-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px}.bc-panel-title span,.bc-card-head>div>span{display:block;color:#69727f;font-size:7px;letter-spacing:.14em;font-weight:900}.bc-panel-title h2,.bc-card-head h3{margin:4px 0 0;font-size:15px}.bc-panel-title small{color:#68717e;font-size:8px}.bc-command-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:13px}.bc-command-card{min-height:145px;text-align:left;padding:14px;border:1px solid #252d39;border-radius:13px;background:#111720;color:#f2f4f7;cursor:pointer;transition:.16s}.bc-command-card:hover{transform:translateY(-2px);border-color:#8c6a32;background:#151b23}.bc-command-card.featured{background:linear-gradient(145deg,#17150f,#111720);border-color:#5e4a28}.bc-command-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#171f29;border:1px solid #2a3441;color:#e1b75e;font-size:17px;margin-bottom:14px}.bc-command-card strong{display:block;font-size:10px}.bc-command-card small{display:block;margin-top:5px;color:#707988;font-size:8px;line-height:1.45;min-height:36px}.bc-command-card b{display:block;color:#dbb66a;font-size:8px;margin-top:12px}
+.bc-overview-grid{grid-template-columns:1fr 1fr;gap:16px}.bc-overview-card{padding:17px;border-radius:15px;border:1px solid var(--bc-line);background:#0f141c}.bc-card-head button{border:0;background:transparent;color:#dbb56c;font:inherit;font-size:8px;font-weight:800;cursor:pointer}.bc-health-mini{grid-template-columns:84px 1fr;gap:15px;margin-top:14px}.bc-score{width:76px;height:76px}.bc-health-mini strong{font-size:12px}.bc-health-mini p{font-size:9px;margin:6px 0 9px}.bc-health-mini .bc-progress{height:7px}.bc-list{gap:7px;margin-top:13px}.bc-list-item{padding:9px;border-radius:10px}.bc-list-item .li-ico{width:28px;height:28px}.bc-list-item strong{font-size:9px}.bc-list-item span{font-size:8px}
+.bc-profile-intro{display:flex;align-items:center;gap:11px;padding:13px 15px;border:1px solid #4d4026;background:linear-gradient(145deg,#16140f,#10151b);border-radius:14px;margin-bottom:13px}.bc-profile-intro-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#221b0e;color:#dfb765;border:1px solid #624c28;font-size:17px}.bc-profile-intro strong{display:block;font-size:10px}.bc-profile-intro span{display:block;margin-top:3px;color:#777f8b;font-size:8px}.bc-subnav-clean{margin-bottom:12px}.bc-subnav-clean button{padding:8px 11px;font-size:8px}
+.bc-theme-strip{padding:15px;margin-bottom:14px}.bc-theme-choices{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:11px}.bc-theme-choice{min-height:72px;padding:10px;text-align:left;border:1px solid #242c38;border-radius:11px;background:#10151c;color:#fff;cursor:pointer}.bc-theme-choice:hover{border-color:#7e6232}.bc-theme-choice span{display:block;color:#68717d;font-size:7px}.bc-theme-choice strong{display:block;margin-top:4px;font-size:9px}.bc-theme-choice small{display:block;margin-top:3px;color:#69727f;font-size:7px}
+.bc-digital-help{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px;padding:13px 15px;border-radius:14px;border:1px solid #292f38;background:#0f141b}.bc-digital-help strong{display:block;font-size:10px}.bc-digital-help span{display:block;margin-top:3px;color:#777f8a;font-size:8px}.bc-digital-help button{border:0;background:transparent;color:#d8b36b;font:inherit;font-size:8px;font-weight:900;cursor:pointer;white-space:nowrap}
+.bc-stats-notice{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:13px;background:#0f141b;border:1px solid #2a313b;margin-bottom:14px}.bc-stats-notice strong{font-size:9px;color:#e3bd74;white-space:nowrap}.bc-stats-notice span{color:#7e8793;font-size:8px;line-height:1.45}
+.bc-main-shell .box,.bc-main-shell .feature-box,.bc-main-shell .analytics-v3,.bc-main-shell .performance,.bc-main-shell .profile-hero,.bc-main-shell .health,.bc-main-shell .stats{border-color:var(--bc-line)!important;background:linear-gradient(145deg,#11161f,#0d1118)!important;border-radius:15px!important}
+.bc-main-shell input,.bc-main-shell select,.bc-main-shell textarea{border-radius:9px!important}.bc-main-shell .analytics-kpi{border-color:#262e39!important;background:#10151d!important}.bc-main-shell .analytics-box{border-color:#262e39!important;background:#10151d!important}
+@media(max-width:1120px){.bc-kpis{grid-template-columns:repeat(3,1fr)}.bc-command-grid{grid-template-columns:repeat(2,1fr)}.bc-theme-choices{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){.bc-sidebar{width:218px}.bc-main-shell{margin-left:218px}.bc-page-frame{padding:0 17px 50px}.bc-topbar{padding:0 17px}.bc-hero-row{display:block}.bc-hero-actions{margin-top:13px}.bc-overview-grid{grid-template-columns:1fr}.bc-kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.bc-sidebar{display:none}.bc-main-shell{margin-left:0}.bc-page-frame{padding:0 12px 84px}.bc-topbar{height:64px;padding:0 12px}.bc-top-actions .bc-top-btn:not(.gold){display:none}.bc-top-left strong{font-size:15px}.bc-view{padding-top:18px}.bc-hero-row h1{font-size:24px}.bc-kpis{grid-template-columns:1fr 1fr}.bc-command-grid{grid-template-columns:1fr}.bc-theme-choices{grid-template-columns:1fr 1fr}.bc-digital-help{align-items:flex-start;flex-direction:column}.bc-section-title-large{display:block}.bc-section-title-large>.bc-primary,.bc-section-title-large>.bc-ghost,.bc-section-title-large>.bc-live{margin-top:12px}.bc-mobile-nav{position:fixed;z-index:1100;display:grid;grid-template-columns:repeat(5,1fr);left:8px;right:8px;bottom:8px;padding:6px;background:rgba(13,17,24,.97);backdrop-filter:blur(16px);border:1px solid #2a313b;border-radius:15px;box-shadow:0 12px 35px #0009}.bc-mobile-nav button{border:0;background:transparent;color:#7f8793;font:inherit;font-size:7px;font-weight:800;padding:7px 3px;border-radius:9px}.bc-mobile-nav button.active{color:#fff;background:#5e451e}.bc-mobile-nav .mi{display:block;font-size:15px;margin-bottom:3px}.bc-command-card{min-height:125px}.bc-stats-notice{display:block}.bc-stats-notice strong{display:block;margin-bottom:4px}.bc-theme-choice{min-height:84px}}
+</style>
+
+</head>
+
+
+
+<body>
+
+<!-- LEO CONNECT BUSINESS CENTER — FINAL SIMPLIFIED UI -->
+<aside class="bc-sidebar" id="bcSidebar">
+  <div class="bc-brand">
+    <div class="bc-brand-mark"><span class="leo-lion-logo" aria-hidden="true"></span></div>
+    <div class="bc-brand-copy"><strong>LEO CONNECT</strong><span>BUSINESS CENTER</span></div>
+  </div>
+
+  <div class="bc-nav-label">YÖNETİM</div>
+  <nav class="bc-nav">
+    <button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="ico bc-icon">⌂</span><span>Genel Bakış</span></button>
+    <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="ico bc-icon">⌘</span><span>Profil</span></button>
+    <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="ico bc-icon">▦</span><span>QR & NFC</span></button>
+    <button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="ico bc-icon">✦</span><span>Kampanyalar</span></button>
+    <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="ico bc-icon">▥</span><span>İstatistikler</span></button>
+  </nav>
+
+  <div class="bc-divider"></div>
+  <div class="bc-nav-label">HIZLI İŞLEM</div>
+  <div class="bc-side-actions">
+    <button type="button" onclick="showBusinessSection('profile');setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),20)"><span>✎</span> Profil düzenle</button>
+    <button type="button" onclick="showBusinessSection('digital')"><span>▦</span> QR / NFC yönet</button>
+    <button type="button" onclick="showBusinessSection('stats')"><span>↗</span> Raporları gör</button>
+  </div>
+
+  <div class="bc-side-footer">
+    <div class="bc-side-status"><span class="bc-status-dot"></span><div><strong>Sistem aktif</strong><small>LEO CONNECT</small></div></div>
+    <a id="bcSidebarProfile" target="_blank" rel="noopener" class="bc-side-profile">Müşteri profilini aç ↗</a>
+  </div>
+</aside>
+
+<div class="bc-main-shell">
+  <div class="bc-topbar">
+    <div class="bc-top-left">
+      <small>LEO CONNECT • BUSINESS</small>
+      <strong id="bcTopTitle">Genel Bakış</strong>
+    </div>
+    <div class="bc-top-actions">
+      <a id="bcProfileLink" class="bc-top-btn gold" target="_blank" rel="noopener">Müşteri Profilini Gör</a>
+      <button class="bc-top-btn" type="button" onclick="copyProfileLink()">Linki Kopyala</button>
+    </div>
+  </div>
+
+  <div class="bc-page-frame">
+    <div class="bc-view bc-view-overview active" data-view="overview">
+      <div class="bc-hero-row">
+        <div>
+          <div class="bc-kicker">İŞLETME YÖNETİM MERKEZİ</div>
+          <h1>Hoş geldin. <span id="bcWelcomeName">İşletme</span></h1>
+          <p>İşletmenin profilini, QR/NFC kodlarını ve performansını tek yerden yönet.</p>
+        </div>
+        <div class="bc-hero-actions">
+          <button type="button" class="bc-primary" onclick="showBusinessSection('digital')">+ QR / NFC Yönet</button>
+          <a id="bcProfileHero" class="bc-ghost" target="_blank" rel="noopener">Profili Gör ↗</a>
+        </div>
+      </div>
+
+      <div class="bc-kpis">
+        <div class="bc-kpi bc-kpi-main"><small>PROFİL GÖRÜNTÜLEME</small><strong id="bcKpiProfile">0</strong><span>toplam görüntüleme</span></div>
+        <div class="bc-kpi"><small>QR TARAMA</small><strong id="bcKpiQR">0</strong><span>QR etkileşimi</span></div>
+        <div class="bc-kpi"><small>NFC DOKUNUŞ</small><strong id="bcKpiNFC">0</strong><span>NFC etkileşimi</span></div>
+        <div class="bc-kpi"><small>WHATSAPP</small><strong id="bcKpiWA">0</strong><span>iletişim tıklaması</span></div>
+        <div class="bc-kpi"><small>TELEFON</small><strong id="bcKpiPhone">0</strong><span>arama tıklaması</span></div>
+        <div class="bc-kpi"><small>TOPLAM</small><strong id="bcKpiTotal">0</strong><span>toplam aksiyon</span></div>
+      </div>
+
+      <section class="bc-command-panel">
+        <div class="bc-panel-title"><div><span>HIZLI BAŞLANGIÇ</span><h2>Bugün ne yapmak istiyorsun?</h2></div><small>En önemli işlemler burada.</small></div>
+        <div class="bc-command-grid">
+          <button class="bc-command-card featured" type="button" onclick="showBusinessSection('profile')"><span class="bc-command-icon">⌘</span><strong>Profilimi düzenle</strong><small>İşletme bilgileri, dijital bağlantılar, ödeme ve görünüm</small><b>Düzenle →</b></button>
+          <button class="bc-command-card" type="button" onclick="showBusinessSection('digital')"><span class="bc-command-icon">▦</span><strong>QR & NFC</strong><small>Ana kodlarını ve masa QR/NFC kodlarını yönet</small><b>Kodları yönet →</b></button>
+          <button class="bc-command-card" type="button" onclick="showBusinessSection('stats')"><span class="bc-command-icon">▥</span><strong>İstatistikler</strong><small>QR, NFC, profil ve müşteri aksiyonlarını incele</small><b>Raporları aç →</b></button>
+          <button class="bc-command-card" type="button" onclick="showBusinessSection('campaigns')"><span class="bc-command-icon">✦</span><strong>Kampanyalar</strong><small>Smart Campaigns içeriklerini oluştur ve düzenle</small><b>Kampanya yönet →</b></button>
+        </div>
+      </section>
+
+      <div class="bc-overview-grid">
+        <div class="bc-overview-card bc-overview-health"><div class="bc-card-head"><div><span>PROFİL DURUMU</span><h3>Profil sağlık skoru</h3></div><button type="button" onclick="showBusinessSection('profile')">Profili düzenle →</button></div><div class="bc-health-mini"><div id="bcScore" class="bc-score"><strong id="bcScoreText">0</strong></div><div><strong id="bcHealthTitle">Profil kontrol ediliyor</strong><p id="bcHealthMsg">Profil bilgileri analiz ediliyor...</p><div class="bc-progress"><i id="bcHealthFill"></i></div></div></div></div>
+        <div class="bc-overview-card"><div class="bc-card-head"><div><span>SON HAREKETLER</span><h3>Canlı aktivite</h3></div><button type="button" onclick="showBusinessSection('stats')">Tümünü gör →</button></div><div id="bcLiveMini" class="bc-list"><div class="bc-list-item"><div class="li-ico">…</div><div><strong>Aktiviteler yükleniyor</strong><span>Son hareketler hazırlanıyor</span></div></div></div></div>
+      </div>
+    </div>
+
+    <div class="bc-view" data-view="profile">
+      <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">PROFİL MERKEZİ</div><h1>Profil</h1><p>İşletme bilgilerinden dijital bağlantılara ve müşteri profilinin tasarımına kadar her şeyi tek yerden yönet.</p></div><a id="bcProfileProfilePage" class="bc-ghost" target="_blank" rel="noopener">Müşteri profilini gör ↗</a></div>
+      <div class="bc-profile-intro"><div class="bc-profile-intro-icon">⌘</div><div><strong>Profilinin 4 ana alanı</strong><span>İşletme bilgileri → Dijital bağlantılar → Ödeme → Görünüm & tasarım</span></div></div>
+      <div class="bc-subnav bc-subnav-clean"><button class="active" onclick="bcScrollTo('profile')">İşletme Bilgileri</button><button onclick="bcScrollTo('profileDesign')">Görünüm & Tema</button></div>
+      <div class="bc-actions-panel bc-theme-strip"><div class="bc-actions-head"><strong>GÖRÜNÜM & TEMA</strong><span>4 premium tema</span></div><div class="bc-theme-choices"><button class="bc-theme-choice" onclick="bcSelectTheme('midnight-gold')"><span>01</span><strong>Midnight Gold</strong><small>Siyah / altın premium</small></button><button class="bc-theme-choice" onclick="bcSelectTheme('obsidian')"><span>02</span><strong>Obsidian</strong><small>Ultra dark / tech</small></button><button class="bc-theme-choice" onclick="bcSelectTheme('champagne')"><span>03</span><strong>Champagne</strong><small>Sıcak / lüks</small></button><button class="bc-theme-choice" onclick="bcSelectTheme('pure-light')"><span>04</span><strong>Pure Light</strong><small>Aydınlık / premium</small></button></div></div>
+      <div id="bcProfileMount"></div><div id="bcDesignMount"></div>
+    </div>
+
+    <div class="bc-view" data-view="digital">
+      <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">DİJİTAL ERİŞİM</div><h1>QR & NFC</h1><p>İşletmenin ana kodlarını ve masa bazlı QR/NFC kodlarını tek merkezden yönet.</p></div><button class="bc-primary" type="button" onclick="loadBusinessTableCodes(true)">↻ Yenile</button></div>
+      <div class="bc-digital-help"><div><strong>1 ana profil + sınırsız masa</strong><span>Ana QR/NFC işletmenin genel profilini açar. Masalar bölümünde Masa 1, Masa 2… şeklinde özel kodlar oluşturulur.</span></div><button type="button" onclick="loadBusinessTableCodes(true)">Kodları yenile →</button></div>
+      <div id="bcDigitalMount"></div>
+    </div>
+
+    <div class="bc-view" data-view="campaigns">
+      <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">PAZARLAMA</div><h1>Kampanyalar</h1><p>Smart Campaigns içeriklerini oluştur, düzenle ve yayınla.</p></div><button class="bc-primary" type="button" onclick="openCampaignEditor()">＋ Yeni Kampanya</button></div>
+      <div id="bcCampaignMount"></div>
+    </div>
+
+    <div class="bc-view" data-view="stats">
+      <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">PERFORMANS MERKEZİ</div><h1>İstatistikler</h1><p>Gerçek etkileşim kayıtlarını dönem bazında incele; QR ve NFC masa performansını takip et.</p></div><div class="bc-live"><span class="bc-status-dot"></span> Canlı veri</div></div>
+      <div class="bc-stats-notice"><strong>Rapor mantığı</strong><span>QR ve NFC tek bir masa kaydına bağlıdır. Böylece hangi masanın ne kadar kullanıldığını aynı raporda görebilirsin.</span></div>
+      <div id="bcStatsMount"></div>
+    </div>
+  </div>
+</div>
+
+<div class="bc-mobile-nav">
+  <button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="mi">⌂</span>Genel</button>
+  <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="mi">⌘</span>Profil</button>
+  <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="mi">▦</span>QR/NFC</button>
+  <button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="mi">✦</span>Kampanya</button>
+  <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="mi">▥</span>İstatistik</button>
+</div>
+
+<!-- ==================================================
+     LOADING
+================================================== -->
+
+<div
+  id="loading"
+  class="loading"
+>
+
+  <div>
+
+    <div class="loading-lion"><span class="leo-lion-logo" aria-hidden="true"></span></div>
+
+    <div class="loading-text">
+      LEO CONNECT
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
+<header>
+
+  <div class="brand">
+
+    <div class="brand-icon"><span class="leo-lion-logo" aria-hidden="true"></span></div>
+
+    <div class="brand-text">
+
+      <strong>
+        LEO <span>CONNECT</span>
+      </strong>
+
+      <small>
+        BUSINESS CENTER
+      </small>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="header-actions">
+
+    <a
+      id="headerProfile"
+      class="header-button gold"
+      target="_blank"
+      rel="noopener"
+    >
+      👤 Profilim
+    </a>
+
+    <a
+      href="/"
+      class="header-button"
+    >
+      Site
+    </a>
+
+  </div>
+
+</header>
+
+
+
+<main id="legacyBusinessMain">
+
+
+
+<!-- ==================================================
+     PAGE HEAD
+================================================== -->
+
+<div class="page-head">
+
+  <div>
+
+    <div class="eyebrow">
+      LEO CONNECT • BUSINESS
+    </div>
+
+    <h1 id="title">
+      İşletme Paneli
+    </h1>
+
+    <p>
+      İşletmenin dijital dünyasını tek merkezden yönet.
+    </p>
+
+  </div>
+
+
+
+  <div class="live">
+
+    <span class="live-dot"></span>
+
+    Sistem aktif
+
+  </div>
+
+</div>
+
+
+
+
+
+<!-- ==================================================
+     BUSINESS CENTER V2 — COMMAND BAR
+================================================== -->
+<div class="command-bar">
+  <div class="command-left">
+    <div class="command-badge"><span class="leo-lion-logo" aria-hidden="true"></span></div>
+    <div class="command-copy">
+      <strong>LEO CONNECT COMMAND CENTER</strong>
+      <span id="commandStatus">İşletme dijital varlıkların hazır.</span>
+    </div>
+  </div>
+  <div class="command-actions">
+    <a id="commandProfile" class="command-btn gold" target="_blank" rel="noopener">👁 Profili Gör</a>
+    <button class="command-btn" type="button" onclick="copyProfileLink()">🔗 Linki Kopyala</button>
+    <button class="command-btn" type="button" onclick="shareProfile()">↗ Paylaş</button>
+  </div>
+</div>
+
+<div class="access-strip" id="accessStrip">
+  <div class="access-item"><span>Profil</span><span id="accessProfile" class="access-state on">AKTİF</span></div>
+  <div class="access-item"><span>QR Merkezi</span><span id="accessQR" class="access-state off">KİLİTLİ</span></div>
+  <div class="access-item"><span>NFC Merkezi</span><span id="accessNFC" class="access-state off">KİLİTLİ</span></div>
+  <div class="access-item"><span>Analiz</span><span id="accessAnalytics" class="access-state off">KİLİTLİ</span></div>
+</div>
+
+<!-- ==================================================
+     PROFILE HERO
+================================================== -->
+
+<section class="profile-hero">
+
+  <div class="profile-hero-inner">
+
+    <div class="logo-wrap">
+
+      <span id="logoPlaceholder" class="logo-placeholder"><span class="leo-lion-logo" aria-hidden="true"></span></span>
+
+      <img
+        id="logoPreview"
+        style="display:none"
+        alt="İşletme logosu"
+      >
+
+    </div>
+
+
+
+    <div class="profile-info">
+
+      <h2 id="heroName">
+        İşletme
+      </h2>
+
+      <span
+        id="heroCategory"
+        class="profile-category"
+      >
+        İşletme
+      </span>
+
+      <p
+        id="heroDescription"
+        class="profile-description"
+      >
+        Dijital profilini yönet.
+      </p>
+
+    </div>
+
+
+
+    <div class="profile-actions">
+
+      <a
+        id="heroProfile"
+        class="action"
+        target="_blank"
+        rel="noopener"
+      >
+        👤 Müşteri Profilini Gör
+      </a>
+
+      <a
+        href="#profile"
+        class="action gold"
+      >
+        ✏️ Profili Düzenle
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     PROFILE HEALTH
+================================================== -->
+
+<section class="health">
+
+  <div class="health-score">
+
+    <div
+      id="healthRing"
+      class="health-ring"
+    >
+
+      <strong id="healthScore">
+        0
+      </strong>
+
+    </div>
+
+    <div class="health-copy">
+
+      <strong id="healthTitle">
+        Profil kontrol ediliyor
+      </strong>
+
+      <span>
+        Profil sağlık skoru
+      </span>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="health-details">
+
+    <div class="health-bar">
+
+      <div
+        id="healthFill"
+        class="health-fill"
+      ></div>
+
+    </div>
+
+    <div
+      id="healthMessage"
+      class="health-message"
+    >
+      Profil bilgileri analiz ediliyor...
+    </div>
+
+    <div
+      id="missingList"
+      class="missing-list"
+    ></div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     STATS
+================================================== -->
+
+<section class="stats">
+
+  <div class="stat">
+
+    <small>PROFİL</small>
+
+    <strong id="profileViews">
+      0
+    </strong>
+
+    <span>Görüntüleme</span>
+
+  </div>
+
+
+
+  <div class="stat">
+
+    <small>WHATSAPP</small>
+
+    <strong id="whatsappViews">
+      0
+    </strong>
+
+    <span>Etkileşim</span>
+
+  </div>
+
+
+
+  <div class="stat">
+
+    <small>TELEFON</small>
+
+    <strong id="phoneViews">
+      0
+    </strong>
+
+    <span>Tıklama</span>
+
+  </div>
+
+
+
+  <div class="stat">
+
+    <small>QR</small>
+
+    <strong id="qrViews">
+      0
+    </strong>
+
+    <span>Tarama</span>
+
+  </div>
+
+
+
+  <div class="stat">
+
+    <small>NFC</small>
+
+    <strong id="nfcViews">
+      0
+    </strong>
+
+    <span>Dokunma</span>
+
+  </div>
+
+
+
+  <div class="stat">
+
+    <small>TOPLAM</small>
+
+    <strong id="totalViews">
+      0
+    </strong>
+
+    <span>Etkileşim</span>
+
+  </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     BUSINESS ANALYTICS V3
+================================================== -->
+<section id="businessAnalyticsV3" class="analytics-v3" style="display:none">
+  <div class="analytics-head">
+    <div>
+      <h2>📊 Akıllı İşletme Analizi</h2>
+      <p>İşletmenizin dijital profil performansını tek ekranda takip edin.</p>
+    </div>
+    <div class="analytics-periods">
+      <button type="button" data-period="today" onclick="loadBusinessAnalytics('today')">Bugün</button>
+      <button type="button" data-period="7d" class="active" onclick="loadBusinessAnalytics('7d')">7 Gün</button>
+      <button type="button" data-period="30d" onclick="loadBusinessAnalytics('30d')">30 Gün</button>
+      <button type="button" data-period="all" onclick="loadBusinessAnalytics('all')">Tümü</button>
+    </div>
+  </div>
+  <div class="analytics-kpis">
+    <div class="analytics-kpi"><small>TOPLAM ETKİLEŞİM</small><strong id="baTotal">0</strong><span>tüm aksiyonlar</span></div>
+    <div class="analytics-kpi"><small>PROFİL</small><strong id="baProfile">0</strong><span>görüntülenme</span></div>
+    <div class="analytics-kpi"><small>QR + NFC</small><strong id="baDigital">0</strong><span>fiziksel temas</span></div>
+    <div class="analytics-kpi"><small>İLETİŞİM</small><strong id="baContact">0</strong><span>telefon + WhatsApp</span></div>
+  </div>
+  <div class="analytics-grid">
+    <div class="analytics-box"><h3>Günlük Trafik</h3><div id="baTraffic" class="traffic-bars"></div><div id="baTrafficLabels" style="display:flex;gap:5px"></div></div>
+    <div class="analytics-box"><h3>Müşteri Aksiyonları</h3><div id="baActions"></div></div>
+  </div>
+</section>
+
+<!-- ==================================================
+     QUICK ACTIONS
+================================================== -->
+
+<section class="quick-grid">
+
+  <a
+    href="#profile"
+    class="quick"
+  >
+
+    <div class="quick-icon">
+      ✏️
+    </div>
+
+    <strong>
+      Profili Düzenle
+    </strong>
+
+    <span>
+      Bilgilerini güncelle
+    </span>
+
+  </a>
+
+
+
+  <a
+    id="quickProfile"
+    class="quick"
+    target="_blank"
+    rel="noopener"
+  >
+
+    <div class="quick-icon">
+      👁️
+    </div>
+
+    <strong>
+      Profili Gör
+    </strong>
+
+    <span>
+      Müşteri görünümü
+    </span>
+
+  </a>
+
+
+
+  <a
+    id="quickQR"
+    href="/qr-center"
+    class="quick"
+  >
+
+    <div class="quick-icon">
+      🔲
+    </div>
+
+    <strong>
+      QR Merkezi
+    </strong>
+
+    <span>
+      QR kodunu yönet
+    </span>
+
+  </a>
+
+
+
+  <a
+    id="quickNFC"
+    href="#digital"
+    class="quick"
+  >
+
+    <div class="quick-icon">
+      📡
+    </div>
+
+    <strong>
+      NFC Merkezi
+    </strong>
+
+    <span>
+      NFC bağlantını yönet
+    </span>
+
+  </a>
+
+
+
+  <button
+    class="quick"
+    type="button"
+    onclick="shareProfile()"
+  >
+
+    <div class="quick-icon">
+      ↗️
+    </div>
+
+    <strong>
+      Profili Paylaş
+    </strong>
+
+    <span>
+      İşletmeni paylaş
+    </span>
+
+  </button>
+
+</section>
+
+
+
+<!-- ==================================================
+     PROFILE
+================================================== -->
+
+<section
+  id="profile"
+  class="box"
+>
+
+<div id="profileControlCenter" class="profile-control-center">
+  <div class="pcc-head">
+    <div>
+      <div class="eyebrow">PROFİL MERKEZİ</div>
+      <h3>İşletme Profilini Yönet</h3>
+      <p>Temel bilgiler, bağlantılar, ödeme ve görünümü tek yerden düzenle.</p>
+    </div>
+    <span class="pcc-badge">MÜŞTERİ PROFİLİ</span>
+  </div>
+
+  <div class="pcc-grid">
+    <button type="button" class="pcc-card" onclick="openProfileGroup('info')">
+      <span class="pcc-icon">🏢</span><strong>İşletme Bilgileri</strong><small>Ad, kategori, açıklama, telefon, adres, saatler</small><b>Düzenle →</b>
+    </button>
+    <button type="button" class="pcc-card" onclick="openProfileGroup('connections')">
+      <span class="pcc-icon">🔗</span><strong>Dijital Bağlantılar</strong><small>Instagram, Facebook, TikTok, Google, Website ve diğerleri</small><b>Hesapları Bağla →</b>
+    </button>
+    <button type="button" class="pcc-card" onclick="openProfileGroup('payment')">
+      <span class="pcc-icon">₺</span><strong>Ödeme Bilgileri</strong><small>IBAN ve hesap sahibi bilgileri</small><b>Düzenle →</b>
+    </button>
+    <button type="button" class="pcc-card" onclick="openProfileGroup('appearance')">
+      <span class="pcc-icon">✦</span><strong>Görünüm & Tema</strong><small>4 premium tema ve profil tasarımı</small><b>Tema Seç →</b>
+    </button>
+  </div>
+
+  <div class="pcc-actions">
+    <button type="button" class="action gold" onclick="save()">✓ Tüm Profil Bilgilerini Kaydet</button>
+    <a id="pccPublicProfile" class="action" target="_blank" rel="noopener">👁 Müşteri Profilini Aç</a>
+  </div>
+
+  <div id="profileConnectionPanel" class="pcc-panel" style="display:none"></div>
+</div>
+
+
+  <div class="box-head">
+
+    <div>
+
+      <div class="eyebrow">
+        PROFİL
+      </div>
+
+      <h2>
+        İşletme Bilgileri
+      </h2>
+
+      <p>
+        Müşterilerinin göreceği tüm bilgileri buradan yönet.
+      </p>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="form-grid">
+
+
+
+    <div class="field">
+
+      <label>
+        İŞLETME ADI
+      </label>
+
+      <input
+        id="name"
+        placeholder="İşletme adı"
+      >
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        KATEGORİ
+      </label>
+
+      <input
+        id="category"
+        placeholder="Restoran, Klinik, Kuaför..."
+      >
+
+    </div>
+
+
+
+    <div class="field full">
+
+      <label>
+        İŞLETME AÇIKLAMASI
+      </label>
+
+      <textarea
+        id="description"
+        placeholder="İşletmen hakkında kısa açıklama..."
+      ></textarea>
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        TELEFON
+      </label>
+
+      <input
+        id="phone"
+        placeholder="05XXXXXXXXX"
+      >
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        WHATSAPP
+      </label>
+
+      <input
+        id="whatsapp"
+        placeholder="05XXXXXXXXX veya bağlantı"
+      >
+
+      <span class="field-hint">
+        Numara yazarsan bağlantı otomatik oluşturulur.
+      </span>
+
+    </div>
+
+
+
+    <div class="field full">
+
+      <label>
+        KONUM / GOOGLE MAPS
+      </label>
+
+      <input
+        id="address"
+        placeholder="Google Maps bağlantısı"
+      >
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        INSTAGRAM
+      </label>
+
+      <input
+        id="instagram"
+        placeholder="Instagram bağlantısı"
+      >
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        TIKTOK
+      </label>
+
+      <input
+        id="tiktok"
+        placeholder="TikTok bağlantısı"
+      >
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        GOOGLE YORUM
+      </label>
+
+      <input
+        id="google_review"
+        placeholder="Google yorum bağlantısı"
+      >
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        WEB SİTESİ
+      </label>
+
+      <input
+        id="website"
+        placeholder="https://..."
+      >
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        MENÜ
+      </label>
+
+      <input
+        id="menu"
+        placeholder="Menü bağlantısı"
+      >
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        ÇALIŞMA SAATLERİ
+      </label>
+
+      <input
+        id="hours"
+        placeholder="11:00 - 23:59"
+      >
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        IBAN
+      </label>
+
+      <input
+        id="iban"
+        placeholder="TR..."
+      >
+
+    </div>
+
+
+
+    <div class="field">
+
+      <label>
+        IBAN SAHİBİ
+      </label>
+
+      <input
+        id="iban_holder"
+        placeholder="Ad Soyad"
+      >
+
+    </div>
+
+
+
+    <div class="field full">
+
+      <label>
+        LOGO GÖRSEL URL
+      </label>
+
+      <input
+        id="logo_url"
+        placeholder="https://..."
+        oninput="previewLogo()"
+      >
+
+      <span class="field-hint">
+        Logo bağlantısını eklediğinde üstteki önizleme güncellenir.
+      </span>
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <div class="save-area">
+
+    <button
+      id="saveButton"
+      class="save-button"
+      onclick="save()"
+      type="button"
+    >
+      ✓ Bilgileri Kaydet
+    </button>
+
+    <div id="message"></div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     DIGITAL
+================================================== -->
+
+<section
+  id="digital"
+  class="box"
+>
+
+  <div class="box-head">
+
+    <div>
+
+      <div class="eyebrow">
+        DIGITAL CONNECTION
+      </div>
+
+      <h2>
+        QR + NFC Merkezi
+      </h2>
+
+      <p>
+        İşletmeni tek tarama veya tek dokunuşla müşterilerine ulaştır.
+      </p>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="digital-grid">
+
+
+
+    <!-- QR -->
+
+    <div id="qrCard" class="digital-card">
+
+      <div class="digital-icon">
+        ▣
+      </div>
+
+      <h3>
+        QR Kodun
+      </h3>
+
+      <p>
+        Masa, stand, vitrin, menü veya kartvizit üzerinde kullan.
+      </p>
+
+
+
+      <img
+        id="qr"
+        class="qr-image"
+        alt="LEO CONNECT QR"
+      >
+
+
+
+      <div
+        id="url"
+        class="digital-url"
+      >
+        QR bağlantısı hazırlanıyor...
+      </div>
+
+
+
+      <div class="digital-actions">
+
+        <a
+          id="open"
+          class="action"
+          target="_blank"
+          rel="noopener"
+        >
+          👁 Profili Aç
+        </a>
+
+        <a
+          id="download"
+          class="action gold"
+          download="leo-connect-qr.png"
+        >
+          ↓ QR'ı İndir
+        </a>
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <!-- NFC -->
+
+    <div id="nfcCard" class="digital-card">
+
+      <div class="nfc-symbol">
+        📡
+      </div>
+
+      <h3>
+        NFC Bağlantın
+      </h3>
+
+      <p>
+        Bu bağlantıyı NFC etiketine yaz. Müşteri dokunduğunda profilin açılır.
+      </p>
+
+
+
+      <div
+        id="nfcUrl"
+        class="nfc-url"
+      >
+        NFC bağlantısı hazırlanıyor...
+      </div>
+
+
+
+      <div class="digital-actions">
+
+        <button
+          class="action gold"
+          onclick="copyNFC()"
+          type="button"
+        >
+          🔗 NFC'yi Kopyala
+        </button>
+
+        <button
+          class="action"
+          onclick="openNFC()"
+          type="button"
+        >
+          ↗ Test Et
+        </button>
+
+      </div>
+
+
+
+      <div class="nfc-status">
+
+        <span class="status-dot"></span>
+
+        NFC sistemi hazır
+
+      </div>
+
+
+
+      <div
+        id="nfcMessage"
+        class="field-hint"
+        style="margin-top:8px"
+      ></div>
+
+    </div>
+
+    <div id="tableCodesPanel" class="table-code-panel">
+  <div class="table-code-head">
+    <div><div class="eyebrow">MASALAR</div><h3>Masalarına özel QR + NFC</h3><p>Her masa için tek bir bağlantı oluştur. Aynı masa kaydı QR ve NFC istatistiklerini birlikte tutar.</p></div>
+    <button type="button" class="table-code-create" onclick="openBusinessTableCodeForm()">＋ Masa Ekle</button>
+  </div>
+  <div id="tableCodeList" class="table-code-list"><div class="table-code-empty">Masalar yükleniyor...</div></div>
+  <div class="table-code-note">Business'ta oluşturduğun masa doğrudan admin paneline de düşer. Admin'den yapılan ad, durum veya silme değişikliği burada aynı kayda yansır.</div>
+</div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     PERFORMANCE
+================================================== -->
+
+<section id="performanceSection" class="box">
+
+  <div class="box-head">
+
+    <div>
+
+      <div class="eyebrow">
+        PERFORMANCE
+      </div>
+
+      <h2>
+        Kanal Performansı
+      </h2>
+
+      <p>
+        Müşterilerinin işletmenle hangi yollarla etkileşime geçtiğini gör.
+      </p>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="performance">
+
+
+
+    <div class="performance-card">
+
+      <div class="performance-head">
+
+        <strong>
+          Etkileşim Dağılımı
+        </strong>
+
+        <span id="strongestChannel">
+          Analiz ediliyor
+        </span>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          👁️
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              Profil
+            </strong>
+
+            <span id="channelProfile">
+              0
+            </span>
+
+          </div>
+
+          <div class="channel-bar">
+
+            <div
+              id="barProfile"
+              class="channel-fill"
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          🔲
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              QR
+            </strong>
+
+            <span id="channelQR">
+              0
+            </span>
+
+          </div>
+
+          <div class="channel-bar">
+
+            <div
+              id="barQR"
+              class="channel-fill"
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          📡
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              NFC
+            </strong>
+
+            <span id="channelNFC">
+              0
+            </span>
+
+          </div>
+
+          <div class="channel-bar">
+
+            <div
+              id="barNFC"
+              class="channel-fill"
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          💬
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              WhatsApp
+            </strong>
+
+            <span id="channelWhatsApp">
+              0
+            </span>
+
+          </div>
+
+          <div class="channel-bar">
+
+            <div
+              id="barWhatsApp"
+              class="channel-fill"
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="performance-card">
+
+      <div class="performance-head">
+
+        <strong>
+          Hızlı Özet
+        </strong>
+
+        <span>
+          LEO CONNECT
+        </span>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          📞
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              Telefon
+            </strong>
+
+            <span id="summaryPhone">
+              0
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          📍
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              Konum
+            </strong>
+
+            <span id="summaryLocation">
+              0
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          📸
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              Instagram
+            </strong>
+
+            <span id="summaryInstagram">
+              0
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="channel">
+
+        <div class="channel-icon">
+          ⭐
+        </div>
+
+        <div class="channel-main">
+
+          <div class="channel-top">
+
+            <strong>
+              Google
+            </strong>
+
+            <span id="summaryGoogle">
+              0
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     LEO CONNECT BUSINESS CENTER MODULES
+================================================== -->
+<section id="liveSection" class="feature-box">
+  <div class="feature-head">
+    <div><div class="eyebrow">LIVE</div><h2>🔴 Canlı Takip</h2><p>İşletmenin son müşteri etkileşimlerini görüntüle.</p></div>
+    <button class="feature-btn" type="button" onclick="loadBusinessLive()">↻ Yenile</button>
+  </div>
+  <div class="live-kpis">
+    <div><small>SON 15 DK</small><strong id="live15">0</strong></div>
+    <div><small>SON 60 DK</small><strong id="live60">0</strong></div>
+    <div><small>BUGÜN</small><strong id="liveToday">0</strong></div>
+  </div>
+  <div id="liveActivityList" class="feature-list"><div class="feature-empty">Aktiviteler yükleniyor...</div></div>
+</section>
+
+<section id="aiSection" class="feature-box">
+  <div class="feature-head">
+    <div><div class="eyebrow">INTELLIGENCE</div><h2>🧠 LEO AI Insights</h2><p>Etkileşim verilerinden otomatik performans içgörüleri üretir.</p></div>
+    <div class="feature-periods">
+      <button type="button" class="active" onclick="loadAIInsights('7d',this)">7 Gün</button>
+      <button type="button" onclick="loadAIInsights('30d',this)">30 Gün</button>
+      <button type="button" onclick="loadAIInsights('all',this)">Tümü</button>
+    </div>
+  </div>
+  <div class="ai-score-row">
+    <div class="ai-score"><strong id="aiScore">0</strong><span id="aiTitle">Analiz hazırlanıyor</span></div>
+    <div class="ai-mini"><span>Dönüşüm</span><strong id="aiConversion">%0</strong></div>
+    <div class="ai-mini"><span>Yoğun saat</span><strong id="aiPeak">—</strong></div>
+    <div class="ai-mini"><span>Güçlü kaynak</span><strong id="aiSource">—</strong></div>
+  </div>
+  <div class="ai-columns">
+    <div><h3>İçgörüler</h3><div id="aiInsights" class="feature-list"><div class="feature-empty">Yükleniyor...</div></div></div>
+    <div><h3>Öneriler</h3><div id="aiRecommendations" class="feature-list"><div class="feature-empty">Yükleniyor...</div></div></div>
+  </div>
+</section>
+
+<section id="profileDesign" class="box">
+  <div class="box-head">
+    <div>
+      <div class="eyebrow">V2 • PROFILE DESIGN</div>
+      <h2>Profil Tasarım Merkezi</h2>
+      <p>Profilinin müşteriye görünen vitrinini tek merkezden tasarla ve canlı önizlemede kontrol et.</p>
+    </div>
+    <div class="design-badge">V2 ACTIVE</div>
+  </div>
+
+  <div class="profile-design-shell">
+    <div class="design-editor">
+      <div class="design-section-title">
+        <div>
+          <h3>Görünüm ve içerik</h3>
+          <p>Değişiklikler kaydedilene kadar mevcut profilin etkilenmez.</p>
+        </div>
+      </div>
+
+      <div class="design-grid">
+        <div class="design-field">
+          <label>TEMA</label>
+          <select id="design_theme" oninput="updateDesignPreview()" onchange="updateDesignPreview()">
+            <option value="midnight-gold">Midnight Gold</option>
+            <option value="obsidian">Obsidian</option>
+            <option value="champagne">Champagne</option>
+            <option value="pure-light">Pure Light</option>
+          </select>
+        </div>
+
+        <div class="design-field">
+          <label>VURGU RENGİ</label>
+          <div class="design-color-row">
+            <input id="design_accent_picker" type="color" value="#D4AF37" oninput="syncDesignColor('picker')">
+            <input id="design_accent" type="text" value="#D4AF37" maxlength="7" oninput="syncDesignColor('text')">
+          </div>
+        </div>
+
+        <div class="design-field full">
+          <label>KAPAK GÖRSEL URL</label>
+          <input id="design_cover_url" placeholder="https://..." oninput="updateDesignPreview()">
+          <div class="design-help">Profilin üst bölümünde premium kapak alanı olarak kullanılır.</div>
+        </div>
+
+        <div class="design-field">
+          <label>KAPAK POZİSYONU</label>
+          <select id="design_cover_position" oninput="updateDesignPreview()">
+            <option value="center">Merkez</option>
+            <option value="top">Üst</option>
+            <option value="bottom">Alt</option>
+            <option value="left">Sol</option>
+            <option value="right">Sağ</option>
+          </select>
+        </div>
+
+        <div class="design-field">
+          <label>İŞLETME MARKASI</label>
+          <div class="design-toggle">
+            <span>Müşteri profilinde işletme logosu ve adını göster</span>
+            <label class="switch">
+              <input id="design_business_brand_enabled" type="checkbox" onchange="updateDesignPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+          <div class="design-help">Açıkken üstte LEO CONNECT yerine işletmenin logosu ve adı görünür. Kapalıyken LEO CONNECT görünümü korunur.</div>
+        </div>
+
+        <div class="design-field">
+          <label>DUYURU DURUMU</label>
+          <div class="design-toggle">
+            <span>Duyuruyu göster</span>
+            <label class="switch">
+              <input id="design_announcement_enabled" type="checkbox" onchange="updateDesignPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="design-field full">
+          <label>DUYURU METNİ</label>
+          <input id="design_announcement_text" maxlength="180" placeholder="Bugün 23:00'e kadar açığız..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>KAMPANYA BAŞLIĞI</label>
+          <input id="design_campaign_title" maxlength="90" placeholder="Bu haftanın özel fırsatı" oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>KAMPANYA METNİ</label>
+          <textarea id="design_campaign_text" maxlength="240" placeholder="Müşterilerine özel kampanyanı burada duyur..." oninput="updateDesignPreview()"></textarea>
+        </div>
+
+        <div class="design-field">
+          <label>KAMPANYA GÖRSEL URL</label>
+          <input id="design_campaign_image_url" placeholder="https://..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field">
+          <label>KAMPANYA DURUMU</label>
+          <div class="design-toggle">
+            <span>Kampanyayı göster</span>
+            <label class="switch">
+              <input id="design_campaign_enabled" type="checkbox" onchange="updateDesignPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="design-field">
+          <label>BUTTON METNİ</label>
+          <input id="design_campaign_button_text" maxlength="40" placeholder="Detayları Gör" oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field">
+          <label>BUTTON URL</label>
+          <input id="design_campaign_button_url" placeholder="https://..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>ÖNE ÇIKAN BAŞLIK</label>
+          <input id="design_featured_title" maxlength="90" placeholder="Öne çıkan ürünün veya hizmetin" oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>ÖNE ÇIKAN AÇIKLAMA</label>
+          <textarea id="design_featured_text" maxlength="240" placeholder="Müşterinin ilk görmesini istediğin içeriği anlat..." oninput="updateDesignPreview()"></textarea>
+        </div>
+
+        <div class="design-field">
+          <label>ÖNE ÇIKAN GÖRSEL URL</label>
+          <input id="design_featured_image_url" placeholder="https://..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field">
+          <label>ÖNE ÇIKAN DURUMU</label>
+          <div class="design-toggle">
+            <span>İçeriği göster</span>
+            <label class="switch">
+              <input id="design_featured_enabled" type="checkbox" onchange="updateDesignPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="design-field">
+          <label>BUTTON METNİ</label>
+          <input id="design_featured_button_text" maxlength="40" placeholder="İncele" oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field">
+          <label>BUTTON URL</label>
+          <input id="design_featured_button_url" placeholder="https://..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field full">
+          <label>GALERİ GÖRSELLERİ</label>
+          <textarea id="design_gallery" placeholder="Her satıra bir görsel URL'si yaz.&#10;https://...&#10;https://..." oninput="updateDesignPreview()"></textarea>
+          <div class="design-help">İlk aşamada URL tabanlı galeri kullanıyoruz. En fazla 30 görsel kaydedilir.</div>
+        </div>
+
+        <div class="design-field">
+          <label>VİDEO URL</label>
+          <input id="design_video_url" placeholder="https://youtube.com/..." oninput="updateDesignPreview()">
+        </div>
+
+        <div class="design-field">
+          <label>VİDEO DURUMU</label>
+          <div class="design-toggle">
+            <span>Videoyu göster</span>
+            <label class="switch">
+              <input id="design_video_enabled" type="checkbox" onchange="updateDesignPreview()">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="design-save-row">
+        <button id="designSaveButton" class="design-save-button" type="button" onclick="saveProfileDesign()">✓ Tasarımı Kaydet</button>
+        <div id="designMessage"></div>
+      </div>
+    </div>
+
+    <div class="design-preview-box">
+      <div class="design-section-title">
+        <div>
+          <h3>Canlı önizleme <span id="previewLiveStatus" style="display:inline-block;margin-left:7px;font-size:9px;letter-spacing:.08em;color:#6fd08a;font-weight:900;">● CANLI</span></h3>
+          <p>Müşterinin göreceği yeni vitrin yapısının hızlı önizlemesi.</p>
+        </div>
+      </div>
+
+      <div id="designPreview" class="preview-frame">
+        <div id="previewCover" class="preview-cover"></div>
+        <div class="preview-body">
+          <div id="previewLogo" class="preview-logo"><span class="leo-lion-logo" aria-hidden="true"></span></div>
+          <div id="previewName" class="preview-name">İşletme</div>
+          <div id="previewCategory" class="preview-category">İŞLETME</div>
+          <div id="previewAnnouncement" class="preview-announcement" style="display:none">
+            <strong>📢 Duyuru</strong>
+            <span id="previewAnnouncementText"></span>
+          </div>
+          <div id="previewCampaign" class="preview-campaign" style="display:none">
+            <strong id="previewCampaignTitle"></strong>
+            <span id="previewCampaignText"></span>
+            <span id="previewCampaignButton" class="preview-button" style="display:none"></span>
+          </div>
+          <div id="previewFeatured" class="preview-featured" style="display:none">
+            <strong id="previewFeaturedTitle"></strong>
+            <span id="previewFeaturedText"></span>
+            <span id="previewFeaturedButton" class="preview-button" style="display:none"></span>
+          </div>
+          <div id="previewGallery" class="preview-gallery"></div>
+          <div id="previewVideo" class="preview-video" style="display:none">🎬 Video içeriği eklendi</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==================================================
+     V2 — REVIEW BOOSTER
+================================================== -->
+
+
+<section id="reviewSection" class="feature-box">
+  <div class="feature-head">
+    <div><div class="eyebrow">REPUTATION</div><h2>⭐ Review Booster</h2><p>Memnun müşteriyi Google yorumuna yönlendiren sistem.</p></div>
+    <div class="feature-actions"><span id="reviewStatus" class="feature-status off">KAPALI</span><button class="feature-btn" type="button" onclick="toggleReviewEditor()">✎ Düzenle</button></div>
+  </div>
+  <div class="review-grid">
+    <div class="review-card"><small>BAŞLIK</small><strong id="reviewTitle">—</strong><span id="reviewText">—</span></div>
+    <div class="review-card"><small>PUAN EŞİĞİ</small><strong id="reviewThreshold">—</strong><span>ve üzeri Google yönlendirmesi</span></div>
+    <div class="review-card"><small>GOOGLE</small><a id="reviewGoogle" target="_blank" rel="noopener">Bağlantıyı Aç →</a></div>
+  </div>
+  <div id="reviewEditor" class="feature-editor" style="display:none">
+    <div class="editor-grid">
+      <label><span>Durum</span><select id="reviewEnabled"><option value="true">Aktif</option><option value="false">Pasif</option></select></label>
+      <label><span>Puan eşiği</span><input id="reviewThresholdInput" type="number" min="1" max="5" step="1"></label>
+      <label><span>Başlık</span><input id="reviewTitleInput" maxlength="160"></label>
+      <label><span>Google bağlantısı</span><input id="reviewGoogleInput" type="url" placeholder="https://g.page/.../review"></label>
+      <label class="full"><span>Metin</span><textarea id="reviewTextInput" maxlength="500" rows="3"></textarea></label>
+    </div>
+    <div class="editor-actions"><button class="feature-btn" type="button" onclick="saveReviewBooster()">💾 Kaydet</button><button class="feature-btn" type="button" onclick="toggleReviewEditor(false)">Vazgeç</button></div>
+  </div>
+</section>
+
+<section id="campaignSection" class="feature-box">
+  <div class="feature-head">
+    <div><div class="eyebrow">SMART CAMPAIGNS</div><h2>🚀 Smart Campaigns</h2><p>Aktif ve planlanmış kampanyalarını yönet.</p></div>
+    <div class="feature-actions"><button class="feature-btn" type="button" onclick="openCampaignEditor()">＋ Yeni Kampanya</button><button class="feature-btn" type="button" onclick="loadBusinessCampaigns()">↻ Yenile</button></div>
+  </div>
+  <div id="campaignList" class="campaign-list"><div class="feature-empty">Kampanyalar yükleniyor...</div></div>
+  <div id="campaignEditor" class="feature-editor" style="display:none">
+    <input type="hidden" id="campaignId">
+    <div class="editor-grid">
+      <label><span>Başlık</span><input id="campaignTitleInput" maxlength="120"></label>
+      <label><span>Durum</span><select id="campaignEnabledInput"><option value="true">Aktif</option><option value="false">Pasif</option></select></label>
+      <label class="full"><span>Açıklama</span><textarea id="campaignTextInput" maxlength="500" rows="3"></textarea></label>
+      <label><span>Görsel URL</span><input id="campaignImageInput" type="url"></label>
+      <label><span>Buton yazısı</span><input id="campaignButtonTextInput" maxlength="60" placeholder="Detayları Gör"></label>
+      <label><span>Buton URL</span><input id="campaignButtonUrlInput" type="url"></label>
+      <label><span>Başlangıç</span><input id="campaignStartInput" type="datetime-local"></label>
+      <label><span>Bitiş</span><input id="campaignEndInput" type="datetime-local"></label>
+      <label><span>Öncelik</span><input id="campaignPriorityInput" type="number" min="-100" max="100" value="0"></label>
+    </div>
+    <div class="editor-actions"><button class="feature-btn" type="button" onclick="saveCampaign()">💾 Kaydet</button><button class="feature-btn" type="button" onclick="closeCampaignEditor()">Vazgeç</button></div>
+  </div>
+</section>
+
+<!-- ==================================================
+     QUICK INFO
+================================================== -->
+
+<section class="box">
+
+  <div class="box-head">
+
+    <div>
+
+      <div class="eyebrow">
+        BUSINESS PROFILE
+      </div>
+
+      <h2>
+        Profil Özeti
+      </h2>
+
+      <p>
+        İşletme profilindeki bağlantıların mevcut durumunu kontrol et.
+      </p>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="info-grid">
+
+
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        📞
+      </div>
+
+      <strong>
+        Telefon
+      </strong>
+
+      <span id="infoPhone">
+        Eklenmedi
+      </span>
+
+    </div>
+
+
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        💬
+      </div>
+
+      <strong>
+        WhatsApp
+      </strong>
+
+      <span id="infoWhatsapp">
+        Eklenmedi
+      </span>
+
+    </div>
+
+
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        📍
+      </div>
+
+      <strong>
+        Konum
+      </strong>
+
+      <span id="infoAddress">
+        Eklenmedi
+      </span>
+
+    </div>
+
+
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        📸
+      </div>
+
+      <strong>
+        Instagram
+      </strong>
+
+      <span id="infoInstagram">
+        Eklenmedi
+      </span>
+
+    </div>
+
+
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        ⭐
+      </div>
+
+      <strong>
+        Google
+      </strong>
+
+      <span id="infoGoogle">
+        Eklenmedi
+      </span>
+
+    </div>
+
+
+
+    <div class="info-card">
+
+      <div class="info-card-icon">
+        🕐
+      </div>
+
+      <strong>
+        Çalışma Saatleri
+      </strong>
+
+      <span id="infoHours">
+        Eklenmedi
+      </span>
+
+    </div>
+
+
+
+  </div>
+
+</section>
+
+
+
+<div class="footer">
+
+  LEO CONNECT • PREMIUM DIGITAL BUSINESS SYSTEM
+
+</div>
+
+
+
+</main>
+
+
+
+<!-- ==================================================
+     TOAST
+================================================== -->
+
+<div
+  id="toast"
+  class="toast"
+></div>
+
+
+
+<script>
+
+
+
+/* ==================================================
+   AUTH
+================================================== */
+
+const token =
+  localStorage.getItem(
+    "token"
+  );
+
+
+
+if(!token){
+
+  window.location.href =
+    "/login";
+
+}
+
+
+
+/* ==================================================
+   FIELDS
+================================================== */
+
+const fields = [
+
+  "name",
+  "category",
+  "description",
+
+  "phone",
+  "whatsapp",
+
+  "address",
+
+  "instagram",
+  "tiktok",
+
+  "google_review",
+  "website",
+  "menu",
+
+  "iban",
+  "iban_holder",
+
+  "hours",
+
+  "logo_url"
+
+];
+
+
+
+/* ==================================================
+   GLOBAL STATE
+================================================== */
+
+let currentBusiness = null;
+
+let nfcUrl = "";
+
+let statsData = [];
+
+
+
+/* ==================================================
+   API
+================================================== */
+
+async function api(
+  url,
+  options={}
+){
+
+  options.headers = {
+
+    ...(options.headers || {}),
+
+    "Authorization":
+      "Bearer " + token,
+
+    "Content-Type":
+      "application/json"
+
   };
-}
 
-async function getActiveCampaigns(businessId){
-  const r=await pool.query(`
-    SELECT * FROM campaigns
-    WHERE business_id=$1
-      AND enabled=TRUE
-      AND (starts_at IS NULL OR starts_at<=CURRENT_TIMESTAMP)
-      AND (ends_at IS NULL OR ends_at>=CURRENT_TIMESTAMP)
-    ORDER BY priority DESC, created_at DESC
-    LIMIT 5
-  `,[businessId]);
-  return r.rows.map(normalizeCampaign);
-}
 
-app.get('/api/business-campaigns', auth, requireBusinessPermission('campaign'), async (req,res)=>{
+
   try{
-    const r=await pool.query(`SELECT * FROM campaigns WHERE business_id=$1 ORDER BY enabled DESC, priority DESC, created_at DESC`,[req.user.id]);
-    res.json({campaigns:r.rows.map(normalizeCampaign)});
-  }catch(e){console.error('CAMPAIGNS LIST ERROR:',e);res.status(500).json({error:'Kampanyalar alınamadı'});}
-});
 
-app.post('/api/business-campaigns', auth, requireBusinessPermission('campaign'), async (req,res)=>{
-  try{
-    const b=req.body||{};
-    const title=String(b.title||'').trim().slice(0,120);
-    if(!title)return res.status(400).json({error:'Kampanya başlığı gerekli'});
-    const text=String(b.text||'').trim().slice(0,500);
-    const image_url=String(b.image_url||'').trim().slice(0,1000);
-    const button_text=String(b.button_text||'').trim().slice(0,60);
-    const button_url=String(b.button_url||'').trim().slice(0,1000);
-    const starts_at=b.starts_at?new Date(b.starts_at):null;
-    const ends_at=b.ends_at?new Date(b.ends_at):null;
-    if(starts_at && Number.isNaN(starts_at.getTime()))return res.status(400).json({error:'Başlangıç tarihi geçersiz'});
-    if(ends_at && Number.isNaN(ends_at.getTime()))return res.status(400).json({error:'Bitiş tarihi geçersiz'});
-    if(starts_at && ends_at && starts_at>ends_at)return res.status(400).json({error:'Bitiş tarihi başlangıçtan önce olamaz'});
-    const priority=Math.max(-100,Math.min(100,Number(b.priority)||0));
-    const r=await pool.query(`INSERT INTO campaigns(business_id,title,text,image_url,button_text,button_url,starts_at,ends_at,enabled,priority,updated_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,CURRENT_TIMESTAMP) RETURNING *`,[req.user.id,title,text,image_url,button_text,button_url,starts_at,ends_at,b.enabled!==false,priority]);
-    res.status(201).json({campaign:normalizeCampaign(r.rows[0])});
-  }catch(e){console.error('CAMPAIGN CREATE ERROR:',e);res.status(500).json({error:'Kampanya oluşturulamadı'});}
-});
-
-app.put('/api/business-campaigns/:id', auth, requireBusinessPermission('campaign'), async (req,res)=>{
-  try{
-    const id=Number(req.params.id), b=req.body||{};
-    const existing=await pool.query(`SELECT * FROM campaigns WHERE id=$1 AND business_id=$2 LIMIT 1`,[id,req.user.id]);
-    if(!existing.rows.length)return res.status(404).json({error:'Kampanya bulunamadı'});
-    const current=existing.rows[0];
-    const title=String(b.title??current.title).trim().slice(0,120);
-    if(!title)return res.status(400).json({error:'Kampanya başlığı gerekli'});
-    const text=String(b.text??current.text).trim().slice(0,500);
-    const image_url=String(b.image_url??current.image_url).trim().slice(0,1000);
-    const button_text=String(b.button_text??current.button_text).trim().slice(0,60);
-    const button_url=String(b.button_url??current.button_url).trim().slice(0,1000);
-    const starts_at=b.starts_at===null||b.starts_at===''?null:(b.starts_at!==undefined?new Date(b.starts_at):current.starts_at);
-    const ends_at=b.ends_at===null||b.ends_at===''?null:(b.ends_at!==undefined?new Date(b.ends_at):current.ends_at);
-    if(starts_at && Number.isNaN(new Date(starts_at).getTime()))return res.status(400).json({error:'Başlangıç tarihi geçersiz'});
-    if(ends_at && Number.isNaN(new Date(ends_at).getTime()))return res.status(400).json({error:'Bitiş tarihi geçersiz'});
-    if(starts_at && ends_at && new Date(starts_at)>new Date(ends_at))return res.status(400).json({error:'Bitiş tarihi başlangıçtan önce olamaz'});
-    const priority=b.priority!==undefined?Math.max(-100,Math.min(100,Number(b.priority)||0)):Number(current.priority||0);
-    const enabled=b.enabled!==undefined?b.enabled===true:current.enabled===true;
-    const r=await pool.query(`UPDATE campaigns SET title=$1,text=$2,image_url=$3,button_text=$4,button_url=$5,starts_at=$6,ends_at=$7,enabled=$8,priority=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND business_id=$11 RETURNING *`,[title,text,image_url,button_text,button_url,starts_at?new Date(starts_at):null,ends_at?new Date(ends_at):null,enabled,priority,id,req.user.id]);
-    res.json({campaign:normalizeCampaign(r.rows[0])});
-  }catch(e){console.error('CAMPAIGN UPDATE ERROR:',e);res.status(500).json({error:'Kampanya güncellenemedi'});}
-});
-
-app.delete('/api/business-campaigns/:id', auth, requireBusinessPermission('campaign'), async (req,res)=>{
-  try{
-    const r=await pool.query(`DELETE FROM campaigns WHERE id=$1 AND business_id=$2 RETURNING id`,[Number(req.params.id),req.user.id]);
-    if(!r.rows.length)return res.status(404).json({error:'Kampanya bulunamadı'});
-    res.json({success:true});
-  }catch(e){console.error('CAMPAIGN DELETE ERROR:',e);res.status(500).json({error:'Kampanya silinemedi'});}
-});
-
-/* =========================================================
-   V2 — REVIEW BOOSTER API
-========================================================= */
-
-app.get('/api/business-review-booster', auth, requireBusinessPermission('review'), async (req, res) => {
-  try {
-    let result = await pool.query(
-      `SELECT * FROM review_boosters WHERE business_id=$1 LIMIT 1`,
-      [req.user.id]
-    );
-    if (!result.rows.length) {
-      result = await pool.query(
-        `INSERT INTO review_boosters(business_id) VALUES($1) RETURNING *`,
-        [req.user.id]
-      );
-    }
-    res.json(normalizeReviewBooster(result.rows[0]));
-  } catch (error) {
-    console.error('REVIEW BOOSTER GET ERROR:', error);
-    res.status(500).json({ error: 'Review Booster ayarları alınamadı' });
-  }
-});
-
-app.put('/api/business-review-booster', auth, requireBusinessPermission('review'), async (req, res) => {
-  try {
-    const body = req.body || {};
-    const str = (v, max) => String(v ?? '').trim().slice(0, max);
-    const threshold = Math.min(5, Math.max(1, Number(body.threshold) || 4));
-
-    const result = await pool.query(`
-      INSERT INTO review_boosters(
-        business_id,enabled,title,text,threshold,
-        low_title,low_text,success_title,success_text,updated_at
-      )
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,CURRENT_TIMESTAMP)
-      ON CONFLICT(business_id) DO UPDATE SET
-        enabled=EXCLUDED.enabled,
-        title=EXCLUDED.title,
-        text=EXCLUDED.text,
-        threshold=EXCLUDED.threshold,
-        low_title=EXCLUDED.low_title,
-        low_text=EXCLUDED.low_text,
-        success_title=EXCLUDED.success_title,
-        success_text=EXCLUDED.success_text,
-        updated_at=CURRENT_TIMESTAMP
-      RETURNING *
-    `, [
-      req.user.id,
-      body.enabled === true,
-      str(body.title, 160) || REVIEW_BOOSTER_DEFAULTS.title,
-      str(body.text, 500) || REVIEW_BOOSTER_DEFAULTS.text,
-      threshold,
-      str(body.low_title, 160) || REVIEW_BOOSTER_DEFAULTS.low_title,
-      str(body.low_text, 500) || REVIEW_BOOSTER_DEFAULTS.low_text,
-      str(body.success_title, 160) || REVIEW_BOOSTER_DEFAULTS.success_title,
-      str(body.success_text, 500) || REVIEW_BOOSTER_DEFAULTS.success_text
-    ]);
-
-    res.json(normalizeReviewBooster(result.rows[0]));
-  } catch (error) {
-    console.error('REVIEW BOOSTER UPDATE ERROR:', error);
-    res.status(500).json({ error: 'Review Booster ayarları kaydedilemedi' });
-  }
-});
-
-/* =========================================================
-   PUBLIC PROFILE API
-========================================================= */
-
-/*
-   Public profile data endpoint.
-   QR:  /api/profile/:slug
-   NFC: /api/profile-by-nfc/:code
-
-   IMPORTANT:
-   Business slug is never regenerated here.
-   Existing QR URLs therefore remain stable.
-*/
-
-app.get(
-  '/api/profile/:slug',
-  async (req, res) => {
-
-    try {
-
-      const slug =
-        String(req.params.slug || '').trim();
-
-      if (!slug) {
-        return res.status(404).json({
-          error: 'Profil bulunamadı'
-        });
-      }
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-            id,
-            name,
-            slug,
-            category,
-            description,
-            phone,
-            whatsapp,
-            address,
-            instagram,
-            tiktok,
-            google_review,
-            website,
-            menu,
-            iban,
-            iban_holder,
-            hours,
-            logo_url,
-            profile_field_permissions,
-            social_links,
-            custom_links,
-            social_platform_permissions,
-            created_at
-          FROM businesses
-          WHERE slug=$1
-          LIMIT 1
-          `,
-          [slug]
-        );
-
-      if (!result.rows.length) {
-        return res.status(404).json({
-          error: 'Profil bulunamadı'
-        });
-      }
-
-      const profile = publicBusinessWithFieldPermissions(result.rows[0]);
-      const profile_design = await getPublicProfileDesign(result.rows[0].id);
-      const review_booster = await getReviewBooster(result.rows[0].id);
-      const campaigns = await getActiveCampaigns(result.rows[0].id);
-
-      return res.json({
-        ...profile,
-        profile_design,
-        review_booster,
-        campaigns
-      });
-
-    } catch (error) {
-
-      console.error(
-        'PUBLIC PROFILE API ERROR:',
-        error
+    const response =
+      await fetch(
+        url,
+        options
       );
 
-      return res.status(500).json({
-        error: 'Profil alınamadı'
-      });
-
-    }
-  }
-);
 
 
-/* =========================================================
-   PUBLIC NFC PROFILE API
-========================================================= */
+    if(
+      response.status === 401
+    ){
 
-app.get(
-  '/api/profile-by-nfc/:code',
-  async (req, res) => {
-
-    try {
-
-      const code =
-        String(req.params.code || '').trim();
-
-      if (!code) {
-        return res.status(404).json({
-          error: 'NFC profili bulunamadı'
-        });
-      }
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-            b.id,
-            b.name,
-            b.slug,
-            b.category,
-            b.description,
-            b.phone,
-            b.whatsapp,
-            b.address,
-            b.instagram,
-            b.tiktok,
-            b.google_review,
-            b.website,
-            b.menu,
-            b.iban,
-            b.iban_holder,
-            b.hours,
-            b.logo_url,
-            b.profile_field_permissions,
-            b.social_links,
-            b.custom_links,
-            b.social_platform_permissions,
-            b.created_at
-          FROM nfc_tags t
-          INNER JOIN businesses b
-            ON b.id=t.business_id
-          WHERE t.code=$1
-            AND t.is_active=TRUE
-          LIMIT 1
-          `,
-          [code]
-        );
-
-      if (!result.rows.length) {
-        return res.status(404).json({
-          error: 'NFC profili bulunamadı'
-        });
-      }
-
-      const profile = publicBusinessWithFieldPermissions(result.rows[0]);
-      const profile_design = await getPublicProfileDesign(result.rows[0].id);
-      const review_booster = await getReviewBooster(result.rows[0].id);
-      const campaigns = await getActiveCampaigns(result.rows[0].id);
-
-      return res.json({
-        ...profile,
-        profile_design,
-        review_booster,
-        campaigns
-      });
-
-    } catch (error) {
-
-      console.error(
-        'PUBLIC NFC PROFILE API ERROR:',
-        error
+      localStorage.removeItem(
+        "token"
       );
 
-      return res.status(500).json({
-        error: 'NFC profili alınamadı'
-      });
+      window.location.href =
+        "/login";
 
-    }
-  }
-);
-
-
-/* =========================================================
-   NFC TAG MANAGEMENT 2.0
-========================================================= */
-
-
-/*
-   GET ALL TAGS
-*/
-
-app.get('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, res) => {
-
-  try {
-
-    const result =
-      await pool.query(
-        `
-        SELECT
-
-          t.id,
-          t.business_id,
-          t.name,
-          t.placement,
-          t.code,
-          t.is_active,
-          t.created_at,
-          t.updated_at,
-
-          COALESCE((
-            SELECT COUNT(*)
-            FROM events e
-            WHERE e.nfc_tag_id=t.id
-            AND e.type='nfc'
-          ),0)::int AS tap_count,
-
-          COALESCE((
-            SELECT COUNT(*)
-            FROM events e
-            WHERE e.nfc_tag_id=t.id
-            AND e.type='qr_scan'
-          ),0)::int AS qr_count,
-
-          COALESCE((
-            SELECT COUNT(*)
-            FROM events e
-            WHERE e.nfc_tag_id=t.id
-            AND e.type='nfc'
-          ),0)::int AS nfc_count,
-
-          COALESCE((
-            SELECT COUNT(*)
-            FROM events e
-            WHERE e.nfc_tag_id=t.id
-            AND e.type IN ('nfc','qr_scan')
-          ),0)::int AS total_count,
-
-          (
-            SELECT MAX(e.created_at)
-            FROM events e
-            WHERE e.nfc_tag_id=t.id
-            AND e.type IN ('nfc','qr_scan')
-          ) AS last_tap
-
-        FROM nfc_tags t
-
-        WHERE t.business_id=$1
-
-        ORDER BY t.id DESC
-        `,
-        [req.user.id]
-      );
-
-    res.json(
-      result.rows.map(nfcTagPublic)
-    );
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'NFC etiketleri alınamadı'
-    });
-
-  }
-
-});
-
-
-/*
-   GET SINGLE TAG
-*/
-
-app.get(
-  '/api/nfc-tags/:id',
-  auth,
-  requireBusinessPermission('nfc'),
-  async (req, res) => {
-
-    try {
-
-      const id =
-        Number(req.params.id);
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-
-            t.id,
-            t.business_id,
-            t.name,
-            t.placement,
-            t.code,
-            t.is_active,
-            t.created_at,
-            t.updated_at,
-
-            COALESCE((
-              SELECT COUNT(*)
-              FROM events e
-              WHERE e.nfc_tag_id=t.id
-              AND e.type='nfc'
-            ),0)::int AS tap_count,
-
-            (
-              SELECT MAX(e.created_at)
-              FROM events e
-              WHERE e.nfc_tag_id=t.id
-              AND e.type='nfc'
-            ) AS last_tap
-
-          FROM nfc_tags t
-
-          WHERE t.id=$1
-          AND t.business_id=$2
-          `,
-          [
-            id,
-            req.user.id
-          ]
-        );
-
-      if (!result.rows.length) {
-
-        return res.status(404).json({
-          error: 'NFC etiketi bulunamadı'
-        });
-
-      }
-
-      res.json(
-        nfcTagPublic(result.rows[0])
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).json({
-        error: 'NFC etiketi alınamadı'
-      });
+      return null;
 
     }
 
-  }
-);
 
 
-/*
-   STABLE PUBLIC TABLE QR IMAGE
-   Uses the existing NFC tag code as the single source of truth.
-   The image URL is deterministic, public, and cacheable so the Business
-   Dashboard never depends on several authenticated JSON requests.
-*/
-app.get('/qr/nfc/:code.png', async (req, res) => {
-  try {
-    const code = String(req.params.code || '').trim();
-    if (!code) return res.status(404).send('QR bulunamadı');
+    return await response.json();
 
-    const result = await pool.query(
-      `SELECT t.code,b.slug FROM nfc_tags t INNER JOIN businesses b ON b.id=t.business_id WHERE t.code=$1 LIMIT 1`,
-      [code]
-    );
-    if (!result.rows.length) return res.status(404).send('QR bulunamadı');
-
-    const baseUrl = process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get('host')}`;
-    const publicUrl = `${baseUrl}/p/nfc/${encodeURIComponent(result.rows[0].code)}?source=qr`;
-    const png = await QRCode.toBuffer(publicUrl, { type:'png', width:700, margin:2, errorCorrectionLevel:'H' });
-
-    res.set('Content-Type','image/png');
-    res.set('Cache-Control','public, max-age=31536000, immutable');
-    res.set('ETag', `"nfc-qr-${result.rows[0].code}"`);
-    return res.end(png);
-  } catch (error) {
-    console.error('PUBLIC TABLE QR ERROR:', error);
-    return res.status(500).send('QR oluşturulamadı');
-  }
-});
-
-/*
-   TABLE / POINT QR JSON (legacy-compatible)
-   Uses the existing NFC tag URL; no second QR database is created.
-*/
-app.get('/api/nfc-tags/:id/qr', auth, requireBusinessPermission('nfc'), async (req, res) => {
-  try {
-    const id=Number(req.params.id);
-    if(!Number.isInteger(id)||id<=0) return res.status(400).json({error:'Geçersiz NFC etiketi'});
-    const result=await pool.query(`SELECT id,business_id,name,placement,code,is_active FROM nfc_tags WHERE id=$1 AND business_id=$2 LIMIT 1`,[id,req.user.id]);
-    if(!result.rows.length) return res.status(404).json({error:'NFC etiketi bulunamadı'});
-    const baseUrl=process.env.PUBLIC_URL||process.env.RENDER_EXTERNAL_URL||`${req.protocol}://${req.get('host')}`;
-    const url=`${baseUrl}/p/nfc/${result.rows[0].code}?source=qr`;
-    const qr=await QRCode.toDataURL(url,{width:900,margin:2,errorCorrectionLevel:'H'});
-    res.set('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');res.set('Pragma','no-cache');res.set('Expires','0');
-    res.json({...result.rows[0],url,qr});
-  } catch(error) {console.error('BUSINESS NFC QR ERROR:',error);res.status(500).json({error:'Masa / nokta QR kodu oluşturulamadı'});}
-});
-
-
-/*
-   CREATE TAG
-*/
-
-app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, res) => {
-
-  try {
-
-    const {
-      name,
-      placement,
-      is_active
-    } = req.body;
-
-    const tagName =
-      String(name || '').trim();
-
-    const tagPlacement =
-      String(placement || '').trim();
-
-    const active =
-      typeof is_active === 'boolean'
-        ? is_active
-        : true;
-
-    if (!tagName) {
-
-      return res.status(400).json({
-        error: 'NFC etiket adı gerekli'
-      });
-
-    }
-
-    let code = '';
-
-    /*
-      Benzersiz code üret.
-    */
-
-    for (let i = 0; i < 10; i++) {
-
-      const candidate =
-        createNfcCode();
-
-      const exists =
-        await pool.query(
-          `
-          SELECT id
-          FROM nfc_tags
-          WHERE code=$1
-          `,
-          [candidate]
-        );
-
-      if (!exists.rows.length) {
-
-        code = candidate;
-
-        break;
-      }
-
-    }
-
-    if (!code) {
-
-      return res.status(500).json({
-        error: 'NFC kodu oluşturulamadı'
-      });
-
-    }
-
-    const result =
-      await pool.query(
-        `
-        INSERT INTO nfc_tags(
-          business_id,
-          name,
-          placement,
-          code,
-          is_active
-        )
-
-        VALUES(
-          $1,
-          $2,
-          $3,
-          $4,
-          $5
-        )
-
-        RETURNING *
-        `,
-        [
-          req.user.id,
-          tagName,
-          tagPlacement,
-          code,
-          active
-        ]
-      );
-
-    res.status(201).json({
-      tag:
-        nfcTagPublic(result.rows[0])
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'NFC etiketi oluşturulamadı'
-    });
-
-  }
-
-});
-
-
-/*
-   UPDATE TAG
-*/
-
-app.put(
-  '/api/nfc-tags/:id',
-  auth,
-  requireBusinessPermission('nfc'),
-  async (req, res) => {
-
-    try {
-
-      const id =
-        Number(req.params.id);
-
-      const {
-        name,
-        placement,
-        is_active
-      } = req.body;
-
-      const tagName =
-        String(name || '').trim();
-
-      const tagPlacement =
-        String(placement || '').trim();
-
-      if (!tagName) {
-
-        return res.status(400).json({
-          error: 'NFC etiket adı gerekli'
-        });
-
-      }
-
-      const active =
-        typeof is_active === 'boolean'
-          ? is_active
-          : true;
-
-      const result =
-        await pool.query(
-          `
-          UPDATE nfc_tags
-
-          SET
-            name=$1,
-            placement=$2,
-            is_active=$3,
-            updated_at=CURRENT_TIMESTAMP
-
-          WHERE id=$4
-          AND business_id=$5
-
-          RETURNING *
-          `,
-          [
-            tagName,
-            tagPlacement,
-            active,
-            id,
-            req.user.id
-          ]
-        );
-
-      if (!result.rows.length) {
-
-        return res.status(404).json({
-          error: 'NFC etiketi bulunamadı'
-        });
-
-      }
-
-      /*
-        İstatistikleri tekrar hesaplayarak döndür.
-      */
-
-      const stats =
-        await pool.query(
-          `
-          SELECT
-
-            COALESCE((
-              SELECT COUNT(*)
-              FROM events e
-              WHERE e.nfc_tag_id=t.id
-              AND e.type='nfc'
-            ),0)::int AS tap_count,
-
-            (
-              SELECT MAX(e.created_at)
-              FROM events e
-              WHERE e.nfc_tag_id=t.id
-              AND e.type='nfc'
-            ) AS last_tap
-
-          FROM nfc_tags t
-
-          WHERE t.id=$1
-          `,
-          [id]
-        );
-
-      const tag = {
-        ...result.rows[0],
-        tap_count:
-          stats.rows[0]?.tap_count || 0,
-        last_tap:
-          stats.rows[0]?.last_tap || null
-      };
-
-      res.json({
-        tag:
-          nfcTagPublic(tag)
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).json({
-        error: 'NFC etiketi güncellenemedi'
-      });
-
-    }
-
-  }
-);
-
-
-/*
-   DELETE TAG
-*/
-
-app.delete(
-  '/api/nfc-tags/:id',
-  auth,
-  requireBusinessPermission('nfc'),
-  async (req, res) => {
-
-    try {
-
-      const id =
-        Number(req.params.id);
-
-      const result =
-        await pool.query(
-          `
-          DELETE FROM nfc_tags
-
-          WHERE id=$1
-          AND business_id=$2
-
-          RETURNING id
-          `,
-          [
-            id,
-            req.user.id
-          ]
-        );
-
-      if (!result.rows.length) {
-
-        return res.status(404).json({
-          error: 'NFC etiketi bulunamadı'
-        });
-
-      }
-
-      res.json({
-        success: true,
-        id
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).json({
-        error: 'NFC etiketi silinemedi'
-      });
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   NFC TAG ANALYTICS
-========================================================= */
-
-app.get(
-  '/api/nfc-tags/:id/analytics',
-  auth,
-  requireBusinessPermission('analytics'),
-  async (req, res) => {
-
-    try {
-
-      const id =
-        Number(req.params.id);
-
-      const tag =
-        await pool.query(
-          `
-          SELECT id
-          FROM nfc_tags
-          WHERE id=$1
-          AND business_id=$2
-          `,
-          [
-            id,
-            req.user.id
-          ]
-        );
-
-      if (!tag.rows.length) {
-
-        return res.status(404).json({
-          error: 'NFC etiketi bulunamadı'
-        });
-
-      }
-
-      const total =
-        await pool.query(
-          `
-          SELECT
-            COUNT(*)::int AS total_taps,
-            MAX(created_at) AS last_tap
-          FROM events
-
-          WHERE nfc_tag_id=$1
-          AND type='nfc'
-          `,
-          [id]
-        );
-
-      const daily =
-        await pool.query(
-          `
-          SELECT
-
-            DATE(created_at) AS date,
-            COUNT(*)::int AS taps
-
-          FROM events
-
-          WHERE nfc_tag_id=$1
-          AND type='nfc'
-
-          GROUP BY DATE(created_at)
-
-          ORDER BY date DESC
-
-          LIMIT 90
-          `,
-          [id]
-        );
-
-      res.json({
-        total_taps:
-          total.rows[0].total_taps,
-
-        last_tap:
-          total.rows[0].last_tap,
-
-        daily:
-          daily.rows
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).json({
-        error: 'NFC analizleri alınamadı'
-      });
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   PUBLIC NFC TAG ROUTE
-========================================================= */
-
-/*
-   DİKKAT:
-
-   Bu route /p/:slug route'undan ÖNCE bulunuyor.
-
-   NFC TAG:
-   /p/nfc/CODE
-
-   -> tag bulunur
-   -> işletme bulunur
-   -> NFC event'i tag ID ile kaydedilir
-   -> profile.html açılır
-*/
-
-app.get(
-  '/p/nfc/:code',
-  async (req, res) => {
-
-    try {
-
-      const code =
-        String(req.params.code || '').trim();
-
-      if (!code) {
-
-        return res.status(404).send(
-          'NFC etiketi bulunamadı'
-        );
-
-      }
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-
-            t.id AS tag_id,
-            t.business_id,
-            t.is_active,
-
-            b.slug
-
-          FROM nfc_tags t
-
-          INNER JOIN businesses b
-            ON b.id=t.business_id
-
-          WHERE t.code=$1
-
-          LIMIT 1
-          `,
-          [code]
-        );
-
-      if (!result.rows.length) {
-
-        return res.status(404).send(
-          'NFC etiketi bulunamadı'
-        );
-
-      }
-
-      const tag =
-        result.rows[0];
-
-      /*
-        Pasif tag çalışmaz.
-      */
-
-      if (!tag.is_active) {
-
-        return res.status(410).send(`
-          <!DOCTYPE html>
-          <html lang="tr">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport"
-              content="width=device-width,initial-scale=1">
-            <title>NFC Pasif</title>
-
-            <style>
-              body{
-                margin:0;
-                min-height:100vh;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                background:#050505;
-                color:#fff;
-                font-family:Arial,sans-serif;
-                text-align:center;
-                padding:30px;
-                box-sizing:border-box;
-              }
-
-              .box{
-                max-width:420px;
-                padding:35px;
-                border:1px solid rgba(212,175,55,.3);
-                border-radius:24px;
-                background:#0c0c0c;
-              }
-
-              .icon{
-                font-size:54px;
-                margin-bottom:20px;
-              }
-
-              h1{
-                margin:0 0 12px;
-                font-size:26px;
-              }
-
-              p{
-                color:#aaa;
-                line-height:1.6;
-                margin:0;
-              }
-            </style>
-          </head>
-
-          <body>
-
-            <div class="box">
-
-              <div class="icon">
-                📡
-              </div>
-
-              <h1>
-                NFC etiketi pasif
-              </h1>
-
-              <p>
-                Bu NFC bağlantısı şu anda aktif değil.
-              </p>
-
-            </div>
-
-          </body>
-          </html>
-        `);
-
-      }
-
-      const isQr = String(req.query.source || '').toLowerCase() === 'qr';
-
-      await pool.query(
-        `
-        INSERT INTO events(
-          business_id,
-          type,
-          source,
-          nfc_tag_id
-        )
-
-        VALUES(
-          $1,
-          'profile_view',
-          $2,
-          $3
-        )
-        `,
-        [
-          tag.business_id,
-          isQr ? 'qr' : 'nfc',
-          tag.tag_id
-        ]
-      );
-
-      await pool.query(
-        `
-        INSERT INTO events(
-          business_id,
-          type,
-          source,
-          nfc_tag_id
-        )
-
-        VALUES(
-          $1,
-          $2,
-          $3,
-          $4
-        )
-        `,
-        [
-          tag.business_id,
-          isQr ? 'qr_scan' : 'nfc',
-          isQr ? 'qr' : 'nfc',
-          tag.tag_id
-        ]
-      );
-
-
-      /*
-        Profile aç.
-      */
-
-      return res.sendFile(
-        path.join(
-          __dirname,
-          'public',
-          'profile.html'
-        )
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).send(
-        'NFC bağlantısı açılırken hata oluştu'
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   PUBLIC PROFILE
-========================================================= */
-
-app.get(
-  '/p/:slug',
-  async (req, res) => {
-
-    try {
-
-      const slug =
-        String(req.params.slug || '');
-
-      const result =
-        await pool.query(
-          `
-          SELECT *
-          FROM businesses
-          WHERE slug=$1
-          `,
-          [slug]
-        );
-
-      if (!result.rows.length) {
-
-        return res.status(404).send(
-          'İşletme bulunamadı'
-        );
-
-      }
-
-      const business =
-        result.rows[0];
-
-      /*
-        Profile view
-      */
-
-      await pool.query(
-        `
-        INSERT INTO events(
-          business_id,
-          type,
-          source
-        )
-
-        VALUES(
-          $1,
-          'profile_view',
-          $2
-        )
-        `,
-        [
-          business.id,
-          req.query.source === 'qr'
-            ? 'qr'
-            : req.query.source === 'nfc'
-              ? 'nfc'
-              : 'direct'
-        ]
-      );
-
-
-      /*
-        QR
-      */
-
-      if (
-        req.query.source === 'qr'
-      ) {
-
-        await pool.query(
-          `
-          INSERT INTO events(
-            business_id,
-            type,
-            source
-          )
-
-          VALUES(
-            $1,
-            'qr_scan',
-            'qr'
-          )
-          `,
-          [business.id]
-        );
-
-      }
-
-
-      /*
-        Eski NFC bağlantıları:
-
-        /p/slug?source=nfc
-
-        Bunlar yeni tag sistemi kullanılmadan
-        oluşturulmuş NFC bağlantıları olabilir.
-
-        Backward compatibility korunuyor.
-      */
-
-      if (
-        req.query.source === 'nfc'
-      ) {
-
-        await pool.query(
-          `
-          INSERT INTO events(
-            business_id,
-            type,
-            source
-          )
-
-          VALUES(
-            $1,
-            'nfc',
-            'nfc'
-          )
-          `,
-          [business.id]
-        );
-
-      }
-
-
-      res.sendFile(
-        path.join(
-          __dirname,
-          'public',
-          'profile.html'
-        )
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-      res.status(500).send(
-        'Profil açılırken hata oluştu'
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   DASHBOARD PAGE
-========================================================= */
-
-app.get(
-  '/dashboard',
-  (req, res) => {
-
-    res.sendFile(
-      path.join(
-        __dirname,
-        'public',
-        'dashboard.html'
-      )
-    );
-
-  }
-);
-
-
-/* =========================================================
-   QR CENTER
-========================================================= */
-
-app.get(
-  '/qr-center',
-  (req, res) => {
-
-    res.sendFile(
-      path.join(
-        __dirname,
-        'public',
-        'qr-center.html'
-      )
-    );
-
-  }
-);
-
-
-/* =========================================================
-   NFC CENTER
-========================================================= */
-
-app.get(
-  '/nfc-center',
-  (req, res) => {
-
-    res.sendFile(
-      path.join(
-        __dirname,
-        'public',
-        'nfc-center.html'
-      )
-    );
-
-  }
-);
-
-
-/* =========================================================
-   ADMIN PAGE
-========================================================= */
-
-app.get(
-  '/admin',
-  (req, res) => {
-
-    res.sendFile(
-      path.join(
-        __dirname,
-        'public',
-        'admin.html'
-      )
-    );
-
-  }
-);
-
-
-/* =========================================================
-   REGISTER PAGE
-========================================================= */
-
-app.get(
-  '/register',
-  (req, res) => {
-
-    res.sendFile(
-      path.join(
-        __dirname,
-        'public',
-        'register.html'
-      )
-    );
-
-  }
-);
-
-
-/* =========================================================
-   LOGIN PAGE
-========================================================= */
-
-app.get(
-  '/login',
-  (req, res) => {
-
-    res.sendFile(
-      path.join(
-        __dirname,
-        'public',
-        'login.html'
-      )
-    );
-
-  }
-);
-
-
-/* =========================================================
-   MAIN PAGE
-========================================================= */
-
-app.get(
-  '/',
-  (req, res) => {
-
-    res.sendFile(
-      path.join(
-        __dirname,
-        'public',
-        'index.html'
-      )
-    );
-
-  }
-);
-
-
-/* =========================================================
-   FALLBACK
-========================================================= */
-
-app.use(
-  (req, res) => {
-
-    res.sendFile(
-      path.join(
-        __dirname,
-        'public',
-        'index.html'
-      )
-    );
-
-  }
-);
-
-
-/* =========================================================
-   START
-========================================================= */
-
-initDatabase()
-  .then(() => {
-
-    app.listen(
-      PORT,
-      '0.0.0.0',
-      () => {
-
-        console.log(
-          `LEO CONNECT V2 FINAL CORE + V1 COMPATIBILITY çalışıyor: ${PORT}`
-        );
-
-      }
-    );
-
-  })
-  .catch(error => {
+  }catch(error){
 
     console.error(
-      'DATABASE BAŞLATMA HATASI:',
+      "API error:",
       error
     );
 
-    process.exit(1);
+    return null;
 
+  }
+
+}
+
+
+
+/* ==================================================
+   NFC
+================================================== */
+
+function createNFCUrl(
+  business
+){
+
+  return (
+
+    window.location.origin +
+
+    "/p/" +
+
+    business.slug +
+
+    "?source=nfc"
+
+  );
+
+}
+
+
+
+async function copyNFC(){
+
+  if(!nfcUrl)
+    return;
+
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      nfcUrl
+    );
+
+    document.getElementById(
+      "nfcMessage"
+    ).textContent =
+      "✓ NFC bağlantısı kopyalandı.";
+
+    showToast(
+      "NFC bağlantısı kopyalandı."
+    );
+
+  }catch(error){
+
+    document.getElementById(
+      "nfcMessage"
+    ).textContent =
+      nfcUrl;
+
+  }
+
+}
+
+
+
+function openNFC(){
+
+  if(!nfcUrl)
+    return;
+
+  window.open(
+    nfcUrl,
+    "_blank"
+  );
+
+}
+
+
+
+/* ==================================================
+   LOGO
+================================================== */
+
+function previewLogo(){
+
+  const url =
+    document.getElementById(
+      "logo_url"
+    ).value.trim();
+
+
+
+  const img =
+    document.getElementById(
+      "logoPreview"
+    );
+
+
+
+  const placeholder =
+    document.getElementById(
+      "logoPlaceholder"
+    );
+
+
+
+  if(!url){
+
+    img.style.display =
+      "none";
+
+    placeholder.style.display =
+      "block";
+
+    return;
+
+  }
+
+
+
+  img.onload =
+    function(){
+
+      img.style.display =
+        "block";
+
+      placeholder.style.display =
+        "none";
+
+    };
+
+
+
+  img.onerror =
+    function(){
+
+      img.style.display =
+        "none";
+
+      placeholder.style.display =
+        "block";
+
+    };
+
+
+
+  img.src =
+    url;
+
+}
+
+
+
+/* ==================================================
+   INFO
+================================================== */
+
+function setInfo(
+  id,
+  value
+){
+
+  const element =
+    document.getElementById(
+      id
+    );
+
+
+
+  if(!element)
+    return;
+
+
+
+  element.textContent =
+    value ||
+    "Eklenmedi";
+
+}
+
+
+
+/* ==================================================
+   PROFILE HEALTH
+================================================== */
+
+function calculateHealth(
+  business
+){
+
+  const checks = [
+
+    {
+      label:"İşletme adı",
+      value:business.name
+    },
+
+    {
+      label:"Kategori",
+      value:business.category
+    },
+
+    {
+      label:"Açıklama",
+      value:business.description
+    },
+
+    {
+      label:"Telefon",
+      value:business.phone
+    },
+
+    {
+      label:"WhatsApp",
+      value:business.whatsapp
+    },
+
+    {
+      label:"Konum",
+      value:business.address
+    },
+
+    {
+      label:"Instagram",
+      value:business.instagram
+    },
+
+    {
+      label:"Google yorum",
+      value:business.google_review
+    },
+
+    {
+      label:"Çalışma saatleri",
+      value:business.hours
+    },
+
+    {
+      label:"Logo",
+      value:business.logo_url
+    }
+
+  ];
+
+
+
+  const completed =
+    checks.filter(
+      item =>
+        String(
+          item.value || ""
+        ).trim()
+    ).length;
+
+
+
+  const score =
+    Math.round(
+      completed /
+      checks.length *
+      100
+    );
+
+
+
+  const missing =
+    checks.filter(
+      item =>
+        !String(
+          item.value || ""
+        ).trim()
+    );
+
+
+
+  return {
+    score,
+    missing
+  };
+
+}
+
+
+
+function renderHealth(
+  business
+){
+
+  const result =
+    calculateHealth(
+      business
+    );
+
+
+
+  const score =
+    result.score;
+
+
+
+  const ring =
+    document.getElementById(
+      "healthRing"
+    );
+
+
+
+  ring.style.setProperty(
+    "--score",
+    (
+      score *
+      3.6
+    ) +
+    "deg"
+  );
+
+
+
+  document.getElementById(
+    "healthScore"
+  ).textContent =
+    score;
+
+
+
+  document.getElementById(
+    "healthFill"
+  ).style.width =
+    score + "%";
+
+
+
+  const title =
+    document.getElementById(
+      "healthTitle"
+    );
+
+
+
+  const message =
+    document.getElementById(
+      "healthMessage"
+    );
+
+
+
+  if(score >= 90){
+
+    title.textContent =
+      "Mükemmel profil";
+
+    message.textContent =
+      "Profilin müşterilerin için neredeyse tamamen hazır.";
+
+  }else if(score >= 70){
+
+    title.textContent =
+      "Güçlü profil";
+
+    message.textContent =
+      "Birkaç küçük dokunuşla profilini daha da güçlendirebilirsin.";
+
+  }else if(score >= 50){
+
+    title.textContent =
+      "Geliştirilebilir";
+
+    message.textContent =
+      "Eksik bilgileri tamamlayarak müşteri deneyimini yükseltebilirsin.";
+
+  }else{
+
+    title.textContent =
+      "Profil eksik";
+
+    message.textContent =
+      "Daha fazla bilgi ekleyerek profilini güçlendir.";
+
+  }
+
+
+
+  const list =
+    document.getElementById(
+      "missingList"
+    );
+
+
+
+  list.innerHTML =
+    "";
+
+
+
+  result.missing
+    .slice(0,5)
+    .forEach(
+      item => {
+
+        const element =
+          document.createElement(
+            "div"
+          );
+
+        element.className =
+          "missing-item";
+
+        element.textContent =
+          "＋ " +
+          item.label;
+
+        list.appendChild(
+          element
+        );
+
+      }
+    );
+
+
+
+  if(!result.missing.length){
+
+    const element =
+      document.createElement(
+        "div"
+      );
+
+    element.className =
+      "missing-item";
+
+    element.textContent =
+      "✓ Tüm temel alanlar tamam";
+
+    list.appendChild(
+      element
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   STATS HELPERS
+================================================== */
+
+function getStat(
+  type
+){
+
+  const item =
+    statsData.find(
+      stat =>
+        stat.type === type
+    );
+
+
+
+  return item
+    ? Number(item.count || 0)
+    : 0;
+
+}
+
+
+
+function renderStats(){
+
+  const profile =
+    getStat(
+      "profile_view"
+    );
+
+
+
+  const whatsapp =
+    getStat(
+      "whatsapp"
+    );
+
+
+
+  const phone =
+    getStat(
+      "phone"
+    );
+
+
+
+  const qr =
+    getStat("qr") ||
+    getStat("qr_scan");
+
+
+
+  const nfc =
+    getStat("nfc");
+
+
+
+  const total =
+    statsData.reduce(
+      (
+        sum,
+        item
+      ) =>
+        sum +
+        Number(
+          item.count || 0
+        ),
+      0
+    );
+
+
+
+  document.getElementById(
+    "profileViews"
+  ).textContent =
+    profile;
+
+
+
+  document.getElementById(
+    "whatsappViews"
+  ).textContent =
+    whatsapp;
+
+
+
+  document.getElementById(
+    "phoneViews"
+  ).textContent =
+    phone;
+
+
+
+  document.getElementById(
+    "qrViews"
+  ).textContent =
+    qr;
+
+
+
+  document.getElementById(
+    "nfcViews"
+  ).textContent =
+    nfc;
+
+
+
+  document.getElementById(
+    "totalViews"
+  ).textContent =
+    total;
+
+
+
+  renderPerformance(
+    profile,
+    qr,
+    nfc,
+    whatsapp,
+    phone
+  );
+
+}
+
+
+
+/* ==================================================
+   PERFORMANCE
+================================================== */
+
+function renderPerformance(
+  profile,
+  qr,
+  nfc,
+  whatsapp,
+  phone
+){
+
+  const values = [
+
+    {
+      name:"Profil",
+      value:profile
+    },
+
+    {
+      name:"QR",
+      value:qr
+    },
+
+    {
+      name:"NFC",
+      value:nfc
+    },
+
+    {
+      name:"WhatsApp",
+      value:whatsapp
+    }
+
+  ];
+
+
+
+  const max =
+    Math.max(
+      1,
+      ...values.map(
+        item => item.value
+      )
+    );
+
+
+
+  document.getElementById(
+    "channelProfile"
+  ).textContent =
+    profile;
+
+
+
+  document.getElementById(
+    "channelQR"
+  ).textContent =
+    qr;
+
+
+
+  document.getElementById(
+    "channelNFC"
+  ).textContent =
+    nfc;
+
+
+
+  document.getElementById(
+    "channelWhatsApp"
+  ).textContent =
+    whatsapp;
+
+
+
+  document.getElementById(
+    "barProfile"
+  ).style.width =
+    (
+      profile / max * 100
+    ) + "%";
+
+
+
+  document.getElementById(
+    "barQR"
+  ).style.width =
+    (
+      qr / max * 100
+    ) + "%";
+
+
+
+  document.getElementById(
+    "barNFC"
+  ).style.width =
+    (
+      nfc / max * 100
+    ) + "%";
+
+
+
+  document.getElementById(
+    "barWhatsApp"
+  ).style.width =
+    (
+      whatsapp / max * 100
+    ) + "%";
+
+
+
+  const strongest =
+    values.sort(
+      (
+        a,
+        b
+      ) =>
+        b.value -
+        a.value
+    )[0];
+
+
+
+  document.getElementById(
+    "strongestChannel"
+  ).textContent =
+    strongest.value > 0
+      ? "En güçlü: " + strongest.name
+      : "Henüz veri yok";
+
+
+
+  document.getElementById(
+    "summaryPhone"
+  ).textContent =
+    phone;
+
+
+
+  document.getElementById(
+    "summaryLocation"
+  ).textContent =
+    getStat(
+      "location"
+    );
+
+
+
+  document.getElementById(
+    "summaryInstagram"
+  ).textContent =
+    getStat(
+      "instagram"
+    );
+
+
+
+  document.getElementById(
+    "summaryGoogle"
+  ).textContent =
+    getStat(
+      "google_review"
+    );
+
+}
+
+
+
+async function copyProfileLink(){
+  if(!currentBusiness?.slug) return;
+  const url=window.location.origin+"/p/"+currentBusiness.slug;
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast("Profil bağlantısı kopyalandı.");
+  }catch(error){
+    showToast("Profil bağlantısı: "+url);
+  }
+}
+
+
+/* ==================================================
+   SHARE
+================================================== */
+
+async function shareProfile(){
+
+  if(!currentBusiness?.slug)
+    return;
+
+
+
+  const url =
+    window.location.origin +
+    "/p/" +
+    currentBusiness.slug;
+
+
+
+  const data = {
+
+    title:
+      currentBusiness.name ||
+      "LEO CONNECT",
+
+    text:
+      (
+        currentBusiness.name ||
+        "İşletme"
+      ) +
+      " — LEO CONNECT dijital profil",
+
+    url
+
+  };
+
+
+
+  if(
+    navigator.share
+  ){
+
+    try{
+
+      await navigator.share(
+        data
+      );
+
+      return;
+
+    }catch(error){
+
+      if(
+        error?.name ===
+        "AbortError"
+      ){
+
+        return;
+
+      }
+
+    }
+
+  }
+
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      url
+    );
+
+    showToast(
+      "Profil bağlantısı kopyalandı."
+    );
+
+  }catch(error){
+
+    showToast(
+      "Profil bağlantısı: " + url
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   PANEL PERMISSIONS
+================================================== */
+
+function applyPermissions(business){
+  const p={profile:true,qr:false,nfc:false,analytics:false,live:false,ai:false,review:false,campaign:false,...(business?.permissions||{})};
+  const setDisplay=(id,on)=>{const el=document.getElementById(id);if(el)el.style.display=on?"":"none";};
+
+  setDisplay("quickQR",p.qr);setDisplay("quickNFC",p.nfc);
+  setDisplay("qrCard",p.qr);setDisplay("nfcCard",p.nfc);setDisplay("digital",p.qr||p.nfc);
+  setDisplay("profile",p.profile);setDisplay("saveButton",p.profile);
+  document.querySelectorAll('a[href="#profile"]').forEach(el=>el.style.display=p.profile?"":"none");
+
+  const qrStat=document.getElementById("qrViews")?.closest(".stat");
+  const nfcStat=document.getElementById("nfcViews")?.closest(".stat");
+  if(qrStat)qrStat.style.display=p.qr?"":"none";
+  if(nfcStat)nfcStat.style.display=p.nfc?"":"none";
+
+  setDisplay("performanceSection",p.analytics);
+  setDisplay("businessAnalyticsV3",p.analytics);
+  setDisplay("liveSection",p.live);
+  setDisplay("aiSection",p.ai);
+  setDisplay("reviewSection",p.review);
+  setDisplay("campaignSection",p.campaign);
+
+  const profileFields={name:true,category:true,description:true,phone:true,whatsapp:true,address:true,instagram:true,tiktok:true,google_review:true,website:true,menu:true,hours:true,iban:true,iban_holder:true,logo_url:true,...(business?.permissions?.profile_fields||{})};
+  Object.entries(profileFields).forEach(([field,allowed])=>{
+    const el=document.getElementById(field);
+    if(!el)return;
+    el.disabled=!allowed;
+    const wrap=el.closest('.field');
+    if(wrap){
+      wrap.classList.toggle('profile-field-locked',!allowed);
+      const label=wrap.querySelector('label');
+      if(label){
+        label.dataset.originalText=label.dataset.originalText||label.textContent;
+        label.textContent=allowed?label.dataset.originalText:'🔒 '+label.dataset.originalText;
+      }
+    }
   });
+}
+
+/* ==================================================
+   BUSINESS CENTER ANALYTICS V3
+================================================== */
+async function loadBusinessAnalytics(period='7d'){
+  if(!currentBusiness?.permissions?.analytics) return;
+  document.querySelectorAll('.analytics-periods button').forEach(b=>b.classList.toggle('active',b.dataset.period===period));
+  const data=await api('/api/business-analytics?period='+encodeURIComponent(period));
+  if(!data) return;
+  const t=data.totals||{};
+  const n=v=>Number(v||0);
+  document.getElementById('baTotal').textContent=n(t.total_events).toLocaleString('tr-TR');
+  document.getElementById('baProfile').textContent=n(t.profile_views).toLocaleString('tr-TR');
+  document.getElementById('baDigital').textContent=(n(t.qr_scans)+n(t.nfc_taps)).toLocaleString('tr-TR');
+  document.getElementById('baContact').textContent=(n(t.phone_clicks)+n(t.whatsapp_clicks)).toLocaleString('tr-TR');
+  const days=data.daily||[]; const max=Math.max(1,...days.map(x=>n(x.events)));
+  const traffic=document.getElementById('baTraffic'), labels=document.getElementById('baTrafficLabels'); traffic.innerHTML=''; labels.innerHTML='';
+  if(!days.length){traffic.innerHTML='<div class="analytics-empty">Henüz seçilen dönemde veri yok.</div>';return;}
+  days.slice(-30).forEach(x=>{const wrap=document.createElement('div');wrap.className='traffic-bar-wrap';wrap.title=x.day+': '+n(x.events)+' etkileşim';const bar=document.createElement('div');bar.className='traffic-bar';bar.style.height=(n(x.events)/max*100)+'%';wrap.appendChild(bar);traffic.appendChild(wrap);const l=document.createElement('span');l.className='traffic-label';l.style.flex='1';l.textContent=x.day.slice(5);labels.appendChild(l);});
+  const actions=(data.actions||[]).slice(0,6), actionMax=Math.max(1,...actions.map(x=>n(x.count))), names={profile_view:'Profil',qr_scan:'QR',qr:'QR',nfc:'NFC',phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google',website:'Website',menu:'Menü'};
+  document.getElementById('baActions').innerHTML=actions.length?actions.map(x=>`<div class="action-row"><span>${names[x.type]||x.type}</span><div class="action-track"><div class="action-fill" style="width:${n(x.count)/actionMax*100}%"></div></div><strong>${n(x.count)}</strong></div>`).join(''):'<div class="analytics-empty">Henüz aksiyon yok.</div>';
+}
+
+
+/* ==================================================
+   LOAD
+================================================== */
+
+const designFields = [
+  "design_theme",
+  "design_accent",
+  "design_cover_url",
+  "design_cover_position",
+  "design_announcement_text",
+  "design_campaign_title",
+  "design_campaign_text",
+  "design_campaign_image_url",
+  "design_campaign_button_text",
+  "design_campaign_button_url",
+  "design_featured_title",
+  "design_featured_text",
+  "design_featured_image_url",
+  "design_featured_button_text",
+  "design_featured_button_url",
+  "design_gallery",
+  "design_video_url"
+];
+
+let profileDesign = {
+  theme:"midnight-gold",
+  accent_color:"#D4AF37",
+  cover_url:"",
+  cover_position:"center",
+  announcement_text:"",
+  announcement_enabled:false,
+  campaign_title:"",
+  campaign_text:"",
+  campaign_image_url:"",
+  campaign_button_text:"",
+  campaign_button_url:"",
+  campaign_enabled:false,
+  featured_title:"",
+  featured_text:"",
+  featured_image_url:"",
+  featured_button_text:"",
+  featured_button_url:"",
+  featured_enabled:false,
+  gallery:[],
+  video_url:"",
+  video_enabled:false
+};
+
+function safeDesignColor(value){
+  const v = String(value || "").trim();
+  return /^#[0-9a-fA-F]{6}$/.test(v) ? v : "#D4AF37";
+}
+
+function syncDesignColor(source){
+  const text = document.getElementById("design_accent");
+  const picker = document.getElementById("design_accent_picker");
+  if(!text || !picker) return;
+
+  if(source === "picker"){
+    text.value = picker.value.toUpperCase();
+  }else{
+    const value = text.value.trim();
+    if(/^#[0-9a-fA-F]{6}$/.test(value)) picker.value = value;
+  }
+  updateDesignPreview();
+}
+
+function getDesignForm(){
+  const val = id => document.getElementById(id)?.value?.trim() || "";
+  const checked = id => document.getElementById(id)?.checked === true;
+  const gallery = val("design_gallery")
+    .split(/\r?\n/)
+    .map(x => x.trim())
+    .filter(Boolean)
+    .slice(0,30)
+    .map(url => ({url}));
+
+  return {
+    theme: val("design_theme") || "midnight-gold",
+    accent_color: safeDesignColor(val("design_accent")),
+    cover_url: val("design_cover_url"),
+    cover_position: val("design_cover_position") || "center",
+    business_brand_enabled: checked("design_business_brand_enabled"),
+    announcement_text: val("design_announcement_text"),
+    announcement_enabled: checked("design_announcement_enabled"),
+    campaign_title: val("design_campaign_title"),
+    campaign_text: val("design_campaign_text"),
+    campaign_image_url: val("design_campaign_image_url"),
+    campaign_button_text: val("design_campaign_button_text"),
+    campaign_button_url: val("design_campaign_button_url"),
+    campaign_enabled: checked("design_campaign_enabled"),
+    featured_title: val("design_featured_title"),
+    featured_text: val("design_featured_text"),
+    featured_image_url: val("design_featured_image_url"),
+    featured_button_text: val("design_featured_button_text"),
+    featured_button_url: val("design_featured_button_url"),
+    featured_enabled: checked("design_featured_enabled"),
+    gallery,
+    video_url: val("design_video_url"),
+    video_enabled: checked("design_video_enabled")
+  };
+}
+
+function setDesignField(id, value){
+  const el = document.getElementById(id);
+  if(el) el.value = value ?? "";
+}
+
+function loadDesignIntoForm(data){
+  profileDesign = {
+    ...profileDesign,
+    ...(data || {})
+  };
+
+  setDesignField("design_theme", profileDesign.theme || "midnight-gold");
+  setDesignField("design_accent", safeDesignColor(profileDesign.accent_color));
+  setDesignField("design_cover_url", profileDesign.cover_url);
+  setDesignField("design_cover_position", profileDesign.cover_position || "center");
+  setDesignField("design_announcement_text", profileDesign.announcement_text);
+  setDesignField("design_campaign_title", profileDesign.campaign_title);
+  setDesignField("design_campaign_text", profileDesign.campaign_text);
+  setDesignField("design_campaign_image_url", profileDesign.campaign_image_url);
+  setDesignField("design_campaign_button_text", profileDesign.campaign_button_text);
+  setDesignField("design_campaign_button_url", profileDesign.campaign_button_url);
+  setDesignField("design_featured_title", profileDesign.featured_title);
+  setDesignField("design_featured_text", profileDesign.featured_text);
+  setDesignField("design_featured_image_url", profileDesign.featured_image_url);
+  setDesignField("design_featured_button_text", profileDesign.featured_button_text);
+  setDesignField("design_featured_button_url", profileDesign.featured_button_url);
+  setDesignField("design_video_url", profileDesign.video_url);
+
+  const gallery = Array.isArray(profileDesign.gallery) ? profileDesign.gallery : [];
+  setDesignField("design_gallery", gallery.map(item => typeof item === "string" ? item : item?.url || "").filter(Boolean).join("\n"));
+
+  const checks = [
+    ["design_business_brand_enabled", profileDesign.business_brand_enabled !== false],
+    ["design_announcement_enabled", profileDesign.announcement_enabled],
+    ["design_campaign_enabled", profileDesign.campaign_enabled],
+    ["design_featured_enabled", profileDesign.featured_enabled],
+    ["design_video_enabled", profileDesign.video_enabled]
+  ];
+  checks.forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if(el) el.checked = value === true;
+  });
+
+  const picker = document.getElementById("design_accent_picker");
+  if(picker) picker.value = safeDesignColor(profileDesign.accent_color);
+
+  updateDesignPreview();
+}
+
+function updateDesignPreview(){
+  try{
+    const data = getDesignForm();
+    const root = document.getElementById("designPreview");
+    if(!root) return;
+
+    const theme = data.theme || "midnight-gold";
+    root.className = "preview-frame theme-" + theme;
+    /* Theme is applied directly to the preview root so it never depends on nested CSS selectors. */
+    const themeMap = {
+      "midnight-gold": {bg:"#101010", color:"#fff"},
+      "obsidian": {bg:"#050505", color:"#fff"},
+      "champagne": {bg:"#17120b", color:"#fff"},
+      "pure-light": {bg:"#f5f2eb", color:"#151515"}
+    };
+    const themeStyle = themeMap[theme] || themeMap["midnight-gold"];
+    root.style.background = themeStyle.bg;
+    root.style.color = themeStyle.color;
+    root.style.setProperty("--preview-accent", data.accent_color);
+    root.style.setProperty("--lc-gold", data.accent_color);
+    root.style.setProperty("--gold-light", data.accent_color);
+
+    /* COVER */
+    const cover = document.getElementById("previewCover");
+    if(cover){
+      cover.style.backgroundPosition = data.cover_position || "center";
+      cover.style.backgroundImage = data.cover_url
+        ? `linear-gradient(180deg,transparent 20%,rgba(0,0,0,.82) 100%), url("${String(data.cover_url).replace(/"/g,'\\"')}")`
+        : "radial-gradient(circle at 80% 20%,#c59a5230,transparent 35%),linear-gradient(145deg,#1d1d1d,#090909)";
+    }
+
+    /* BUSINESS */
+    const name = document.getElementById("previewName");
+    const category = document.getElementById("previewCategory");
+    const brandOn = data.business_brand_enabled !== false;
+
+    if(name){
+      name.textContent = brandOn ? (currentBusiness?.name || "İşletme") : "LEO CONNECT";
+    }
+
+    if(category){
+      category.style.display = "none";
+    }
+
+    /* LOGO */
+    const logo = document.getElementById("previewLogo");
+
+    if(logo){
+      const logoUrl = brandOn ? (currentBusiness?.logo_url || "") : "";
+
+      logo.innerHTML = logoUrl
+        ? `<img src="${esc(logoUrl)}" alt="">`
+        : '<span class="leo-lion-logo" aria-hidden="true"></span>';
+    }
+
+    /* ANNOUNCEMENT */
+    const announcement =
+      document.getElementById("previewAnnouncement");
+
+    const announcementText =
+      document.getElementById("previewAnnouncementText");
+
+    if(announcement && announcementText){
+      const enabled =
+        data.announcement_enabled === true &&
+        !!data.announcement_text;
+
+      announcement.style.display =
+        enabled ? "block" : "none";
+
+      announcementText.textContent =
+        data.announcement_text || "";
+    }
+
+    /* CAMPAIGN */
+    const campaign =
+      document.getElementById("previewCampaign");
+
+    if(campaign){
+      const show =
+        data.campaign_enabled === true &&
+        !!(data.campaign_title || data.campaign_text);
+
+      campaign.style.display =
+        show ? "block" : "none";
+
+      if(data.campaign_image_url){
+        campaign.style.backgroundImage =
+          `linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.72)), url("${String(data.campaign_image_url).replace(/"/g,'\\"')}")`;
+        campaign.style.backgroundSize = "cover";
+        campaign.style.backgroundPosition = "center";
+      }else{
+        campaign.style.backgroundImage = "none";
+      }
+
+      const title =
+        document.getElementById("previewCampaignTitle");
+
+      const text =
+        document.getElementById("previewCampaignText");
+
+      const button =
+        document.getElementById("previewCampaignButton");
+
+      if(title){
+        title.textContent =
+          data.campaign_title || "Kampanya";
+      }
+
+      if(text){
+        text.textContent =
+          data.campaign_text || "Kampanya detayları";
+      }
+
+      if(button){
+        button.style.display =
+          data.campaign_button_text
+            ? "inline-flex"
+            : "none";
+
+        button.textContent =
+          data.campaign_button_text || "";
+      }
+    }
+
+    /* FEATURED */
+    const featured =
+      document.getElementById("previewFeatured");
+
+    if(featured){
+      const show =
+        data.featured_enabled === true &&
+        !!(data.featured_title || data.featured_text);
+
+      featured.style.display =
+        show ? "block" : "none";
+
+      if(data.featured_image_url){
+        featured.style.backgroundImage =
+          `linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.68)), url("${String(data.featured_image_url).replace(/"/g,'\\"')}")`;
+        featured.style.backgroundSize = "cover";
+        featured.style.backgroundPosition = "center";
+      }else{
+        featured.style.backgroundImage = "none";
+      }
+
+      const title =
+        document.getElementById("previewFeaturedTitle");
+
+      const text =
+        document.getElementById("previewFeaturedText");
+
+      const button =
+        document.getElementById("previewFeaturedButton");
+
+      if(title){
+        title.textContent =
+          data.featured_title || "Öne Çıkan";
+      }
+
+      if(text){
+        text.textContent =
+          data.featured_text || "Öne çıkan içerik";
+      }
+
+      if(button){
+        button.style.display =
+          data.featured_button_text
+            ? "inline-flex"
+            : "none";
+
+        button.textContent =
+          data.featured_button_text || "";
+      }
+    }
+
+    /* GALLERY */
+    const galleryBox =
+      document.getElementById("previewGallery");
+
+    if(galleryBox){
+      const gallery =
+        Array.isArray(data.gallery)
+          ? data.gallery
+          : [];
+
+      galleryBox.innerHTML =
+        gallery
+          .slice(0,6)
+          .map(item => {
+            const url =
+              typeof item === "string"
+                ? item
+                : item?.url || "";
+
+            return url
+              ? `<div><img src="${esc(url)}" alt=""></div>`
+              : "";
+          })
+          .join("");
+    }
+
+    /* VIDEO */
+    const video =
+      document.getElementById("previewVideo");
+
+    if(video){
+      video.style.display =
+        data.video_enabled && data.video_url
+          ? "block"
+          : "none";
+    }
+
+    /* LIVE INDICATOR */
+    const live =
+      document.getElementById("previewLiveStatus");
+
+    if(live){
+      live.textContent = "● CANLI";
+    }
+
+  }catch(error){
+    console.error("LEO CONNECT preview error:", error);
+
+    const message =
+      document.getElementById("designMessage");
+
+    if(message && !message.textContent){
+      message.textContent =
+        "Önizleme güncellenemedi.";
+    }
+  }
+}
+
+/* Gerçek canlı önizleme: inline handler'a ek olarak
+   tüm tasarım alanlarını merkezi olarak dinle. */
+function initLiveDesignPreview(){
+  const container = document.getElementById("profileDesign");
+  if(!container) return;
+
+  const refresh = function(){
+    try{ updateDesignPreview(); }catch(error){ console.error("LEO CONNECT preview refresh error:", error); }
+  };
+
+  /* Capture phase ensures the listener survives any dashboard navigation/rendering. */
+  container.addEventListener("input", function(event){
+    if(event.target && event.target.matches("input, textarea, select")) refresh();
+  }, true);
+
+  container.addEventListener("change", function(event){
+    if(event.target && event.target.matches("input, textarea, select")) refresh();
+  }, true);
+
+  refresh();
+}
+
+
+async function loadProfileDesign(){
+  const result = await api("/api/business-profile-design");
+  if(result && !result.error){
+    const design = result.design && typeof result.design === "object"
+      ? result.design
+      : result;
+    loadDesignIntoForm(design);
+    updateDesignPreview();
+  }else if(result?.error){
+    const msg = document.getElementById("designMessage");
+    if(msg) msg.textContent = result.error;
+  }
+}
+
+async function saveProfileDesign(){
+  const button = document.getElementById("designSaveButton");
+  const message = document.getElementById("designMessage");
+  const data = getDesignForm();
+
+  if(!button || !message) return;
+
+  button.disabled = true;
+  button.textContent = "Kaydediliyor...";
+  message.textContent = "";
+
+  const result = await api("/api/business-profile-design", {
+    method:"PUT",
+    body:JSON.stringify(data)
+  });
+
+  if(result && !result.error){
+    const savedDesign = result.design && typeof result.design === "object"
+      ? result.design
+      : result;
+    profileDesign = savedDesign;
+    loadDesignIntoForm(savedDesign);
+    updateDesignPreview();
+    message.textContent = "✓ Profil tasarımı kaydedildi.";
+    showToast("Profil tasarımı güncellendi.");
+  }else{
+    message.textContent = result?.error || "Tasarım kaydedilemedi.";
+    showToast("Tasarım kaydedilirken hata oluştu.");
+  }
+
+  button.disabled = false;
+  button.textContent = "✓ Tasarımı Kaydet";
+  setTimeout(() => { message.textContent = ""; }, 3500);
+}
+
+
+
+
+
+
+async function load(){
+
+  const business =
+    await api(
+      "/api/me"
+    );
+
+
+
+  if(!business)
+    return;
+
+
+
+  currentBusiness =
+    business;
+
+  applyPermissions(business);
+
+  try{
+    await loadProfileDesign();
+    initLiveDesignPreview();
+  }catch(error){
+    console.error("PROFILE DESIGN LOAD ERROR:", error);
+  }
+
+  const analyticsCard=document.getElementById('businessAnalyticsV3');
+  if(analyticsCard){
+    analyticsCard.style.display=business?.permissions?.analytics?'':'none';
+    if(business?.permissions?.analytics) loadBusinessAnalytics('7d');
+  }
+
+
+
+  /* TITLE */
+
+  document.getElementById(
+    "title"
+  ).textContent =
+    business.name ||
+    "İşletme Paneli";
+
+
+
+  document.getElementById(
+    "heroName"
+  ).textContent =
+    business.name ||
+    "İşletme";
+
+
+
+  document.getElementById(
+    "heroCategory"
+  ).textContent =
+    business.category ||
+    "İşletme";
+
+
+
+  document.getElementById(
+    "heroDescription"
+  ).textContent =
+    business.description ||
+    "Dijital işletme profilini yönet.";
+
+
+
+  /* FIELDS */
+
+  fields.forEach(
+    field => {
+
+      const element =
+        document.getElementById(
+          field
+        );
+
+
+
+      if(element){
+
+        element.value =
+          business[field] ||
+          "";
+
+      }
+
+    }
+  );
+
+
+
+  previewLogo();
+
+
+
+  /* HEALTH */
+
+  renderHealth(
+    business
+  );
+
+
+
+  /* PROFILE URL */
+
+  const profileUrl =
+    window.location.origin +
+    "/p/" +
+    business.slug;
+
+
+
+  document.getElementById(
+    "headerProfile"
+  ).href =
+    profileUrl;
+
+
+
+  document.getElementById(
+    "heroProfile"
+  ).href =
+    profileUrl;
+
+  const commandProfile = document.getElementById("commandProfile");
+  if(commandProfile) commandProfile.href = profileUrl;
+  const commandStatus = document.getElementById("commandStatus");
+  if(commandStatus) commandStatus.textContent = (business.name || "İşletme") + " dijital varlıkların tek merkezden yönetiliyor.";
+
+
+
+  document.getElementById(
+    "quickProfile"
+  ).href =
+    profileUrl;
+
+
+
+  /* NFC */
+
+  nfcUrl =
+    createNFCUrl(
+      business
+    );
+
+
+
+  document.getElementById(
+    "nfcUrl"
+  ).textContent =
+    nfcUrl;
+
+
+
+  /* QR */
+  const qr = await api("/api/qr");
+  if(qr && qr.qr){
+    const qrImage=document.getElementById("qr");
+    qrImage.src=qr.qr;
+    qrImage.style.display="block";
+    document.getElementById("url").textContent=qr.url||"";
+    document.getElementById("open").href=qr.url||"#";
+    document.getElementById("download").href=qr.qr;
+  }else{
+    const qrImage=document.getElementById("qr");
+    if(qrImage){qrImage.removeAttribute("src");qrImage.style.display="none";}
+    document.getElementById("url").textContent=qr?.error||"QR kodu oluşturulamadı.";
+  }
+
+  /* STATS */
+
+  const stats =
+    await api(
+      "/api/stats"
+    );
+
+
+
+  if(
+    Array.isArray(stats)
+  ){
+
+    statsData =
+      stats;
+
+    renderStats();
+
+  }
+
+
+
+  /* INFO */
+
+  setInfo(
+    "infoPhone",
+    business.phone
+  );
+
+
+
+  setInfo(
+    "infoWhatsapp",
+    business.whatsapp
+  );
+
+
+
+  setInfo(
+    "infoAddress",
+    business.address
+  );
+
+
+
+  setInfo(
+    "infoInstagram",
+    business.instagram
+  );
+
+
+
+  setInfo(
+    "infoGoogle",
+    business.google_review
+  );
+
+
+
+  setInfo(
+    "infoHours",
+    business.hours
+  );
+
+
+
+  await loadExtraModules();
+
+  hideLoading();
+
+}
+
+
+
+/* ==================================================
+   SAVE
+================================================== */
+
+async function save(){
+
+  const button =
+    document.getElementById(
+      "saveButton"
+    );
+
+
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+
+  const data = {};
+
+
+
+  fields.forEach(
+    field => {
+
+      const element =
+        document.getElementById(
+          field
+        );
+
+
+
+      data[field] =
+        element
+          ? element.value.trim()
+          : "";
+
+    }
+  );
+
+
+
+  /* WHATSAPP */
+
+  const whatsappNumber =
+    data.whatsapp.replace(
+      /\D/g,
+      ""
+    );
+
+
+
+  if(
+    whatsappNumber &&
+    !/^https?:\/\//i.test(
+      data.whatsapp
+    )
+  ){
+
+    data.whatsapp =
+      "https://wa.me/" +
+
+      (
+
+        whatsappNumber.startsWith("90")
+
+          ? whatsappNumber
+
+          : "90" +
+            whatsappNumber
+
+      );
+
+  }
+
+
+
+  button.classList.add(
+    "loading"
+  );
+
+
+
+  button.textContent =
+    "Kaydediliyor...";
+
+
+
+  message.textContent =
+    "";
+
+
+
+  const result =
+    await api(
+
+      "/api/me",
+
+      {
+
+        method:"PUT",
+
+        body:
+          JSON.stringify(
+            data
+          )
+
+      }
+
+    );
+
+
+
+  if(
+    result &&
+    !result.error
+  ){
+
+    currentBusiness =
+      result;
+
+
+
+    message.textContent =
+      "✓ Bilgiler başarıyla kaydedildi.";
+
+    showToast(
+      "İşletme bilgileri güncellendi."
+    );
+
+
+
+    /* HERO */
+
+    document.getElementById(
+      "title"
+    ).textContent =
+      result.name ||
+      "İşletme Paneli";
+
+
+
+    document.getElementById(
+      "heroName"
+    ).textContent =
+      result.name ||
+      "İşletme";
+
+
+
+    document.getElementById(
+      "heroCategory"
+    ).textContent =
+      result.category ||
+      "İşletme";
+
+
+
+    document.getElementById(
+      "heroDescription"
+    ).textContent =
+      result.description ||
+      "Dijital işletme profilini yönet.";
+
+
+
+    /* PROFILE */
+
+    const profileUrl =
+      window.location.origin +
+      "/p/" +
+      result.slug;
+
+
+
+    document.getElementById(
+      "headerProfile"
+    ).href =
+      profileUrl;
+
+
+
+    document.getElementById(
+      "heroProfile"
+    ).href =
+      profileUrl;
+
+
+
+    document.getElementById(
+      "quickProfile"
+    ).href =
+      profileUrl;
+
+
+
+    /* NFC */
+
+    nfcUrl =
+      createNFCUrl(
+        result
+      );
+
+
+
+    document.getElementById(
+      "nfcUrl"
+    ).textContent =
+      nfcUrl;
+
+
+
+    /* LOGO */
+
+    previewLogo();
+
+
+
+    /* HEALTH */
+
+    renderHealth(
+      result
+    );
+
+
+
+    /* INFO */
+
+    setInfo(
+      "infoPhone",
+      result.phone
+    );
+
+
+
+    setInfo(
+      "infoWhatsapp",
+      result.whatsapp
+    );
+
+
+
+    setInfo(
+      "infoAddress",
+      result.address
+    );
+
+
+
+    setInfo(
+      "infoInstagram",
+      result.instagram
+    );
+
+
+
+    setInfo(
+      "infoGoogle",
+      result.google_review
+    );
+
+
+
+    setInfo(
+      "infoHours",
+      result.hours
+    );
+
+
+
+    /* QR */
+
+    const qr =
+      await api(
+        "/api/qr"
+      );
+
+
+
+    if(qr){
+
+      document.getElementById(
+        "qr"
+      ).src =
+        qr.dataUrl;
+
+
+
+      document.getElementById(
+        "url"
+      ).textContent =
+        qr.url;
+
+
+
+      document.getElementById(
+        "open"
+      ).href =
+        qr.url;
+
+
+
+      document.getElementById(
+        "download"
+      ).href =
+        qr.dataUrl;
+
+    }
+
+
+
+  }else{
+
+    message.textContent =
+      result?.error ||
+      "Bir hata oluştu.";
+
+    showToast(
+      "Kaydetme sırasında hata oluştu."
+    );
+
+  }
+
+
+
+  button.classList.remove(
+    "loading"
+  );
+
+
+
+  button.textContent =
+    "✓ Bilgileri Kaydet";
+
+
+
+  setTimeout(
+    function(){
+
+      message.textContent =
+        "";
+
+    },
+    3500
+  );
+
+}
+
+
+
+/* ==================================================
+   TOAST
+================================================== */
+
+let toastTimer = null;
+
+
+
+function showToast(
+  text
+){
+
+  const toast =
+    document.getElementById(
+      "toast"
+    );
+
+
+
+  toast.textContent =
+    text;
+
+
+
+  toast.classList.add(
+    "show"
+  );
+
+
+
+  clearTimeout(
+    toastTimer
+  );
+
+
+
+  toastTimer =
+    setTimeout(
+      function(){
+
+        toast.classList.remove(
+          "show"
+        );
+
+      },
+      2400
+    );
+
+}
+
+
+
+/* ==================================================
+   LOADING
+================================================== */
+
+function hideLoading(){
+
+  const loading =
+    document.getElementById(
+      "loading"
+    );
+
+
+
+  setTimeout(
+    function(){
+
+      loading.classList.add(
+        "hide"
+      );
+
+    },
+    150
+  );
+
+}
+
+
+
+/* ==================================================
+   START
+================================================== */
+
+load();
+
+
+
+/* BUSINESS CENTER EXTRA MODULES */
+function esc(value){return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function formatEventType(type){
+  const events={
+    profile_view:{icon:"👤",label:"Profil görüntülendi"},
+    qr:{icon:"📱",label:"QR kod tarandı"},
+    qr_scan:{icon:"📱",label:"QR kod tarandı"},
+    nfc:{icon:"📡",label:"NFC dokunuldu"},
+    whatsapp:{icon:"💬",label:"WhatsApp'a tıklandı"},
+    phone:{icon:"☎️",label:"Telefon numarasına tıklandı"},
+    instagram:{icon:"📸",label:"Instagram'a tıklandı"},
+    tiktok:{icon:"🎵",label:"TikTok'a tıklandı"},
+    google_review:{icon:"⭐",label:"Google yorumlarına gidildi"},
+    review_open:{icon:"⭐",label:"Yorum sayfası açıldı"},
+    review_positive:{icon:"👍",label:"Olumlu yorum seçildi"},
+    review_feedback:{icon:"💬",label:"Yorum geri bildirimi gönderildi"},
+    website:{icon:"🌐",label:"Web sitesine tıklandı"},
+    menu:{icon:"📋",label:"Menü açıldı"},
+    location:{icon:"📍",label:"Konum açıldı"},
+    share:{icon:"↗️",label:"Profil paylaşıldı"},
+    campaign_view:{icon:"🚀",label:"Kampanya görüntülendi"},
+    campaign_click:{icon:"🚀",label:"Kampanyaya tıklandı"}
+  };
+  const e=events[type];
+  return e ? `${e.icon} ${e.label}` : `🔔 ${type||"Yeni etkileşim"}`;
+}
+async function loadBusinessLive(){if(!currentBusiness?.permissions?.live)return;const data=await api("/api/business-live-activity?limit=20");if(!data||data.error)return;const s=data.stats||{};document.getElementById("live15").textContent=Number(s.last_15m||0);document.getElementById("live60").textContent=Number(s.last_60m||0);document.getElementById("liveToday").textContent=Number(s.today||0);const rows=data.activities||[];document.getElementById("liveActivityList").innerHTML=rows.length?rows.map(x=>{const time=x.created_at?new Date(x.created_at).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";const extra=x.nfc_name?` • ${esc(x.nfc_name)}`:"";return `<div class="feature-item"><strong>${esc(formatEventType(x.type))}</strong>${extra}<span style="float:right;color:#666">${esc(time)}</span></div>`}).join(""):'<div class="feature-empty">Henüz aktivite yok.</div>';}
+async function loadAIInsights(period="7d",button=null){if(!currentBusiness?.permissions?.ai)return;if(button){document.querySelectorAll(".feature-periods button").forEach(b=>b.classList.remove("active"));button.classList.add("active");}const data=await api("/api/business-ai-insights?period="+encodeURIComponent(period));if(!data||data.error){document.getElementById("aiInsights").innerHTML='<div class="feature-empty">AI analizi şu anda yüklenemedi. Yenileyip tekrar deneyin.</div>';document.getElementById("aiRecommendations").innerHTML='';return;}document.getElementById("aiScore").textContent=Number(data.score||0);document.getElementById("aiTitle").textContent=data.title||"Analiz";document.getElementById("aiConversion").textContent="%"+Number(data.conversion||0).toLocaleString("tr-TR");document.getElementById("aiPeak").textContent=data.peak_hour?String(data.peak_hour.hour).padStart(2,"0")+":00":"—";document.getElementById("aiSource").textContent=data.strongest_source?.source||"—";const renderList=(id,items,icon)=>document.getElementById(id).innerHTML=(items||[]).length?items.map(x=>`<div class="feature-item">${icon} ${esc(x)}</div>`).join(""):'<div class="feature-empty">Henüz veri yok.</div>';renderList("aiInsights",data.insights,"💡");renderList("aiRecommendations",data.recommendations,"→");}
+async function loadReviewBooster(){if(!currentBusiness?.permissions?.review)return;const data=await api("/api/business-review-booster");if(!data||data.error)return;window.currentReviewBooster=data;const status=document.getElementById("reviewStatus");status.textContent=data.enabled?"AKTİF":"KAPALI";status.className="feature-status "+(data.enabled?"on":"off");document.getElementById("reviewTitle").textContent=data.title||"—";document.getElementById("reviewText").textContent=data.text||"—";document.getElementById("reviewThreshold").textContent=Number(data.threshold||4)+"★";document.getElementById("reviewEnabled").value=data.enabled?"true":"false";document.getElementById("reviewThresholdInput").value=Number(data.threshold||4);document.getElementById("reviewTitleInput").value=data.title||"";document.getElementById("reviewTextInput").value=data.text||"";document.getElementById("reviewGoogleInput").value=currentBusiness.google_review||"";const link=document.getElementById("reviewGoogle");if(currentBusiness.google_review){link.href=currentBusiness.google_review;link.textContent="Bağlantıyı Aç →";}else{link.removeAttribute("href");link.textContent="Google bağlantısı eklenmemiş";}}
+function toggleReviewEditor(force){const el=document.getElementById("reviewEditor");el.style.display=(force===undefined?el.style.display==="none":!force)?"block":"none";}
+async function saveReviewBooster(){const googleReview=document.getElementById("reviewGoogleInput").value.trim();const payload={enabled:document.getElementById("reviewEnabled").value==="true",title:document.getElementById("reviewTitleInput").value,text:document.getElementById("reviewTextInput").value,threshold:Number(document.getElementById("reviewThresholdInput").value||4),low_title:window.currentReviewBooster?.low_title||"Bunu duymak isteriz",low_text:window.currentReviewBooster?.low_text||"Yaşadığın sorunu bize ilet, seninle ilgilenelim.",success_title:window.currentReviewBooster?.success_title||"Teşekkürler!",success_text:window.currentReviewBooster?.success_text||"Değerlendirmen bizim için çok değerli."};const data=await api("/api/business-review-booster",{method:"PUT",body:JSON.stringify(payload)});if(!data||data.error){showToast(data?.error||"Review Booster kaydedilemedi.");return;}if(googleReview!==String(currentBusiness.google_review||"")){const b=currentBusiness||{};const profilePayload={name:b.name||"",category:b.category||"",description:b.description||"",phone:b.phone||"",whatsapp:b.whatsapp||"",address:b.address||"",instagram:b.instagram||"",tiktok:b.tiktok||"",google_review:googleReview,website:b.website||"",menu:b.menu||"",iban:b.iban||"",iban_holder:b.iban_holder||"",hours:b.hours||"",logo_url:b.logo_url||""};const profileData=await api("/api/me",{method:"PUT",body:JSON.stringify(profilePayload)});if(profileData&&!profileData.error)currentBusiness={...currentBusiness,...profileData};else currentBusiness.google_review=googleReview;}else currentBusiness.google_review=googleReview;await loadReviewBooster();toggleReviewEditor(false);showToast("Review Booster güncellendi.");}
+function toInputDate(v){if(!v)return "";const d=new Date(v);if(Number.isNaN(d.getTime()))return "";const pad=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes());}
+function openCampaignEditor(c=null){document.getElementById("campaignEditor").style.display="block";document.getElementById("campaignId").value=c?.id||"";document.getElementById("campaignTitleInput").value=c?.title||"";document.getElementById("campaignTextInput").value=c?.text||"";document.getElementById("campaignImageInput").value=c?.image_url||"";document.getElementById("campaignButtonTextInput").value=c?.button_text||"";document.getElementById("campaignButtonUrlInput").value=c?.button_url||"";document.getElementById("campaignStartInput").value=toInputDate(c?.starts_at);document.getElementById("campaignEndInput").value=toInputDate(c?.ends_at);document.getElementById("campaignEnabledInput").value=c?.enabled===false?"false":"true";document.getElementById("campaignPriorityInput").value=Number(c?.priority||0);document.getElementById("campaignTitleInput").focus();}
+function closeCampaignEditor(){document.getElementById("campaignEditor").style.display="none";}
+async function saveCampaign(){const id=document.getElementById("campaignId").value;const payload={title:document.getElementById("campaignTitleInput").value,text:document.getElementById("campaignTextInput").value,image_url:document.getElementById("campaignImageInput").value,button_text:document.getElementById("campaignButtonTextInput").value,button_url:document.getElementById("campaignButtonUrlInput").value,starts_at:document.getElementById("campaignStartInput").value||null,ends_at:document.getElementById("campaignEndInput").value||null,enabled:document.getElementById("campaignEnabledInput").value==="true",priority:Number(document.getElementById("campaignPriorityInput").value||0)};if(!payload.title.trim()){showToast("Kampanya başlığı gerekli.");return;}const data=await api(id?"/api/business-campaigns/"+encodeURIComponent(id):"/api/business-campaigns",{method:id?"PUT":"POST",body:JSON.stringify(payload)});if(!data||data.error){showToast(data?.error||"Kampanya kaydedilemedi.");return;}closeCampaignEditor();await loadBusinessCampaigns();showToast(id?"Kampanya güncellendi.":"Kampanya oluşturuldu.");}
+async function deleteCampaign(id){if(!confirm("Bu kampanya silinsin mi?"))return;const data=await api("/api/business-campaigns/"+encodeURIComponent(id),{method:"DELETE"});if(!data||data.error){showToast(data?.error||"Kampanya silinemedi.");return;}await loadBusinessCampaigns();showToast("Kampanya silindi.");}
+async function loadBusinessCampaigns(){if(!currentBusiness?.permissions?.campaign)return;const data=await api("/api/business-campaigns");if(!data||data.error)return;const rows=data.campaigns||[];document.getElementById("campaignList").innerHTML=rows.length?rows.map(c=>{const start=c.starts_at?new Date(c.starts_at).toLocaleDateString("tr-TR"):"Başlangıç yok";const end=c.ends_at?new Date(c.ends_at).toLocaleDateString("tr-TR"):"Süresiz";return `<div class="campaign-card"><h3>${esc(c.title||"Kampanya")}</h3><p>${esc(c.text||"")}</p><div class="campaign-meta"><span>${esc(start)} → ${esc(end)}</span><span class="campaign-badge">${c.enabled?"AKTİF":"PASİF"}</span></div><div class="campaign-actions"><button type="button" onclick='openCampaignEditor(${JSON.stringify(c).replace(/</g,"\u003c")})'>✎ Düzenle</button><button type="button" onclick="deleteCampaign(${Number(c.id)})">🗑 Sil</button></div></div>`}).join(""):'<div class="feature-empty" style="grid-column:1/-1">Henüz kampanya oluşturulmamış.</div>'; }
+async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.permissions?.live)loadBusinessLive();if(currentBusiness.permissions?.ai)loadAIInsights("7d");if(currentBusiness.permissions?.review)loadReviewBooster();if(currentBusiness.permissions?.campaign)loadBusinessCampaigns();}
+
+</script>
+
+
+
+
+
+<script id="leo-profile-connections-v1">
+(function(){
+  const names={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website',yemeksepeti:'Yemeksepeti',getir:'Getir','trendyol-yemek':'Trendyol Yemek','migros-yemek':'Migros Yemek',rezervasyon:'Rezervasyon',bilet:'Bilet / Etkinlik',menu:'Online Menü',location:'Konum',tripadvisor:'Tripadvisor',booking:'Booking',telegram:'Telegram',email:'E-posta'};
+  const icons={instagram:'<svg viewBox="0 0 24 24"><defs><linearGradient id="ig" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#feda75"/><stop offset=".35" stop-color="#fa7e1e"/><stop offset=".7" stop-color="#d62976"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="5" fill="url(#ig)"/><circle cx="12" cy="12" r="4" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="17.4" cy="6.7" r="1.1" fill="#fff"/></svg>',facebook:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#1877F2"/><path d="M13.5 20v-7h2.4l.4-2.8h-2.8V8.4c0-.8.3-1.4 1.5-1.4h1.5V4.5c-.7-.1-1.5-.2-2.2-.2-2.3 0-3.8 1.4-3.8 3.9v2H8v2.8h2.5v7z" fill="#fff"/></svg>',tiktok:'<svg viewBox="0 0 24 24"><path d="M14.2 3h3.1c.2 1.8 1.2 3.2 2.7 4v3.1c-1.1-.1-2.2-.5-3.1-1.1v6.1c0 3-2.3 5.1-5.4 5.1A5.5 5.5 0 1 1 13 9.4v3.3a2.5 2.5 0 1 0 1.5 2.3V3z" fill="#111"/><path d="M13.1 3h2.1c.2 1.7 1.1 3 2.5 3.7v2.1c-1.1-.3-2-.8-2.8-1.5v6.7c0 2.8-2 4.8-4.8 4.8a4.9 4.9 0 0 1-3.7-1.7 4.9 4.9 0 0 0 3.1 1.1c3.1 0 5.4-2.1 5.4-5.1V7.1c.7.6 1.6 1 2.5 1.2-1.5-.9-2.4-2.4-2.6-4h-1.7z" fill="#25F4EE" opacity=".8"/></svg>',youtube:'<svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0000"/><path d="M10 9l6 3-6 3z" fill="#fff"/></svg>',linkedin:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="#0A66C2"/><circle cx="8" cy="9" r="1.2" fill="#fff"/><path d="M7 11h2v6H7zm4 0h2v.9c.6-.8 1.4-1.2 2.4-1.2 1.9 0 2.6 1.2 2.6 3.1V17h-2v-2.8c0-.8-.1-1.5-1-1.5s-1 1-1 1.7V17h-2z" fill="#fff"/></svg>',x:'<svg viewBox="0 0 24 24"><path d="M4 4l6.3 8.4L4.4 20h3l4.3-5.7L16 20h4l-6.7-8.9L19.3 4h-3l-4 5.3L8 4z" fill="#111"/></svg>',whatsapp:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#25D366"/><path d="M8.1 18l.8-2.7A6.1 6.1 0 1 1 18 8.4a6 6 0 0 1-8.5 8.7z" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M9.5 8.6c.3-.4.7-.4 1-.1l.8 1c.2.3.2.5 0 .8l-.4.5c.5 1 1.2 1.7 2.2 2.2l.5-.4c.3-.2.5-.2.8 0l1 .8c.3.2.3.7 0 1-.5.6-1.2.8-1.9.5-2.7-1-4.2-2.5-5.2-5.2-.3-.7-.1-1.4.5-1.9z" fill="#fff"/></svg>',google:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M21 12.2c0-.7-.1-1.4-.2-2H12v3.8h5c-.2 1.2-.9 2.2-1.9 2.9v2.4h3.1c1.8-1.7 2.8-4.1 2.8-7.1z" fill="#4285F4"/><path d="M12 21c2.6 0 4.8-.9 6.4-2.5l-3.1-2.4c-.9.6-2 1-3.3 1-2.5 0-4.6-1.7-5.3-4H3.5v2.5A9.7 9.7 0 0 0 12 21z" fill="#34A853"/><path d="M6.7 13.1A5.8 5.8 0 0 1 6.4 12c0-.4.1-.8.2-1.1V8.4H3.5A9 9 0 0 0 2.5 12c0 1.3.3 2.5 1 3.6z" fill="#FBBC05"/><path d="M12 6.9c1.4 0 2.7.5 3.7 1.4l2.7-2.7A9.7 9.7 0 0 0 3.5 8.4l3.1 2.5c.7-2.3 2.9-4 5.4-4z" fill="#EA4335"/></svg>',website:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#6C5CE7"/><path d="M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9S14.5 18.5 12 21c-2.5-2.5-3.5-5.5-3.5-9S9.5 5.5 12 3z" fill="none" stroke="#fff" stroke-width="1.4"/></svg>',yemeksepeti:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FA0050"/><path d="M7 10h10M8 10l1 8h6l1-8M10 7h4l1 3H9z" fill="none" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/></svg>',getir:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#5B2D8B"/><path d="M7 7h10v3H10v2h6v3h-6v2H7z" fill="#FFC900"/></svg>','trendyol-yemek':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#F27A1A"/><path d="M7 8h10v3h-7v2h6v3H7z" fill="#fff"/></svg>','migros-yemek':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FF8C00"/><path d="M6 9h12v7H6z" fill="#fff"/><path d="M8 9V7h8v2" fill="none" stroke="#FF8C00" stroke-width="1.5"/></svg>',rezervasyon:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3" fill="#00A884"/><path d="M7 3v4M17 3v4M3 9h18" stroke="#fff" stroke-width="1.6"/><path d="M8 13h3v3H8z" fill="#fff"/></svg>',bilet:'<svg viewBox="0 0 24 24"><path d="M4 7a3 3 0 0 0 0 6v4h16v-4a3 3 0 0 0 0-6V3H4z" fill="#7C4DFF"/><path d="M12 6v2m0 2v2m0 2v2" stroke="#fff" stroke-width="1.5"/></svg>',menu:'<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2" fill="#D4AF37"/><path d="M8 7h8M8 11h8M8 15h5" stroke="#111" stroke-width="1.5"/></svg>',location:'<svg viewBox="0 0 24 24"><path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12z" fill="#EA4335"/><circle cx="12" cy="9" r="2.5" fill="#fff"/></svg>',tripadvisor:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#00AF87"/><path d="M6 9h12M8 15a3 3 0 1 0 0-6m8 6a3 3 0 1 0 0-6" fill="none" stroke="#fff" stroke-width="1.5"/></svg>',booking:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#003B95"/><path d="M7 8h6a3 3 0 0 1 0 6H7zm0 0v8m0-4h6" fill="none" stroke="#fff" stroke-width="2"/></svg>',telegram:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#229ED9"/><path d="M5 11.7l13-5-3.2 10.6-3.2-3-2.1 2v-3.1z" fill="#fff"/></svg>',email:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="#EA4335"/><path d="M4 7l8 6 8-6" fill="none" stroke="#fff" stroke-width="1.6"/></svg>'};
+  const legacyMap={instagram:'instagram',tiktok:'tiktok',whatsapp:'whatsapp',google:'google_review',website:'website'};
+  const esc2=v=>String(v??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+  let settings={allowed_platforms:{},social_links:{},custom_links:[]};
+
+  let settingsLoaded=false;
+  async function loadSettings(){
+    try{
+      const data=await api('/api/business-v2-settings?fresh='+Date.now(),{cache:'no-store'});
+      if(data&&!data.error){settings={...data,allowed_platforms:(data.allowed_platforms&&typeof data.allowed_platforms==='object')?data.allowed_platforms:{}};window.leoProfileSettings=settings;settingsLoaded=true;renderConnections();return true;}
+      throw new Error(data?.error||'Profil ayarları alınamadı');
+    }catch(e){settingsLoaded=false;console.warn('Profile connection settings:',e);const panel=document.getElementById('profileConnectionPanel');if(panel)panel.innerHTML='<div class="pcc-panel-head"><div><strong>Bağlantı izinleri alınamadı</strong><span>Lütfen tekrar deneyin.</span></div></div>';return false;}
+  }
+  function publicUrl(){
+    return document.getElementById('headerProfile')?.href||'';
+  }
+  function renderConnections(){
+    const panel=document.getElementById('profileConnectionPanel'); if(!panel)return;
+    const allowed=settings.allowed_platforms||{};
+    const links=settings.social_links||{};
+    const platforms=Object.keys(names).filter(k=>Object.keys(allowed).length===0 || allowed[k]!==false);
+    panel.innerHTML=`
+      <div class="pcc-panel-head"><div><strong>🔗 Dijital Bağlantılar</strong><span>Bağla dediğinde müşteri profilinde görünür.</span></div><button type="button" class="action" onclick="closeProfileGroup()">Kapat</button></div>
+      <div class="pcc-conn-grid">
+        ${platforms.map(k=>{
+          const item=links[k]||{};
+          const url=item.url||'';
+          return `<div class="pcc-conn"><div class="pcc-conn-main"><div class="pcc-conn-icon">${icons[k]}</div><div><strong>${names[k]}</strong><small>${esc2(url||'Bağlantı eklenmedi')}</small></div></div><button type="button" class="pcc-connect ${url?'on':''}" onclick="connectProfilePlatform('${k}')">${url?'Düzenle':'Hesabı Bağla'}</button></div>`;
+        }).join('')}
+      </div>
+      <div class="pcc-custom"><input id="pccCustomTitle" placeholder="Özel bağlantı adı (Yemeksepeti, Getir...)"><input id="pccCustomUrl" placeholder="Bağlantı adresi"><button type="button" onclick="addProfileCustomLink()">＋ Özel Bağlantı Ekle</button></div>
+      ${(settings.custom_links||[]).length?`<div style="margin-top:10px;display:grid;gap:6px">${settings.custom_links.map((x,i)=>`<div class="pcc-conn"><div class="pcc-conn-main"><div class="pcc-conn-icon">${esc2(x.icon||'🔗')}</div><div><strong>${esc2(x.title)}</strong><small>${esc2(x.url)}</small></div></div><button type="button" class="pcc-connect" onclick="removeProfileCustomLink(${i})">Sil</button></div>`).join('')}</div>`:''}
+    `;
+  }
+  window.openProfileGroup=async function(group){
+    const panel=document.getElementById('profileConnectionPanel'); if(!panel)return;
+    panel.style.display='block';
+    if(group==='connections'){panel.innerHTML='<div class="pcc-panel-head"><div><strong>Dijital Bağlantılar</strong><span>Admin izinleri kontrol ediliyor…</span></div></div>';panel.scrollIntoView({behavior:'smooth',block:'center'});const ok=await loadSettings();if(ok)renderConnections();return;}
+    if(group==='info'){document.querySelector('#profile .form-grid')?.scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('name')?.focus();return;}
+    if(group==='payment'){document.getElementById('iban')?.scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('iban')?.focus();return;}
+    if(group==='appearance'){
+      panel.innerHTML=`<div class="pcc-panel-head"><div><strong>✦ Görünüm & Tema</strong><span>4 premium tema arasından seçim yap.</span></div><button type="button" class="action" onclick="closeProfileGroup()">Kapat</button></div>
+      <div class="pcc-theme-grid">
+        <button type="button" class="pcc-theme" onclick="selectProfileTheme('midnight-gold')"><strong>Midnight Gold</strong><small>Siyah / altın premium</small></button>
+        <button type="button" class="pcc-theme" onclick="selectProfileTheme('obsidian')"><strong>Obsidian</strong><small>Ultra dark / tech</small></button>
+        <button type="button" class="pcc-theme" onclick="selectProfileTheme('champagne')"><strong>Champagne</strong><small>Sıcak / lüks</small></button>
+        <button type="button" class="pcc-theme" onclick="selectProfileTheme('pure-light')"><strong>Pure Light</strong><small>Aydınlık / premium</small></button>
+      </div>
+      <div class="pcc-actions" style="margin-top:10px"><button type="button" class="action" onclick="document.getElementById('profileDesign')?.scrollIntoView({behavior:'smooth',block:'start'})">Detaylı Profil Tasarımını Aç →</button></div>`;
+      panel.style.display='block';panel.scrollIntoView({behavior:'smooth',block:'center'});return;
+    }
+  };
+  window.closeProfileGroup=function(){const p=document.getElementById('profileConnectionPanel');if(p)p.style.display='none';};
+  window.connectProfilePlatform=async function(type){
+    const label=names[type]||type;
+    const current=settings.social_links?.[type]?.url||document.getElementById(legacyMap[type]||'')?.value||'';
+    const value=prompt((current?'Düzenle: ':'Bağla: ')+label+' bağlantısını gir:',current);
+    if(value===null)return;
+    const url=value.trim();
+    if(!url)return;
+    const next={...(settings.social_links||{})};
+    next[type]={url,enabled:true,label};
+    try{
+      const result=await api('/api/business-social-links',{method:'PUT',body:JSON.stringify({social_links:next})});
+      settings.social_links=result.social_links||next;
+      if(legacyMap[type]&&document.getElementById(legacyMap[type])) document.getElementById(legacyMap[type]).value=url;
+      if(legacyMap[type]==='google_review') currentBusiness.google_review=url;
+      if(legacyMap[type]) await saveLegacyField(type,url);
+      renderConnections();showToast(label+' bağlantısı kaydedildi.');
+    }catch(e){showToast(e.message||'Bağlantı kaydedilemedi.');}
+  };
+  async function saveLegacyField(type,url){
+    const field=legacyMap[type]; if(!field)return;
+    const b=currentBusiness||{};
+    const payload={name:b.name||'',category:b.category||'',description:b.description||'',phone:b.phone||'',whatsapp:b.whatsapp||'',address:b.address||'',instagram:b.instagram||'',tiktok:b.tiktok||'',google_review:b.google_review||'',website:b.website||'',menu:b.menu||'',iban:b.iban||'',iban_holder:b.iban_holder||'',hours:b.hours||'',logo_url:b.logo_url||''};
+    payload[field]=url;
+    const r=await api('/api/me',{method:'PUT',body:JSON.stringify(payload)});
+    if(r&&!r.error)currentBusiness={...currentBusiness,...r};
+  }
+  window.addProfileCustomLink=async function(){
+    const title=document.getElementById('pccCustomTitle')?.value.trim(),url=document.getElementById('pccCustomUrl')?.value.trim();
+    if(!title||!url){showToast('Özel bağlantı adı ve adresi gerekli.');return;}
+    const next=[...(settings.custom_links||[]),{title,url,icon:'🔗',enabled:true,sort_order:(settings.custom_links||[]).length}].slice(0,20);
+    try{const r=await api('/api/business-custom-links',{method:'PUT',body:JSON.stringify({custom_links:next})});settings.custom_links=r.custom_links||next;renderConnections();showToast('Özel bağlantı eklendi.');}catch(e){showToast(e.message||'Özel bağlantı eklenemedi.');}
+  };
+  window.removeProfileCustomLink=async function(index){
+    const next=(settings.custom_links||[]).filter((_,i)=>i!==index);
+    try{const r=await api('/api/business-custom-links',{method:'PUT',body:JSON.stringify({custom_links:next})});settings.custom_links=r.custom_links||next;renderConnections();showToast('Özel bağlantı kaldırıldı.');}catch(e){showToast(e.message||'Bağlantı silinemedi.');}
+  };
+  window.selectProfileTheme=async function(theme){
+    try{
+      const r=await api('/api/business-theme',{method:'PUT',body:JSON.stringify({theme,accent_color:'#D4AF37'})});
+      if(typeof loadProfileDesign==='function') await loadProfileDesign();
+      if(typeof updateDesignPreview==='function') updateDesignPreview();
+      showToast((r.theme_name||theme)+' teması seçildi.');
+    }catch(e){showToast(e.message||'Tema kaydedilemedi.');}
+  };
+  const originalLoad=window.load;
+  if(typeof originalLoad==='function'){
+    window.load=async function(){await originalLoad.apply(this,arguments);await loadSettings();const p=document.getElementById('pccPublicProfile');const h=document.getElementById('headerProfile');if(p&&h)p.href=h.href;};
+  }
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadSettings();});
+  window.addEventListener('focus',()=>loadSettings());
+})();
+</script>
+
+<script id="leo-business-final-js">
+(function(){
+  const map={overview:{title:'Genel Bakış',ids:[]},profile:{title:'Profil',ids:['profile','profileDesign']},digital:{title:'QR & NFC',ids:['digital']},campaigns:{title:'Kampanyalar',ids:['campaignSection']},stats:{title:'İstatistikler',ids:['businessAnalyticsV3','performanceSection','liveSection','aiSection','reviewSection']}};
+  window.showBusinessSection=function(name){
+    const cfg=map[name]||map.overview;
+    document.querySelectorAll('.bc-view').forEach(v=>v.classList.toggle('active',v.dataset.view===name));
+    document.querySelectorAll('[data-bc]').forEach(b=>b.classList.toggle('active',b.dataset.bc===name));
+    document.querySelectorAll('.bc-main-shell main > section,.bc-main-shell main > .box,.bc-main-shell main > .feature-box,.bc-main-shell main > .analytics-v3,.bc-main-shell main > .performance').forEach(el=>{
+      const id=el.id||'';
+      el.dataset.bcOriginalDisplay=el.dataset.bcOriginalDisplay||el.style.display||'';
+      el.style.display='none';
+    });
+    // Move original working V1 sections into the correct V2 view containers without cloning.
+    cfg.ids.forEach(id=>{const el=document.getElementById(id); if(el){el.style.display=el.dataset.bcOriginalDisplay||''; const mount=document.getElementById(name==='profile'?(id==='profile'?'bcProfileMount':'bcDesignMount'):name==='digital'?'bcDigitalMount':name==='campaigns'?'bcCampaignMount':'bcStatsMount'); if(mount && el.parentElement!==mount) mount.appendChild(el);}});
+    document.getElementById('bcTopTitle').textContent=cfg.title;
+    window.scrollTo({top:0,behavior:'smooth'});
+    if(name==='digital' && typeof loadQR==='function'){try{loadQR()}catch(e){}}
+    if(name==='digital' && typeof loadBusinessTableCodes==='function'){try{setTimeout(()=>loadBusinessTableCodes(),50)}catch(e){}}
+    if(name==='campaigns' && typeof loadBusinessCampaigns==='function'){try{loadBusinessCampaigns()}catch(e){}}
+    if(name==='stats'){try{if(typeof loadBusinessAnalytics==='function')loadBusinessAnalytics('7d');if(typeof loadBusinessLive==='function')loadBusinessLive();if(typeof loadAIInsights==='function')loadAIInsights('7d');if(typeof loadReviewBooster==='function')loadReviewBooster()}catch(e){}}
+  };
+  window.bcScrollTo=function(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});};
+  window.bcSelectTheme=function(theme){const sel=document.getElementById('design_theme');if(!sel)return;sel.value=theme;sel.dispatchEvent(new Event('change',{bubbles:true}));const save=document.querySelector('#profileDesign .design-save-button, #profileDesign button[type=submit]');if(typeof updateDesignPreview==='function')updateDesignPreview();if(save)save.click();};
+  function syncKpis(){
+    const pairs=[['profileViews','bcKpiProfile'],['qrViews','bcKpiQR'],['nfcViews','bcKpiNFC'],['whatsappViews','bcKpiWA'],['phoneViews','bcKpiPhone'],['totalViews','bcKpiTotal']];
+    pairs.forEach(([a,b])=>{const x=document.getElementById(a),y=document.getElementById(b);if(x&&y)y.textContent=x.textContent||'0';});
+    const hs=document.getElementById('healthScore'), ht=document.getElementById('healthTitle'), hm=document.getElementById('healthMessage'), hf=document.getElementById('healthFill');
+    if(hs){document.getElementById('bcScoreText').textContent=hs.textContent||'0';const n=Number(hs.textContent)||0;document.getElementById('bcScore').style.setProperty('--score',(n*3.6)+'deg');document.getElementById('bcHealthFill').style.width=n+'%';}
+    if(ht)document.getElementById('bcHealthTitle').textContent=ht.textContent; if(hm)document.getElementById('bcHealthMsg').textContent=hm.textContent;
+  }
+  function syncLive(){const src=document.getElementById('liveActivityList'),dst=document.getElementById('bcLiveMini');if(!src||!dst)return;const items=[...src.querySelectorAll('.feature-item')].slice(0,5);if(!items.length)return;dst.innerHTML=items.map(x=>`<div class="bc-list-item"><div class="li-ico">⚡</div><div><strong>${x.querySelector('strong')?.textContent||'Aktivite'}</strong><span>Son hareket</span></div><div class="li-right">●</div></div>`).join('');}
+  function boot(){
+    const profileLink=document.getElementById('headerProfile');
+    const topLink=document.getElementById('bcProfileLink');
+    const sideLink=document.getElementById('bcSidebarProfile');
+    const heroLink=document.getElementById('bcProfileHero');
+    const profilePageLink=document.getElementById('bcProfileProfilePage');
+    const welcomeName=document.getElementById('bcWelcomeName');
+    const syncProfileLinks=()=>{
+      if(profileLink && profileLink.href){
+        [topLink,sideLink,heroLink,profilePageLink].forEach(el=>{if(el)el.href=profileLink.href});
+      }
+      if(welcomeName && currentBusiness?.name) welcomeName.textContent=currentBusiness.name;
+    };
+    if(profileLink){const obs=new MutationObserver(syncProfileLinks);obs.observe(profileLink,{attributes:true,attributeFilter:['href']});}
+    setInterval(()=>{syncKpis();syncLive();syncProfileLinks();},700);
+    showBusinessSection('overview');
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+<script id="leo-business-table-codes">
+(function(){
+  let editingId=null;
+  let loadedRows=[];
+  const esc=v=>{const d=document.createElement('div');d.textContent=String(v==null?'':v);return d.innerHTML;};
+  const attr=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const byId=id=>loadedRows.find(x=>Number(x.id)===Number(id));
+  function nextTableNumber(rows){
+    const nums=rows.map(r=>{const m=String(r.name||'').match(/^Masa\s*(\d+)$/i);return m?Number(m[1]):0;});
+    let n=1;while(nums.includes(n))n++;return n;
+  }
+  function setModal(show){const el=document.getElementById('tableCodeModal');if(el)el.style.display=show?'flex':'none';}
+  window.openBusinessTableCodeForm=function(id){
+    editingId=id?Number(id):null;
+    const row=editingId?byId(editingId):null;
+    const input=document.getElementById('tableCodeNameInput');
+    const title=document.getElementById('tableCodeModalTitle');
+    const save=document.getElementById('tableCodeModalSave');
+    if(title)title.textContent=editingId?'Masayı Düzenle':'Yeni Masa';
+    if(save){save.textContent=editingId?'Kaydet':'Masayı Oluştur';save.disabled=false;}
+    if(input)input.value=row?.name||('Masa '+nextTableNumber(loadedRows));
+    setModal(true);setTimeout(()=>input?.focus(),60);
+  };
+  window.closeBusinessTableCodeForm=function(){editingId=null;setModal(false);};
+  window.saveBusinessTableCode=async function(){
+    const name=document.getElementById('tableCodeNameInput')?.value.trim();
+    if(!name){showToast('Masa adı gerekli.');return;}
+    const btn=document.getElementById('tableCodeModalSave');if(btn)btn.disabled=true;
+    try{
+      if(editingId){
+        const row=byId(editingId);
+        await api('/api/nfc-tags/'+editingId,{method:'PUT',body:JSON.stringify({name,placement:'Masa',is_active:row?.is_active!==false})});
+        showToast('Masa güncellendi.');
+      }else{
+        await api('/api/nfc-tags',{method:'POST',body:JSON.stringify({name,placement:'Masa',is_active:true})});
+        showToast('Masa oluşturuldu. Admin paneline de yansıdı.');
+      }
+      closeBusinessTableCodeForm();await loadBusinessTableCodes();
+    }catch(e){showToast(e?.message||'Masa işlemi başarısız.');}
+    finally{if(btn)btn.disabled=false;}
+  };
+  window.toggleBusinessTableCode=async function(id,active){
+    const row=byId(id);if(!row)return;
+    try{
+      const result=await api('/api/nfc-tags/'+id,{method:'PUT',body:JSON.stringify({name:row.name,placement:'Masa',is_active:!active})});
+      if(result?.error)throw new Error(result.error);
+      showToast(!active?'Masa aktifleştirildi.':'Masa pasifleştirildi.');
+      await loadBusinessTableCodes();
+    }catch(e){showToast(e?.message||'Durum değiştirilemedi.');}
+  };
+  window.deleteBusinessTableCode=async function(id,name){
+    if(!confirm('“'+String(name||'Bu masa')+'” silinsin mi? Bu kayıt admin panelinden de kaldırılır.'))return;
+    try{
+      const result=await api('/api/nfc-tags/'+id,{method:'DELETE'});
+      if(result?.error)throw new Error(result.error);
+      showToast('Masa silindi.');await loadBusinessTableCodes();
+    }catch(e){showToast(e?.message||'Masa silinemedi.');}
+  };
+  async function copyText(value){
+    try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);return true;}}catch(e){}
+    try{
+      const ta=document.createElement('textarea');ta.value=value;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');ta.remove();return ok;
+    }catch(e){return false;}
+  }
+  window.copyBusinessTableCode=async function(url){
+    if(await copyText(url))showToast('NFC bağlantısı kopyalandı.');else showToast('Bağlantı kopyalanamadı.');
+  };
+  window.openBusinessTableCode=function(url){window.open(url,'_blank','noopener,noreferrer');};
+  function tableQRImageUrl(code){return code?('/qr/nfc/'+encodeURIComponent(code)+'.png'):'';}
+  window.downloadBusinessTableQR=async function(id,name){
+    try{
+      const row=byId(id);const url=tableQRImageUrl(row?.code);if(!url)throw new Error('QR hazır değil');
+      const response=await fetch(url,{cache:'no-store'});if(!response.ok)throw new Error('QR görseli alınamadı');
+      const blob=await response.blob();const objectUrl=URL.createObjectURL(blob);const a=document.createElement('a');
+      a.href=objectUrl;a.download='leo-connect-'+String(name||'masa').replace(/[^a-z0-9ğüşöçıİĞÜŞÖÇ_-]+/gi,'-').toLowerCase()+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(objectUrl),1200);
+    }catch(e){showToast(e?.message||'QR indirilemedi.');}
+  };
+  function qrMarkup(t){
+    const code=String(t.code||'');
+    const qrUrl=tableQRImageUrl(code);
+    const id=Number(t.id);
+    const name=String(t.name||'Masa');
+    const active=t.is_active!==false;
+    const qrCount=Number(t.qr_count||0);
+    const nfcCount=Number(t.nfc_count||t.tap_count||0);
+    const total=Number(t.total_count||qrCount+nfcCount);
+    const url=t.url||('/p/nfc/'+encodeURIComponent(code));
+    return `<article class="table-code-row" data-table-row="${id}">
+      <div class="table-code-qr-wrap"><img id="tableCodeQr_${id}" class="table-code-qr" src="${attr(qrUrl)}" data-qr-src="${attr(qrUrl)}" alt="${attr(name)} QR" decoding="async" referrerpolicy="no-referrer"><span>QR</span></div>
+      <div class="table-code-main"><div class="table-code-name-line"><div class="table-code-name">${esc(name)}</div><span class="table-code-status ${active?'on':'off'}">${active?'AKTİF':'PASİF'}</span></div><div class="table-code-meta">QR: ${qrCount} · NFC: ${nfcCount}</div><div class="table-code-stat">Toplam okutma: <b>${total}</b></div></div>
+      <div class="table-code-actions">
+        <button type="button" class="gold" data-table-action="download" data-id="${id}">QR İndir</button>
+        <button type="button" data-table-action="copy" data-id="${id}">NFC Bağlantısını Kopyala</button>
+        <button type="button" data-table-action="test" data-id="${id}">Test Et ↗</button>
+        <button type="button" data-table-action="edit" data-id="${id}">Düzenle</button>
+        <button type="button" data-table-action="toggle" data-id="${id}" data-active="${active}">${active?'Pasife Al':'Aktifleştir'}</button>
+        <button type="button" class="danger" data-table-action="delete" data-id="${id}">Sil</button>
+      </div>
+    </article>`;
+  }
+  window.loadBusinessTableCodes=async function(){
+    const list=document.getElementById('tableCodeList');if(!list)return;
+    try{
+      const tags=await api('/api/nfc-tags?fresh='+Date.now(),{cache:'no-store'});
+      if(tags?.error)throw new Error(tags.error);
+      const rows=Array.isArray(tags)?tags:(tags?.nfc_tags||[]);loadedRows=rows;
+      if(!rows.length){list.innerHTML='<div class="table-code-empty">Henüz masa eklenmemiş.<br><span style="display:inline-block;margin-top:7px">İlk masayı eklemek için <b>＋ Masa Ekle</b> butonuna bas.</span></div>';return;}
+      list.innerHTML=rows.map(qrMarkup).join('');
+      list.querySelectorAll('.table-code-qr').forEach(img=>{
+        img.addEventListener('error',function(){
+          if(this.dataset.retry!=='1'){
+            this.dataset.retry='1';
+            setTimeout(()=>{this.src=this.dataset.qrSrc+'?retry=1';},400);
+          }else{
+            this.style.display='none';this.parentElement.classList.add('broken');
+          }
+        },{once:false});
+      });
+    }catch(e){list.innerHTML='<div class="table-code-empty">'+esc(e?.message||'Masalar alınamadı.')+'</div>';}
+  };
+  function handleTableAction(event){
+    const btn=event.target.closest('[data-table-action]');if(!btn)return;
+    event.preventDefault();event.stopPropagation();
+    const id=Number(btn.dataset.id);const row=byId(id);if(!row)return;
+    const action=btn.dataset.tableAction;
+    if(action==='download')return downloadBusinessTableQR(id,row.name);
+    if(action==='copy')return copyBusinessTableCode(row.url||('/p/nfc/'+encodeURIComponent(row.code||'')));
+    if(action==='test')return openBusinessTableCode(row.url||('/p/nfc/'+encodeURIComponent(row.code||'')));
+    if(action==='edit')return openBusinessTableCodeForm(id);
+    if(action==='toggle')return toggleBusinessTableCode(id,btn.dataset.active==='true');
+    if(action==='delete')return deleteBusinessTableCode(id,row.name);
+  }
+  document.addEventListener('DOMContentLoaded',()=>{
+    const list=document.getElementById('tableCodeList');
+    if(list&&!list.dataset.tableEvents){list.dataset.tableEvents='1';list.addEventListener('click',handleTableAction);}
+    if(!document.getElementById('tableCodeModal')){
+      const m=document.createElement('div');m.id='tableCodeModal';m.className='table-code-modal';m.style.display='none';m.innerHTML='<div class="table-code-modal-card"><h3 id="tableCodeModalTitle">Yeni Masa</h3><p>Bu masa için ayrı QR ve NFC bağlantısı oluşturulacak.</p><label class="table-code-field"><span>Masa adı</span><input id="tableCodeNameInput" maxlength="80" placeholder="Örn. Masa 12"></label><div class="table-code-modal-actions"><button type="button" onclick="closeBusinessTableCodeForm()">Vazgeç</button><button type="button" class="gold" id="tableCodeModalSave" onclick="saveBusinessTableCode()">Masayı Oluştur</button></div></div>';document.body.appendChild(m);
+    }
+    setTimeout(()=>loadBusinessTableCodes(),300);
+  });
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadBusinessTableCodes();});
+  window.addEventListener('focus',()=>loadBusinessTableCodes());
+})();
+</script>
+</body>
+
+</html>
