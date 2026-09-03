@@ -1165,7 +1165,7 @@ async function showWebsiteCMS(btn){
 }
 async function renderWebsiteCMS(){
   const [sd,ss]=await Promise.all([api('/api/admin/website/settings'),api('/api/admin/website/sections')]);
-  const settings=sd.settings||{}; const sections=ss.sections||[];
+  const settings=sd.settings||{}; const sections=(ss.sections||[]).filter(section=>section.section_key!=='contact');
   const settingsFields=['site_name','site_tagline','seo_title','seo_description','favicon_url','logo_url','primary_color','secondary_color','contact_email','contact_phone','contact_whatsapp','contact_instagram','contact_facebook','contact_linkedin','contact_website','contact_address','contact_map_url','contact_hours','footer_text'];
   const labels={site_name:'Site adı',site_tagline:'Slogan',seo_title:'SEO başlığı',seo_description:'SEO açıklaması',favicon_url:'Favicon URL',logo_url:'Logo URL',primary_color:'Ana renk',secondary_color:'Arka plan rengi',contact_email:'E-posta',contact_phone:'Telefon',contact_whatsapp:'WhatsApp',contact_instagram:'Instagram',contact_facebook:'Facebook',contact_linkedin:'LinkedIn',contact_website:'Web sitesi',contact_address:'Adres',contact_map_url:'Google Maps / Harita linki',contact_hours:'Çalışma saatleri',footer_text:'Footer metni'};
   document.getElementById('globalContent').innerHTML=`<div class="cms-wrap">
