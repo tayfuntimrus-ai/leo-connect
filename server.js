@@ -66,30 +66,241 @@ function createNfcCode() {
 
 function publicBusiness(row) {
   if (!row) return null;
-
+  const allowed = normalizeAllowedPlatforms(row.social_platform_permissions);
+  const legacyAllowed = {
+    instagram: allowed.instagram !== false,
+    tiktok: allowed.tiktok !== false,
+    whatsapp: allowed.whatsapp !== false,
+    google_review: allowed.google !== false,
+    website: allowed.website !== false,
+    menu: allowed.menu !== false,
+    address: allowed.location !== false
+  };
+  const social = normalizeSocialLinks(row.social_links);
+  const filteredSocial = Object.fromEntries(
+    Object.entries(social).filter(([key,item]) => allowed[key] !== false && item && item.url)
+  );
   return {
-    id: row.id,
-    name: row.name,
-    slug: row.slug,
-    email: row.email,
-    category: row.category || '',
-    description: row.description || '',
-    phone: row.phone || '',
-    whatsapp: row.whatsapp || '',
-    address: row.address || '',
-    instagram: row.instagram || '',
-    tiktok: row.tiktok || '',
-    google_review: row.google_review || '',
-    website: row.website || '',
-    menu: row.menu || '',
-    iban: row.iban || '',
-    iban_holder: row.iban_holder || '',
-    hours: row.hours || '',
-    logo_url: row.logo_url || '',
-    created_at: row.created_at
+    id: row.id, name: row.name, slug: row.slug, email: row.email,
+    category: row.category || '', description: row.description || '', phone: row.phone || '',
+    whatsapp: legacyAllowed.whatsapp ? (row.whatsapp || '') : '',
+    address: legacyAllowed.address ? (row.address || '') : '',
+    instagram: legacyAllowed.instagram ? (row.instagram || '') : '',
+    tiktok: legacyAllowed.tiktok ? (row.tiktok || '') : '',
+    google_review: legacyAllowed.google_review ? (row.google_review || '') : '',
+    website: legacyAllowed.website ? (row.website || '') : '',
+    menu: legacyAllowed.menu ? (row.menu || '') : '',
+    iban: row.iban || '', iban_holder: row.iban_holder || '', hours: row.hours || '', logo_url: row.logo_url || '',
+    social_links: filteredSocial, custom_links: normalizeCustomLinks(row.custom_links),
+    social_platform_permissions: allowed, created_at: row.created_at
   };
 }
 
+
+
+const LEO_V2_THEMES = {
+  'midnight-gold': { name:'Midnight Gold', description:'Siyah + altın, ana premium tema' },
+  'obsidian': { name:'Obsidian', description:'Ultra koyu, modern ve teknolojik tema' },
+  'champagne': { name:'Champagne', description:'Sıcak, zarif ve lüks tema' },
+  'pure-light': { name:'Pure Light', description:'Aydınlık, temiz ve premium tema' }
+};
+
+const LEO_V2_SOCIAL_PLATFORMS = ['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google','website','yemeksepeti','getir','trendyol-yemek','migros-yemek','rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email'];
+const LEO_V2_DEFAULT_ALLOWED_PLATFORMS = Object.fromEntries(LEO_V2_SOCIAL_PLATFORMS.map(k=>[k,true]));
+function normalizeAllowedPlatforms(value){
+  let raw=value;
+  if(typeof raw==='string'){ try{raw=JSON.parse(raw)}catch(_){raw={};} }
+  raw=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
+  return Object.fromEntries(LEO_V2_SOCIAL_PLATFORMS.map(k=>[k,raw[k]!==false]));
+}
+
+function normalizeSocialLinks(value){
+  let raw=value;
+  if(typeof raw==='string'){ try{ raw=JSON.parse(raw); }catch(_){ raw={}; } }
+  raw=raw && typeof raw==='object' && !Array.isArray(raw) ? raw : {};
+  const out={};
+  for(const key of LEO_V2_SOCIAL_PLATFORMS){
+    const item=raw[key];
+    if(typeof item==='string') out[key]={url:item.trim().slice(0,2000),enabled:true};
+    else if(item && typeof item==='object') out[key]={url:String(item.url||'').trim().slice(0,2000),enabled:item.enabled!==false,label:String(item.label||'').trim().slice(0,80)};
+  }
+  return out;
+}
+
+function normalizeCustomLinks(value){
+  let raw=value;
+  if(typeof raw==='string'){ try{ raw=JSON.parse(raw); }catch(_){ raw=[]; } }
+  if(!Array.isArray(raw)) return [];
+  return raw.slice(0,20).map((item,i)=>({
+    id:String(item?.id || `custom-${i+1}`),
+    title:String(item?.title || '').trim().slice(0,80),
+    url:String(item?.url || '').trim().slice(0,2000),
+    icon:String(item?.icon || '🔗').trim().slice(0,8),
+    enabled:item?.enabled!==false,
+    sort_order:Number.isFinite(Number(item?.sort_order)) ? Number(item.sort_order) : i
+  })).filter(x=>x.title && x.url);
+}
+
+const DYNAMIC_PROFILE_DEFAULTS = {
+  theme: 'midnight-gold',
+  accent_color: '#D4AF37',
+  cover_url: '',
+  cover_position: 'center',
+  announcement_text: '',
+  announcement_enabled: false,
+  campaign_title: '',
+  campaign_text: '',
+  campaign_image_url: '',
+  campaign_button_text: '',
+  campaign_button_url: '',
+  campaign_enabled: false,
+  featured_title: '',
+  featured_text: '',
+  featured_image_url: '',
+  featured_button_text: '',
+  featured_button_url: '',
+  featured_enabled: false,
+  gallery: [],
+  video_url: '',
+  video_enabled: false
+};
+
+function normalizeProfileDesign(row) {
+  if (!row) return { ...DYNAMIC_PROFILE_DEFAULTS };
+  return {
+    ...DYNAMIC_PROFILE_DEFAULTS,
+    ...row,
+    gallery: Array.isArray(row.gallery) ? row.gallery : []
+  };
+}
+
+async function getPublicProfileDesign(businessId) {
+  const result = await pool.query(
+    `SELECT theme,accent_color,cover_url,cover_position,
+            announcement_text,announcement_enabled,
+            campaign_title,campaign_text,campaign_image_url,campaign_button_text,campaign_button_url,campaign_enabled,
+            featured_title,featured_text,featured_image_url,featured_button_text,featured_button_url,featured_enabled,
+            gallery,video_url,video_enabled
+     FROM profile_designs
+     WHERE business_id=$1
+     LIMIT 1`,
+    [businessId]
+  );
+  return normalizeProfileDesign(result.rows[0]);
+}
+
+
+const REVIEW_BOOSTER_DEFAULTS = {
+  enabled: false,
+  title: 'Deneyimini bizimle paylaş',
+  text: 'Memnun kaldıysan Google’da bizi değerlendir. Bir sorun yaşadıysan doğrudan bize ulaş.',
+  threshold: 4,
+  low_title: 'Bunu duymak isteriz',
+  low_text: 'Yaşadığın sorunu bize ilet, seninle ilgilenelim.',
+  success_title: 'Teşekkürler!',
+  success_text: 'Değerlendirmen bizim için çok değerli.'
+};
+
+function normalizeReviewBooster(row) {
+  if (!row) return { ...REVIEW_BOOSTER_DEFAULTS };
+  return {
+    ...REVIEW_BOOSTER_DEFAULTS,
+    ...row,
+    enabled: row.enabled === true,
+    threshold: Math.min(5, Math.max(1, Number(row.threshold) || 4))
+  };
+}
+
+async function getReviewBooster(businessId) {
+  const result = await pool.query(
+    `SELECT enabled,title,text,threshold,low_title,low_text,success_title,success_text
+     FROM review_boosters WHERE business_id=$1 LIMIT 1`,
+    [businessId]
+  );
+  return normalizeReviewBooster(result.rows[0]);
+}
+
+
+/* =========================================================
+   V2 — INDEPENDENT PERSONAL BUSINESS CARD
+========================================================= */
+const CARD_PERSON_FIELDS = [
+  'display_name','person_name','job_title','company','phone','whatsapp','email','website','address',
+  'instagram','facebook','tiktok','linkedin','youtube','x','photo_url','cover_url','bio','note'
+];
+const CARD_PERSON_LABELS = {
+  display_name:'Kart Başlığı', person_name:'Ad Soyad', job_title:'Unvan', company:'Şirket / Kurum',
+  phone:'Telefon', whatsapp:'WhatsApp', email:'E-posta', website:'Web Sitesi', address:'Adres',
+  instagram:'Instagram', facebook:'Facebook', tiktok:'TikTok', linkedin:'LinkedIn', youtube:'YouTube', x:'X / Twitter',
+  photo_url:'Profil Fotoğrafı', cover_url:'Kapak Görseli', bio:'Hakkımda', note:'Not / Kısa Açıklama'
+};
+const CARD_PERSON_DEFAULT_DATA = Object.fromEntries(CARD_PERSON_FIELDS.map(k=>[k,'']));
+const CARD_PERSON_DEFAULT_PERMISSIONS = Object.fromEntries(CARD_PERSON_FIELDS.map(k=>[k,false]));
+function normalizeCardPerson(row){
+  const data={...CARD_PERSON_DEFAULT_DATA,...(row?.data||{})};
+  const permissions={...CARD_PERSON_DEFAULT_PERMISSIONS,...(row?.permissions||{})};
+  for(const key of CARD_PERSON_FIELDS){ data[key]=String(data[key]??''); permissions[key]=permissions[key]===true; }
+  return {id:row?.id||null,slug:row?.slug||'',enabled:row?.enabled===true,email:row?.email||'',data,permissions,field_labels:CARD_PERSON_LABELS};
+}
+async function getCardPerson(id){
+  const r=await pool.query(`SELECT id,slug,email,enabled,data,permissions FROM card_people WHERE id=$1 LIMIT 1`,[id]);
+  return normalizeCardPerson(r.rows[0]);
+}
+function cardPersonAuth(req,res,next){
+  try{
+    const header=req.headers.authorization||'';
+    if(!header.startsWith('Bearer ')) return res.status(401).json({error:'Kart sahibi oturumu gerekli'});
+    const decoded=jwt.verify(header.substring(7),SECRET);
+    if(!decoded?.id || decoded.role!=='card_person') return res.status(403).json({error:'Kart sahibi yetkisi gerekli'});
+    req.cardPerson=decoded; next();
+  }catch(e){ return res.status(401).json({error:'Kart sahibi oturumu geçersiz veya süresi dolmuş'}); }
+}
+
+const BUSINESS_PROFILE_FIELDS = [
+  'name','category','description','phone','whatsapp','address',
+  'instagram','tiktok','google_review','website','menu',
+  'hours','iban','iban_holder','logo_url'
+];
+
+const BUSINESS_PROFILE_FIELD_LABELS = {
+  name:'İşletme Adı',
+  category:'Kategori',
+  description:'İşletme Açıklaması',
+  phone:'Telefon',
+  whatsapp:'WhatsApp',
+  address:'Konum / Google Maps',
+  instagram:'Instagram',
+  tiktok:'TikTok',
+  google_review:'Google Yorum',
+  website:'Web Sitesi',
+  menu:'Menü',
+  hours:'Çalışma Saatleri',
+  iban:'IBAN',
+  iban_holder:'IBAN Sahibi',
+  logo_url:'Logo Görseli'
+};
+
+function businessProfileFieldPermissions(row) {
+  let raw = row?.profile_field_permissions;
+  if (typeof raw === 'string') {
+    try { raw = JSON.parse(raw); } catch (_) { raw = {}; }
+  }
+  raw = raw && typeof raw === 'object' ? raw : {};
+  const result = {};
+  for (const key of BUSINESS_PROFILE_FIELDS) result[key] = raw[key] === false ? false : true;
+  return result;
+}
+
+function publicBusinessWithFieldPermissions(row) {
+  const profile = publicBusiness(row);
+  const permissions = businessProfileFieldPermissions(row);
+
+  for (const key of BUSINESS_PROFILE_FIELDS) {
+    if (!permissions[key]) profile[key] = '';
+  }
+
+  return profile;
+}
 
 function businessPermissions(row) {
   return {
@@ -98,7 +309,11 @@ function businessPermissions(row) {
     nfc: row?.dashboard_nfc === true,
     analytics: row?.dashboard_analytics === true,
     live: row?.dashboard_live === true,
-    ai: row?.dashboard_ai === true
+    ai: row?.dashboard_ai === true,
+    review: row?.dashboard_review === true,
+    campaign: row?.dashboard_campaign === true,
+    profile_theme: row?.profile_theme_permission !== false,
+    profile_fields: businessProfileFieldPermissions(row)
   };
 }
 
@@ -107,7 +322,7 @@ function requireBusinessPermission(permission) {
     try {
       if (req.user?.role === 'admin') return next();
       const result = await pool.query(
-        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai
+        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign
          FROM businesses WHERE id=$1 LIMIT 1`,
         [req.user.id]
       );
@@ -151,7 +366,10 @@ function nfcTagPublic(row) {
     code: row.code,
     url,
     is_active: row.is_active,
-    tap_count: Number(row.tap_count || 0),
+    tap_count: Number(row.tap_count || row.nfc_count || 0),
+    qr_count: Number(row.qr_count || 0),
+    nfc_count: Number(row.nfc_count || row.tap_count || 0),
+    total_count: Number(row.total_count || ((Number(row.qr_count || 0)) + (Number(row.nfc_count || row.tap_count || 0)))),
     last_tap: row.last_tap || null,
     created_at: row.created_at,
     updated_at: row.updated_at
@@ -197,7 +415,12 @@ async function initDatabase() {
       ADD COLUMN IF NOT EXISTS dashboard_nfc BOOLEAN NOT NULL DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS dashboard_analytics BOOLEAN NOT NULL DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS dashboard_live BOOLEAN NOT NULL DEFAULT FALSE,
-      ADD COLUMN IF NOT EXISTS dashboard_ai BOOLEAN NOT NULL DEFAULT FALSE
+      ADD COLUMN IF NOT EXISTS dashboard_ai BOOLEAN NOT NULL DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS profile_field_permissions JSONB NOT NULL DEFAULT '{}'::jsonb,
+      ADD COLUMN IF NOT EXISTS profile_theme_permission BOOLEAN NOT NULL DEFAULT TRUE,
+      ADD COLUMN IF NOT EXISTS social_links JSONB NOT NULL DEFAULT '{}'::jsonb,
+      ADD COLUMN IF NOT EXISTS custom_links JSONB NOT NULL DEFAULT '[]'::jsonb,
+      ADD COLUMN IF NOT EXISTS social_platform_permissions JSONB NOT NULL DEFAULT '{}'::jsonb
   `);
 
 
@@ -284,6 +507,111 @@ async function initDatabase() {
   await pool.query(`
     CREATE INDEX IF NOT EXISTS idx_nfc_tags_code
     ON nfc_tags(code)
+  `);
+
+
+
+  /* V2 — INDEPENDENT PERSONAL BUSINESS CARDS */
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS card_people (
+      id SERIAL PRIMARY KEY,
+      slug TEXT NOT NULL UNIQUE,
+      email TEXT UNIQUE,
+      password_hash TEXT,
+      enabled BOOLEAN NOT NULL DEFAULT TRUE,
+      data JSONB NOT NULL DEFAULT '{}'::jsonb,
+      permissions JSONB NOT NULL DEFAULT '{}'::jsonb,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_card_people_slug ON card_people(slug)`);
+
+  /* V2 — DYNAMIC PROFILE DESIGN */
+
+  /* V2 — REVIEW BOOSTER */
+  await pool.query(`
+    ALTER TABLE businesses
+      ADD COLUMN IF NOT EXISTS dashboard_review BOOLEAN NOT NULL DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS dashboard_campaign BOOLEAN NOT NULL DEFAULT FALSE
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS review_boosters (
+      id SERIAL PRIMARY KEY,
+      business_id INTEGER NOT NULL UNIQUE REFERENCES businesses(id) ON DELETE CASCADE,
+      enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      title TEXT NOT NULL DEFAULT 'Deneyimini bizimle paylaş',
+      text TEXT NOT NULL DEFAULT 'Memnun kaldıysan Google’da bizi değerlendir. Bir sorun yaşadıysan doğrudan bize ulaş.',
+      threshold INTEGER NOT NULL DEFAULT 4,
+      low_title TEXT NOT NULL DEFAULT 'Bunu duymak isteriz',
+      low_text TEXT NOT NULL DEFAULT 'Yaşadığın sorunu bize ilet, seninle ilgilenelim.',
+      success_title TEXT NOT NULL DEFAULT 'Teşekkürler!',
+      success_text TEXT NOT NULL DEFAULT 'Değerlendirmen bizim için çok değerli.',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_review_boosters_business_id
+    ON review_boosters(business_id)
+  `);
+
+  /* V2 — SMART CAMPAIGNS */
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS campaigns (
+      id SERIAL PRIMARY KEY,
+      business_id INTEGER NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      text TEXT DEFAULT '',
+      image_url TEXT DEFAULT '',
+      button_text TEXT DEFAULT '',
+      button_url TEXT DEFAULT '',
+      starts_at TIMESTAMP NULL,
+      ends_at TIMESTAMP NULL,
+      enabled BOOLEAN NOT NULL DEFAULT TRUE,
+      priority INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_campaigns_business_id ON campaigns(business_id)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_campaigns_active_window ON campaigns(enabled,starts_at,ends_at)`);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS profile_designs (
+      id SERIAL PRIMARY KEY,
+      business_id INTEGER NOT NULL UNIQUE REFERENCES businesses(id) ON DELETE CASCADE,
+      theme TEXT NOT NULL DEFAULT 'midnight-gold',
+      accent_color TEXT NOT NULL DEFAULT '#D4AF37',
+      cover_url TEXT DEFAULT '',
+      cover_position TEXT DEFAULT 'center',
+      announcement_text TEXT DEFAULT '',
+      announcement_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      campaign_title TEXT DEFAULT '',
+      campaign_text TEXT DEFAULT '',
+      campaign_image_url TEXT DEFAULT '',
+      campaign_button_text TEXT DEFAULT '',
+      campaign_button_url TEXT DEFAULT '',
+      campaign_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      featured_title TEXT DEFAULT '',
+      featured_text TEXT DEFAULT '',
+      featured_image_url TEXT DEFAULT '',
+      featured_button_text TEXT DEFAULT '',
+      featured_button_url TEXT DEFAULT '',
+      featured_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      gallery JSONB NOT NULL DEFAULT '[]'::jsonb,
+      video_url TEXT DEFAULT '',
+      video_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_profile_designs_business_id
+    ON profile_designs(business_id)
   `);
 
   console.log('PostgreSQL + NFC Tag Management hazır.');
@@ -859,7 +1187,7 @@ app.get(
 app.get('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai
+      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_theme_permission, profile_field_permissions
       FROM businesses WHERE id=$1 LIMIT 1
     `, [Number(req.params.id)]);
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
@@ -880,13 +1208,34 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
     const analytics = body.analytics === true;
     const live = body.live === true;
     const ai = body.ai === true;
+    const review = body.review === true;
+    const campaign = body.campaign === true;
+
+    const current = await pool.query(
+      `SELECT profile_field_permissions FROM businesses WHERE id=$1 LIMIT 1`,
+      [id]
+    );
+    if (!current.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
+
+    const incomingFields = body.profile_fields && typeof body.profile_fields === 'object'
+      ? body.profile_fields
+      : {};
+    const profile_fields = businessProfileFieldPermissions(current.rows[0]);
+    const profile_theme = body.profile_theme !== undefined
+      ? body.profile_theme === true
+      : current.rows[0].profile_theme_permission !== false;
+    for (const key of BUSINESS_PROFILE_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(incomingFields, key)) {
+        profile_fields[key] = incomingFields[key] === true;
+      }
+    }
 
     const result = await pool.query(`
       UPDATE businesses
-      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6
-      WHERE id=$7
-      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai
-    `, [profile, qr, nfc, analytics, live, ai, id]);
+      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7, dashboard_campaign=$8, profile_theme_permission=$9, profile_field_permissions=$10::jsonb
+      WHERE id=$11
+      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_theme_permission, profile_field_permissions
+    `, [profile, qr, nfc, analytics, live, ai, review, campaign, profile_theme, JSON.stringify(profile_fields), id]);
 
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
     res.json({ success: true, permissions: businessPermissions(result.rows[0]) });
@@ -896,6 +1245,98 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
   }
 });
 
+
+
+/* =========================================================
+   INDEPENDENT PERSONAL BUSINESS CARD API
+========================================================= */
+app.get('/api/admin/card-people', adminAuth, async (req,res)=>{
+  try{
+    const r=await pool.query(`SELECT id,slug,email,enabled,data,permissions,created_at,updated_at FROM card_people ORDER BY created_at DESC`);
+    res.json({people:r.rows.map(x=>normalizeCardPerson(x))});
+  }catch(e){console.error('ADMIN CARD PEOPLE LIST ERROR:',e);res.status(500).json({error:'Business Card kişileri alınamadı'});}
+});
+app.post('/api/admin/card-people', adminAuth, async (req,res)=>{
+  try{
+    const body=req.body||{}, name=String(body.person_name||body.display_name||'').trim();
+    if(!name) return res.status(400).json({error:'Ad Soyad gerekli'});
+    const base=slugify(name)||'kart';
+    let slug=base, i=2;
+    while((await pool.query(`SELECT 1 FROM card_people WHERE slug=$1 LIMIT 1`,[slug])).rows.length) slug=`${base}-${i++}`;
+    const data={...CARD_PERSON_DEFAULT_DATA};
+    for(const k of CARD_PERSON_FIELDS) if(Object.prototype.hasOwnProperty.call(body.data||{},k)) data[k]=String(body.data[k]??'').trim();
+    data.person_name=data.person_name||name;
+    const permissions={...CARD_PERSON_DEFAULT_PERMISSIONS};
+    for(const k of CARD_PERSON_FIELDS) if(body.permissions&&Object.prototype.hasOwnProperty.call(body.permissions,k)) permissions[k]=body.permissions[k]===true;
+    const email=String(body.email||'').trim().toLowerCase()||null;
+    let passwordHash=null;
+    if(body.password) passwordHash=await bcrypt.hash(String(body.password),10);
+    const r=await pool.query(`INSERT INTO card_people(slug,email,password_hash,enabled,data,permissions) VALUES($1,$2,$3,$4,$5::jsonb,$6::jsonb) RETURNING id,slug,email,enabled,data,permissions,created_at,updated_at`,[slug,email,passwordHash,body.enabled!==false,JSON.stringify(data),JSON.stringify(permissions)]);
+    res.status(201).json({person:normalizeCardPerson(r.rows[0])});
+  }catch(e){console.error('ADMIN CARD PERSON CREATE ERROR:',e);res.status(500).json({error:e.code==='23505'?'E-posta veya slug zaten kullanılıyor':'Business Card kişisi oluşturulamadı'});}
+});
+app.get('/api/admin/card-people/:id', adminAuth, async (req,res)=>{
+  try{const p=await getCardPerson(Number(req.params.id));if(!p.id)return res.status(404).json({error:'Kişi bulunamadı'});res.json({person:p});}
+  catch(e){res.status(500).json({error:'Business Card kişisi alınamadı'});}
+});
+app.put('/api/admin/card-people/:id', adminAuth, async (req,res)=>{
+  try{
+    const id=Number(req.params.id), current=await getCardPerson(id); if(!current.id)return res.status(404).json({error:'Kişi bulunamadı'});
+    const body=req.body||{}, data={...current.data}, permissions={...current.permissions};
+    if(body.data&&typeof body.data==='object') for(const k of CARD_PERSON_FIELDS) if(Object.prototype.hasOwnProperty.call(body.data,k)) data[k]=String(body.data[k]??'').trim();
+    if(body.permissions&&typeof body.permissions==='object') for(const k of CARD_PERSON_FIELDS) if(Object.prototype.hasOwnProperty.call(body.permissions,k)) permissions[k]=body.permissions[k]===true;
+    const enabled=body.enabled===true;
+    let passwordHash=null;
+    if(body.password) passwordHash=await bcrypt.hash(String(body.password),10);
+    const r=await pool.query(`UPDATE card_people SET email=$1,enabled=$2,data=$3::jsonb,permissions=$4::jsonb,password_hash=COALESCE($5,password_hash),updated_at=CURRENT_TIMESTAMP WHERE id=$6 RETURNING id,slug,email,enabled,data,permissions,created_at,updated_at`,[String(body.email??current.email).trim().toLowerCase()||null,enabled,JSON.stringify(data),JSON.stringify(permissions),passwordHash,id]);
+    res.json({person:normalizeCardPerson(r.rows[0])});
+  }catch(e){console.error('ADMIN CARD PERSON UPDATE ERROR:',e);res.status(500).json({error:'Business Card kişisi güncellenemedi'});}
+});
+app.delete('/api/admin/card-people/:id', adminAuth, async (req,res)=>{
+  try{const r=await pool.query(`DELETE FROM card_people WHERE id=$1 RETURNING id`,[Number(req.params.id)]);if(!r.rows.length)return res.status(404).json({error:'Kişi bulunamadı'});res.json({success:true});}
+  catch(e){res.status(500).json({error:'Business Card kişisi silinemedi'});}
+});
+
+app.post('/api/card-login', async (req,res)=>{
+  try{
+    const email=String(req.body?.email||'').trim().toLowerCase(), password=String(req.body?.password||'');
+    const r=await pool.query(`SELECT * FROM card_people WHERE email=$1 AND enabled=TRUE LIMIT 1`,[email]);
+    if(!r.rows.length || !r.rows[0].password_hash) return res.status(401).json({error:'E-posta veya şifre hatalı'});
+    if(!await bcrypt.compare(password,r.rows[0].password_hash)) return res.status(401).json({error:'E-posta veya şifre hatalı'});
+    const p=r.rows[0], token=jwt.sign({id:p.id,email:p.email,role:'card_person'},SECRET,{expiresIn:'30d'});
+    res.json({token,person:normalizeCardPerson(p)});
+  }catch(e){res.status(500).json({error:'Kart girişi yapılamadı'});}
+});
+app.get('/api/card/me', cardPersonAuth, async (req,res)=>{try{const p=await getCardPerson(req.cardPerson.id);if(!p.id)return res.status(404).json({error:'Kart bulunamadı'});res.json({person:p});}catch(e){res.status(500).json({error:'Kart bilgileri alınamadı'});}});
+app.put('/api/card/me', cardPersonAuth, async (req,res)=>{
+  try{
+    const current=await getCardPerson(req.cardPerson.id); if(!current.id)return res.status(404).json({error:'Kart bulunamadı'});
+    const data={...current.data};
+    for(const k of CARD_PERSON_FIELDS){if(Object.prototype.hasOwnProperty.call(req.body||{},k)){if(current.permissions[k]!==true)return res.status(403).json({error:`${CARD_PERSON_LABELS[k]} alanı için admin izni gerekli`,permission:`card_${k}`});data[k]=String(req.body[k]??'').trim();}}
+    const r=await pool.query(`UPDATE card_people SET data=$1::jsonb,updated_at=CURRENT_TIMESTAMP WHERE id=$2 RETURNING id,slug,email,enabled,data,permissions`,[JSON.stringify(data),current.id]);
+    res.json({person:normalizeCardPerson(r.rows[0])});
+  }catch(e){res.status(500).json({error:'Kart bilgileri kaydedilemedi'});}
+});
+
+app.get('/card/:slug', async (req,res)=>{
+  try{
+    const r=await pool.query(`SELECT id,slug,enabled,data,permissions FROM card_people WHERE slug=$1 LIMIT 1`,[String(req.params.slug||'')]);
+    if(!r.rows.length || r.rows[0].enabled!==true)return res.status(404).send('Business Card bulunamadı');
+    return res.sendFile(path.join(__dirname,'public','business-card.html'));
+  }catch(e){console.error('PUBLIC CARD ERROR:',e);res.status(500).send('Business Card açılamadı');}
+});
+app.get('/api/public-card/:slug', async (req,res)=>{
+  try{
+    const r=await pool.query(`SELECT id,slug,enabled,data,permissions FROM card_people WHERE slug=$1 LIMIT 1`,[String(req.params.slug||'')]);
+    if(!r.rows.length || r.rows[0].enabled!==true)return res.status(404).json({error:'Business Card bulunamadı'});
+    const p=normalizeCardPerson(r.rows[0]), filtered={};
+    for(const k of CARD_PERSON_FIELDS) if(p.permissions[k]===true) filtered[k]=p.data[k];
+    res.json({card:{slug:p.slug,enabled:true,data:filtered,permissions:p.permissions,field_labels:CARD_PERSON_LABELS}});
+  }catch(e){res.status(500).json({error:'Business Card alınamadı'});}
+});
+
+app.get('/card-login',(req,res)=>res.sendFile(path.join(__dirname,'public','card-login.html')));
+app.get('/card-dashboard',(req,res)=>res.sendFile(path.join(__dirname,'public','card-dashboard.html')));
 
 /* =========================================================
    ADMIN BUSINESS ANALYTICS
@@ -2136,7 +2577,7 @@ app.get('/api/me', auth, async (req, res) => {
 
   try {
 
-    const result =
+    let result =
       await pool.query(
         `
         SELECT *
@@ -2146,17 +2587,30 @@ app.get('/api/me', auth, async (req, res) => {
         [req.user.id]
       );
 
-    if (!result.rows.length) {
+    /* Eski oturumlarda ID değişmiş olabileceği için e-posta ile güvenli geri dönüş. */
+    if (!result.rows.length && req.user.email) {
+      result = await pool.query(
+        `
+        SELECT *
+        FROM businesses
+        WHERE email=$1
+        LIMIT 1
+        `,
+        [String(req.user.email).trim().toLowerCase()]
+      );
+    }
 
+    if (!result.rows.length) {
       return res.status(404).json({
         error: 'İşletme bulunamadı'
       });
-
     }
 
+    const business = result.rows[0];
+
     res.json({
-      ...publicBusiness(result.rows[0]),
-      permissions: businessPermissions(result.rows[0])
+      ...publicBusiness(business),
+      permissions: businessPermissions(business)
     });
 
   } catch (error) {
@@ -2177,103 +2631,166 @@ app.get('/api/me', auth, async (req, res) => {
 ========================================================= */
 
 app.put('/api/me', auth, requireBusinessPermission('profile'), async (req, res) => {
-
   try {
+    let currentResult = await pool.query(
+      `SELECT * FROM businesses WHERE id=$1 LIMIT 1`,
+      [req.user.id]
+    );
 
-    const {
-      name,
-      category,
-      description,
-      phone,
-      whatsapp,
-      address,
-      instagram,
-      tiktok,
-      google_review,
-      website,
-      menu,
-      iban,
-      iban_holder,
-      hours,
-      logo_url
-    } = req.body;
+    if (!currentResult.rows.length && req.user.email) {
+      currentResult = await pool.query(
+        `SELECT * FROM businesses WHERE email=$1 LIMIT 1`,
+        [String(req.user.email).trim().toLowerCase()]
+      );
+    }
 
-    if (!name) {
+    if (!currentResult.rows.length) {
+      return res.status(404).json({ error: 'İşletme bulunamadı' });
+    }
 
-      return res.status(400).json({
-        error: 'İşletme adı gerekli'
-      });
+    const current = currentResult.rows[0];
+    const permissions = businessProfileFieldPermissions(current);
+    const body = req.body || {};
 
+    const valueFor = (key) => {
+      if (permissions[key] && Object.prototype.hasOwnProperty.call(body, key)) {
+        return String(body[key] ?? '').trim();
+      }
+      return String(current[key] ?? '');
+    };
+
+    const values = {};
+    for (const key of BUSINESS_PROFILE_FIELDS) values[key] = valueFor(key);
+
+    if (!values.name) {
+      return res.status(400).json({ error: 'İşletme adı gerekli' });
     }
 
     await pool.query(
-      `
-      UPDATE businesses
-
-      SET
-        name=$1,
-        category=$2,
-        description=$3,
-        phone=$4,
-        whatsapp=$5,
-        address=$6,
-        instagram=$7,
-        tiktok=$8,
-        google_review=$9,
-        website=$10,
-        menu=$11,
-        iban=$12,
-        iban_holder=$13,
-        hours=$14,
-        logo_url=$15
-
-      WHERE id=$16
-      `,
+      `UPDATE businesses SET
+        name=$1, category=$2, description=$3, phone=$4, whatsapp=$5,
+        address=$6, instagram=$7, tiktok=$8, google_review=$9,
+        website=$10, menu=$11, iban=$12, iban_holder=$13,
+        hours=$14, logo_url=$15
+       WHERE id=$16`,
       [
-        name,
-        category || '',
-        description || '',
-        phone || '',
-        whatsapp || '',
-        address || '',
-        instagram || '',
-        tiktok || '',
-        google_review || '',
-        website || '',
-        menu || '',
-        iban || '',
-        iban_holder || '',
-        hours || '',
-        logo_url || '',
-        req.user.id
+        values.name, values.category, values.description, values.phone,
+        values.whatsapp, values.address, values.instagram, values.tiktok,
+        values.google_review, values.website, values.menu, values.iban,
+        values.iban_holder, values.hours, values.logo_url, current.id
       ]
     );
 
-    const result =
-      await pool.query(
-        `
-        SELECT *
-        FROM businesses
-        WHERE id=$1
-        `,
-        [req.user.id]
-      );
+    const result = await pool.query(
+      `SELECT * FROM businesses WHERE id=$1`,
+      [current.id]
+    );
 
     res.json({
-      business:
-        publicBusiness(result.rows[0])
+      ...publicBusiness(result.rows[0]),
+      permissions: businessPermissions(result.rows[0])
     });
-
   } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Profil güncellenemedi'
-    });
-
+    console.error('BUSINESS PROFILE UPDATE ERROR:', error);
+    res.status(500).json({ error: 'Profil güncellenemedi' });
   }
+});
 
+
+/* =========================================================
+   V2 FINAL — THEME + SOCIAL/DIGITAL LINKS
+========================================================= */
+
+app.get('/api/business-v2-settings', auth, requireBusinessPermission('profile'), async (req,res)=>{
+  try{
+    res.set('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma','no-cache');
+    res.set('Expires','0');
+    const r=await pool.query(`SELECT id,profile_theme_permission,social_links,custom_links,social_platform_permissions FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    const d=await pool.query(`SELECT theme,accent_color FROM profile_designs WHERE business_id=$1 LIMIT 1`,[req.user.id]);
+    const design=d.rows[0]||{};
+    const theme=LEO_V2_THEMES[design.theme] ? design.theme : 'midnight-gold';
+    res.json({theme,themes:LEO_V2_THEMES,theme_permission:r.rows[0].profile_theme_permission!==false,accent_color:design.accent_color||'#D4AF37',social_links:normalizeSocialLinks(r.rows[0].social_links),custom_links:normalizeCustomLinks(r.rows[0].custom_links),allowed_platforms:normalizeAllowedPlatforms(r.rows[0].social_platform_permissions)});
+  }catch(e){console.error('V2 SETTINGS GET ERROR:',e);res.status(500).json({error:'Profil ayarları alınamadı'});}
+});
+
+app.put('/api/business-theme', auth, requireBusinessPermission('profile'), async (req,res)=>{
+  try{
+    const b=await pool.query(`SELECT profile_theme_permission FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
+    if(!b.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    if(b.rows[0].profile_theme_permission===false) return res.status(403).json({error:'Tema değiştirme yetkisi admin tarafından kapatıldı'});
+    const theme=String(req.body?.theme||'').trim();
+    if(!LEO_V2_THEMES[theme]) return res.status(400).json({error:'Geçersiz tema'});
+    const accent=String(req.body?.accent_color||'').trim().slice(0,30)||'#D4AF37';
+    const r=await pool.query(`INSERT INTO profile_designs(business_id,theme,accent_color,updated_at) VALUES($1,$2,$3,CURRENT_TIMESTAMP) ON CONFLICT(business_id) DO UPDATE SET theme=EXCLUDED.theme,accent_color=EXCLUDED.accent_color,updated_at=CURRENT_TIMESTAMP RETURNING theme,accent_color`,[req.user.id,theme,accent]);
+    res.json({theme:r.rows[0].theme,accent_color:r.rows[0].accent_color,theme_name:LEO_V2_THEMES[r.rows[0].theme].name});
+  }catch(e){console.error('BUSINESS THEME UPDATE ERROR:',e);res.status(500).json({error:'Tema kaydedilemedi'});}
+});
+
+app.put('/api/business-social-links', auth, requireBusinessPermission('profile'), async (req,res)=>{
+  try{
+    const b=await pool.query(`SELECT social_platform_permissions FROM businesses WHERE id=$1 LIMIT 1`,[req.user.id]);
+    if(!b.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    const allowed=normalizeAllowedPlatforms(b.rows[0].social_platform_permissions);
+    const incoming=normalizeSocialLinks(req.body?.social_links||req.body);
+    const existing=normalizeSocialLinks(b.rows[0].social_links);
+    const links={...existing};
+    for(const key of Object.keys(incoming)){
+      if(allowed[key]!==false) links[key]=incoming[key];
+    }
+    const r=await pool.query(`UPDATE businesses SET social_links=$1::jsonb WHERE id=$2 RETURNING social_links`,[JSON.stringify(links),req.user.id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    res.json({social_links:normalizeSocialLinks(r.rows[0].social_links)});
+  }catch(e){console.error('SOCIAL LINKS UPDATE ERROR:',e);res.status(500).json({error:'Bağlantılar kaydedilemedi'});}
+});
+
+app.put('/api/business-custom-links', auth, requireBusinessPermission('profile'), async (req,res)=>{
+  try{
+    const links=normalizeCustomLinks(req.body?.custom_links);
+    const r=await pool.query(`UPDATE businesses SET custom_links=$1::jsonb WHERE id=$2 RETURNING custom_links`,[JSON.stringify(links),req.user.id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    res.json({custom_links:normalizeCustomLinks(r.rows[0].custom_links)});
+  }catch(e){console.error('CUSTOM LINKS UPDATE ERROR:',e);res.status(500).json({error:'Özel bağlantılar kaydedilemedi'});}
+});
+
+app.get('/api/admin/business/:id/v2-settings', adminAuth, async (req,res)=>{
+  try{
+    const id=Number(req.params.id);
+    const r=await pool.query(`SELECT b.id,b.name,b.profile_theme_permission,b.social_links,b.custom_links,b.social_platform_permissions,COALESCE(pd.theme,'midnight-gold') theme,COALESCE(pd.accent_color,'#D4AF37') accent_color FROM businesses b LEFT JOIN profile_designs pd ON pd.business_id=b.id WHERE b.id=$1 LIMIT 1`,[id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    const row=r.rows[0];
+    res.json({id:row.id,name:row.name,theme:LEO_V2_THEMES[row.theme]?row.theme:'midnight-gold',themes:LEO_V2_THEMES,theme_permission:row.profile_theme_permission!==false,accent_color:row.accent_color,social_links:normalizeSocialLinks(row.social_links),custom_links:normalizeCustomLinks(row.custom_links),allowed_platforms:normalizeAllowedPlatforms(row.social_platform_permissions)});
+  }catch(e){console.error('ADMIN V2 SETTINGS GET ERROR:',e);res.status(500).json({error:'V2 ayarları alınamadı'});}
+});
+
+app.put('/api/admin/business/:id/theme', adminAuth, async (req,res)=>{
+  try{
+    const id=Number(req.params.id), theme=String(req.body?.theme||'').trim();
+    if(!LEO_V2_THEMES[theme]) return res.status(400).json({error:'Geçersiz tema'});
+    const accent=String(req.body?.accent_color||'').trim().slice(0,30)||'#D4AF37';
+    const r=await pool.query(`INSERT INTO profile_designs(business_id,theme,accent_color,updated_at) VALUES($1,$2,$3,CURRENT_TIMESTAMP) ON CONFLICT(business_id) DO UPDATE SET theme=EXCLUDED.theme,accent_color=EXCLUDED.accent_color,updated_at=CURRENT_TIMESTAMP RETURNING theme,accent_color`,[id,theme,accent]);
+    res.json({theme:r.rows[0].theme,accent_color:r.rows[0].accent_color,theme_name:LEO_V2_THEMES[r.rows[0].theme].name});
+  }catch(e){console.error('ADMIN THEME UPDATE ERROR:',e);res.status(500).json({error:'Tema kaydedilemedi'});}
+});
+
+app.put('/api/admin/business/:id/theme-permission', adminAuth, async (req,res)=>{
+  try{
+    const id=Number(req.params.id), allowed=req.body?.allowed!==false;
+    const r=await pool.query(`UPDATE businesses SET profile_theme_permission=$1 WHERE id=$2 RETURNING id,name,profile_theme_permission`,[allowed,id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    res.json({id:r.rows[0].id,name:r.rows[0].name,theme_permission:r.rows[0].profile_theme_permission!==false});
+  }catch(e){console.error('ADMIN THEME PERMISSION ERROR:',e);res.status(500).json({error:'Tema yetkisi kaydedilemedi'});}
+});
+
+app.put('/api/admin/business/:id/social-platform-permissions', adminAuth, async (req,res)=>{
+  try{
+    const id=Number(req.params.id);
+    const allowed=normalizeAllowedPlatforms(req.body?.allowed_platforms||req.body);
+    const r=await pool.query(`UPDATE businesses SET social_platform_permissions=$1::jsonb WHERE id=$2 RETURNING id,name,social_platform_permissions`,[JSON.stringify(allowed),id]);
+    if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
+    res.json({id:r.rows[0].id,name:r.rows[0].name,allowed_platforms:normalizeAllowedPlatforms(r.rows[0].social_platform_permissions)});
+  }catch(e){console.error('ADMIN SOCIAL PLATFORM PERMISSION ERROR:',e);res.status(500).json({error:'Bağlantı yetkileri kaydedilemedi'});}
 });
 
 
@@ -2465,7 +2982,7 @@ app.get('/api/business-ai-insights', auth, requireBusinessPermission('ai'), asyn
       COUNT(*) FILTER(WHERE type='location')::int location,
       COUNT(*) FILTER(WHERE type='share')::int share
       FROM events WHERE ${where}`,params);
-    const hourlyQ=await pool.query(`SELECT EXTRACT(HOUR FROM created_at)::int hour, COUNT(*)::int events FROM events WHERE ${where} GROUP BY 1 ORDER BY events DESC LIMIT 1`,params);
+    const hourlyQ=await pool.query(`SELECT EXTRACT(HOUR FROM created_at)::int AS hour, COUNT(*)::int AS events FROM events WHERE ${where} GROUP BY 1 ORDER BY events DESC LIMIT 1`,params);
     const actionsQ=await pool.query(`SELECT type, COUNT(*)::int count FROM events WHERE ${where} GROUP BY type ORDER BY count DESC LIMIT 5`,params);
     const sourceQ=await pool.query(`SELECT COALESCE(NULLIF(source,''),'direct') source, COUNT(*)::int count FROM events WHERE ${where} GROUP BY 1 ORDER BY count DESC`,params);
     const t=totalsQ.rows[0]||{};
@@ -2625,6 +3142,11 @@ app.post('/api/event/:slug', async (req, res) => {
       'website',
       'menu',
       'google_review',
+      'review_open',
+      'review_positive',
+      'review_feedback',
+      'campaign_view',
+      'campaign_click',
       'location',
       'iban',
       'share'
@@ -2735,6 +3257,273 @@ app.post('/api/event/:slug', async (req, res) => {
 });
 
 
+
+/* =========================================================
+   V2 — DYNAMIC PROFILE DESIGN API
+========================================================= */
+
+app.get('/api/business-profile-design', auth, requireBusinessPermission('profile'), async (req, res) => {
+  try {
+    let result = await pool.query(
+      `SELECT * FROM profile_designs WHERE business_id=$1 LIMIT 1`,
+      [req.user.id]
+    );
+
+    if (!result.rows.length) {
+      result = await pool.query(
+        `INSERT INTO profile_designs(business_id) VALUES($1) RETURNING *`,
+        [req.user.id]
+      );
+    }
+
+    res.json(normalizeProfileDesign(result.rows[0]));
+  } catch (error) {
+    console.error('BUSINESS PROFILE DESIGN GET ERROR:', error);
+    res.status(500).json({ error: 'Profil tasarım ayarları alınamadı' });
+  }
+});
+
+app.put('/api/business-profile-design', auth, requireBusinessPermission('profile'), async (req, res) => {
+  try {
+    const body = req.body || {};
+    const str = (value, max) => String(value ?? '').trim().slice(0, max);
+    const gallery = Array.isArray(body.gallery)
+      ? body.gallery.slice(0, 30).map(item => {
+          if (typeof item === 'string') return str(item, 2000);
+          if (item && typeof item === 'object') {
+            return { url: str(item.url, 2000), title: str(item.title, 200) };
+          }
+          return '';
+        }).filter(Boolean)
+      : [];
+
+    const values = [
+      req.user.id,
+      str(body.theme, 80) || DYNAMIC_PROFILE_DEFAULTS.theme,
+      str(body.accent_color, 30) || DYNAMIC_PROFILE_DEFAULTS.accent_color,
+      str(body.cover_url, 2000),
+      str(body.cover_position, 50) || 'center',
+      str(body.announcement_text, 1000),
+      body.announcement_enabled === true,
+      str(body.campaign_title, 200),
+      str(body.campaign_text, 2000),
+      str(body.campaign_image_url, 2000),
+      str(body.campaign_button_text, 100),
+      str(body.campaign_button_url, 2000),
+      body.campaign_enabled === true,
+      str(body.featured_title, 200),
+      str(body.featured_text, 2000),
+      str(body.featured_image_url, 2000),
+      str(body.featured_button_text, 100),
+      str(body.featured_button_url, 2000),
+      body.featured_enabled === true,
+      JSON.stringify(gallery),
+      str(body.video_url, 2000),
+      body.video_enabled === true
+    ];
+
+    const result = await pool.query(`
+      INSERT INTO profile_designs(
+        business_id,theme,accent_color,cover_url,cover_position,
+        announcement_text,announcement_enabled,
+        campaign_title,campaign_text,campaign_image_url,campaign_button_text,campaign_button_url,campaign_enabled,
+        featured_title,featured_text,featured_image_url,featured_button_text,featured_button_url,featured_enabled,
+        gallery,video_url,video_enabled,updated_at
+      )
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,CURRENT_TIMESTAMP)
+      ON CONFLICT(business_id) DO UPDATE SET
+        theme=EXCLUDED.theme,
+        accent_color=EXCLUDED.accent_color,
+        cover_url=EXCLUDED.cover_url,
+        cover_position=EXCLUDED.cover_position,
+        announcement_text=EXCLUDED.announcement_text,
+        announcement_enabled=EXCLUDED.announcement_enabled,
+        campaign_title=EXCLUDED.campaign_title,
+        campaign_text=EXCLUDED.campaign_text,
+        campaign_image_url=EXCLUDED.campaign_image_url,
+        campaign_button_text=EXCLUDED.campaign_button_text,
+        campaign_button_url=EXCLUDED.campaign_button_url,
+        campaign_enabled=EXCLUDED.campaign_enabled,
+        featured_title=EXCLUDED.featured_title,
+        featured_text=EXCLUDED.featured_text,
+        featured_image_url=EXCLUDED.featured_image_url,
+        featured_button_text=EXCLUDED.featured_button_text,
+        featured_button_url=EXCLUDED.featured_button_url,
+        featured_enabled=EXCLUDED.featured_enabled,
+        gallery=EXCLUDED.gallery,
+        video_url=EXCLUDED.video_url,
+        video_enabled=EXCLUDED.video_enabled,
+        updated_at=CURRENT_TIMESTAMP
+      RETURNING *
+    `, values);
+
+    res.json(normalizeProfileDesign(result.rows[0]));
+  } catch (error) {
+    console.error('BUSINESS PROFILE DESIGN UPDATE ERROR:', error);
+    res.status(500).json({ error: 'Profil tasarım ayarları kaydedilemedi' });
+  }
+});
+
+
+/* =========================================================
+   V2 — SMART CAMPAIGNS API
+========================================================= */
+function normalizeCampaign(row){
+  if(!row) return null;
+  return {
+    id:row.id,
+    business_id:row.business_id,
+    title:String(row.title||''),
+    text:String(row.text||''),
+    image_url:String(row.image_url||''),
+    button_text:String(row.button_text||''),
+    button_url:String(row.button_url||''),
+    starts_at:row.starts_at||null,
+    ends_at:row.ends_at||null,
+    enabled:row.enabled===true,
+    priority:Number(row.priority||0),
+    created_at:row.created_at||null,
+    updated_at:row.updated_at||null
+  };
+}
+
+async function getActiveCampaigns(businessId){
+  const r=await pool.query(`
+    SELECT * FROM campaigns
+    WHERE business_id=$1
+      AND enabled=TRUE
+      AND (starts_at IS NULL OR starts_at<=CURRENT_TIMESTAMP)
+      AND (ends_at IS NULL OR ends_at>=CURRENT_TIMESTAMP)
+    ORDER BY priority DESC, created_at DESC
+    LIMIT 5
+  `,[businessId]);
+  return r.rows.map(normalizeCampaign);
+}
+
+app.get('/api/business-campaigns', auth, requireBusinessPermission('campaign'), async (req,res)=>{
+  try{
+    const r=await pool.query(`SELECT * FROM campaigns WHERE business_id=$1 ORDER BY enabled DESC, priority DESC, created_at DESC`,[req.user.id]);
+    res.json({campaigns:r.rows.map(normalizeCampaign)});
+  }catch(e){console.error('CAMPAIGNS LIST ERROR:',e);res.status(500).json({error:'Kampanyalar alınamadı'});}
+});
+
+app.post('/api/business-campaigns', auth, requireBusinessPermission('campaign'), async (req,res)=>{
+  try{
+    const b=req.body||{};
+    const title=String(b.title||'').trim().slice(0,120);
+    if(!title)return res.status(400).json({error:'Kampanya başlığı gerekli'});
+    const text=String(b.text||'').trim().slice(0,500);
+    const image_url=String(b.image_url||'').trim().slice(0,1000);
+    const button_text=String(b.button_text||'').trim().slice(0,60);
+    const button_url=String(b.button_url||'').trim().slice(0,1000);
+    const starts_at=b.starts_at?new Date(b.starts_at):null;
+    const ends_at=b.ends_at?new Date(b.ends_at):null;
+    if(starts_at && Number.isNaN(starts_at.getTime()))return res.status(400).json({error:'Başlangıç tarihi geçersiz'});
+    if(ends_at && Number.isNaN(ends_at.getTime()))return res.status(400).json({error:'Bitiş tarihi geçersiz'});
+    if(starts_at && ends_at && starts_at>ends_at)return res.status(400).json({error:'Bitiş tarihi başlangıçtan önce olamaz'});
+    const priority=Math.max(-100,Math.min(100,Number(b.priority)||0));
+    const r=await pool.query(`INSERT INTO campaigns(business_id,title,text,image_url,button_text,button_url,starts_at,ends_at,enabled,priority,updated_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,CURRENT_TIMESTAMP) RETURNING *`,[req.user.id,title,text,image_url,button_text,button_url,starts_at,ends_at,b.enabled!==false,priority]);
+    res.status(201).json({campaign:normalizeCampaign(r.rows[0])});
+  }catch(e){console.error('CAMPAIGN CREATE ERROR:',e);res.status(500).json({error:'Kampanya oluşturulamadı'});}
+});
+
+app.put('/api/business-campaigns/:id', auth, requireBusinessPermission('campaign'), async (req,res)=>{
+  try{
+    const id=Number(req.params.id), b=req.body||{};
+    const existing=await pool.query(`SELECT * FROM campaigns WHERE id=$1 AND business_id=$2 LIMIT 1`,[id,req.user.id]);
+    if(!existing.rows.length)return res.status(404).json({error:'Kampanya bulunamadı'});
+    const current=existing.rows[0];
+    const title=String(b.title??current.title).trim().slice(0,120);
+    if(!title)return res.status(400).json({error:'Kampanya başlığı gerekli'});
+    const text=String(b.text??current.text).trim().slice(0,500);
+    const image_url=String(b.image_url??current.image_url).trim().slice(0,1000);
+    const button_text=String(b.button_text??current.button_text).trim().slice(0,60);
+    const button_url=String(b.button_url??current.button_url).trim().slice(0,1000);
+    const starts_at=b.starts_at===null||b.starts_at===''?null:(b.starts_at!==undefined?new Date(b.starts_at):current.starts_at);
+    const ends_at=b.ends_at===null||b.ends_at===''?null:(b.ends_at!==undefined?new Date(b.ends_at):current.ends_at);
+    if(starts_at && Number.isNaN(new Date(starts_at).getTime()))return res.status(400).json({error:'Başlangıç tarihi geçersiz'});
+    if(ends_at && Number.isNaN(new Date(ends_at).getTime()))return res.status(400).json({error:'Bitiş tarihi geçersiz'});
+    if(starts_at && ends_at && new Date(starts_at)>new Date(ends_at))return res.status(400).json({error:'Bitiş tarihi başlangıçtan önce olamaz'});
+    const priority=b.priority!==undefined?Math.max(-100,Math.min(100,Number(b.priority)||0)):Number(current.priority||0);
+    const enabled=b.enabled!==undefined?b.enabled===true:current.enabled===true;
+    const r=await pool.query(`UPDATE campaigns SET title=$1,text=$2,image_url=$3,button_text=$4,button_url=$5,starts_at=$6,ends_at=$7,enabled=$8,priority=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND business_id=$11 RETURNING *`,[title,text,image_url,button_text,button_url,starts_at?new Date(starts_at):null,ends_at?new Date(ends_at):null,enabled,priority,id,req.user.id]);
+    res.json({campaign:normalizeCampaign(r.rows[0])});
+  }catch(e){console.error('CAMPAIGN UPDATE ERROR:',e);res.status(500).json({error:'Kampanya güncellenemedi'});}
+});
+
+app.delete('/api/business-campaigns/:id', auth, requireBusinessPermission('campaign'), async (req,res)=>{
+  try{
+    const r=await pool.query(`DELETE FROM campaigns WHERE id=$1 AND business_id=$2 RETURNING id`,[Number(req.params.id),req.user.id]);
+    if(!r.rows.length)return res.status(404).json({error:'Kampanya bulunamadı'});
+    res.json({success:true});
+  }catch(e){console.error('CAMPAIGN DELETE ERROR:',e);res.status(500).json({error:'Kampanya silinemedi'});}
+});
+
+/* =========================================================
+   V2 — REVIEW BOOSTER API
+========================================================= */
+
+app.get('/api/business-review-booster', auth, requireBusinessPermission('review'), async (req, res) => {
+  try {
+    let result = await pool.query(
+      `SELECT * FROM review_boosters WHERE business_id=$1 LIMIT 1`,
+      [req.user.id]
+    );
+    if (!result.rows.length) {
+      result = await pool.query(
+        `INSERT INTO review_boosters(business_id) VALUES($1) RETURNING *`,
+        [req.user.id]
+      );
+    }
+    res.json(normalizeReviewBooster(result.rows[0]));
+  } catch (error) {
+    console.error('REVIEW BOOSTER GET ERROR:', error);
+    res.status(500).json({ error: 'Review Booster ayarları alınamadı' });
+  }
+});
+
+app.put('/api/business-review-booster', auth, requireBusinessPermission('review'), async (req, res) => {
+  try {
+    const body = req.body || {};
+    const str = (v, max) => String(v ?? '').trim().slice(0, max);
+    const threshold = Math.min(5, Math.max(1, Number(body.threshold) || 4));
+
+    const result = await pool.query(`
+      INSERT INTO review_boosters(
+        business_id,enabled,title,text,threshold,
+        low_title,low_text,success_title,success_text,updated_at
+      )
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,CURRENT_TIMESTAMP)
+      ON CONFLICT(business_id) DO UPDATE SET
+        enabled=EXCLUDED.enabled,
+        title=EXCLUDED.title,
+        text=EXCLUDED.text,
+        threshold=EXCLUDED.threshold,
+        low_title=EXCLUDED.low_title,
+        low_text=EXCLUDED.low_text,
+        success_title=EXCLUDED.success_title,
+        success_text=EXCLUDED.success_text,
+        updated_at=CURRENT_TIMESTAMP
+      RETURNING *
+    `, [
+      req.user.id,
+      body.enabled === true,
+      str(body.title, 160) || REVIEW_BOOSTER_DEFAULTS.title,
+      str(body.text, 500) || REVIEW_BOOSTER_DEFAULTS.text,
+      threshold,
+      str(body.low_title, 160) || REVIEW_BOOSTER_DEFAULTS.low_title,
+      str(body.low_text, 500) || REVIEW_BOOSTER_DEFAULTS.low_text,
+      str(body.success_title, 160) || REVIEW_BOOSTER_DEFAULTS.success_title,
+      str(body.success_text, 500) || REVIEW_BOOSTER_DEFAULTS.success_text
+    ]);
+
+    res.json(normalizeReviewBooster(result.rows[0]));
+  } catch (error) {
+    console.error('REVIEW BOOSTER UPDATE ERROR:', error);
+    res.status(500).json({ error: 'Review Booster ayarları kaydedilemedi' });
+  }
+});
+
 /* =========================================================
    PUBLIC PROFILE API
 ========================================================= */
@@ -2785,6 +3574,10 @@ app.get(
             iban_holder,
             hours,
             logo_url,
+            profile_field_permissions,
+            social_links,
+            custom_links,
+            social_platform_permissions,
             created_at
           FROM businesses
           WHERE slug=$1
@@ -2799,9 +3592,17 @@ app.get(
         });
       }
 
-      return res.json(
-        publicBusiness(result.rows[0])
-      );
+      const profile = publicBusinessWithFieldPermissions(result.rows[0]);
+      const profile_design = await getPublicProfileDesign(result.rows[0].id);
+      const review_booster = await getReviewBooster(result.rows[0].id);
+      const campaigns = await getActiveCampaigns(result.rows[0].id);
+
+      return res.json({
+        ...profile,
+        profile_design,
+        review_booster,
+        campaigns
+      });
 
     } catch (error) {
 
@@ -2859,6 +3660,10 @@ app.get(
             b.iban_holder,
             b.hours,
             b.logo_url,
+            b.profile_field_permissions,
+            b.social_links,
+            b.custom_links,
+            b.social_platform_permissions,
             b.created_at
           FROM nfc_tags t
           INNER JOIN businesses b
@@ -2876,9 +3681,17 @@ app.get(
         });
       }
 
-      return res.json(
-        publicBusiness(result.rows[0])
-      );
+      const profile = publicBusinessWithFieldPermissions(result.rows[0]);
+      const profile_design = await getPublicProfileDesign(result.rows[0].id);
+      const review_booster = await getReviewBooster(result.rows[0].id);
+      const campaigns = await getActiveCampaigns(result.rows[0].id);
+
+      return res.json({
+        ...profile,
+        profile_design,
+        review_booster,
+        campaigns
+      });
 
     } catch (error) {
 
@@ -2930,11 +3743,32 @@ app.get('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, res
             AND e.type='nfc'
           ),0)::int AS tap_count,
 
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type='qr_scan'
+          ),0)::int AS qr_count,
+
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type='nfc'
+          ),0)::int AS nfc_count,
+
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type IN ('nfc','qr_scan')
+          ),0)::int AS total_count,
+
           (
             SELECT MAX(e.created_at)
             FROM events e
             WHERE e.nfc_tag_id=t.id
-            AND e.type='nfc'
+            AND e.type IN ('nfc','qr_scan')
           ) AS last_tap
 
         FROM nfc_tags t
@@ -3044,6 +3878,56 @@ app.get(
 
 
 /*
+   STABLE PUBLIC TABLE QR IMAGE
+   Uses the existing NFC tag code as the single source of truth.
+   The image URL is deterministic, public, and cacheable so the Business
+   Dashboard never depends on several authenticated JSON requests.
+*/
+app.get('/qr/nfc/:code.png', async (req, res) => {
+  try {
+    const code = String(req.params.code || '').trim();
+    if (!code) return res.status(404).send('QR bulunamadı');
+
+    const result = await pool.query(
+      `SELECT t.code,b.slug FROM nfc_tags t INNER JOIN businesses b ON b.id=t.business_id WHERE t.code=$1 LIMIT 1`,
+      [code]
+    );
+    if (!result.rows.length) return res.status(404).send('QR bulunamadı');
+
+    const baseUrl = process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get('host')}`;
+    const publicUrl = `${baseUrl}/p/nfc/${encodeURIComponent(result.rows[0].code)}?source=qr`;
+    const png = await QRCode.toBuffer(publicUrl, { type:'png', width:700, margin:2, errorCorrectionLevel:'H' });
+
+    res.set('Content-Type','image/png');
+    res.set('Cache-Control','public, max-age=31536000, immutable');
+    res.set('ETag', `"nfc-qr-${result.rows[0].code}"`);
+    return res.end(png);
+  } catch (error) {
+    console.error('PUBLIC TABLE QR ERROR:', error);
+    return res.status(500).send('QR oluşturulamadı');
+  }
+});
+
+/*
+   TABLE / POINT QR JSON (legacy-compatible)
+   Uses the existing NFC tag URL; no second QR database is created.
+*/
+app.get('/api/nfc-tags/:id/qr', auth, requireBusinessPermission('nfc'), async (req, res) => {
+  try {
+    const id=Number(req.params.id);
+    if(!Number.isInteger(id)||id<=0) return res.status(400).json({error:'Geçersiz NFC etiketi'});
+    const result=await pool.query(`SELECT id,business_id,name,placement,code,is_active FROM nfc_tags WHERE id=$1 AND business_id=$2 LIMIT 1`,[id,req.user.id]);
+    if(!result.rows.length) return res.status(404).json({error:'NFC etiketi bulunamadı'});
+    const baseUrl=process.env.PUBLIC_URL||process.env.RENDER_EXTERNAL_URL||`${req.protocol}://${req.get('host')}`;
+    const url=`${baseUrl}/p/nfc/${result.rows[0].code}?source=qr`;
+    const qr=await QRCode.toDataURL(url,{width:900,margin:2,errorCorrectionLevel:'H'});
+    res.set('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');res.set('Pragma','no-cache');res.set('Expires','0');
+    res.json({...result.rows[0],url,qr});
+  } catch(error) {console.error('BUSINESS NFC QR ERROR:',error);res.status(500).json({error:'Masa / nokta QR kodu oluşturulamadı'});}
+});
+
+
+/*
    CREATE TAG
 */
 
@@ -3053,7 +3937,8 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
 
     const {
       name,
-      placement
+      placement,
+      is_active
     } = req.body;
 
     const tagName =
@@ -3061,6 +3946,11 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
 
     const tagPlacement =
       String(placement || '').trim();
+
+    const active =
+      typeof is_active === 'boolean'
+        ? is_active
+        : true;
 
     if (!tagName) {
 
@@ -3124,7 +4014,7 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
           $2,
           $3,
           $4,
-          TRUE
+          $5
         )
 
         RETURNING *
@@ -3133,7 +4023,8 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
           req.user.id,
           tagName,
           tagPlacement,
-          code
+          code,
+          active
         ]
       );
 
@@ -3590,9 +4481,7 @@ app.get(
 
       }
 
-      /*
-        Önce profil görüntüleme.
-      */
+      const isQr = String(req.query.source || '').toLowerCase() === 'qr';
 
       await pool.query(
         `
@@ -3606,20 +4495,16 @@ app.get(
         VALUES(
           $1,
           'profile_view',
-          'nfc',
-          $2
+          $2,
+          $3
         )
         `,
         [
           tag.business_id,
+          isQr ? 'qr' : 'nfc',
           tag.tag_id
         ]
       );
-
-
-      /*
-        Sonra gerçek NFC tap.
-      */
 
       await pool.query(
         `
@@ -3632,13 +4517,15 @@ app.get(
 
         VALUES(
           $1,
-          'nfc',
-          'nfc',
-          $2
+          $2,
+          $3,
+          $4
         )
         `,
         [
           tag.business_id,
+          isQr ? 'qr_scan' : 'nfc',
+          isQr ? 'qr' : 'nfc',
           tag.tag_id
         ]
       );
@@ -3990,7 +4877,7 @@ initDatabase()
       () => {
 
         console.log(
-          `LEO CONNECT 3.8 STABLE PUBLIC PROFILE çalışıyor: ${PORT}`
+          `LEO CONNECT V2 FINAL CORE + V1 COMPATIBILITY çalışıyor: ${PORT}`
         );
 
       }
