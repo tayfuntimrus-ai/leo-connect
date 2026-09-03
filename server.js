@@ -827,6 +827,53 @@ function createWebsiteCmsRouter({ pool, adminAuth }) {
       `, [key, title, subtitle, description, sort]);
     }
 
+    // V3 Content Studio: mevcut web sitesinde sabit duran metinleri de CMS'e al.
+    // Sağdaki değerler sadece eksik alanları doldurur; admin'de yapılmış değişiklikler ezilmez.
+    const contentDefaults = {
+      hero: {
+        home_intro_eyebrow:'LEO CONNECT NEDİR?',
+        home_intro_title:'Fiziksel işletmenizi dijital bir deneyime dönüştürün.',
+        home_intro_text:'LEO CONNECT; QR, NFC, dijital profil, bağlantılar, kampanyalar ve işletme yönetimini tek bir sistemde buluşturur. Müşterinizin ihtiyaç duyduğu bilgiye ulaşması için gereken adımları azaltır.',
+        home_intro_link:'Platformu keşfet →',
+        home_trust:[
+          {title:'Fizikselden dijitale',text:'tek bağlantı deneyimi'},
+          {title:'İşletmenize özel',text:'yönetilebilir dijital profil'},
+          {title:'QR + NFC',text:'müşterinin temas noktası'},
+          {title:'Ölçülebilir',text:'etkileşim ve analiz'}
+        ],
+        home_stats:[
+          {no:'01',title:'Tek Profil',text:'İletişim, sosyal medya, konum ve diğer bağlantılar tek noktada.'},
+          {no:'02',title:'Akıllı Temas',text:'QR ve NFC ile fiziksel ürününüz doğrudan dijital dünyanıza bağlanır.'},
+          {no:'03',title:'Merkezi Yönetim',text:'İşletme bilgilerinizi ve dijital deneyiminizi panelden güncelleyin.'},
+          {no:'04',title:'Gelişebilir Sistem',text:'Kampanya, yorum, analiz ve yeni dijital bağlantılarla büyür.'}
+        ],
+        home_products_eyebrow:'ÜRÜNLER',home_products_title:'Markanıza uygun fiziksel deneyimi seçin.',home_products_button:'Tüm ürünler',
+        home_cta_eyebrow:'LEO CONNECT',home_cta_title:'İşletmenizin dijital temas noktalarını yeniden tasarlayalım.',
+        home_cta_text:'İhtiyacınızı anlatın; QR, NFC ve fiziksel ürünlerden oluşan size özel deneyimi birlikte planlayalım.',
+        home_cta_primary:'Projenizi Konuşalım →',home_cta_secondary:'Ürünleri İncele'
+      },
+      platform: {
+        home_eyebrow:'PLATFORM',home_button:'Tüm platformu gör →',
+        platform_panel_1_eyebrow:'TEK DENEYİM',platform_panel_1_title:'QR + NFC + profil.',platform_panel_1_text:'Müşterinin fiziksel bir noktadan dijital dünyanıza geçişini mümkün olduğunca kısa ve anlaşılır hale getirin.',
+        platform_panel_2_eyebrow:'ÖLÇÜLEBİLİR',platform_panel_2_title:'Etkileşimi görün.',platform_panel_2_text:'İşletme panelinizde QR, NFC ve dijital temas noktalarından gelen hareketleri takip edin.'
+      },
+      'how-it-works': {
+        how_eyebrow:'NASIL ÇALIŞIR?',how_action:'Nasıl çalıştığını detaylı incele →',
+        how_bottom_eyebrow:'İŞLETME DENEYİMİ',how_bottom_title:'Kurulumdan sonra yönetim sizde.',
+        how_bottom_text:'Profil bilgileri, dijital bağlantılar, kampanyalar, QR/NFC erişimleri ve analizler işletme paneliniz üzerinden yönetilebilir.',
+        how_bottom_primary:'Bilgi Al',how_bottom_secondary:'Ürünleri Gör'
+      },
+      contact: {
+        contact_card_eyebrow:'BİRLİKTE TASARLAYALIM',contact_card_title:'İşletmeniz için doğru çözümü oluşturalım.',
+        contact_card_text:'İhtiyacınızı, ürün tipini ve kullanım alanını anlatın. Size uygun LEO CONNECT deneyimini birlikte planlayalım.',
+        contact_button:"WhatsApp'tan Yaz",contact_info_eyebrow:'İLETİŞİM BİLGİLERİ'
+      },
+      footer: {footer_right:'QR • NFC • Dijital Deneyim'}
+    };
+    for (const [sectionKey, defaults] of Object.entries(contentDefaults)) {
+      await pool.query(`UPDATE site_sections SET settings = $2::jsonb || COALESCE(settings,'{}'::jsonb), updated_at=CURRENT_TIMESTAMP WHERE section_key=$1`, [sectionKey, JSON.stringify(defaults)]);
+    }
+
     // İlk açılışta örnek içerikler oluştur. Sonrasında admin panelinden tamamen değiştirilebilir.
     const seedItems = {
       hero: [
