@@ -153,7 +153,13 @@ a{color:inherit;text-decoration:none}
 
 .nested-products-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0 10px}.nested-products{display:grid;gap:9px}.nested-product-card{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:14px;padding:10px}.nested-thumb{width:72px;height:62px;border-radius:10px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);overflow:hidden}.nested-thumb img{width:100%;height:100%;object-fit:cover}.nested-main{min-width:0}.nested-main strong{display:block}.nested-main>span{display:block;color:var(--muted);font-size:12px;margin-top:4px}.nested-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}@media(max-width:700px){.nested-product-card{grid-template-columns:58px 1fr}.nested-thumb{width:58px;height:52px}.nested-actions{grid-column:1/-1;justify-content:flex-start}}
 
-<style>.cms-subpanel{border:1px solid var(--line);border-radius:16px;padding:0 14px;background:rgba(255,255,255,.018)}.cms-subpanel>summary{list-style:none}.cms-subpanel>summary::-webkit-details-marker{display:none}</style>
+<style>.cms-subpanel{border:1px solid var(--line);border-radius:16px;padding:0 14px;background:rgba(255,255,255,.018)}.cms-subpanel>summary{list-style:none}.cms-subpanel>summary::-webkit-details-marker{display:none}
+<style>
+/* LEO CMS V2.1: İletişim artık Site Ayarları > İletişim Merkezi üzerinden yönetilir.
+   Eski section kartını arayüzden gizle; veriyi silme. */
+.leo-legacy-contact-section{display:none!important}
+</style>
+</style>
 </style>
 <style id="leo-layout-vars">:root{--topbar-h:82px}@media(max-width:720px){:root{--topbar-h:58px}}</style>
 <style id="leo-fit-fix">
@@ -1361,3 +1367,15 @@ if(adminToken){showApp();loadAll()}
 </script>
 </body>
 </html>
+<script>
+(function legacyContactSweep(){
+  function sweep(){
+    document.querySelectorAll('[class*="site-section-card"],[class*="section-card"]').forEach(function(el){
+      var t=(el.innerText||'').trim().toLowerCase();
+      if(t.startsWith('iletişim\n') || t.includes('leo connect hakkında bilgi alın')) el.classList.add('leo-legacy-contact-section');
+    });
+  }
+  document.addEventListener('DOMContentLoaded',sweep);
+  setTimeout(sweep,800); setTimeout(sweep,1800);
+})();
+</script>
