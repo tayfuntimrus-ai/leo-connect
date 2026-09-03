@@ -3878,7 +3878,38 @@ app.get(
 
 
 /*
-   TABLE / POINT QR
+   STABLE PUBLIC TABLE QR IMAGE
+   Uses the existing NFC tag code as the single source of truth.
+   The image URL is deterministic, public, and cacheable so the Business
+   Dashboard never depends on several authenticated JSON requests.
+*/
+app.get('/qr/nfc/:code.png', async (req, res) => {
+  try {
+    const code = String(req.params.code || '').trim();
+    if (!code) return res.status(404).send('QR bulunamadı');
+
+    const result = await pool.query(
+      `SELECT t.code,b.slug FROM nfc_tags t INNER JOIN businesses b ON b.id=t.business_id WHERE t.code=$1 LIMIT 1`,
+      [code]
+    );
+    if (!result.rows.length) return res.status(404).send('QR bulunamadı');
+
+    const baseUrl = process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get('host')}`;
+    const publicUrl = `${baseUrl}/p/nfc/${encodeURIComponent(result.rows[0].code)}?source=qr`;
+    const png = await QRCode.toBuffer(publicUrl, { type:'png', width:700, margin:2, errorCorrectionLevel:'H' });
+
+    res.set('Content-Type','image/png');
+    res.set('Cache-Control','public, max-age=31536000, immutable');
+    res.set('ETag', `"nfc-qr-${result.rows[0].code}"`);
+    return res.end(png);
+  } catch (error) {
+    console.error('PUBLIC TABLE QR ERROR:', error);
+    return res.status(500).send('QR oluşturulamadı');
+  }
+});
+
+/*
+   TABLE / POINT QR JSON (legacy-compatible)
    Uses the existing NFC tag URL; no second QR database is created.
 */
 app.get('/api/nfc-tags/:id/qr', auth, requireBusinessPermission('nfc'), async (req, res) => {
