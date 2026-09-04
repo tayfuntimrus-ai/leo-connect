@@ -2907,18 +2907,20 @@ app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'),
         n.name,
         n.code,
         n.placement,
-        COUNT(e.id)::int AS tap_count,
+        COALESCE(SUM(CASE WHEN e.type='qr_scan' THEN 1 ELSE 0 END),0)::int AS qr_count,
+        COALESCE(SUM(CASE WHEN e.type='nfc' THEN 1 ELSE 0 END),0)::int AS nfc_count,
+        COUNT(e.id)::int AS total_count,
         MAX(e.created_at) AS last_tap
       FROM nfc_tags n
       LEFT JOIN events e
         ON e.nfc_tag_id = n.id
-       AND e.type = 'nfc'
+       AND e.type <> 'campaign_view'
       WHERE n.business_id=$1
       GROUP BY n.id,n.name,n.code,n.placement,n.created_at
-      ORDER BY tap_count DESC, n.created_at DESC
-      LIMIT 10`,[req.user.id]);
+      ORDER BY total_count DESC, n.created_at DESC
+      LIMIT 50`,[req.user.id]);
 
-    res.json({period, totals: totals.rows[0], daily: daily.rows, hourly: hourly.rows, actions: actions.rows, top_nfc: tags.rows});
+    res.json({period, totals: totals.rows[0], daily: daily.rows, hourly: hourly.rows, actions: actions.rows, top_nfc: tags.rows, table_reports: tags.rows});
   } catch(error) {
     console.error('BUSINESS ANALYTICS V3 ERROR:', error);
     res.status(500).json({error:'Analiz verileri alınamadı'});
