@@ -92,66 +92,6 @@ body{
 
 
 /* ==================================================
-   TOP BRAND
-================================================== */
-
-.top-brand{
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:9px;
-
-  margin-bottom:22px;
-
-}
-
-
-.brand-lion{
-
-  width:38px;
-
-  height:38px;
-
-  display:grid;
-
-  place-items:center;
-
-  border-radius:12px;
-
-  background:#050505;
-
-  border:
-    1px solid #c59a5260;
-
-  font-size:21px;
-
-}
-
-
-.brand-name{
-
-  font-size:13px;
-
-  font-weight:800;
-
-  letter-spacing:.15em;
-
-}
-
-
-.brand-name span{
-
-  color:
-    var(--gold-light);
-
-}
-
-
-/* ==================================================
    HERO
 ================================================== */
 
@@ -1050,15 +990,6 @@ body{
     #070707 !important;
 }
 .page{max-width:720px !important; padding-top:18px !important;}
-.top-brand{
-  position:sticky;top:10px;z-index:20;
-  width:max-content;margin:0 auto 18px !important;
-  padding:9px 15px !important;border:1px solid var(--lc-border);
-  border-radius:999px;background:rgba(8,8,8,.78);backdrop-filter:blur(16px);
-  box-shadow:0 12px 35px rgba(0,0,0,.35), inset 0 0 18px rgba(214,173,85,.035);
-}
-.brand-lion{filter:drop-shadow(0 0 12px rgba(214,173,85,.25));}
-.brand-name{letter-spacing:.12em !important;}
 .hero{
   position:relative;overflow:hidden;margin-top:4px !important;
   padding:44px 24px 30px !important;border:1px solid var(--lc-border);
@@ -1136,37 +1067,170 @@ body{
 
 
 
-/* REAL BRAND ICONS */
-.link-icon img.brand-icon-svg,
-.action-icon img.brand-icon-svg,
-.info-icon img.brand-icon-svg {
-  width:24px;
-  height:24px;
-  display:block;
-  object-fit:contain;
-}
 
-.action-icon img.brand-icon-svg {
-  width:20px;
-  height:20px;
-}
 
-.link-icon {
+/* ==================================================
+   PROFILE BRAND POSITION
+================================================== */
+.page{
   display:flex;
-  align-items:center;
-  justify-content:center;
-  flex:0 0 46px;
-  width:46px;
-  height:46px;
+  flex-direction:column;
+}
+.footer{
+  margin-top:32px !important;
+  padding:30px 12px 34px !important;
+  border-top:1px solid rgba(197,154,82,.28);
+  text-align:center;
+  color:var(--gold-light);
+  font-size:10px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+}
+.footer::before{
+  content:'🦁';
+  display:block;
+  width:38px;
+  height:38px;
+  margin:0 auto 10px;
+  padding-top:9px;
+  border:1px solid rgba(197,154,82,.5);
+  border-radius:12px;
+  background:rgba(197,154,82,.06);
+  box-shadow:0 0 24px rgba(197,154,82,.08);
+  font-size:18px;
+  letter-spacing:0;
+}
+.footer .powered{
+  margin-top:9px;
+  color:#8f774f;
+  font-size:8px;
+  letter-spacing:.16em;
 }
 
-@media(max-width:430px){
-  .link-icon {
-    flex-basis:42px;
-    width:42px;
-    height:42px;
-  }
+/* ==================================================
+   LEO CONNECT V2 — DYNAMIC PROFILE
+================================================== */
+.dynamic-cover{
+  display:none;
+  position:relative;
+  min-height:190px;
+  margin:-24px -24px 22px;
+  overflow:hidden;
+  border-radius:24px 24px 0 0;
+  background:linear-gradient(145deg,#191919,#0a0a0a);
+  border-bottom:1px solid rgba(214,173,85,.16);
 }
+.dynamic-cover img{
+  width:100%;height:100%;min-height:190px;display:block;object-fit:cover;
+}
+.dynamic-cover::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 30%,rgba(7,7,7,.72) 100%);
+}
+.dynamic-announcement,
+.dynamic-campaign,
+.dynamic-featured,
+.dynamic-video{
+  display:none;
+  margin-top:16px;
+  padding:16px;
+  border-radius:18px;
+  border:1px solid rgba(214,173,85,.18);
+  background:linear-gradient(145deg,rgba(214,173,85,.09),rgba(255,255,255,.025));
+  text-align:left;
+}
+.dynamic-announcement strong,
+.dynamic-campaign strong,
+.dynamic-featured strong{
+  display:block;color:var(--lc-gold-soft);font-size:12px;margin-bottom:7px;
+}
+.dynamic-announcement span,
+.dynamic-campaign span,
+.dynamic-featured span{
+  display:block;color:#d0d0d0;font-size:11px;line-height:1.55;
+}
+.dynamic-media{
+  display:none;width:100%;margin-top:12px;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.07);background:#080808;
+}
+.dynamic-media img{display:block;width:100%;max-height:260px;object-fit:cover;}
+.dynamic-button{
+  display:none!important;width:max-content;margin-top:12px;padding:9px 13px;border-radius:11px;
+  background:linear-gradient(135deg,var(--lc-gold),#9e7738);color:#fff;text-decoration:none;
+  font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.1);
+}
+.dynamic-button.show{display:inline-flex!important;}
+.dynamic-gallery{
+  display:none;margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;
+}
+.dynamic-gallery:empty{display:none;}
+.dynamic-gallery-item{aspect-ratio:1/1;border-radius:13px;overflow:hidden;background:#101010;border:1px solid rgba(255,255,255,.06);}
+.dynamic-gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.dynamic-video iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:13px;display:block;}
+.dynamic-video-label{color:#888;font-size:9px;margin-bottom:8px;letter-spacing:.08em;font-weight:800;}
+.theme-obsidian{--lc-gold:#9aa0aa;--lc-gold-soft:#e0e4ea;}
+.theme-champagne{--lc-gold:#d8b36a;--lc-gold-soft:#f5dfae;}
+.theme-pure-light{--lc-gold:#a47a2d;--lc-gold-soft:#6e4d16;}
+.theme-pure-light .hero,.theme-pure-light .section{background:linear-gradient(145deg,#fff,#f4f1e9)!important;color:#151515;}
+.theme-pure-light .business-name,.theme-pure-light .section-title strong{color:#151515;}
+.theme-pure-light .description,.theme-pure-light .info-value,.theme-pure-light .link-text strong{color:#333!important;}
+.theme-pure-light .category{background:rgba(164,122,45,.08);}
+@media(max-width:520px){
+  .dynamic-cover{margin:-17px -17px 18px;border-radius:20px 20px 0 0;min-height:155px;}
+  .dynamic-cover img{min-height:155px;}
+  .dynamic-gallery{grid-template-columns:repeat(2,1fr);}
+}
+
+
+.review-booster{
+  margin:18px 0;
+  padding:20px;
+  border-radius:18px;
+  border:1px solid #c59a5245;
+  background:linear-gradient(145deg,#151515,#090909);
+  box-shadow:0 18px 45px #0008;
+  text-align:center;
+}
+.review-booster.hidden{display:none}
+.review-booster-icon{
+  width:46px;height:46px;margin:0 auto 10px;
+  display:grid;place-items:center;border-radius:14px;
+  border:1px solid #c59a5260;color:#e0bd7b;font-size:21px;
+}
+.review-booster-title{font-size:17px;font-weight:900}
+.review-booster-text{margin:7px auto 0;max-width:480px;color:#8a8a8a;font-size:10px;line-height:1.6}
+.review-booster-stars{display:flex;justify-content:center;gap:6px;margin-top:17px}
+.review-star{
+  width:40px;height:40px;border-radius:12px;border:1px solid #3b3b3b;
+  background:#111;color:#e0bd7b;font-size:21px;cursor:pointer;
+}
+.review-star:hover{border-color:#c59a52;background:#1a1a1a}
+.review-booster-message{margin-top:13px;color:#777;font-size:9px;line-height:1.6}
+.review-google-button,.review-whatsapp-button{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-top:13px;min-height:40px;padding:9px 14px;border-radius:10px;
+  text-decoration:none;font-size:10px;font-weight:900;
+}
+.review-google-button{background:linear-gradient(135deg,#c59a52,#9e7738);color:#fff}
+.review-whatsapp-button{border:1px solid #3b3b3b;background:#111;color:#ddd;margin-left:7px}
+@media(max-width:430px){
+  .review-star{width:35px;height:35px}
+  .review-whatsapp-button{margin-left:0}
+}
+
+
+/* ==================================================
+   V2 — SMART CAMPAIGN PUBLIC LAYER
+================================================== */
+.smart-campaigns{display:grid;gap:14px;margin:18px 0}
+.smart-campaign{overflow:hidden;border:1px solid #c59a5245;border-radius:18px;background:linear-gradient(145deg,#151515,#090909);box-shadow:0 18px 45px #0008}
+.smart-campaign-media{width:100%;max-height:260px;object-fit:cover;display:none}
+.smart-campaign-body{padding:20px}
+.smart-campaign-kicker{font-size:9px;letter-spacing:.18em;color:#e0bd7b;font-weight:900}
+.smart-campaign-title{margin-top:7px;font-size:20px;font-weight:900}
+.smart-campaign-text{margin-top:8px;color:#9a9a9a;font-size:11px;line-height:1.65;white-space:pre-line}
+.smart-campaign-button{display:none;margin-top:14px;min-height:40px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,#c59a52,#9e7738);color:#fff;font-size:10px;font-weight:900;text-decoration:none}
+.smart-campaign-button.show{display:inline-flex;align-items:center;justify-content:center}
 
 </style>
 
@@ -1177,24 +1241,6 @@ body{
 
 
 <div class="page">
-
-
-<!-- ==================================================
-     BRAND
-================================================== -->
-
-<div class="top-brand">
-
-  <div class="brand-lion">
-    🦁
-  </div>
-
-  <div class="brand-name">
-    LEO <span>CONNECT</span>
-  </div>
-
-</div>
-
 
 
 <!-- ==================================================
@@ -1262,7 +1308,7 @@ body{
       class="action gold"
       href="#"
     >
-      <span class="action-icon">☎</span> Ara
+      📞 Ara
     </a>
 
 
@@ -1273,7 +1319,7 @@ body{
       target="_blank"
       rel="noopener"
     >
-      <span class="action-icon"><img class="brand-icon-svg" src="https://cdn.simpleicons.org/whatsapp/FFFFFF" alt="WhatsApp" width="20" height="20"></span> WhatsApp
+      💬 WhatsApp
     </a>
 
   </div>
@@ -1281,6 +1327,40 @@ body{
 
 </section>
 
+<!-- ==================================================
+     V2 — DYNAMIC PROFILE CONTENT
+================================================== -->
+<div id="dynamicCover" class="dynamic-cover">
+  <img id="dynamicCoverImage" alt="Profil kapak görseli">
+</div>
+
+<div id="dynamicAnnouncement" class="dynamic-announcement">
+  <strong>📢 Duyuru</strong>
+  <span id="dynamicAnnouncementText"></span>
+</div>
+
+<div id="dynamicCampaign" class="dynamic-campaign">
+  <strong id="dynamicCampaignTitle"></strong>
+  <span id="dynamicCampaignText"></span>
+  <img id="dynamicCampaignImage" class="dynamic-media" alt="Kampanya görseli">
+  <a id="dynamicCampaignButton" class="dynamic-button" target="_blank" rel="noopener"></a>
+</div>
+
+<div id="smartCampaignsPublic" class="smart-campaigns"></div>
+
+<div id="dynamicFeatured" class="dynamic-featured">
+  <strong id="dynamicFeaturedTitle"></strong>
+  <span id="dynamicFeaturedText"></span>
+  <img id="dynamicFeaturedImage" class="dynamic-media" alt="Öne çıkan içerik görseli">
+  <a id="dynamicFeaturedButton" class="dynamic-button" target="_blank" rel="noopener"></a>
+</div>
+
+<div id="dynamicGallery" class="dynamic-gallery"></div>
+
+<div id="dynamicVideo" class="dynamic-video">
+  <div class="dynamic-video-label">VİDEO</div>
+  <div id="dynamicVideoFrame"></div>
+</div>
 
 
 <!-- ==================================================
@@ -1399,190 +1479,17 @@ body{
   class="section hidden"
 >
 
-
   <div class="section-title">
-
     <div class="section-icon">
       ✨
     </div>
-
     <div>
-
-      <strong>
-        Dijital Kanallar
-      </strong>
-
-      <span>
-        İşletmeyi online keşfet
-      </span>
-
+      <strong>Dijital Kanallar</strong>
+      <span>İşletmenin bağladığı tüm kanallar</span>
     </div>
-
   </div>
 
-
-  <div class="link-grid">
-
-
-    <a
-      id="instagramLink"
-      class="link hidden"
-      target="_blank"
-      rel="noopener"
-    >
-
-      <div class="link-icon">
-        <img
-          class="brand-icon-svg"
-          src="https://cdn.simpleicons.org/instagram/FFFFFF"
-          alt="Instagram"
-          width="24"
-          height="24"
-          loading="lazy"
-        >
-      </div>
-
-      <div class="link-text">
-
-        <strong>
-          Instagram
-        </strong>
-
-        <span>
-          Instagram profilini aç
-        </span>
-
-      </div>
-
-    </a>
-
-
-    <a
-      id="tiktokLink"
-      class="link hidden"
-      target="_blank"
-      rel="noopener"
-    >
-
-      <div class="link-icon">
-        <img
-          class="brand-icon-svg"
-          src="https://cdn.simpleicons.org/tiktok/FFFFFF"
-          alt="TikTok"
-          width="24"
-          height="24"
-          loading="lazy"
-        >
-      </div>
-
-      <div class="link-text">
-
-        <strong>
-          TikTok
-        </strong>
-
-        <span>
-          TikTok profilini aç
-        </span>
-
-      </div>
-
-    </a>
-
-
-    <a
-      id="googleLink"
-      class="link hidden"
-      target="_blank"
-      rel="noopener"
-    >
-
-      <div class="link-icon">
-        <img
-          class="brand-icon-svg"
-          src="https://cdn.simpleicons.org/google/FFFFFF"
-          alt="Google"
-          width="24"
-          height="24"
-          loading="lazy"
-        >
-      </div>
-
-      <div class="link-text">
-
-        <strong>
-          Google'da Değerlendir
-        </strong>
-
-        <span>
-          Deneyimini paylaş
-        </span>
-
-      </div>
-
-    </a>
-
-
-    <a
-      id="websiteLink"
-      class="link hidden"
-      target="_blank"
-      rel="noopener"
-    >
-
-      <div class="link-icon">
-        <svg class="brand-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
-          <path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9S14.4 18.5 12 21M12 3c-2.4 2.5-3.6 5.5-3.6 9S9.6 18.5 12 21" fill="none" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
-      </div>
-
-      <div class="link-text">
-
-        <strong>
-          Web Sitesi
-        </strong>
-
-        <span>
-          İnternet sitesini aç
-        </span>
-
-      </div>
-
-    </a>
-
-
-    <a
-      id="menuLink"
-      class="link hidden"
-      target="_blank"
-      rel="noopener"
-    >
-
-      <div class="link-icon">
-        <svg class="brand-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="5" y="4" width="14" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
-          <path d="M9 4.5h6M9 9h6M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-      </div>
-
-      <div class="link-text">
-
-        <strong>
-          Menü
-        </strong>
-
-        <span>
-          Menüyü görüntüle
-        </span>
-
-      </div>
-
-    </a>
-
-
-  </div>
-
+  <div id="dynamicDigitalChannels" class="link-grid"></div>
 
 </section>
 
@@ -1755,6 +1662,17 @@ body{
 
 
 
+
+<section id="reviewBooster" class="review-booster hidden">
+  <div class="review-booster-icon">★</div>
+  <div id="reviewBoosterTitle" class="review-booster-title">Deneyimini bizimle paylaş</div>
+  <div id="reviewBoosterText" class="review-booster-text">Memnun kaldıysan Google’da bizi değerlendir.</div>
+  <div id="reviewBoosterStars" class="review-booster-stars"></div>
+  <div id="reviewBoosterMessage" class="review-booster-message"></div>
+  <div id="reviewBoosterActions"></div>
+</section>
+
+
 <!-- ==================================================
      FOOTER
 ================================================== -->
@@ -1776,6 +1694,98 @@ body{
 
 <script>
 
+
+
+/* ==================================================
+   REVIEW BOOSTER
+================================================== */
+
+function trackReviewEvent(type){
+  try{
+    const slug = business?.slug;
+    if(!slug) return;
+    fetch("/api/event/" + encodeURIComponent(slug),{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({type,source:source || "direct",nfc_code:nfcCode || ""})
+    }).catch(()=>{});
+  }catch(_){}
+}
+
+function renderReviewBooster(){
+  const cfg = business?.review_booster || {};
+  const box = document.getElementById("reviewBooster");
+  if(!box || cfg.enabled !== true) return;
+
+  const google = safeUrl(business.google_review);
+  const whatsapp = safeUrl(business.whatsapp);
+  if(!google && !whatsapp) return;
+
+  box.classList.remove("hidden");
+  const title = document.getElementById("reviewBoosterTitle");
+  const text = document.getElementById("reviewBoosterText");
+  const stars = document.getElementById("reviewBoosterStars");
+  if(title) title.textContent = cfg.title || "Deneyimini bizimle paylaş";
+  if(text) text.textContent = cfg.text || "";
+  if(stars){
+    stars.innerHTML = "";
+    for(let i=1;i<=5;i++){
+      const b=document.createElement("button");
+      b.type="button";
+      b.className="review-star";
+      b.textContent="☆";
+      b.setAttribute("aria-label",i+" yıldız");
+      b.onclick=()=>handleReviewRating(i);
+      stars.appendChild(b);
+    }
+  }
+  trackReviewEvent("review_open");
+}
+
+function handleReviewRating(rating){
+  const cfg = business?.review_booster || {};
+  const msg=document.getElementById("reviewBoosterMessage");
+  const actions=document.getElementById("reviewBoosterActions");
+  if(msg) msg.textContent="";
+  if(actions) actions.innerHTML="";
+
+  const threshold = Number(cfg.threshold || 4);
+  const google = safeUrl(business.google_review);
+  const whatsapp = safeUrl(business.whatsapp);
+
+  if(rating >= threshold && google){
+    trackReviewEvent("review_positive");
+    if(msg) msg.textContent = cfg.success_title || "Teşekkürler!";
+    const a=document.createElement("a");
+    a.className="review-google-button";
+    a.href=google;
+    a.target="_blank";
+    a.rel="noopener";
+    a.textContent="★ Google'da Değerlendir";
+    if(actions) actions.appendChild(a);
+    return;
+  }
+
+  trackReviewEvent("review_feedback");
+  if(msg) msg.textContent = cfg.low_text || "Yaşadığın sorunu bize ilet, seninle ilgilenelim.";
+  if(whatsapp){
+    const a=document.createElement("a");
+    a.className="review-whatsapp-button";
+    a.href=whatsapp;
+    a.target="_blank";
+    a.rel="noopener";
+    a.textContent="💬 Bize Ulaş";
+    if(actions) actions.appendChild(a);
+  }else if(google){
+    const a=document.createElement("a");
+    a.className="review-google-button";
+    a.href=google;
+    a.target="_blank";
+    a.rel="noopener";
+    a.textContent="★ Değerlendir";
+    if(actions) actions.appendChild(a);
+  }
+}
 
 /* ==================================================
    GLOBAL
@@ -1838,7 +1848,8 @@ async function getBusiness(){
 
     endpoint =
       "/api/profile-by-nfc/" +
-      encodeURIComponent(code);
+      encodeURIComponent(code) +
+      "?fresh=" + Date.now();
 
   }else{
 
@@ -1852,14 +1863,20 @@ async function getBusiness(){
 
     endpoint =
       "/api/profile/" +
-      encodeURIComponent(slug);
+      encodeURIComponent(slug) +
+      "?fresh=" + Date.now();
 
   }
 
   try{
 
     const response =
-      await fetch(endpoint);
+      await fetch(endpoint, {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache"
+        }
+      });
 
     if(!response.ok){
       showError();
@@ -2041,6 +2058,88 @@ function renderLogo(){
 
 
 /* ==================================================
+   DIGITAL CHANNELS — V2 INTEGRATION
+================================================== */
+
+function renderDigitalChannels(){
+  const section=document.getElementById("socialSection");
+  const mount=document.getElementById("dynamicDigitalChannels");
+  if(!section || !mount || !business) return;
+
+  const names={
+    instagram:"Instagram",facebook:"Facebook",tiktok:"TikTok",youtube:"YouTube",
+    linkedin:"LinkedIn",x:"X",whatsapp:"WhatsApp",google:"Google",website:"Website",
+    yemeksepeti:"Yemeksepeti",getir:"Getir",'trendyol-yemek':"Trendyol Yemek",
+    'migros-yemek':"Migros Yemek",rezervasyon:"Rezervasyon",bilet:"Bilet / Etkinlik",
+    menu:"Online Menü",location:"Konum",tripadvisor:"Tripadvisor",booking:"Booking",
+    telegram:"Telegram",email:"E-posta"
+  };
+
+  const iconSlug={
+    instagram:"instagram",facebook:"facebook",tiktok:"tiktok",youtube:"youtube",
+    linkedin:"linkedin",x:"x",whatsapp:"whatsapp",google:"google",website:"globe",
+    yemeksepeti:"yemeksepeti",getir:"getir",'trendyol-yemek':"trendyol",
+    'migros-yemek':"migros",rezervasyon:"calendar",bilet:"ticket",
+    menu:"book-open",location:"map-pin",tripadvisor:"tripadvisor",booking:"booking-com",
+    telegram:"telegram",email:"gmail"
+  };
+
+  const legacyMap={instagram:"instagram",tiktok:"tiktok",whatsapp:"whatsapp",google:"google_review",website:"website",menu:"menu"};
+  const links=(business.social_links && typeof business.social_links==='object') ? business.social_links : {};
+  const allowed=(business.social_platform_permissions && typeof business.social_platform_permissions==='object') ? business.social_platform_permissions : {};
+  const custom=Array.isArray(business.custom_links) ? business.custom_links : [];
+
+  const rows=[];
+  Object.keys(names).forEach(key=>{
+    if(Object.keys(allowed).length && allowed[key]===false) return;
+    const item=links[key] || {};
+    let url=typeof item==='string' ? item : item.url;
+    if(!url && legacyMap[key]) url=business[legacyMap[key]] || '';
+    url=String(url||'').trim();
+    if(!url) return;
+    if(typeof item==='object' && item.enabled===false && !legacyMap[key]) return;
+    rows.push({key,name:names[key],url,icon_url:typeof item==='object' ? String(item.icon_url||'').trim() : ''});
+  });
+
+  custom.forEach((item,i)=>{
+    const url=String(item?.url||'').trim();
+    const title=String(item?.title||'').trim();
+    if(url && title) rows.push({key:'custom-'+i,name:title,url,custom:true,icon:item?.icon||'🔗',icon_url:String(item?.icon_url||'').trim()});
+  });
+
+  mount.innerHTML=rows.map(row=>{
+    const icon=row.icon_url
+      ? `<img class="brand-icon-svg" src="${safeUrl(row.icon_url)||'#'}" alt="${escProfile(row.name)}" width="24" height="24" loading="lazy">`
+      : row.custom
+        ? `<span style="font-size:24px">${escProfile(row.icon)}</span>`
+        : `<img class="brand-icon-svg" src="https://cdn.simpleicons.org/${encodeURIComponent(iconSlug[row.key]||row.key)}/FFFFFF" alt="${escProfile(row.name)}" width="24" height="24" loading="lazy">`;
+    return `<a class="link" href="${safeUrl(row.url)||'#'}" target="_blank" rel="noopener" data-digital-key="${escProfile(row.key)}">
+      <div class="link-icon">${icon}</div>
+      <div class="link-text"><strong>${escProfile(row.name)}</strong><span>Bağlantıyı aç</span></div>
+    </a>`;
+  }).join('');
+
+  if(!rows.length){
+    mount.innerHTML='';
+    section.classList.add('hidden');
+    return;
+  }
+
+  section.classList.remove('hidden');
+  mount.querySelectorAll('[data-digital-key]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const key=el.getAttribute('data-digital-key');
+      const eventKey=key==='google'?'google_review':key;
+      if(['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google_review','website','yemeksepeti','getir','trendyol-yemek','migros-yemek','rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email'].includes(eventKey)) track(eventKey);
+    });
+  });
+}
+
+function escProfile(value){
+  return String(value??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+/* ==================================================
    LINK HELPER
 ================================================== */
 
@@ -2103,11 +2202,158 @@ function setupLink(
 }
 
 
+
+
+/* ==================================================
+   V2 — DYNAMIC PROFILE RENDERER
+================================================== */
+function dynamicSafeUrl(value){
+  const url=String(value||'').trim();
+  return /^https?:\/\//i.test(url) ? url : '';
+}
+
+function dynamicYoutubeEmbed(value){
+  const url=dynamicSafeUrl(value);
+  if(!url) return '';
+  try{
+    const u=new URL(url);
+    let id='';
+    if(u.hostname.includes('youtu.be')) id=u.pathname.replace(/^\//,'').split('/')[0];
+    if(u.hostname.includes('youtube.com')){
+      id=u.searchParams.get('v') || (u.pathname.match(/\/embed\/([^/]+)/)||[])[1] || (u.pathname.match(/\/shorts\/([^/]+)/)||[])[1] || '';
+    }
+    return id ? 'https://www.youtube.com/embed/'+encodeURIComponent(id)+'?rel=0' : '';
+  }catch(e){ return ''; }
+}
+
+function renderDynamicProfile(){
+  const d=business?.profile_design || {};
+  const theme=String(d.theme||'midnight-gold');
+  document.body.classList.remove('theme-obsidian','theme-champagne','theme-pure-light');
+  if(theme!=='midnight-gold') document.body.classList.add('theme-'+theme);
+  if(d.accent_color && /^#[0-9a-f]{6}$/i.test(String(d.accent_color))){
+    document.documentElement.style.setProperty('--lc-gold',d.accent_color);
+  }
+
+  const cover=document.getElementById('dynamicCover');
+  const coverImg=document.getElementById('dynamicCoverImage');
+  const coverUrl=dynamicSafeUrl(d.cover_url);
+  if(cover && coverImg && coverUrl){
+    cover.style.display='block';
+    coverImg.src=coverUrl;
+    const pos=['center','top','bottom','left','right'].includes(d.cover_position) ? d.cover_position : 'center';
+    coverImg.style.objectPosition=pos;
+    coverImg.onerror=()=>{cover.style.display='none';};
+  }
+
+  const announcement=document.getElementById('dynamicAnnouncement');
+  const announcementText=document.getElementById('dynamicAnnouncementText');
+  if(announcement && announcementText){
+    const show=d.announcement_enabled && String(d.announcement_text||'').trim();
+    announcement.style.display=show?'block':'none';
+    announcementText.textContent=String(d.announcement_text||'');
+  }
+
+  const campaign=document.getElementById('dynamicCampaign');
+  if(campaign){
+    const show=d.campaign_enabled && (d.campaign_title || d.campaign_text || d.campaign_image_url);
+    campaign.style.display=show?'block':'none';
+    document.getElementById('dynamicCampaignTitle').textContent=d.campaign_title||'Kampanya';
+    document.getElementById('dynamicCampaignText').textContent=d.campaign_text||'';
+    const img=document.getElementById('dynamicCampaignImage');
+    const imgUrl=dynamicSafeUrl(d.campaign_image_url);
+    if(imgUrl){img.src=imgUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}else img.style.display='none';
+    const btn=document.getElementById('dynamicCampaignButton');
+    const btnUrl=dynamicSafeUrl(d.campaign_button_url);
+    if(btnUrl && d.campaign_button_text){btn.href=btnUrl;btn.textContent=d.campaign_button_text;btn.classList.add('show');}else btn.classList.remove('show');
+    btn.onclick=()=>{ if(btnUrl) track('campaign'); };
+  }
+
+  /* V2 SMART CAMPAIGNS — scheduled campaigns take priority over legacy single campaign */
+  const smartBox=document.getElementById('smartCampaignsPublic');
+  const smartCampaigns=Array.isArray(business?.campaigns)?business.campaigns:[];
+  if(smartBox){
+    smartBox.innerHTML='';
+    if(smartCampaigns.length){
+      if(campaign) campaign.style.display='none';
+      smartCampaigns.slice(0,5).forEach(c=>{
+        const wrap=document.createElement('article');
+        wrap.className='smart-campaign';
+        const imageUrl=dynamicSafeUrl(c.image_url);
+        const buttonUrl=dynamicSafeUrl(c.button_url);
+        wrap.innerHTML=`<img class="smart-campaign-media" alt="Kampanya görseli"><div class="smart-campaign-body"><div class="smart-campaign-kicker">LEO CONNECT • ÖZEL FIRSAT</div><div class="smart-campaign-title"></div><div class="smart-campaign-text"></div><a class="smart-campaign-button" target="_blank" rel="noopener"></a></div>`;
+        const img=wrap.querySelector('.smart-campaign-media');
+        if(imageUrl){img.src=imageUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}
+        wrap.querySelector('.smart-campaign-title').textContent=String(c.title||'Kampanya');
+        wrap.querySelector('.smart-campaign-text').textContent=String(c.text||'');
+        const btn=wrap.querySelector('.smart-campaign-button');
+        if(buttonUrl && c.button_text){btn.href=buttonUrl;btn.textContent=String(c.button_text);btn.classList.add('show');btn.addEventListener('click',()=>track('campaign_click'));}
+        smartBox.appendChild(wrap);
+        track('campaign_view');
+      });
+    }
+  }
+
+  const featured=document.getElementById('dynamicFeatured');
+  if(featured){
+    const show=d.featured_enabled && (d.featured_title || d.featured_text || d.featured_image_url);
+    featured.style.display=show?'block':'none';
+    document.getElementById('dynamicFeaturedTitle').textContent=d.featured_title||'Öne Çıkan';
+    document.getElementById('dynamicFeaturedText').textContent=d.featured_text||'';
+    const img=document.getElementById('dynamicFeaturedImage');
+    const imgUrl=dynamicSafeUrl(d.featured_image_url);
+    if(imgUrl){img.src=imgUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}else img.style.display='none';
+    const btn=document.getElementById('dynamicFeaturedButton');
+    const btnUrl=dynamicSafeUrl(d.featured_button_url);
+    if(btnUrl && d.featured_button_text){btn.href=btnUrl;btn.textContent=d.featured_button_text;btn.classList.add('show');}else btn.classList.remove('show');
+    btn.onclick=()=>{ if(btnUrl) track('featured'); };
+  }
+
+  const galleryBox=document.getElementById('dynamicGallery');
+  if(galleryBox){
+    galleryBox.innerHTML='';
+    const gallery=Array.isArray(d.gallery)?d.gallery:[];
+    gallery.slice(0,30).forEach(item=>{
+      const url=dynamicSafeUrl(typeof item==='string'?item:item?.url||'');
+      if(!url) return;
+      const cell=document.createElement('div');
+      cell.className='dynamic-gallery-item';
+      const img=document.createElement('img');
+      img.src=url;img.alt='';
+      img.onerror=()=>cell.remove();
+      cell.appendChild(img);galleryBox.appendChild(cell);
+    });
+    galleryBox.style.display=galleryBox.children.length?'grid':'none';
+  }
+
+  const video=document.getElementById('dynamicVideo');
+  const frame=document.getElementById('dynamicVideoFrame');
+  if(video && frame){
+    const embed=dynamicYoutubeEmbed(d.video_url);
+    if(d.video_enabled && embed){
+      frame.innerHTML='';
+      const iframe=document.createElement('iframe');
+      iframe.src=embed;iframe.title='İşletme videosu';iframe.loading='lazy';iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';iframe.allowFullscreen=true;
+      frame.appendChild(iframe);video.style.display='block';
+    }else{frame.innerHTML='';video.style.display='none';}
+  }
+}
+
+
 /* ==================================================
    RENDER
 ================================================== */
 
 function render(){
+
+  renderDynamicProfile();
+
+  /* V2 REVIEW BOOSTER */
+  try{
+    renderReviewBooster();
+  }catch(error){
+    console.error("Review Booster render error:", error);
+  }
 
   document.title =
     (
@@ -2391,85 +2637,10 @@ function render(){
   }
 
 
-  /* SOCIAL */
+  /* DIGITAL CHANNELS — BUSINESS → CUSTOMER PROFILE */
 
-  let socialCount = 0;
+  renderDigitalChannels();
 
-
-  if(
-    setupLink(
-      "instagramLink",
-      business.instagram,
-      "instagram"
-    )
-  ){
-
-    socialCount++;
-
-  }
-
-
-  if(
-    setupLink(
-      "tiktokLink",
-      business.tiktok,
-      "tiktok"
-    )
-  ){
-
-    socialCount++;
-
-  }
-
-
-  if(
-    setupLink(
-      "googleLink",
-      business.google_review,
-      "google_review"
-    )
-  ){
-
-    socialCount++;
-
-  }
-
-
-  if(
-    setupLink(
-      "websiteLink",
-      business.website,
-      "website"
-    )
-  ){
-
-    socialCount++;
-
-  }
-
-
-  if(
-    setupLink(
-      "menuLink",
-      business.menu,
-      "menu"
-    )
-  ){
-
-    socialCount++;
-
-  }
-
-
-  if(socialCount){
-
-    document.getElementById(
-      "socialSection"
-    ).classList.remove(
-      "hidden"
-    );
-
-  }
 
 
   /* CONTACT */
