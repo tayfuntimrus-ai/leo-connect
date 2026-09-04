@@ -1897,7 +1897,60 @@ app.put(
    ADMIN NFC DELETE
 ========================= */
 
-app.delete('/api/admin/nfc-tags/:id', adminAuth, async (req,res)=>{ return res.status(405).json({error:'QR / NFC kodları kalıcıdır; silinemez. İsterseniz pasife alabilirsiniz.'}); });
+app.delete(
+  '/api/admin/nfc-tags/:id',
+  adminAuth,
+  async (req, res) => {
+
+    try {
+
+      const result =
+        await pool.query(
+          `
+          DELETE FROM nfc_tags
+
+          WHERE id=$1
+
+          RETURNING id
+          `,
+          [
+            req.params.id
+          ]
+        );
+
+      if (!result.rows.length) {
+
+        return res
+          .status(404)
+          .json({
+            error:
+              'NFC etiketi bulunamadı'
+          });
+
+      }
+
+      res.json({
+        ok: true
+      });
+
+    } catch (error) {
+
+      console.error(
+        'ADMIN NFC DELETE ERROR:',
+        error
+      );
+
+      res
+        .status(500)
+        .json({
+          error:
+            'NFC etiketi silinemedi'
+        });
+
+    }
+
+  }
+);
 
 
 /* =========================
@@ -2806,19 +2859,19 @@ app.get('/api/qr', auth, requireBusinessPermission('qr'), async (req, res) => {
 /* =========================================================
    BUSINESS CENTER ANALYTICS V3
 ========================================================= */
+
 app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'), async (req, res) => {
   try {
     const period = ['today','7d','30d','all'].includes(req.query.period) ? req.query.period : '7d';
-    let where = 'business_id=$1';
+    let where = "business_id=$1 AND type <> 'campaign_view'";
     if (period === 'today') where += " AND created_at >= CURRENT_DATE";
     if (period === '7d') where += " AND created_at >= NOW() - INTERVAL '7 days'";
     if (period === '30d') where += " AND created_at >= NOW() - INTERVAL '30 days'";
-    const cleanWhere = `${where} AND type <> 'review_open' AND NOT (type='profile_view' AND source IN ('qr','nfc'))`;
 
     const totals = await pool.query(`
       SELECT
         COUNT(*)::int AS total_events,
-        COUNT(*) FILTER (WHERE type='profile_view' AND COALESCE(source,'direct')='direct')::int AS profile_views,
+        COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
         COUNT(*) FILTER (WHERE type IN ('qr_scan','qr'))::int AS qr_scans,
         COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
         COUNT(*) FILTER (WHERE type='phone')::int AS phone_clicks,
@@ -2827,50 +2880,45 @@ app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'),
         COUNT(*) FILTER (WHERE type='tiktok')::int AS tiktok_clicks,
         COUNT(*) FILTER (WHERE type='google_review')::int AS google_review_clicks,
         COUNT(*) FILTER (WHERE type='website')::int AS website_clicks,
-        COUNT(*) FILTER (WHERE type='menu')::int AS menu_clicks,
-        COUNT(*) FILTER (WHERE type='location')::int AS location_clicks,
-        COUNT(*) FILTER (WHERE type='share')::int AS share_clicks
-      FROM events WHERE ${cleanWhere}`,[req.user.id]);
+        COUNT(*) FILTER (WHERE type='menu')::int AS menu_clicks
+      FROM events WHERE ${where}`,[req.user.id]);
 
     const daily = await pool.query(`
       SELECT TO_CHAR(created_at::date,'YYYY-MM-DD') AS day,
         COUNT(*)::int AS events,
-        COUNT(*) FILTER (WHERE type='profile_view' AND COALESCE(source,'direct')='direct')::int AS profile_views,
+        COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
         COUNT(*) FILTER (WHERE type IN ('qr_scan','qr'))::int AS qr_scans,
         COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps
-      FROM events WHERE ${cleanWhere}
+      FROM events WHERE ${where}
       GROUP BY created_at::date ORDER BY created_at::date ASC`,[req.user.id]);
 
     const hourly = await pool.query(`
       SELECT EXTRACT(HOUR FROM created_at)::int AS hour, COUNT(*)::int AS events
-      FROM events WHERE ${cleanWhere}
+      FROM events WHERE ${where}
       GROUP BY EXTRACT(HOUR FROM created_at) ORDER BY hour ASC`,[req.user.id]);
 
     const actions = await pool.query(`
       SELECT type, COUNT(*)::int AS count FROM events
-      WHERE ${cleanWhere} GROUP BY type ORDER BY count DESC`,[req.user.id]);
+      WHERE ${where} GROUP BY type ORDER BY count DESC`,[req.user.id]);
 
     const tags = await pool.query(`
-      SELECT n.id,n.name,n.code,n.placement,n.is_active,
-        COUNT(e.id) FILTER (WHERE e.type IN ('qr_scan','qr'))::int AS qr_scans,
-        COUNT(e.id) FILTER (WHERE e.type='nfc')::int AS nfc_taps,
-        COUNT(e.id) FILTER (WHERE e.type IN ('qr_scan','qr','nfc'))::int AS total_physical,
-        MAX(e.created_at) AS last_activity
+      SELECT
+        n.id,
+        n.name,
+        n.code,
+        n.placement,
+        COUNT(e.id)::int AS tap_count,
+        MAX(e.created_at) AS last_tap
       FROM nfc_tags n
       LEFT JOIN events e
-        ON e.nfc_tag_id=n.id
-       AND e.business_id=$1
-       AND e.type <> 'review_open'
+        ON e.nfc_tag_id = n.id
+       AND e.type = 'nfc'
       WHERE n.business_id=$1
-      GROUP BY n.id,n.name,n.code,n.placement,n.is_active,n.created_at
-      ORDER BY total_physical DESC,n.created_at DESC`,[req.user.id]);
+      GROUP BY n.id,n.name,n.code,n.placement,n.created_at
+      ORDER BY tap_count DESC, n.created_at DESC
+      LIMIT 10`,[req.user.id]);
 
-    const sources = await pool.query(`
-      SELECT COALESCE(NULLIF(source,''),'direct') AS source, COUNT(*)::int AS count
-      FROM events WHERE ${cleanWhere}
-      GROUP BY 1 ORDER BY count DESC`,[req.user.id]);
-
-    res.json({period, totals: totals.rows[0], daily: daily.rows, hourly: hourly.rows, actions: actions.rows, top_nfc: tags.rows, sources: sources.rows});
+    res.json({period, totals: totals.rows[0], daily: daily.rows, hourly: hourly.rows, actions: actions.rows, top_nfc: tags.rows});
   } catch(error) {
     console.error('BUSINESS ANALYTICS V3 ERROR:', error);
     res.status(500).json({error:'Analiz verileri alınamadı'});
@@ -2890,8 +2938,7 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
       FROM events e
       LEFT JOIN nfc_tags t ON t.id=e.nfc_tag_id
       WHERE e.business_id=$1
-        AND e.type <> 'review_open'
-        AND NOT (e.type='profile_view' AND e.source IN ('qr','nfc'))
+        AND e.type <> 'campaign_view'
       ORDER BY e.created_at DESC
       LIMIT $2
     `, [req.user.id, limit]);
@@ -2900,10 +2947,7 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
         COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '15 minutes')::int AS last_15m,
         COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '60 minutes')::int AS last_60m,
         COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE)::int AS today
-      FROM events
-      WHERE business_id=$1
-        AND type <> 'review_open'
-        AND NOT (type='profile_view' AND source IN ('qr','nfc'))
+      FROM events WHERE business_id=$1 AND type <> 'campaign_view'
     `, [req.user.id]);
     res.json({activities: result.rows, stats: stats.rows[0] || {last_15m:0,last_60m:0,today:0}});
   } catch(error) {
@@ -2919,14 +2963,14 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
 app.get('/api/business-ai-insights', auth, requireBusinessPermission('ai'), async (req, res) => {
   try {
     const period = ['today','7d','30d','all'].includes(req.query.period) ? req.query.period : '7d';
-    let where = 'business_id=$1';
+    let where = "business_id=$1 AND type <> 'campaign_view'";
     if (period === 'today') where += " AND created_at >= CURRENT_DATE";
     if (period === '7d') where += " AND created_at >= NOW() - INTERVAL '7 days'";
     if (period === '30d') where += " AND created_at >= NOW() - INTERVAL '30 days'";
     const params=[req.user.id];
     const totalsQ=await pool.query(`SELECT
-      COUNT(*) FILTER(WHERE type <> 'review_open' AND NOT (type='profile_view' AND source IN ('qr','nfc')))::int total_events,
-      COUNT(*) FILTER(WHERE type='profile_view' AND COALESCE(source,'direct')='direct')::int profile_views,
+      COUNT(*)::int total_events,
+      COUNT(*) FILTER(WHERE type='profile_view')::int profile_views,
       COUNT(*) FILTER(WHERE type IN ('qr_scan','qr'))::int qr,
       COUNT(*) FILTER(WHERE type='nfc')::int nfc,
       COUNT(*) FILTER(WHERE type='whatsapp')::int whatsapp,
@@ -2939,14 +2983,13 @@ app.get('/api/business-ai-insights', auth, requireBusinessPermission('ai'), asyn
       COUNT(*) FILTER(WHERE type='location')::int location,
       COUNT(*) FILTER(WHERE type='share')::int share
       FROM events WHERE ${where}`,params);
-    const hourlyQ=await pool.query(`SELECT EXTRACT(HOUR FROM created_at)::int AS hour, COUNT(*)::int AS events FROM events WHERE ${where} AND type <> 'review_open' AND NOT (type='profile_view' AND source IN ('qr','nfc')) GROUP BY 1 ORDER BY events DESC LIMIT 1`,params);
-    const actionsQ=await pool.query(`SELECT type, COUNT(*)::int count FROM events WHERE ${where} AND type <> 'review_open' AND NOT (type='profile_view' AND source IN ('qr','nfc')) GROUP BY type ORDER BY count DESC LIMIT 5`,params);
-    const sourceQ=await pool.query(`SELECT COALESCE(NULLIF(source,''),'direct') source, COUNT(*)::int count FROM events WHERE ${where} AND type <> 'review_open' AND NOT (type='profile_view' AND source IN ('qr','nfc')) GROUP BY 1 ORDER BY count DESC`,params);
+    const hourlyQ=await pool.query(`SELECT EXTRACT(HOUR FROM created_at)::int AS hour, COUNT(*)::int AS events FROM events WHERE ${where} GROUP BY 1 ORDER BY events DESC LIMIT 1`,params);
+    const actionsQ=await pool.query(`SELECT type, COUNT(*)::int count FROM events WHERE ${where} GROUP BY type ORDER BY count DESC LIMIT 5`,params);
+    const sourceQ=await pool.query(`SELECT COALESCE(NULLIF(source,''),'direct') source, COUNT(*)::int count FROM events WHERE ${where} GROUP BY 1 ORDER BY count DESC`,params);
     const t=totalsQ.rows[0]||{};
     const n=k=>Number(t[k]||0);
     const profile=n('profile_views'), total=n('total_events'), digital=n('qr')+n('nfc'), contact=n('whatsapp')+n('phone');
-    const meaningful=n('whatsapp')+n('phone')+n('instagram')+n('tiktok')+n('google_review')+n('website')+n('menu')+n('location')+n('share');
-    const actionTotal=meaningful;
+    const actionTotal=Math.max(0,total-profile);
     const conversion=profile?Math.min(100,actionTotal/profile*100):0;
     let score=0;
     if(profile>=20) score+=20; else if(profile>0) score+=10;
@@ -2991,7 +3034,7 @@ app.get('/api/stats', auth, async (req, res) => {
       await pool.query(
         `
         SELECT
-          COUNT(*)::int AS total_events,
+          COUNT(*) FILTER(WHERE type <> 'campaign_view')::int AS total_events,
 
           COUNT(*) FILTER(
             WHERE type='profile_view'
@@ -4138,7 +4181,58 @@ app.put(
    DELETE TAG
 */
 
-app.delete('/api/nfc-tags/:id', auth, requireBusinessPermission('nfc'), async (req,res)=>{ return res.status(405).json({error:'QR / NFC kodları kalıcıdır; silinemez. İsterseniz pasife alabilirsiniz.'}); });
+app.delete(
+  '/api/nfc-tags/:id',
+  auth,
+  requireBusinessPermission('nfc'),
+  async (req, res) => {
+
+    try {
+
+      const id =
+        Number(req.params.id);
+
+      const result =
+        await pool.query(
+          `
+          DELETE FROM nfc_tags
+
+          WHERE id=$1
+          AND business_id=$2
+
+          RETURNING id
+          `,
+          [
+            id,
+            req.user.id
+          ]
+        );
+
+      if (!result.rows.length) {
+
+        return res.status(404).json({
+          error: 'NFC etiketi bulunamadı'
+        });
+
+      }
+
+      res.json({
+        success: true,
+        id
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.status(500).json({
+        error: 'NFC etiketi silinemedi'
+      });
+
+    }
+
+  }
+);
 
 
 /* =========================================================
@@ -4390,11 +4484,53 @@ app.get(
 
       const isQr = String(req.query.source || '').toLowerCase() === 'qr';
 
-      // Tek fiziksel temas = tek event. QR/NFC açılışında profile_view üretmeyiz.
       await pool.query(
-        `INSERT INTO events(business_id,type,source,nfc_tag_id) VALUES($1,$2,$3,$4)`,
-        [tag.business_id, isQr ? 'qr_scan' : 'nfc', isQr ? 'qr' : 'nfc', tag.tag_id]
+        `
+        INSERT INTO events(
+          business_id,
+          type,
+          source,
+          nfc_tag_id
+        )
+
+        VALUES(
+          $1,
+          'profile_view',
+          $2,
+          $3
+        )
+        `,
+        [
+          tag.business_id,
+          isQr ? 'qr' : 'nfc',
+          tag.tag_id
+        ]
       );
+
+      await pool.query(
+        `
+        INSERT INTO events(
+          business_id,
+          type,
+          source,
+          nfc_tag_id
+        )
+
+        VALUES(
+          $1,
+          $2,
+          $3,
+          $4
+        )
+        `,
+        [
+          tag.business_id,
+          isQr ? 'qr_scan' : 'nfc',
+          isQr ? 'qr' : 'nfc',
+          tag.tag_id
+        ]
+      );
+
 
       /*
         Profile aç.
@@ -4456,20 +4592,95 @@ app.get(
       const business =
         result.rows[0];
 
-      const source = String(req.query.source || '').toLowerCase();
+      /*
+        Profile view
+      */
 
-      // Tek giriş event'i: direct=profil, qr=QR, nfc=NFC.
-      // Eski çift sayımlı profile_view kayıtları raporlarda kaynakla ayrıştırılacak.
-      if(source === 'qr' || source === 'nfc'){
+      await pool.query(
+        `
+        INSERT INTO events(
+          business_id,
+          type,
+          source
+        )
+
+        VALUES(
+          $1,
+          'profile_view',
+          $2
+        )
+        `,
+        [
+          business.id,
+          req.query.source === 'qr'
+            ? 'qr'
+            : req.query.source === 'nfc'
+              ? 'nfc'
+              : 'direct'
+        ]
+      );
+
+
+      /*
+        QR
+      */
+
+      if (
+        req.query.source === 'qr'
+      ) {
+
         await pool.query(
-          `INSERT INTO events(business_id,type,source) VALUES($1,$2,$3)`,
-          [business.id, source === 'qr' ? 'qr_scan' : 'nfc', source]
-        );
-      }else{
-        await pool.query(
-          `INSERT INTO events(business_id,type,source) VALUES($1,'profile_view','direct')`,
+          `
+          INSERT INTO events(
+            business_id,
+            type,
+            source
+          )
+
+          VALUES(
+            $1,
+            'qr_scan',
+            'qr'
+          )
+          `,
           [business.id]
         );
+
+      }
+
+
+      /*
+        Eski NFC bağlantıları:
+
+        /p/slug?source=nfc
+
+        Bunlar yeni tag sistemi kullanılmadan
+        oluşturulmuş NFC bağlantıları olabilir.
+
+        Backward compatibility korunuyor.
+      */
+
+      if (
+        req.query.source === 'nfc'
+      ) {
+
+        await pool.query(
+          `
+          INSERT INTO events(
+            business_id,
+            type,
+            source
+          )
+
+          VALUES(
+            $1,
+            'nfc',
+            'nfc'
+          )
+          `,
+          [business.id]
+        );
+
       }
 
 
