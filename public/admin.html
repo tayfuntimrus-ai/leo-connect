@@ -131,17 +131,17 @@ a{color:inherit;text-decoration:none}
     <div class="brand"><div class="brand-mark">🦁</div><div><strong>LEO CONNECT</strong><small>COMMAND CENTER</small></div></div>
     <div class="nav-title">ANA MENÜ</div>
     <nav class="nav">
-      <button class="active" onclick="setActive(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
-      <button onclick="focusBusinesses();setActive(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
-      <button onclick="showNFCManager(this)"><span class="nav-icon">◉</span><span>NFC Etiketleri</span></button>
-      <button onclick="showQRManager(this)"><span class="nav-icon">▣</span><span>QR Merkezi</span></button>
-      <button onclick="showToast('Analytics modülü bir sonraki aşamada genişletilecek.')"><span class="nav-icon">⌁</span><span>Analytics</span></button>
+      <button type="button" class="active" onclick="showHome(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
+      <button type="button" onclick="showBusinessesPage(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
+      <button type="button" onclick="showNFCManager(this)"><span class="nav-icon">◉</span><span>NFC Etiketleri</span></button>
+      <button type="button" onclick="showQRManager(this)"><span class="nav-icon">▣</span><span>QR Merkezi</span></button>
+      <button type="button" onclick="showAdminAnalytics(this)"><span class="nav-icon">⌁</span><span>Analytics</span></button>
     </nav>
     <div class="nav-title">SİSTEM</div>
     <nav class="nav">
-      <button onclick="showToast('Hesap yönetimi sonraki sürümde.')"><span class="nav-icon">♙</span><span>Hesaplar</span></button>
-      <button onclick="showToast('Ayarlar için tema seçeneklerini üst menüden kullanabilirsin.')"><span class="nav-icon">⚙</span><span>Ayarlar</span></button>
-      <button onclick="showToast('Destek alanı sonraki sürümde.')"><span class="nav-icon">?</span><span>Destek</span></button>
+      <button type="button" onclick="showAccountsPage(this)"><span class="nav-icon">♙</span><span>Hesaplar</span></button>
+      <button type="button" onclick="showSettingsPage(this)"><span class="nav-icon">⚙</span><span>Ayarlar</span></button>
+      <button type="button" onclick="showSupportPage(this)"><span class="nav-icon">?</span><span>Destek</span></button>
     </nav>
     <div class="admin-card"><div class="admin-row"><div class="avatar">A</div><div><div class="admin-name">Admin</div><div id="adminMail" class="admin-mail">admin</div></div></div><div class="online"><i></i>Çevrimiçi</div></div>
   </aside>
@@ -677,7 +677,8 @@ async function showQR(id){
 function closeGlobalPage(){
   document.getElementById("globalPage").classList.remove("show");
   document.querySelector(".content").style.display="";
-  window.scrollTo({top:0,behavior:"smooth"});
+  setActive(document.querySelector(".nav button"));
+  window.scrollTo({top:0,behavior:"auto"});
 }
 function showGlobalPage(title,subtitle,html){
   document.querySelector(".content").style.display="none";
@@ -720,6 +721,171 @@ async function showQRManager(btn){
     const biz=allBusinesses.length?allBusinesses:(await api("/api/admin/businesses")).businesses||[];
     document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div><h3>Merkezi QR Yönetimi</h3><div class="sub">Mevcut slug ve QR adresleri korunur.</div></div><div class="global-grid" style="margin-top:15px">${biz.length?biz.map(b=>`<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">▣</div><div><div class="global-name">${esc(b.name||"İsimsiz")}</div><div class="global-sub">${esc(b.category||"—")} • /p/${esc(b.slug||"")} • ${n(b.qr_scans)} tarama</div></div></div><div class="modal-actions"><button class="btn primary" onclick="showQR(${Number(b.id)})">QR'ı Gör</button><button class="btn" onclick="openBusiness(${Number(b.id)})">İşletmeye Git</button></div></div>`).join(""):'<div class="empty">İşletme bulunamadı.</div>'}</div></section>`;
   }catch(e){document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
+}
+
+
+function hideAllMainPages(){
+  document.querySelector(".content").style.display="none";
+  document.getElementById("businessPage").classList.remove("show");
+  document.getElementById("globalPage").classList.add("show");
+  window.scrollTo({top:0,behavior:"auto"});
+}
+
+function showHome(btn){
+  setActive(btn);
+  currentBusiness=null;
+  document.getElementById("businessPage").classList.remove("show");
+  document.getElementById("globalPage").classList.remove("show");
+  document.querySelector(".content").style.display="";
+  window.scrollTo({top:0,behavior:"auto"});
+}
+
+function showBusinessesPage(btn){
+  setActive(btn);
+  hideAllMainPages();
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • ADMIN";
+  document.getElementById("globalTitle").textContent="İşletmeler";
+  document.getElementById("globalSubtitle").textContent="Tüm işletmeleri tek ekrandan görüntüle ve yönet.";
+  renderBusinessesGlobal();
+}
+
+function renderBusinessesGlobal(){
+  const q = "";
+  const rows = allBusinesses || [];
+  document.getElementById("globalContent").innerHTML = `
+    <section class="card biz-section">
+      <div class="section-head">
+        <div><div class="section-title">İşletme Listesi</div><div class="section-sub">${n(rows.length)} işletme</div></div>
+        <div class="search"><input id="globalBusinessSearch" placeholder="İşletme ara..." oninput="filterGlobalBusinesses()"><button class="btn" onclick="loadAll()">↻ Yenile</button></div>
+      </div>
+      <div class="table-wrap">
+        <table class="table" id="globalBizTable">
+          <thead><tr><th>İŞLETME</th><th>KATEGORİ</th><th>PROFİL</th><th>QR</th><th>NFC</th><th>ETİKET</th><th>İŞLEM</th></tr></thead>
+          <tbody id="globalBusinessRows"></tbody>
+        </table>
+      </div>
+    </section>`;
+  renderGlobalBusinessRows(rows);
+}
+
+function renderGlobalBusinessRows(list){
+  const tbody=document.getElementById("globalBusinessRows");
+  if(!tbody)return;
+  if(!list.length){
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty">İşletme bulunamadı.</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML=list.map(b=>`
+    <tr>
+      <td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td>
+      <td class="accent">${esc(b.category||"—")}</td>
+      <td>${n(b.profile_views)}</td><td>${n(b.qr_scans)}</td><td>${n(b.nfc_scans)}</td>
+      <td><span class="badge">${n(b.nfc_tags)} NFC</span></td>
+      <td><button class="btn primary" onclick="openBusiness(${Number(b.id)})">Detay ›</button></td>
+    </tr>`).join("");
+}
+
+function filterGlobalBusinesses(){
+  const q=(document.getElementById("globalBusinessSearch")?.value||"").toLowerCase().trim();
+  renderGlobalBusinessRows(allBusinesses.filter(b=>(String(b.name||"")+" "+String(b.email||"")+" "+String(b.category||"")).toLowerCase().includes(q)));
+}
+
+function showAdminAnalytics(btn){
+  setActive(btn);
+  hideAllMainPages();
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • ANALYTICS";
+  document.getElementById("globalTitle").textContent="Analytics";
+  document.getElementById("globalSubtitle").textContent="Sistemdeki toplam profil, QR, NFC ve etkileşim verileri.";
+  const o=overview||{};
+  document.getElementById("globalContent").innerHTML=`
+    <section class="cards">
+      <div class="card stat"><div class="stat-top"><div class="stat-icon">▦</div></div><div class="stat-label">İŞLETMELER</div><div class="stat-value">${n(o.businesses??o.total_businesses??allBusinesses.length)}</div></div>
+      <div class="card stat"><div class="stat-top"><div class="stat-icon">⌂</div></div><div class="stat-label">PROFİL GÖRÜNTÜLEME</div><div class="stat-value">${n(o.profile_views??o.total_profile_views)}</div></div>
+      <div class="card stat"><div class="stat-top"><div class="stat-icon">▣</div></div><div class="stat-label">QR TARAMA</div><div class="stat-value">${n(o.qr_scans??o.total_qr_scans)}</div></div>
+      <div class="card stat"><div class="stat-top"><div class="stat-icon">◉</div></div><div class="stat-label">NFC DOKUNUŞ</div><div class="stat-value">${n(o.nfc_scans??o.total_nfc_scans)}</div></div>
+    </section>
+    <section class="card biz-section" style="margin-top:16px">
+      <h3>Etkileşim Özeti</h3>
+      <div class="sub">Mevcut admin overview verilerinden canlı özet.</div>
+      <div class="summary-grid">
+        <div class="summary-item"><div class="summary-value">${n(o.phone_clicks)}</div><div class="summary-label">Telefon Tıklama</div></div>
+        <div class="summary-item"><div class="summary-value">${n(o.whatsapp_clicks)}</div><div class="summary-label">WhatsApp Tıklama</div></div>
+        <div class="summary-item"><div class="summary-value">${n(o.profile_views??o.total_profile_views)}</div><div class="summary-label">Profil Görüntüleme</div></div>
+        <div class="summary-item"><div class="summary-value">${n(o.qr_scans??o.total_qr_scans)}</div><div class="summary-label">QR Tarama</div></div>
+        <div class="summary-item"><div class="summary-value">${n(o.nfc_scans??o.total_nfc_scans)}</div><div class="summary-label">NFC Dokunuş</div></div>
+      </div>
+    </section>`;
+}
+
+function showAccountsPage(btn){
+  setActive(btn);
+  hideAllMainPages();
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • SİSTEM";
+  document.getElementById("globalTitle").textContent="Hesaplar";
+  document.getElementById("globalSubtitle").textContent="Admin erişim hesabının mevcut oturum bilgileri.";
+  const email=localStorage.getItem("admin_email")||"Admin erişimi";
+  document.getElementById("globalContent").innerHTML=`
+    <section class="card biz-section">
+      <h3>Admin Hesabı</h3>
+      <div class="sub">Mevcut oturum bilgisi</div>
+      <div class="info-grid" style="margin-top:15px">
+        <div class="info-box"><small>E-POSTA</small><strong>${esc(email)}</strong></div>
+        <div class="info-box"><small>OTURUM</small><strong>Aktif</strong></div>
+      </div>
+      <div class="modal-actions"><button class="btn primary" onclick="logout()">Çıkış Yap</button></div>
+    </section>`;
+}
+
+function showSettingsPage(btn){
+  setActive(btn);
+  hideAllMainPages();
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • SİSTEM";
+  document.getElementById("globalTitle").textContent="Ayarlar";
+  document.getElementById("globalSubtitle").textContent="Admin görünümünü buradan yönet.";
+  document.getElementById("globalContent").innerHTML=`
+    <section class="card biz-section">
+      <h3>Görünüm</h3>
+      <div class="sub">Tema ve vurgu rengini değiştirebilirsin.</div>
+      <div class="permission-grid" style="margin-top:15px">
+        <div class="permission-card"><div><strong>Koyu / Açık Tema</strong><span>Admin paneli görünümü</span></div><button class="btn" onclick="toggleTheme();showSettingsPage(document.querySelector('.nav button:nth-child(7)'))">Değiştir</button></div>
+        <div class="permission-card"><div><strong>Vurgu Rengi</strong><span>Üst menüdeki renk seçenekleri aktif.</span></div><div class="top-actions">
+          <button class="swatch s-gold" onclick="setAccent('gold',this)"></button>
+          <button class="swatch s-green" onclick="setAccent('green',this)"></button>
+          <button class="swatch s-blue" onclick="setAccent('blue',this)"></button>
+          <button class="swatch s-purple" onclick="setAccent('purple',this)"></button>
+          <button class="swatch s-red" onclick="setAccent('red',this)"></button>
+        </div></div>
+      </div>
+    </section>`;
+}
+
+function showSupportPage(btn){
+  setActive(btn);
+  hideAllMainPages();
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • DESTEK";
+  document.getElementById("globalTitle").textContent="Destek / Sistem Kontrolü";
+  document.getElementById("globalSubtitle").textContent="Bağlantı ve servis durumunu hızlıca kontrol et.";
+  document.getElementById("globalContent").innerHTML=`
+    <section class="card biz-section">
+      <h3>Sistem Durumu</h3>
+      <div class="sub">Admin API bağlantısını test etmek için aşağıdaki butonu kullan.</div>
+      <div id="supportStatus" class="detail-grid" style="margin-top:15px">
+        <div class="detail-box"><small>API</small><strong>Kontrol bekliyor</strong></div>
+        <div class="detail-box"><small>OTURUM</small><strong>${adminToken?"Aktif":"Kapalı"}</strong></div>
+      </div>
+      <div class="modal-actions"><button class="btn primary" onclick="checkSupportApi()">API'YI TEST ET</button></div>
+    </section>`;
+}
+
+async function checkSupportApi(){
+  const box=document.getElementById("supportStatus");
+  if(!box)return;
+  try{
+    await api("/api/admin/overview");
+    box.innerHTML='<div class="detail-box"><small>API</small><strong class="accent">Çalışıyor ✓</strong></div><div class="detail-box"><small>OTURUM</small><strong class="accent">Aktif ✓</strong></div>';
+  }catch(e){
+    box.innerHTML='<div class="detail-box"><small>API</small><strong style="color:var(--danger)">Hata</strong></div><div class="detail-box"><small>MESAJ</small><strong>'+esc(e.message)+'</strong></div>';
+  }
 }
 
 function toggleTheme(){
