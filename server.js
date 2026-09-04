@@ -1,13 +1,10 @@
 LEO CONNECT – ADIM 2
+TAM SERVER.JS
 
-DOSYA: server.js
+Mevcut server.js dosyanın TAMAMINI silip aşağıdaki kodun TAMAMINI yapıştır.
+Bu dosya orijinal repo baz alınarak hazırlandı; yalnızca müşteri profilinin güncel veriyi alması için cache başlıkları eklendi.
 
-YAPILACAK:
-Mevcut server.js dosyanın TAMAMINI sil ve aşağıdaki kodun TAMAMINI yapıştır.
-
-NOT: dashboard.html'ye bu adımda dokunma.
-
-==================== KOD BAŞLANGICI ====================
+==================== KOD ====================
 
 require('dotenv').config();
 
@@ -3556,11 +3553,9 @@ app.put('/api/business-review-booster', auth, requireBusinessPermission('review'
 app.get(
   '/api/profile/:slug',
   async (req, res) => {
-
-    // Public business profiles must always read the latest saved content.
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
 
     try {
 
@@ -3647,11 +3642,9 @@ app.get(
 app.get(
   '/api/profile-by-nfc/:code',
   async (req, res) => {
-
-    // NFC public profiles must always read the latest saved content.
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
 
     try {
 
