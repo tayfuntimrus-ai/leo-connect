@@ -8,6 +8,7 @@ const QRCode = require('qrcode');
 const { Pool } = require('pg');
 const path = require('path');
 const crypto = require('crypto');
+const { createWebsiteCmsRouter } = require('./LEO-CONNECT-WEBSITE-CMS-MODULE-V1');
 
 const app = express();
 
@@ -121,8 +122,8 @@ function normalizeSocialLinks(value){
   const out={};
   for(const key of LEO_V2_SOCIAL_PLATFORMS){
     const item=raw[key];
-    if(typeof item==='string') out[key]={url:item.trim().slice(0,2000),enabled:true,icon_url:''};
-    else if(item && typeof item==='object') out[key]={url:String(item.url||'').trim().slice(0,2000),enabled:item.enabled!==false,label:String(item.label||'').trim().slice(0,80),icon_url:String(item.icon_url||'').trim().slice(0,2000)};
+    if(typeof item==='string') out[key]={url:item.trim().slice(0,2000),enabled:true};
+    else if(item && typeof item==='object') out[key]={url:String(item.url||'').trim().slice(0,2000),enabled:item.enabled!==false,label:String(item.label||'').trim().slice(0,80)};
   }
   return out;
 }
@@ -136,7 +137,6 @@ function normalizeCustomLinks(value){
     title:String(item?.title || '').trim().slice(0,80),
     url:String(item?.url || '').trim().slice(0,2000),
     icon:String(item?.icon || '🔗').trim().slice(0,8),
-    icon_url:String(item?.icon_url || '').trim().slice(0,2000),
     enabled:item?.enabled!==false,
     sort_order:Number.isFinite(Number(item?.sort_order)) ? Number(item.sort_order) : i
   })).filter(x=>x.title && x.url);
@@ -367,10 +367,7 @@ function nfcTagPublic(row) {
     code: row.code,
     url,
     is_active: row.is_active,
-    tap_count: Number(row.tap_count || row.nfc_count || 0),
-    qr_count: Number(row.qr_count || 0),
-    nfc_count: Number(row.nfc_count || row.tap_count || 0),
-    total_count: Number(row.total_count || ((Number(row.qr_count || 0)) + (Number(row.nfc_count || row.tap_count || 0)))),
+    tap_count: Number(row.tap_count || 0),
     last_tap: row.last_tap || null,
     created_at: row.created_at,
     updated_at: row.updated_at
@@ -615,7 +612,8 @@ async function initDatabase() {
     ON profile_designs(business_id)
   `);
 
-  console.log('PostgreSQL + NFC Tag Management hazır.');
+  await websiteCms.initWebsiteCmsDatabase();
+  console.log('PostgreSQL + NFC Tag Management + Website CMS hazır.');
 }
 
 
@@ -688,6 +686,13 @@ function adminAuth(req, res, next) {
     });
   }
 }
+
+
+/* =========================================================
+   WEBSITE CMS — SEPARATE CORPORATE WEBSITE
+========================================================= */
+const websiteCms = createWebsiteCmsRouter({ pool, adminAuth });
+app.use(websiteCms.router);
 
 
 /* =========================================================
@@ -2289,34 +2294,21 @@ app.delete(
   adminAuth,
   async (req, res) => {
 
-    const client = await pool.connect();
-
     try {
 
       const id = Number(req.params.id);
 
-      if (!Number.isInteger(id) || id <= 0) {
-        return res.status(400).json({
-          error: 'Geçersiz işletme ID'
-        });
-      }
-
-      await client.query('BEGIN');
-
-      const business =
-        await client.query(
+      const result =
+        await pool.query(
           `
-          SELECT id, name
-          FROM businesses
+          DELETE FROM businesses
           WHERE id=$1
-          FOR UPDATE
+          RETURNING id
           `,
           [id]
         );
 
-      if (!business.rows.length) {
-
-        await client.query('ROLLBACK');
+      if (!result.rows.length) {
 
         return res.status(404).json({
           error: 'İşletme bulunamadı'
@@ -2324,50 +2316,17 @@ app.delete(
 
       }
 
-      /*
-        events tablosunda business_id için eski veritabanlarında
-        FK/CASCADE olmayabilir. İşletme silinirken bu kayıtları
-        açıkça temizliyoruz. nfc_tags, campaigns, profile_designs
-        ve review_boosters ise kendi CASCADE kurallarıyla silinir.
-      */
-      await client.query(
-        `
-        DELETE FROM events
-        WHERE business_id=$1
-        `,
-        [id]
-      );
-
-      const result =
-        await client.query(
-          `
-          DELETE FROM businesses
-          WHERE id=$1
-          RETURNING id, name
-          `,
-          [id]
-        );
-
-      await client.query('COMMIT');
-
       res.json({
-        success: true,
-        business: result.rows[0]
+        success: true
       });
 
     } catch (error) {
 
-      await client.query('ROLLBACK');
-
-      console.error('ADMIN BUSINESS DELETE ERROR:', error);
+      console.error(error);
 
       res.status(500).json({
         error: 'İşletme silinemedi'
       });
-
-    } finally {
-
-      client.release();
 
     }
 
@@ -2910,7 +2869,7 @@ app.get('/api/qr', auth, requireBusinessPermission('qr'), async (req, res) => {
 app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'), async (req, res) => {
   try {
     const period = ['today','7d','30d','all'].includes(req.query.period) ? req.query.period : '7d';
-    let where = "business_id=$1 AND type <> 'campaign_view'";
+    let where = 'business_id=$1';
     if (period === 'today') where += " AND created_at >= CURRENT_DATE";
     if (period === '7d') where += " AND created_at >= NOW() - INTERVAL '7 days'";
     if (period === '30d') where += " AND created_at >= NOW() - INTERVAL '30 days'";
@@ -2954,20 +2913,18 @@ app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'),
         n.name,
         n.code,
         n.placement,
-        COALESCE(SUM(CASE WHEN e.type='qr_scan' THEN 1 ELSE 0 END),0)::int AS qr_count,
-        COALESCE(SUM(CASE WHEN e.type='nfc' THEN 1 ELSE 0 END),0)::int AS nfc_count,
-        COUNT(e.id)::int AS total_count,
+        COUNT(e.id)::int AS tap_count,
         MAX(e.created_at) AS last_tap
       FROM nfc_tags n
       LEFT JOIN events e
         ON e.nfc_tag_id = n.id
-       AND e.type <> 'campaign_view'
+       AND e.type = 'nfc'
       WHERE n.business_id=$1
       GROUP BY n.id,n.name,n.code,n.placement,n.created_at
-      ORDER BY total_count DESC, n.created_at DESC
-      LIMIT 50`,[req.user.id]);
+      ORDER BY tap_count DESC, n.created_at DESC
+      LIMIT 10`,[req.user.id]);
 
-    res.json({period, totals: totals.rows[0], daily: daily.rows, hourly: hourly.rows, actions: actions.rows, top_nfc: tags.rows, table_reports: tags.rows});
+    res.json({period, totals: totals.rows[0], daily: daily.rows, hourly: hourly.rows, actions: actions.rows, top_nfc: tags.rows});
   } catch(error) {
     console.error('BUSINESS ANALYTICS V3 ERROR:', error);
     res.status(500).json({error:'Analiz verileri alınamadı'});
@@ -2987,13 +2944,6 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
       FROM events e
       LEFT JOIN nfc_tags t ON t.id=e.nfc_tag_id
       WHERE e.business_id=$1
-        AND e.type IN (
-          'qr_scan','qr','nfc',
-          'instagram','facebook','tiktok','youtube','linkedin','x',
-          'whatsapp','google_review','website','yemeksepeti','getir',
-          'trendyol-yemek','migros-yemek','rezervasyon','bilet','menu',
-          'location','tripadvisor','booking','telegram','email'
-        )
       ORDER BY e.created_at DESC
       LIMIT $2
     `, [req.user.id, limit]);
@@ -3002,15 +2952,7 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
         COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '15 minutes')::int AS last_15m,
         COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '60 minutes')::int AS last_60m,
         COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE)::int AS today
-      FROM events
-      WHERE business_id=$1
-        AND type IN (
-          'qr_scan','qr','nfc',
-          'instagram','facebook','tiktok','youtube','linkedin','x',
-          'whatsapp','google_review','website','yemeksepeti','getir',
-          'trendyol-yemek','migros-yemek','rezervasyon','bilet','menu',
-          'location','tripadvisor','booking','telegram','email'
-        )
+      FROM events WHERE business_id=$1
     `, [req.user.id]);
     res.json({activities: result.rows, stats: stats.rows[0] || {last_15m:0,last_60m:0,today:0}});
   } catch(error) {
@@ -3026,7 +2968,7 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
 app.get('/api/business-ai-insights', auth, requireBusinessPermission('ai'), async (req, res) => {
   try {
     const period = ['today','7d','30d','all'].includes(req.query.period) ? req.query.period : '7d';
-    let where = "business_id=$1 AND type <> 'campaign_view'";
+    let where = 'business_id=$1';
     if (period === 'today') where += " AND created_at >= CURRENT_DATE";
     if (period === '7d') where += " AND created_at >= NOW() - INTERVAL '7 days'";
     if (period === '30d') where += " AND created_at >= NOW() - INTERVAL '30 days'";
@@ -3097,7 +3039,7 @@ app.get('/api/stats', auth, async (req, res) => {
       await pool.query(
         `
         SELECT
-          COUNT(*) FILTER(WHERE type <> 'campaign_view')::int AS total_events,
+          COUNT(*)::int AS total_events,
 
           COUNT(*) FILTER(
             WHERE type='profile_view'
@@ -3202,32 +3144,18 @@ app.post('/api/event/:slug', async (req, res) => {
       'whatsapp',
       'phone',
       'instagram',
-      'facebook',
       'tiktok',
-      'youtube',
-      'linkedin',
-      'x',
-      'google_review',
       'website',
-      'yemeksepeti',
-      'getir',
-      'trendyol-yemek',
-      'migros-yemek',
-      'rezervasyon',
-      'bilet',
       'menu',
-      'location',
-      'tripadvisor',
-      'booking',
-      'telegram',
-      'email',
-      'share',
-      'iban',
+      'google_review',
       'review_open',
       'review_positive',
       'review_feedback',
       'campaign_view',
-      'campaign_click'
+      'campaign_click',
+      'location',
+      'iban',
+      'share'
     ];
 
     const allowedSources = ['', 'direct', 'qr', 'nfc'];
@@ -3266,17 +3194,10 @@ app.post('/api/event/:slug', async (req, res) => {
 
     let nfcTagId = null;
 
-    /*
-      Masa / nokta QR ve NFC bağlantıları aynı nfc_tags kaydını
-      kullanır. Böylece masadan gelen tüm sonraki dijital aksiyonlar
-      da aynı masaya bağlanır.
-    */
-    if (source === 'nfc' || source === 'qr') {
+    if (source === 'nfc') {
       if (!nfcCode) {
         return res.status(400).json({
-          error: source === 'qr'
-            ? 'QR masa kodu gerekli'
-            : 'NFC kodu gerekli'
+          error: 'NFC kodu gerekli'
         });
       }
 
@@ -3294,9 +3215,7 @@ app.post('/api/event/:slug', async (req, res) => {
 
       if (!tag.rows.length) {
         return res.status(400).json({
-          error: source === 'qr'
-            ? 'QR masa kodu doğrulanamadı'
-            : 'NFC etiketi doğrulanamadı'
+          error: 'NFC etiketi doğrulanamadı'
         });
       }
 
@@ -3629,10 +3548,6 @@ app.get(
   '/api/profile/:slug',
   async (req, res) => {
 
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
-
     try {
 
       const slug =
@@ -3718,10 +3633,6 @@ app.get(
 app.get(
   '/api/profile-by-nfc/:code',
   async (req, res) => {
-
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
 
     try {
 
@@ -3838,32 +3749,11 @@ app.get('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, res
             AND e.type='nfc'
           ),0)::int AS tap_count,
 
-          COALESCE((
-            SELECT COUNT(*)
-            FROM events e
-            WHERE e.nfc_tag_id=t.id
-            AND e.type='qr_scan'
-          ),0)::int AS qr_count,
-
-          COALESCE((
-            SELECT COUNT(*)
-            FROM events e
-            WHERE e.nfc_tag_id=t.id
-            AND e.type='nfc'
-          ),0)::int AS nfc_count,
-
-          COALESCE((
-            SELECT COUNT(*)
-            FROM events e
-            WHERE e.nfc_tag_id=t.id
-            AND e.type IN ('nfc','qr_scan')
-          ),0)::int AS total_count,
-
           (
             SELECT MAX(e.created_at)
             FROM events e
             WHERE e.nfc_tag_id=t.id
-            AND e.type IN ('nfc','qr_scan')
+            AND e.type='nfc'
           ) AS last_tap
 
         FROM nfc_tags t
@@ -3973,56 +3863,6 @@ app.get(
 
 
 /*
-   STABLE PUBLIC TABLE QR IMAGE
-   Uses the existing NFC tag code as the single source of truth.
-   The image URL is deterministic, public, and cacheable so the Business
-   Dashboard never depends on several authenticated JSON requests.
-*/
-app.get('/qr/nfc/:code.png', async (req, res) => {
-  try {
-    const code = String(req.params.code || '').trim();
-    if (!code) return res.status(404).send('QR bulunamadı');
-
-    const result = await pool.query(
-      `SELECT t.code,b.slug FROM nfc_tags t INNER JOIN businesses b ON b.id=t.business_id WHERE t.code=$1 LIMIT 1`,
-      [code]
-    );
-    if (!result.rows.length) return res.status(404).send('QR bulunamadı');
-
-    const baseUrl = process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get('host')}`;
-    const publicUrl = `${baseUrl}/p/nfc/${encodeURIComponent(result.rows[0].code)}?source=qr`;
-    const png = await QRCode.toBuffer(publicUrl, { type:'png', width:700, margin:2, errorCorrectionLevel:'H' });
-
-    res.set('Content-Type','image/png');
-    res.set('Cache-Control','public, max-age=31536000, immutable');
-    res.set('ETag', `"nfc-qr-${result.rows[0].code}"`);
-    return res.end(png);
-  } catch (error) {
-    console.error('PUBLIC TABLE QR ERROR:', error);
-    return res.status(500).send('QR oluşturulamadı');
-  }
-});
-
-/*
-   TABLE / POINT QR JSON (legacy-compatible)
-   Uses the existing NFC tag URL; no second QR database is created.
-*/
-app.get('/api/nfc-tags/:id/qr', auth, requireBusinessPermission('nfc'), async (req, res) => {
-  try {
-    const id=Number(req.params.id);
-    if(!Number.isInteger(id)||id<=0) return res.status(400).json({error:'Geçersiz NFC etiketi'});
-    const result=await pool.query(`SELECT id,business_id,name,placement,code,is_active FROM nfc_tags WHERE id=$1 AND business_id=$2 LIMIT 1`,[id,req.user.id]);
-    if(!result.rows.length) return res.status(404).json({error:'NFC etiketi bulunamadı'});
-    const baseUrl=process.env.PUBLIC_URL||process.env.RENDER_EXTERNAL_URL||`${req.protocol}://${req.get('host')}`;
-    const url=`${baseUrl}/p/nfc/${result.rows[0].code}?source=qr`;
-    const qr=await QRCode.toDataURL(url,{width:900,margin:2,errorCorrectionLevel:'H'});
-    res.set('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');res.set('Pragma','no-cache');res.set('Expires','0');
-    res.json({...result.rows[0],url,qr});
-  } catch(error) {console.error('BUSINESS NFC QR ERROR:',error);res.status(500).json({error:'Masa / nokta QR kodu oluşturulamadı'});}
-});
-
-
-/*
    CREATE TAG
 */
 
@@ -4032,8 +3872,7 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
 
     const {
       name,
-      placement,
-      is_active
+      placement
     } = req.body;
 
     const tagName =
@@ -4041,11 +3880,6 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
 
     const tagPlacement =
       String(placement || '').trim();
-
-    const active =
-      typeof is_active === 'boolean'
-        ? is_active
-        : true;
 
     if (!tagName) {
 
@@ -4109,7 +3943,7 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
           $2,
           $3,
           $4,
-          $5
+          TRUE
         )
 
         RETURNING *
@@ -4118,8 +3952,7 @@ app.post('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, re
           req.user.id,
           tagName,
           tagPlacement,
-          code,
-          active
+          code
         ]
       );
 
@@ -4576,7 +4409,9 @@ app.get(
 
       }
 
-      const isQr = String(req.query.source || '').toLowerCase() === 'qr';
+      /*
+        Önce profil görüntüleme.
+      */
 
       await pool.query(
         `
@@ -4590,16 +4425,20 @@ app.get(
         VALUES(
           $1,
           'profile_view',
-          $2,
-          $3
+          'nfc',
+          $2
         )
         `,
         [
           tag.business_id,
-          isQr ? 'qr' : 'nfc',
           tag.tag_id
         ]
       );
+
+
+      /*
+        Sonra gerçek NFC tap.
+      */
 
       await pool.query(
         `
@@ -4612,15 +4451,13 @@ app.get(
 
         VALUES(
           $1,
-          $2,
-          $3,
-          $4
+          'nfc',
+          'nfc',
+          $2
         )
         `,
         [
           tag.business_id,
-          isQr ? 'qr_scan' : 'nfc',
-          isQr ? 'qr' : 'nfc',
           tag.tag_id
         ]
       );
