@@ -2138,19 +2138,21 @@ function renderDigitalChannels(){
     url=String(url||'').trim();
     if(!url) return;
     if(typeof item==='object' && item.enabled===false && !legacyMap[key]) return;
-    rows.push({key,name:names[key],url});
+    rows.push({key,name:names[key],url,icon_url:typeof item==='object' ? String(item.icon_url||'').trim() : ''});
   });
 
   custom.forEach((item,i)=>{
     const url=String(item?.url||'').trim();
     const title=String(item?.title||'').trim();
-    if(url && title) rows.push({key:'custom-'+i,name:title,url,custom:true,icon:item?.icon||'🔗'});
+    if(url && title) rows.push({key:'custom-'+i,name:title,url,custom:true,icon:item?.icon||'🔗',icon_url:String(item?.icon_url||'').trim()});
   });
 
   mount.innerHTML=rows.map(row=>{
-    const icon=row.custom
-      ? `<span style="font-size:24px">${escProfile(row.icon)}</span>`
-      : `<img class="brand-icon-svg" src="https://cdn.simpleicons.org/${encodeURIComponent(iconSlug[row.key]||row.key)}/FFFFFF" alt="${escProfile(row.name)}" width="24" height="24" loading="lazy">`;
+    const icon=row.icon_url
+      ? `<img class="brand-icon-svg" src="${safeUrl(row.icon_url)||'#'}" alt="${escProfile(row.name)}" width="24" height="24" loading="lazy">`
+      : row.custom
+        ? `<span style="font-size:24px">${escProfile(row.icon)}</span>`
+        : `<img class="brand-icon-svg" src="https://cdn.simpleicons.org/${encodeURIComponent(iconSlug[row.key]||row.key)}/FFFFFF" alt="${escProfile(row.name)}" width="24" height="24" loading="lazy">`;
     return `<a class="link" href="${safeUrl(row.url)||'#'}" target="_blank" rel="noopener" data-digital-key="${escProfile(row.key)}">
       <div class="link-icon">${icon}</div>
       <div class="link-text"><strong>${escProfile(row.name)}</strong><span>Bağlantıyı aç</span></div>
