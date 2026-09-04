@@ -29,7 +29,17 @@ a{color:inherit;text-decoration:none}
 .sidebar{position:sticky;top:0;height:100vh;padding:22px 18px;border-right:1px solid var(--line);background:var(--sidebar);display:flex;flex-direction:column;z-index:20}
 .brand{display:flex;align-items:center;gap:12px;padding:2px 6px 28px}
 .brand-mark{width:48px;height:48px;border:1px solid rgba(var(--accent-rgb),.45);border-radius:15px;display:grid;place-items:center;font-size:25px;background:linear-gradient(145deg,rgba(var(--accent-rgb),.16),transparent)}
-.brand strong{display:block;letter-spacing:2px;font-size:16px}.brand small{display:block;color:var(--muted);letter-spacing:1.5px;font-size:9px;margin-top:3px}
+.brand strong{display:block;letter-spacing:2px;font-size:16px}.brand small{display:block;color:var(--muted);letter-spacing:1.5px;font-size:9px;margin-top:3px};
+.brand-button{width:100%;border:0;background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.brand-button:hover .brand-mark{border-color:rgba(var(--accent-rgb),.8);transform:translateY(-1px);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.brand-mark{transition:.2s}
+.top-context{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:11px;letter-spacing:.3px}
+.top-context b{color:var(--text);font-weight:800}
+.top-context i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px rgba(var(--accent-rgb),.7)}
+.stat.clickable{cursor:pointer;transition:.2s}
+.stat.clickable:hover{transform:translateY(-2px);border-color:rgba(var(--accent-rgb),.45)}
+.quick:hover{transform:translateY(-1px)}
+
 .nav-title{font-size:10px;color:var(--muted);letter-spacing:1.7px;margin:15px 9px 8px}
 .nav{display:grid;gap:5px}
 .nav button{border:1px solid transparent;background:transparent;color:var(--muted);padding:12px 12px;border-radius:12px;text-align:left;display:flex;align-items:center;gap:12px;transition:.2s}
@@ -128,7 +138,16 @@ a{color:inherit;text-decoration:none}
 
 <div id="app" class="app" style="display:none">
   <aside class="sidebar">
-    <div class="brand"><div class="brand-mark">🦁</div><div><strong>LEO CONNECT</strong><small>COMMAND CENTER</small></div></div>
+    <button type="button" class="brand brand-button" onclick="showHome(document.querySelector('.nav button'))" aria-label="LEO CONNECT ana ekran">
+  <div class="brand-mark" aria-hidden="true">
+    <svg viewBox="0 0 48 48" width="28" height="28" fill="none">
+      <path d="M9 15.5 14 10l10 5 10-5 5 5v13l-5 9-10 5-10-5-5-9v-13Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="m17 20 7-4 7 4-2 9-5 4-5-4-2-9Z" fill="currentColor" opacity=".16"/>
+      <path d="M17 22.5h4M27 22.5h4M20 29c2.2 2 5.8 2 8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div><strong>LEO CONNECT</strong><small>COMMAND CENTER</small></div>
+</button>
     <div class="nav-title">ANA MENÜ</div>
     <nav class="nav">
       <button type="button" class="active" onclick="showHome(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
@@ -148,7 +167,7 @@ a{color:inherit;text-decoration:none}
 
   <main class="main">
     <header class="topbar">
-      <div></div>
+      <div class="top-context"><i></i><span>LEO CONNECT</span><b id="topContextTitle">Command Center</b></div>
       <div class="top-actions">
         <div class="mode"><span id="modeText">Koyu</span><button class="toggle" onclick="toggleTheme()" aria-label="Tema değiştir"><b></b></button></div>
         <div class="colors">
@@ -172,24 +191,24 @@ a{color:inherit;text-decoration:none}
       </div>
 
       <div class="cards">
-        <div class="card stat"><div class="stat-top"><div class="stat-icon">▦</div><span class="stat-arrow">›</span></div><div class="stat-label">İŞLETMELER</div><div id="sBusinesses" class="stat-value">—</div><div class="stat-note">toplam işletme</div></div>
-        <div class="card stat"><div class="stat-top"><div class="stat-icon">◉</div><span class="stat-arrow">›</span></div><div class="stat-label">PROFİL GÖRÜNTÜLEME</div><div id="sViews" class="stat-value">—</div><div class="stat-note">toplam görüntüleme</div></div>
-        <div class="card stat"><div class="stat-top"><div class="stat-icon">▣</div><span class="stat-arrow">›</span></div><div class="stat-label">QR TARAMA</div><div id="sQR" class="stat-value">—</div><div class="stat-note">toplam tarama</div></div>
-        <div class="card stat"><div class="stat-top"><div class="stat-icon">◉</div><span class="stat-arrow">›</span></div><div class="stat-label">NFC DOKUNUŞ</div><div id="sNFC" class="stat-value">—</div><div class="stat-note">toplam dokunuş</div></div>
+        <div class="card stat clickable" role="button" tabindex="0" onclick="showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))" onkeydown="if(event.key==='Enter')showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))"><div class="stat-top"><div class="stat-icon">▦</div><span class="stat-arrow">›</span></div><div class="stat-label">İŞLETMELER</div><div id="sBusinesses" class="stat-value">—</div><div class="stat-note">toplam işletme</div></div>
+        <div class="card stat clickable" role="button" tabindex="0" onclick="showAdminAnalytics(document.querySelector('.nav button:nth-child(5)'))" onkeydown="if(event.key==='Enter')showAdminAnalytics(document.querySelector('.nav button:nth-child(5)'))"><div class="stat-top"><div class="stat-icon">◉</div><span class="stat-arrow">›</span></div><div class="stat-label">PROFİL GÖRÜNTÜLEME</div><div id="sViews" class="stat-value">—</div><div class="stat-note">toplam görüntüleme</div></div>
+        <div class="card stat clickable" role="button" tabindex="0" onclick="showQRManager(document.querySelector('.nav button:nth-child(4)'))" onkeydown="if(event.key==='Enter')showQRManager(document.querySelector('.nav button:nth-child(4)'))"><div class="stat-top"><div class="stat-icon">▣</div><span class="stat-arrow">›</span></div><div class="stat-label">QR TARAMA</div><div id="sQR" class="stat-value">—</div><div class="stat-note">toplam tarama</div></div>
+        <div class="card stat clickable" role="button" tabindex="0" onclick="showNFCManager(document.querySelector('.nav button:nth-child(3)'))" onkeydown="if(event.key==='Enter')showNFCManager(document.querySelector('.nav button:nth-child(3)'))"><div class="stat-top"><div class="stat-icon">◉</div><span class="stat-arrow">›</span></div><div class="stat-label">NFC DOKUNUŞ</div><div id="sNFC" class="stat-value">—</div><div class="stat-note">toplam dokunuş</div></div>
       </div>
 
       <div class="grid-main">
         <section id="businessSection" class="card section">
           <div class="section-head">
             <div><div class="section-title">İşletmeler</div><div class="section-sub">İşletme detaylarına ve performansına buradan ulaş.</div></div>
-            <div class="search"><input id="businessSearch" placeholder="İşletme ara..." oninput="filterBusinesses()"><button class="btn primary" onclick="showToast('İşletme oluşturma API\'si henüz mevcut değil. Mevcut işletmeler tam yönetilebilir.')">＋ İşletme Ekle</button></div>
+            <div class="search"><input id="businessSearch" placeholder="İşletme ara..." oninput="filterBusinesses()"><button class="btn primary" onclick="newGlobalBusiness()">＋ İşletme Ekle</button></div>
           </div>
           <div class="table-wrap"><table class="table"><thead><tr><th>İŞLETME</th><th>KATEGORİ</th><th>PROFİL</th><th>QR</th><th>NFC</th><th>ETİKET</th><th>İŞLEM</th></tr></thead><tbody id="businessRows"><tr><td colspan="7"><div class="empty">Yükleniyor…</div></td></tr></tbody></table></div>
         </section>
 
         <div>
           <section class="card chart-card">
-            <div class="chart-head"><div><div class="chart-title">Son 7 Gün Performansı</div><div class="chart-sub">Mevcut toplam verilerden görsel özet</div></div><select class="select" onchange="showToast('Dönem seçimi sonraki analytics sürümünde aktif olacak.')"><option>7 Gün</option><option>30 Gün</option><option>Tümü</option></select></div>
+            <div class="chart-head"><div><div class="chart-title">Son 7 Gün Performansı</div><div class="chart-sub">Mevcut toplam verilerden görsel özet</div></div><select id="overviewPeriod" class="select" onchange="setOverviewPeriod(this.value)"><option value="7">7 Gün</option><option value="30">30 Gün</option><option value="all">Tümü</option></select></div>
             <div class="chart">
               <svg viewBox="0 0 500 250" preserveAspectRatio="none">
                 <g opacity=".16" stroke="currentColor"><line x1="0" y1="35" x2="500" y2="35"/><line x1="0" y1="85" x2="500" y2="85"/><line x1="0" y1="135" x2="500" y2="135"/><line x1="0" y1="185" x2="500" y2="185"/><line x1="0" y1="235" x2="500" y2="235"/></g>
@@ -205,8 +224,8 @@ a{color:inherit;text-decoration:none}
             <div class="quick-grid">
               <button class="quick" onclick="showNFCManager()"><div class="quick-icon">◉</div><div><strong>NFC Merkezi</strong><span>Tüm etiketleri yönet</span></div></button>
               <button class="quick" onclick="showQRManager()"><div class="quick-icon">▣</div><div><strong>QR Merkezi</strong><span>Tüm QR kodlarını yönet</span></div></button>
-              <button class="quick" onclick="showToast('Analytics alanı hazırlanıyor.')"><div class="quick-icon">⌁</div><div><strong>Analytics</strong><span>Performansı incele</span></div></button>
-              <button class="quick" onclick="showToast('Rapor merkezi sonraki sürümde.')"><div class="quick-icon">▤</div><div><strong>Raporlar</strong><span>Özet raporlar</span></div></button>
+              <button class="quick" onclick="showAdminAnalytics(document.querySelector('.nav button:nth-child(5)'))"><div class="quick-icon">⌁</div><div><strong>Analytics</strong><span>Performansı incele</span></div></button>
+              <button class="quick" onclick="showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))"><div class="quick-icon">▤</div><div><strong>İşletmeler</strong><span>İşletme özetlerini aç</span></div></button>
             </div>
           </section>
         </div>
@@ -354,14 +373,16 @@ async function openBusiness(id){
     document.querySelector(".content").style.display="none";
     document.getElementById("businessPage").classList.add("show");
     renderBusinessPage();
-    window.scrollTo({top:0,behavior:"smooth"});
+    document.getElementById("topContextTitle").textContent=b?.name||"İşletme";
+    window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
   }catch(e){showToast(e.message)}
 }
 function closeBusinessPage(){
   currentBusiness=null;
   document.getElementById("businessPage").classList.remove("show");
   document.querySelector(".content").style.display="";
-  window.scrollTo({top:0,behavior:"smooth"});
+  document.getElementById("topContextTitle").textContent="Command Center";
+  window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
 }
 function renderBusinessPage(){
   const b=currentBusiness,tags=b.nfc_tags||[];
@@ -678,7 +699,8 @@ function closeGlobalPage(){
   document.getElementById("globalPage").classList.remove("show");
   document.querySelector(".content").style.display="";
   setActive(document.querySelector(".nav button"));
-  window.scrollTo({top:0,behavior:"auto"});
+  document.getElementById("topContextTitle").textContent="Command Center";
+  window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
 }
 function showGlobalPage(title,subtitle,html){
   document.querySelector(".content").style.display="none";
@@ -688,7 +710,8 @@ function showGlobalPage(title,subtitle,html){
   document.getElementById("globalSubtitle").textContent=subtitle;
   document.getElementById("globalContent").innerHTML=html;
   document.getElementById("globalPage").classList.add("show");
-  window.scrollTo({top:0,behavior:"smooth"});
+  document.getElementById("topContextTitle").textContent=title||"Merkez";
+  window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
 }
 async function showNFCManager(btn){
   if(btn)setActive(btn);
@@ -737,7 +760,46 @@ function showHome(btn){
   document.getElementById("businessPage").classList.remove("show");
   document.getElementById("globalPage").classList.remove("show");
   document.querySelector(".content").style.display="";
-  window.scrollTo({top:0,behavior:"auto"});
+  document.getElementById("topContextTitle").textContent="Command Center";
+  window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
+}
+
+
+function newGlobalBusiness(){
+  document.getElementById("modalTitle").textContent="Yeni İşletme";
+  document.getElementById("modalBody").innerHTML=`
+    <div class="form-grid">
+      <label><span>İşletme Adı</span><input id="cb_name" placeholder="Örn. Hicran Sofrası"></label>
+      <label><span>Kategori</span><input id="cb_category" placeholder="Restoran, kafe..."></label>
+      <label><span>E-posta</span><input id="cb_email" type="email" placeholder="isletme@example.com"></label>
+      <label><span>Şifre</span><input id="cb_password" type="password" placeholder="En az 8 karakter"></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn primary" onclick="createGlobalBusiness()">İşletmeyi Oluştur</button>
+      <button class="btn" onclick="closeModal()">Vazgeç</button>
+    </div>`;
+  openModal();
+}
+
+async function createGlobalBusiness(){
+  const name=document.getElementById("cb_name").value.trim();
+  const category=document.getElementById("cb_category").value.trim();
+  const email=document.getElementById("cb_email").value.trim();
+  const password=document.getElementById("cb_password").value;
+  if(!name||!email||password.length<8){showToast("İşletme adı, e-posta ve en az 8 karakter şifre gerekli.");return}
+  try{
+    const d=await api("/api/admin/businesses",{method:"POST",body:JSON.stringify({name,category,email,password})});
+    closeModal();
+    showToast("İşletme oluşturuldu.");
+    await loadAll();
+    if(d.business?.id) setTimeout(()=>openBusiness(Number(d.business.id)),150);
+  }catch(e){showToast(e.message)}
+}
+
+function setOverviewPeriod(value){
+  const labels={7:"Son 7 Gün",30:"Son 30 Gün",all:"Tüm Zamanlar"};
+  const el=document.querySelector(".chart-sub");
+  if(el)el.textContent=(labels[value]||"Dönem")+" • mevcut admin özet verisi";
 }
 
 function showBusinessesPage(btn){
