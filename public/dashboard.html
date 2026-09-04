@@ -2684,6 +2684,19 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
       <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">PERFORMANS MERKEZİ</div><h1>İstatistikler</h1><p>Gerçek etkileşim kayıtlarını dönem bazında incele; QR ve NFC masa performansını takip et.</p></div><div class="bc-live"><span class="bc-status-dot"></span> Canlı veri</div></div>
       <div class="bc-stats-notice"><strong>Rapor mantığı</strong><span>QR ve NFC tek bir masa kaydına bağlıdır. Böylece hangi masanın ne kadar kullanıldığını aynı raporda görebilirsin.</span></div>
       <div id="bcStatsMount"></div>
+      <section id="tableReportSection" class="feature-box" style="margin-top:18px">
+        <div class="feature-head">
+          <div><div class="eyebrow">MASA PERFORMANSI</div><h2> Masa Bazlı Rapor</h2><p>Her masanın QR ve NFC kullanımını tek raporda ayrı ayrı gösterir.</p></div>
+          <button class="feature-btn" type="button" onclick="loadBusinessTableReport()">↻ Yenile</button>
+        </div>
+        <div class="table-report-summary">
+          <div><small>MASA SAYISI</small><strong id="tableReportCount">0</strong></div>
+          <div><small>QR TOPLAM</small><strong id="tableReportQr">0</strong></div>
+          <div><small>NFC TOPLAM</small><strong id="tableReportNfc">0</strong></div>
+          <div><small>GENEL TOPLAM</small><strong id="tableReportTotal">0</strong></div>
+        </div>
+        <div id="tableReportList" class="feature-list"><div class="feature-empty">Masa raporu yükleniyor...</div></div>
+      </section>
     </div>
   </div>
 </div>
@@ -4036,6 +4049,10 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 </section>
 
 
+
+<style>
+.table-report-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 16px}.table-report-summary>div{padding:14px 16px;border:1px solid var(--border);border-radius:16px;background:#111}.table-report-summary small{display:block;color:#777;font-size:10px;letter-spacing:.1em;margin-bottom:6px}.table-report-summary strong{font-size:22px}.table-report-row{display:grid;grid-template-columns:minmax(0,1.4fr) repeat(3,minmax(90px,.7fr)) minmax(150px,1fr);gap:12px;align-items:center;padding:14px 16px;border:1px solid var(--border);border-radius:16px;background:#111;margin-bottom:8px}.table-report-row .name{min-width:0}.table-report-row .name strong{display:block}.table-report-row .name span{display:block;color:#777;font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.table-report-row .metric small{display:block;color:#666;font-size:9px;letter-spacing:.08em}.table-report-row .metric strong{font-size:17px}.table-report-row .total{font-weight:700}.table-report-row .last{color:#888;font-size:12px;text-align:right}@media(max-width:760px){.table-report-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.table-report-row{grid-template-columns:1fr 1fr 1fr;}.table-report-row .last{grid-column:1/-1;text-align:left}.table-report-row .name{grid-column:1/-1}}
+</style>
 
 <!-- ==================================================
      LEO CONNECT BUSINESS CENTER MODULES
@@ -5526,10 +5543,42 @@ function applyPermissions(business){
 }
 
 /* ==================================================
+   TABLE BASED REPORT
+================================================== */
+async function loadBusinessTableReport(){
+  const list=document.getElementById('tableReportList');
+  if(!list) return;
+  if(!currentBusiness?.permissions?.analytics){
+    list.innerHTML='<div class="feature-empty">Masa raporu için admin analytics izni gerekli.</div>';
+    return;
+  }
+  const data=await api('/api/business-analytics?period='+encodeURIComponent(window.currentAnalyticsPeriod||'7d'));
+  if(!data||data.error){
+    list.innerHTML='<div class="feature-empty">'+esc(data?.error||'Masa raporu alınamadı.')+'</div>';
+    return;
+  }
+  const rows=Array.isArray(data.table_reports)?data.table_reports:[];
+  const num=v=>Number(v||0);
+  const qrTotal=rows.reduce((a,x)=>a+num(x.qr_count),0);
+  const nfcTotal=rows.reduce((a,x)=>a+num(x.nfc_count),0);
+  document.getElementById('tableReportCount').textContent=rows.length.toLocaleString('tr-TR');
+  document.getElementById('tableReportQr').textContent=qrTotal.toLocaleString('tr-TR');
+  document.getElementById('tableReportNfc').textContent=nfcTotal.toLocaleString('tr-TR');
+  document.getElementById('tableReportTotal').textContent=(qrTotal+nfcTotal).toLocaleString('tr-TR');
+  if(!rows.length){list.innerHTML='<div class="feature-empty">Henüz masa kaydı oluşturulmamış.</div>';return;}
+  list.innerHTML=rows.map(x=>{
+    const qr=num(x.qr_count), nfc=num(x.nfc_count), total=num(x.total_count)||qr+nfc;
+    const last=x.last_tap?new Date(x.last_tap).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Henüz kullanım yok';
+    return `<div class="table-report-row"><div class="name"><strong>${esc(x.name||'Masa')}</strong><span>${esc(x.placement||'')}${x.code?' • '+esc(x.code):''}</span></div><div class="metric"><small>QR</small><strong>${qr}</strong></div><div class="metric"><small>NFC</small><strong>${nfc}</strong></div><div class="metric total"><small>TOPLAM</small><strong>${total}</strong></div><div class="last">${esc(last)}</div></div>`;
+  }).join('');
+}
+
+/* ==================================================
    BUSINESS CENTER ANALYTICS V3
 ================================================== */
 async function loadBusinessAnalytics(period='7d'){
   if(!currentBusiness?.permissions?.analytics) return;
+  window.currentAnalyticsPeriod=period;
   document.querySelectorAll('.analytics-periods button').forEach(b=>b.classList.toggle('active',b.dataset.period===period));
   const data=await api('/api/business-analytics?period='+encodeURIComponent(period));
   if(!data) return;
@@ -5544,7 +5593,7 @@ async function loadBusinessAnalytics(period='7d'){
   if(!days.length){traffic.innerHTML='<div class="analytics-empty">Henüz seçilen dönemde veri yok.</div>';return;}
   days.slice(-30).forEach(x=>{const wrap=document.createElement('div');wrap.className='traffic-bar-wrap';wrap.title=x.day+': '+n(x.events)+' etkileşim';const bar=document.createElement('div');bar.className='traffic-bar';bar.style.height=(n(x.events)/max*100)+'%';wrap.appendChild(bar);traffic.appendChild(wrap);const l=document.createElement('span');l.className='traffic-label';l.style.flex='1';l.textContent=x.day.slice(5);labels.appendChild(l);});
   const actions=(data.actions||[]).slice(0,6), actionMax=Math.max(1,...actions.map(x=>n(x.count))), names={profile_view:'Profil',qr_scan:'QR',qr:'QR',nfc:'NFC',phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google',website:'Website',menu:'Menü'};
-  document.getElementById('baActions').innerHTML=actions.length?actions.map(x=>`<div class="action-row"><span>${names[x.type]||x.type}</span><div class="action-track"><div class="action-fill" style="width:${n(x.count)/actionMax*100}%"></div></div><strong>${n(x.count)}</strong></div>`).join(''):'<div class="analytics-empty">Henüz aksiyon yok.</div>';
+  document.getElementById('baActions').innerHTML=actions.length?actions.map(x=>`<div class="action-row"><span>${names[x.type]||x.type}</span><div class="action-track"><div class="action-fill" style="width:${n(x.count)/actionMax*100}%"></div></div><strong>${n(x.count)}</strong></div>`).join(''):'<div class="analytics-empty">Henüz aksiyon yok.</div>';  loadBusinessTableReport();
 }
 
 
