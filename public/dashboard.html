@@ -2574,6 +2574,9 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 @media(max-width:620px){.bc-sidebar{display:none}.bc-main-shell{margin-left:0}.bc-page-frame{padding:0 12px 84px}.bc-topbar{height:64px;padding:0 12px}.bc-top-actions .bc-top-btn:not(.gold){display:none}.bc-top-left strong{font-size:15px}.bc-view{padding-top:18px}.bc-hero-row h1{font-size:24px}.bc-kpis{grid-template-columns:1fr 1fr}.bc-command-grid{grid-template-columns:1fr}.bc-theme-choices{grid-template-columns:1fr 1fr}.bc-digital-help{align-items:flex-start;flex-direction:column}.bc-section-title-large{display:block}.bc-section-title-large>.bc-primary,.bc-section-title-large>.bc-ghost,.bc-section-title-large>.bc-live{margin-top:12px}.bc-mobile-nav{position:fixed;z-index:1100;display:grid;grid-template-columns:repeat(5,1fr);left:8px;right:8px;bottom:8px;padding:6px;background:rgba(13,17,24,.97);backdrop-filter:blur(16px);border:1px solid #2a313b;border-radius:15px;box-shadow:0 12px 35px #0009}.bc-mobile-nav button{border:0;background:transparent;color:#7f8793;font:inherit;font-size:7px;font-weight:800;padding:7px 3px;border-radius:9px}.bc-mobile-nav button.active{color:#fff;background:#5e451e}.bc-mobile-nav .mi{display:block;font-size:15px;margin-bottom:3px}.bc-command-card{min-height:125px}.bc-stats-notice{display:block}.bc-stats-notice strong{display:block;margin-bottom:4px}.bc-theme-choice{min-height:84px}}
 </style>
 
+<style id="leo-analytics-premium-fix">
+.table-code-stable-note{font-size:9px;color:#b9b9b9;padding:8px 11px;border:1px solid #2c2c2c;border-radius:10px;background:#0e0e0e;white-space:nowrap}.analytics-premium-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.analytics-premium-card{padding:14px;border:1px solid #2a2a2a;border-radius:14px;background:#0d0d0d}.analytics-premium-card small{display:block;color:#666;font-size:8px;letter-spacing:.12em;font-weight:900}.analytics-premium-card strong{display:block;font-size:22px;margin-top:6px;color:#e0bd7b}.analytics-premium-card span{display:block;color:#777;font-size:9px;margin-top:4px}.analytics-detail-grid{display:grid;grid-template-columns:1.35fr .9fr;gap:12px;margin-top:12px}.analytics-table{width:100%;border-collapse:separate;border-spacing:0 6px}.analytics-table th{text-align:left;color:#666;font-size:8px;font-weight:800;padding:0 8px 5px}.analytics-table td{padding:9px 8px;background:#0c0c0c;border-top:1px solid #242424;border-bottom:1px solid #242424;color:#ddd;font-size:9px}.analytics-table tr td:first-child{border-left:1px solid #242424;border-radius:9px 0 0 9px}.analytics-table tr td:last-child{border-right:1px solid #242424;border-radius:0 9px 9px 0;text-align:right}.analytics-chip{display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;background:#17130d;border:1px solid #4b3d24;color:#e0bd7b;font-size:8px;font-weight:800}.analytics-mini-list{display:grid;gap:8px}.analytics-mini-row{display:grid;grid-template-columns:95px 1fr 42px;align-items:center;gap:8px;font-size:9px;color:#bbb}.analytics-mini-track{height:6px;background:#202020;border-radius:999px;overflow:hidden}.analytics-mini-fill{height:100%;background:linear-gradient(90deg,#8f6b30,#e0bd7b);border-radius:999px}.analytics-foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.analytics-foot span{padding:7px 9px;border:1px solid #292929;border-radius:9px;background:#0c0c0c;color:#777;font-size:8px}.table-code-actions .table-delete{display:none!important}.analytics-table-scroll{overflow:auto}.analytics-table-scroll .analytics-table{min-width:620px}@media(max-width:850px){.analytics-premium-grid{grid-template-columns:repeat(2,1fr)}.analytics-detail-grid{grid-template-columns:1fr}}@media(max-width:520px){.analytics-premium-grid{grid-template-columns:1fr 1fr}.table-code-stable-note{white-space:normal}}
+</style>
 </head>
 
 
@@ -2671,7 +2674,7 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 
     <div class="bc-view" data-view="digital">
       <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">DİJİTAL ERİŞİM</div><h1>QR & NFC</h1><p>İşletmenin ana kodlarını ve masa bazlı QR/NFC kodlarını tek merkezden yönet.</p></div><button class="bc-primary" type="button" onclick="loadBusinessTableCodes(true)">↻ Yenile</button></div>
-      <div class="bc-digital-help"><div><strong>1 ana profil + sınırsız masa</strong><span>Ana QR/NFC işletmenin genel profilini açar. Masalar bölümünde Masa 1, Masa 2… şeklinde özel kodlar oluşturulur.</span></div><button type="button" onclick="loadBusinessTableCodes(true)">Kodları yenile →</button></div>
+      <div class="bc-digital-help"><div><strong>1 ana profil + sınırsız masa</strong><span>Ana QR/NFC işletmenin genel profilini açar. Masalar bölümünde Masa 1, Masa 2… şeklinde özel kodlar oluşturulur.</span></div><div class="table-code-stable-note">QR + NFC kodları oluşturulduktan sonra değiştirilemez ve silinemez.</div></div>
       <div id="bcDigitalMount"></div>
     </div>
 
@@ -3706,7 +3709,7 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
     <button type="button" class="table-code-create" onclick="openBusinessTableCodeForm()">＋ Masa Ekle</button>
   </div>
   <div id="tableCodeList" class="table-code-list"><div class="table-code-empty">Masalar yükleniyor...</div></div>
-  <div class="table-code-note">Business'ta oluşturduğun masa doğrudan admin paneline de düşer. Admin'den yapılan ad, durum veya silme değişikliği burada aynı kayda yansır.</div>
+  <div class="table-code-note">Business'ta oluşturduğun masa doğrudan admin paneline de düşer. Kodun kendisi kalıcıdır; ad ve aktif/pasif durumu yönetilebilir.</div>
 </div>
 
   </div>
@@ -3718,632 +3721,24 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 <!-- ==================================================
      PERFORMANCE
 ================================================== -->
-
 <section id="performanceSection" class="box">
-
-  <div class="box-head">
-
-    <div>
-
-      <div class="eyebrow">
-        PERFORMANCE
-      </div>
-
-      <h2>
-        Kanal Performansı
-      </h2>
-
-      <p>
-        Müşterilerinin işletmenle hangi yollarla etkileşime geçtiğini gör.
-      </p>
-
-    </div>
-
+  <div class="box-head"><div><div class="eyebrow">PERFORMANCE</div><h2>Kanal Performansı</h2><p>QR, NFC, profil ve müşteri aksiyonlarını tek ekranda gerçek verilerle gör.</p></div></div>
+  <div class="analytics-premium-grid">
+    <div class="analytics-premium-card"><small>PROFİL</small><strong id="cpProfile">0</strong><span>Direkt profil görüntüleme</span></div>
+    <div class="analytics-premium-card"><small>QR</small><strong id="cpQR">0</strong><span>Ana + masa QR taramaları</span></div>
+    <div class="analytics-premium-card"><small>NFC</small><strong id="cpNFC">0</strong><span>Ana + masa NFC dokunuşları</span></div>
+    <div class="analytics-premium-card"><small>AKSİYON</small><strong id="cpActions">0</strong><span>Telefon, WhatsApp, sosyal ve diğerleri</span></div>
   </div>
-
-
-
-  <div class="performance">
-
-
-
-    <div class="performance-card">
-
-      <div class="performance-head">
-
-        <strong>
-          Etkileşim Dağılımı
-        </strong>
-
-        <span id="strongestChannel">
-          Analiz ediliyor
-        </span>
-
-      </div>
-
-
-
-      <div class="channel">
-
-        <div class="channel-icon">
-          👁️
-        </div>
-
-        <div class="channel-main">
-
-          <div class="channel-top">
-
-            <strong>
-              Profil
-            </strong>
-
-            <span id="channelProfile">
-              0
-            </span>
-
-          </div>
-
-          <div class="channel-bar">
-
-            <div
-              id="barProfile"
-              class="channel-fill"
-            ></div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="channel">
-
-        <div class="channel-icon">
-          🔲
-        </div>
-
-        <div class="channel-main">
-
-          <div class="channel-top">
-
-            <strong>
-              QR
-            </strong>
-
-            <span id="channelQR">
-              0
-            </span>
-
-          </div>
-
-          <div class="channel-bar">
-
-            <div
-              id="barQR"
-              class="channel-fill"
-            ></div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="channel">
-
-        <div class="channel-icon">
-          📡
-        </div>
-
-        <div class="channel-main">
-
-          <div class="channel-top">
-
-            <strong>
-              NFC
-            </strong>
-
-            <span id="channelNFC">
-              0
-            </span>
-
-          </div>
-
-          <div class="channel-bar">
-
-            <div
-              id="barNFC"
-              class="channel-fill"
-            ></div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="channel">
-
-        <div class="channel-icon">
-          💬
-        </div>
-
-        <div class="channel-main">
-
-          <div class="channel-top">
-
-            <strong>
-              WhatsApp
-            </strong>
-
-            <span id="channelWhatsApp">
-              0
-            </span>
-
-          </div>
-
-          <div class="channel-bar">
-
-            <div
-              id="barWhatsApp"
-              class="channel-fill"
-            ></div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
-    </div>
-
-
-
-    <div class="performance-card">
-
-      <div class="performance-head">
-
-        <strong>
-          Hızlı Özet
-        </strong>
-
-        <span>
-          LEO CONNECT
-        </span>
-
-      </div>
-
-
-
-      <div class="channel">
-
-        <div class="channel-icon">
-          📞
-        </div>
-
-        <div class="channel-main">
-
-          <div class="channel-top">
-
-            <strong>
-              Telefon
-            </strong>
-
-            <span id="summaryPhone">
-              0
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="channel">
-
-        <div class="channel-icon">
-          📍
-        </div>
-
-        <div class="channel-main">
-
-          <div class="channel-top">
-
-            <strong>
-              Konum
-            </strong>
-
-            <span id="summaryLocation">
-              0
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="channel">
-
-        <div class="channel-icon">
-          📸
-        </div>
-
-        <div class="channel-main">
-
-          <div class="channel-top">
-
-            <strong>
-              Instagram
-            </strong>
-
-            <span id="summaryInstagram">
-              0
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="channel">
-
-        <div class="channel-icon">
-          ⭐
-        </div>
-
-        <div class="channel-main">
-
-          <div class="channel-top">
-
-            <strong>
-              Google
-            </strong>
-
-            <span id="summaryGoogle">
-              0
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
-    </div>
-
-
-
+  <div class="analytics-detail-grid">
+    <div class="analytics-box"><h3>Masa Performansı</h3><div id="cpTables"><div class="analytics-empty">Veriler yükleniyor...</div></div></div>
+    <div class="analytics-box"><h3>Müşteri Aksiyonları</h3><div id="cpActionList" class="analytics-mini-list"><div class="analytics-empty">Veriler yükleniyor...</div></div></div>
   </div>
-
-</section>
-
-
-
-<!-- ==================================================
-     LEO CONNECT BUSINESS CENTER MODULES
-================================================== -->
-<section id="liveSection" class="feature-box">
-  <div class="feature-head">
-    <div><div class="eyebrow">LIVE</div><h2>🔴 Canlı Takip</h2><p>İşletmenin son müşteri etkileşimlerini görüntüle.</p></div>
-    <button class="feature-btn" type="button" onclick="loadBusinessLive()">↻ Yenile</button>
-  </div>
-  <div class="live-kpis">
-    <div><small>SON 15 DK</small><strong id="live15">0</strong></div>
-    <div><small>SON 60 DK</small><strong id="live60">0</strong></div>
-    <div><small>BUGÜN</small><strong id="liveToday">0</strong></div>
-  </div>
-  <div id="liveActivityList" class="feature-list"><div class="feature-empty">Aktiviteler yükleniyor...</div></div>
-</section>
-
-<section id="aiSection" class="feature-box">
-  <div class="feature-head">
-    <div><div class="eyebrow">INTELLIGENCE</div><h2>🧠 LEO AI Insights</h2><p>Etkileşim verilerinden otomatik performans içgörüleri üretir.</p></div>
-    <div class="feature-periods">
-      <button type="button" class="active" onclick="loadAIInsights('7d',this)">7 Gün</button>
-      <button type="button" onclick="loadAIInsights('30d',this)">30 Gün</button>
-      <button type="button" onclick="loadAIInsights('all',this)">Tümü</button>
-    </div>
-  </div>
-  <div class="ai-score-row">
-    <div class="ai-score"><strong id="aiScore">0</strong><span id="aiTitle">Analiz hazırlanıyor</span></div>
-    <div class="ai-mini"><span>Dönüşüm</span><strong id="aiConversion">%0</strong></div>
-    <div class="ai-mini"><span>Yoğun saat</span><strong id="aiPeak">—</strong></div>
-    <div class="ai-mini"><span>Güçlü kaynak</span><strong id="aiSource">—</strong></div>
-  </div>
-  <div class="ai-columns">
-    <div><h3>İçgörüler</h3><div id="aiInsights" class="feature-list"><div class="feature-empty">Yükleniyor...</div></div></div>
-    <div><h3>Öneriler</h3><div id="aiRecommendations" class="feature-list"><div class="feature-empty">Yükleniyor...</div></div></div>
+  <div class="analytics-detail-grid">
+    <div class="analytics-box"><h3>Yoğun Saatler</h3><div id="cpHourly" class="analytics-mini-list"><div class="analytics-empty">Veriler yükleniyor...</div></div></div>
+    <div class="analytics-box"><h3>Dönüşüm Özeti</h3><div id="cpSummary" class="analytics-foot"></div></div>
   </div>
 </section>
 
-<section id="profileDesign" class="box">
-  <div class="box-head">
-    <div>
-      <div class="eyebrow">V2 • PROFILE DESIGN</div>
-      <h2>Profil Tasarım Merkezi</h2>
-      <p>Profilinin müşteriye görünen vitrinini tek merkezden tasarla ve canlı önizlemede kontrol et.</p>
-    </div>
-    <div class="design-badge">V2 ACTIVE</div>
-  </div>
-
-  <div class="profile-design-shell">
-    <div class="design-editor">
-      <div class="design-section-title">
-        <div>
-          <h3>Görünüm ve içerik</h3>
-          <p>Değişiklikler kaydedilene kadar mevcut profilin etkilenmez.</p>
-        </div>
-      </div>
-
-      <div class="design-grid">
-        <div class="design-field">
-          <label>TEMA</label>
-          <select id="design_theme" oninput="updateDesignPreview()" onchange="updateDesignPreview()">
-            <option value="midnight-gold">Midnight Gold</option>
-            <option value="obsidian">Obsidian</option>
-            <option value="champagne">Champagne</option>
-            <option value="pure-light">Pure Light</option>
-          </select>
-        </div>
-
-        <div class="design-field">
-          <label>VURGU RENGİ</label>
-          <div class="design-color-row">
-            <input id="design_accent_picker" type="color" value="#D4AF37" oninput="syncDesignColor('picker')">
-            <input id="design_accent" type="text" value="#D4AF37" maxlength="7" oninput="syncDesignColor('text')">
-          </div>
-        </div>
-
-        <div class="design-field full">
-          <label>KAPAK GÖRSEL URL</label>
-          <input id="design_cover_url" placeholder="https://..." oninput="updateDesignPreview()">
-          <div class="design-help">Profilin üst bölümünde premium kapak alanı olarak kullanılır.</div>
-        </div>
-
-        <div class="design-field">
-          <label>KAPAK POZİSYONU</label>
-          <select id="design_cover_position" oninput="updateDesignPreview()">
-            <option value="center">Merkez</option>
-            <option value="top">Üst</option>
-            <option value="bottom">Alt</option>
-            <option value="left">Sol</option>
-            <option value="right">Sağ</option>
-          </select>
-        </div>
-
-        <div class="design-field">
-          <label>İŞLETME MARKASI</label>
-          <div class="design-toggle">
-            <span>Müşteri profilinde işletme logosu ve adını göster</span>
-            <label class="switch">
-              <input id="design_business_brand_enabled" type="checkbox" onchange="updateDesignPreview()">
-              <span class="switch-track"></span>
-            </label>
-          </div>
-          <div class="design-help">Açıkken üstte LEO CONNECT yerine işletmenin logosu ve adı görünür. Kapalıyken LEO CONNECT görünümü korunur.</div>
-        </div>
-
-        <div class="design-field">
-          <label>DUYURU DURUMU</label>
-          <div class="design-toggle">
-            <span>Duyuruyu göster</span>
-            <label class="switch">
-              <input id="design_announcement_enabled" type="checkbox" onchange="updateDesignPreview()">
-              <span class="switch-track"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="design-field full">
-          <label>DUYURU METNİ</label>
-          <input id="design_announcement_text" maxlength="180" placeholder="Bugün 23:00'e kadar açığız..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field full">
-          <label>KAMPANYA BAŞLIĞI</label>
-          <input id="design_campaign_title" maxlength="90" placeholder="Bu haftanın özel fırsatı" oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field full">
-          <label>KAMPANYA METNİ</label>
-          <textarea id="design_campaign_text" maxlength="240" placeholder="Müşterilerine özel kampanyanı burada duyur..." oninput="updateDesignPreview()"></textarea>
-        </div>
-
-        <div class="design-field">
-          <label>KAMPANYA GÖRSEL URL</label>
-          <input id="design_campaign_image_url" placeholder="https://..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field">
-          <label>KAMPANYA DURUMU</label>
-          <div class="design-toggle">
-            <span>Kampanyayı göster</span>
-            <label class="switch">
-              <input id="design_campaign_enabled" type="checkbox" onchange="updateDesignPreview()">
-              <span class="switch-track"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="design-field">
-          <label>BUTTON METNİ</label>
-          <input id="design_campaign_button_text" maxlength="40" placeholder="Detayları Gör" oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field">
-          <label>BUTTON URL</label>
-          <input id="design_campaign_button_url" placeholder="https://..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field full">
-          <label>ÖNE ÇIKAN BAŞLIK</label>
-          <input id="design_featured_title" maxlength="90" placeholder="Öne çıkan ürünün veya hizmetin" oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field full">
-          <label>ÖNE ÇIKAN AÇIKLAMA</label>
-          <textarea id="design_featured_text" maxlength="240" placeholder="Müşterinin ilk görmesini istediğin içeriği anlat..." oninput="updateDesignPreview()"></textarea>
-        </div>
-
-        <div class="design-field">
-          <label>ÖNE ÇIKAN GÖRSEL URL</label>
-          <input id="design_featured_image_url" placeholder="https://..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field">
-          <label>ÖNE ÇIKAN DURUMU</label>
-          <div class="design-toggle">
-            <span>İçeriği göster</span>
-            <label class="switch">
-              <input id="design_featured_enabled" type="checkbox" onchange="updateDesignPreview()">
-              <span class="switch-track"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="design-field">
-          <label>BUTTON METNİ</label>
-          <input id="design_featured_button_text" maxlength="40" placeholder="İncele" oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field">
-          <label>BUTTON URL</label>
-          <input id="design_featured_button_url" placeholder="https://..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field full">
-          <label>GALERİ GÖRSELLERİ</label>
-          <textarea id="design_gallery" placeholder="Her satıra bir görsel URL'si yaz.&#10;https://...&#10;https://..." oninput="updateDesignPreview()"></textarea>
-          <div class="design-help">İlk aşamada URL tabanlı galeri kullanıyoruz. En fazla 30 görsel kaydedilir.</div>
-        </div>
-
-        <div class="design-field">
-          <label>VİDEO URL</label>
-          <input id="design_video_url" placeholder="https://youtube.com/..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field">
-          <label>VİDEO DURUMU</label>
-          <div class="design-toggle">
-            <span>Videoyu göster</span>
-            <label class="switch">
-              <input id="design_video_enabled" type="checkbox" onchange="updateDesignPreview()">
-              <span class="switch-track"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="design-save-row">
-        <button id="designSaveButton" class="design-save-button" type="button" onclick="saveProfileDesign()">✓ Tasarımı Kaydet</button>
-        <div id="designMessage"></div>
-      </div>
-    </div>
-
-    <div class="design-preview-box">
-      <div class="design-section-title">
-        <div>
-          <h3>Canlı önizleme <span id="previewLiveStatus" style="display:inline-block;margin-left:7px;font-size:9px;letter-spacing:.08em;color:#6fd08a;font-weight:900;">● CANLI</span></h3>
-          <p>Müşterinin göreceği yeni vitrin yapısının hızlı önizlemesi.</p>
-        </div>
-      </div>
-
-      <div id="designPreview" class="preview-frame">
-        <div id="previewCover" class="preview-cover"></div>
-        <div class="preview-body">
-          <div id="previewLogo" class="preview-logo"><span class="leo-lion-logo" aria-hidden="true"></span></div>
-          <div id="previewName" class="preview-name">İşletme</div>
-          <div id="previewCategory" class="preview-category">İŞLETME</div>
-          <div id="previewAnnouncement" class="preview-announcement" style="display:none">
-            <strong>📢 Duyuru</strong>
-            <span id="previewAnnouncementText"></span>
-          </div>
-          <div id="previewCampaign" class="preview-campaign" style="display:none">
-            <strong id="previewCampaignTitle"></strong>
-            <span id="previewCampaignText"></span>
-            <span id="previewCampaignButton" class="preview-button" style="display:none"></span>
-          </div>
-          <div id="previewFeatured" class="preview-featured" style="display:none">
-            <strong id="previewFeaturedTitle"></strong>
-            <span id="previewFeaturedText"></span>
-            <span id="previewFeaturedButton" class="preview-button" style="display:none"></span>
-          </div>
-          <div id="previewGallery" class="preview-gallery"></div>
-          <div id="previewVideo" class="preview-video" style="display:none">🎬 Video içeriği eklendi</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================================================
-     V2 — REVIEW BOOSTER
-================================================== -->
-
-
-<section id="reviewSection" class="feature-box">
-  <div class="feature-head">
-    <div><div class="eyebrow">REPUTATION</div><h2>⭐ Review Booster</h2><p>Memnun müşteriyi Google yorumuna yönlendiren sistem.</p></div>
-    <div class="feature-actions"><span id="reviewStatus" class="feature-status off">KAPALI</span><button class="feature-btn" type="button" onclick="toggleReviewEditor()">✎ Düzenle</button></div>
-  </div>
-  <div class="review-grid">
-    <div class="review-card"><small>BAŞLIK</small><strong id="reviewTitle">—</strong><span id="reviewText">—</span></div>
-    <div class="review-card"><small>PUAN EŞİĞİ</small><strong id="reviewThreshold">—</strong><span>ve üzeri Google yönlendirmesi</span></div>
-    <div class="review-card"><small>GOOGLE</small><a id="reviewGoogle" target="_blank" rel="noopener">Bağlantıyı Aç →</a></div>
-  </div>
-  <div id="reviewEditor" class="feature-editor" style="display:none">
-    <div class="editor-grid">
-      <label><span>Durum</span><select id="reviewEnabled"><option value="true">Aktif</option><option value="false">Pasif</option></select></label>
-      <label><span>Puan eşiği</span><input id="reviewThresholdInput" type="number" min="1" max="5" step="1"></label>
-      <label><span>Başlık</span><input id="reviewTitleInput" maxlength="160"></label>
-      <label><span>Google bağlantısı</span><input id="reviewGoogleInput" type="url" placeholder="https://g.page/.../review"></label>
-      <label class="full"><span>Metin</span><textarea id="reviewTextInput" maxlength="500" rows="3"></textarea></label>
-    </div>
-    <div class="editor-actions"><button class="feature-btn" type="button" onclick="saveReviewBooster()">💾 Kaydet</button><button class="feature-btn" type="button" onclick="toggleReviewEditor(false)">Vazgeç</button></div>
-  </div>
-</section>
-
-<section id="campaignSection" class="feature-box">
-  <div class="feature-head">
-    <div><div class="eyebrow">SMART CAMPAIGNS</div><h2>🚀 Smart Campaigns</h2><p>Aktif ve planlanmış kampanyalarını yönet.</p></div>
-    <div class="feature-actions"><button class="feature-btn" type="button" onclick="openCampaignEditor()">＋ Yeni Kampanya</button><button class="feature-btn" type="button" onclick="loadBusinessCampaigns()">↻ Yenile</button></div>
-  </div>
-  <div id="campaignList" class="campaign-list"><div class="feature-empty">Kampanyalar yükleniyor...</div></div>
-  <div id="campaignEditor" class="feature-editor" style="display:none">
-    <input type="hidden" id="campaignId">
-    <div class="editor-grid">
-      <label><span>Başlık</span><input id="campaignTitleInput" maxlength="120"></label>
-      <label><span>Durum</span><select id="campaignEnabledInput"><option value="true">Aktif</option><option value="false">Pasif</option></select></label>
-      <label class="full"><span>Açıklama</span><textarea id="campaignTextInput" maxlength="500" rows="3"></textarea></label>
-      <label><span>Görsel URL</span><input id="campaignImageInput" type="url"></label>
-      <label><span>Buton yazısı</span><input id="campaignButtonTextInput" maxlength="60" placeholder="Detayları Gör"></label>
-      <label><span>Buton URL</span><input id="campaignButtonUrlInput" type="url"></label>
-      <label><span>Başlangıç</span><input id="campaignStartInput" type="datetime-local"></label>
-      <label><span>Bitiş</span><input id="campaignEndInput" type="datetime-local"></label>
-      <label><span>Öncelik</span><input id="campaignPriorityInput" type="number" min="-100" max="100" value="0"></label>
-    </div>
-    <div class="editor-actions"><button class="feature-btn" type="button" onclick="saveCampaign()">💾 Kaydet</button><button class="feature-btn" type="button" onclick="closeCampaignEditor()">Vazgeç</button></div>
-  </div>
-</section>
 
 <!-- ==================================================
      QUICK INFO
@@ -5218,180 +4613,8 @@ function renderStats(){
    PERFORMANCE
 ================================================== */
 
-function renderPerformance(
-  profile,
-  qr,
-  nfc,
-  whatsapp,
-  phone
-){
-
-  const values = [
-
-    {
-      name:"Profil",
-      value:profile
-    },
-
-    {
-      name:"QR",
-      value:qr
-    },
-
-    {
-      name:"NFC",
-      value:nfc
-    },
-
-    {
-      name:"WhatsApp",
-      value:whatsapp
-    }
-
-  ];
-
-
-
-  const max =
-    Math.max(
-      1,
-      ...values.map(
-        item => item.value
-      )
-    );
-
-
-
-  document.getElementById(
-    "channelProfile"
-  ).textContent =
-    profile;
-
-
-
-  document.getElementById(
-    "channelQR"
-  ).textContent =
-    qr;
-
-
-
-  document.getElementById(
-    "channelNFC"
-  ).textContent =
-    nfc;
-
-
-
-  document.getElementById(
-    "channelWhatsApp"
-  ).textContent =
-    whatsapp;
-
-
-
-  document.getElementById(
-    "barProfile"
-  ).style.width =
-    (
-      profile / max * 100
-    ) + "%";
-
-
-
-  document.getElementById(
-    "barQR"
-  ).style.width =
-    (
-      qr / max * 100
-    ) + "%";
-
-
-
-  document.getElementById(
-    "barNFC"
-  ).style.width =
-    (
-      nfc / max * 100
-    ) + "%";
-
-
-
-  document.getElementById(
-    "barWhatsApp"
-  ).style.width =
-    (
-      whatsapp / max * 100
-    ) + "%";
-
-
-
-  const strongest =
-    values.sort(
-      (
-        a,
-        b
-      ) =>
-        b.value -
-        a.value
-    )[0];
-
-
-
-  document.getElementById(
-    "strongestChannel"
-  ).textContent =
-    strongest.value > 0
-      ? "En güçlü: " + strongest.name
-      : "Henüz veri yok";
-
-
-
-  document.getElementById(
-    "summaryPhone"
-  ).textContent =
-    phone;
-
-
-
-  document.getElementById(
-    "summaryLocation"
-  ).textContent =
-    getStat(
-      "location"
-    );
-
-
-
-  document.getElementById(
-    "summaryInstagram"
-  ).textContent =
-    getStat(
-      "instagram"
-    );
-
-
-
-  document.getElementById(
-    "summaryGoogle"
-  ).textContent =
-    getStat(
-      "google_review"
-    );
-
-}
-
-
-
-async function copyProfileLink(){
-  if(!currentBusiness?.slug) return;
-  const url=window.location.origin+"/p/"+currentBusiness.slug;
-  try{
-    await navigator.clipboard.writeText(url);
-    showToast("Profil bağlantısı kopyalandı.");
-  }catch(error){
-    showToast("Profil bağlantısı: "+url);
-  }
+function renderPerformance() {
+  // Legacy renderer kept intentionally empty. Analytics V3 is rendered by loadBusinessAnalytics().
 }
 
 
@@ -5531,20 +4754,23 @@ function applyPermissions(business){
 async function loadBusinessAnalytics(period='7d'){
   if(!currentBusiness?.permissions?.analytics) return;
   document.querySelectorAll('.analytics-periods button').forEach(b=>b.classList.toggle('active',b.dataset.period===period));
-  const data=await api('/api/business-analytics?period='+encodeURIComponent(period));
-  if(!data) return;
-  const t=data.totals||{};
-  const n=v=>Number(v||0);
-  document.getElementById('baTotal').textContent=n(t.total_events).toLocaleString('tr-TR');
-  document.getElementById('baProfile').textContent=n(t.profile_views).toLocaleString('tr-TR');
-  document.getElementById('baDigital').textContent=(n(t.qr_scans)+n(t.nfc_taps)).toLocaleString('tr-TR');
-  document.getElementById('baContact').textContent=(n(t.phone_clicks)+n(t.whatsapp_clicks)).toLocaleString('tr-TR');
-  const days=data.daily||[]; const max=Math.max(1,...days.map(x=>n(x.events)));
-  const traffic=document.getElementById('baTraffic'), labels=document.getElementById('baTrafficLabels'); traffic.innerHTML=''; labels.innerHTML='';
-  if(!days.length){traffic.innerHTML='<div class="analytics-empty">Henüz seçilen dönemde veri yok.</div>';return;}
-  days.slice(-30).forEach(x=>{const wrap=document.createElement('div');wrap.className='traffic-bar-wrap';wrap.title=x.day+': '+n(x.events)+' etkileşim';const bar=document.createElement('div');bar.className='traffic-bar';bar.style.height=(n(x.events)/max*100)+'%';wrap.appendChild(bar);traffic.appendChild(wrap);const l=document.createElement('span');l.className='traffic-label';l.style.flex='1';l.textContent=x.day.slice(5);labels.appendChild(l);});
-  const actions=(data.actions||[]).slice(0,6), actionMax=Math.max(1,...actions.map(x=>n(x.count))), names={profile_view:'Profil',qr_scan:'QR',qr:'QR',nfc:'NFC',phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google',website:'Website',menu:'Menü'};
-  document.getElementById('baActions').innerHTML=actions.length?actions.map(x=>`<div class="action-row"><span>${names[x.type]||x.type}</span><div class="action-track"><div class="action-fill" style="width:${n(x.count)/actionMax*100}%"></div></div><strong>${n(x.count)}</strong></div>`).join(''):'<div class="analytics-empty">Henüz aksiyon yok.</div>';
+  try{
+    const data=await api('/api/business-analytics?period='+encodeURIComponent(period));
+    if(!data||data.error) throw new Error(data?.error||'Analiz verileri alınamadı');
+    const t=data.totals||{}, n=v=>Number(v||0);
+    const profile=n(t.profile_views), qr=n(t.qr_scans), nfc=n(t.nfc_taps), meaningful=n(t.phone_clicks)+n(t.whatsapp_clicks)+n(t.instagram_clicks)+n(t.tiktok_clicks)+n(t.google_review_clicks)+n(t.website_clicks)+n(t.menu_clicks)+n(t.location_clicks)+n(t.share_clicks);
+    [['cpProfile',profile],['cpQR',qr],['cpNFC',nfc],['cpActions',meaningful]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v.toLocaleString('tr-TR');});
+    const tables=data.top_nfc||[], th=document.getElementById('cpTables');
+    if(th)th.innerHTML=tables.length?`<div class="analytics-table-scroll"><table class="analytics-table"><thead><tr><th>MASA</th><th>QR</th><th>NFC</th><th>TOPLAM</th><th>SON HAREKET</th></tr></thead><tbody>${tables.map(x=>{const last=x.last_activity?new Date(x.last_activity).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';return `<tr><td><strong>${esc(x.name||'Masa')}</strong><div style="margin-top:3px"><span class="analytics-chip">${x.is_active===false?'PASİF':'AKTİF'}</span></div></td><td>${n(x.qr_scans)}</td><td>${n(x.nfc_taps)}</td><td><span class="analytics-chip">${n(x.total_physical)}</span></td><td>${esc(last)}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="analytics-empty">Henüz masa okutması yok.</div>';
+    const names={phone:'Telefon',whatsapp:'WhatsApp',instagram:'Instagram',tiktok:'TikTok',google_review:'Google',website:'Website',menu:'Menü',location:'Konum',share:'Paylaşım',profile_view:'Direkt Profil',qr_scan:'QR',nfc:'NFC'};
+    const rows=(data.actions||[]).filter(x=>x.type!=='review_open').slice(0,8), ah=document.getElementById('cpActionList');
+    if(ah){const mx=Math.max(1,...rows.map(x=>n(x.count)));ah.innerHTML=rows.length?rows.map(x=>`<div class="analytics-mini-row"><span>${esc(names[x.type]||x.type)}</span><div class="analytics-mini-track"><div class="analytics-mini-fill" style="width:${n(x.count)/mx*100}%"></div></div><strong>${n(x.count)}</strong></div>`).join(''):'<div class="analytics-empty">Henüz müşteri aksiyonu yok.</div>'; }
+    const hs=(data.hourly||[]).slice().sort((a,b)=>n(b.events)-n(a.events)).slice(0,6), hh=document.getElementById('cpHourly');
+    if(hh){const mx=Math.max(1,...hs.map(x=>n(x.events)));hh.innerHTML=hs.length?hs.map(x=>`<div class="analytics-mini-row"><span>${String(x.hour).padStart(2,'0')}:00</span><div class="analytics-mini-track"><div class="analytics-mini-fill" style="width:${n(x.events)/mx*100}%"></div></div><strong>${n(x.events)}</strong></div>`).join(''):'<div class="analytics-empty">Henüz saat verisi yok.</div>'; }
+    const cv=profile?Math.min(100,meaningful/profile*100):0, summary=document.getElementById('cpSummary');
+    const strongestSource=(data.sources||[])[0];
+    if(summary)summary.innerHTML=`<span>${period==='today'?'Bugün':period==='30d'?'Son 30 gün':period==='all'?'Tüm zamanlar':'Son 7 gün'}</span><span>${n(t.total_events).toLocaleString('tr-TR')} gerçek etkileşim</span><span>${meaningful.toLocaleString('tr-TR')} müşteri aksiyonu</span><span>%${cv.toLocaleString('tr-TR',{maximumFractionDigits:1})} profil → aksiyon</span><span>${strongestSource?('En güçlü kaynak: '+esc(strongestSource.source)):'Kaynak verisi yok'}</span>`;
+  }catch(e){console.warn('Business analytics:',e);const s=document.getElementById('cpSummary');if(s)s.innerHTML='<span>Analiz verileri şu anda alınamadı.</span>';}
 }
 
 
@@ -6709,7 +5935,7 @@ function formatEventType(type){
     instagram:{icon:"📸",label:"Instagram'a tıklandı"},
     tiktok:{icon:"🎵",label:"TikTok'a tıklandı"},
     google_review:{icon:"⭐",label:"Google yorumlarına gidildi"},
-    review_open:{icon:"⭐",label:"Yorum sayfası açıldı"},
+    
     review_positive:{icon:"👍",label:"Olumlu yorum seçildi"},
     review_feedback:{icon:"💬",label:"Yorum geri bildirimi gönderildi"},
     website:{icon:"🌐",label:"Web sitesine tıklandı"},
@@ -6722,7 +5948,7 @@ function formatEventType(type){
   const e=events[type];
   return e ? `${e.icon} ${e.label}` : `🔔 ${type||"Yeni etkileşim"}`;
 }
-async function loadBusinessLive(){if(!currentBusiness?.permissions?.live)return;const data=await api("/api/business-live-activity?limit=20");if(!data||data.error)return;const s=data.stats||{};document.getElementById("live15").textContent=Number(s.last_15m||0);document.getElementById("live60").textContent=Number(s.last_60m||0);document.getElementById("liveToday").textContent=Number(s.today||0);const rows=data.activities||[];document.getElementById("liveActivityList").innerHTML=rows.length?rows.map(x=>{const time=x.created_at?new Date(x.created_at).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";const extra=x.nfc_name?` • ${esc(x.nfc_name)}`:"";return `<div class="feature-item"><strong>${esc(formatEventType(x.type))}</strong>${extra}<span style="float:right;color:#666">${esc(time)}</span></div>`}).join(""):'<div class="feature-empty">Henüz aktivite yok.</div>';}
+async function loadBusinessLive(){if(!currentBusiness?.permissions?.live)return;const data=await api("/api/business-live-activity?limit=20");if(!data||data.error)return;const s=data.stats||{};document.getElementById("live15").textContent=Number(s.last_15m||0);document.getElementById("live60").textContent=Number(s.last_60m||0);document.getElementById("liveToday").textContent=Number(s.today||0);const rows=(data.activities||[]).filter(x=>x.type!=="review_open" && !(x.type==="profile_view" && (x.source==="qr"||x.source==="nfc")));document.getElementById("liveActivityList").innerHTML=rows.length?rows.map(x=>{const time=x.created_at?new Date(x.created_at).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";const extra=x.nfc_name?` • ${esc(x.nfc_name)}`:"";return `<div class="feature-item"><strong>${esc(formatEventType(x.type))}</strong>${extra}<span style="float:right;color:#666">${esc(time)}</span></div>`}).join(""):'<div class="feature-empty">Henüz aktivite yok.</div>';}
 async function loadAIInsights(period="7d",button=null){if(!currentBusiness?.permissions?.ai)return;if(button){document.querySelectorAll(".feature-periods button").forEach(b=>b.classList.remove("active"));button.classList.add("active");}const data=await api("/api/business-ai-insights?period="+encodeURIComponent(period));if(!data||data.error){document.getElementById("aiInsights").innerHTML='<div class="feature-empty">AI analizi şu anda yüklenemedi. Yenileyip tekrar deneyin.</div>';document.getElementById("aiRecommendations").innerHTML='';return;}document.getElementById("aiScore").textContent=Number(data.score||0);document.getElementById("aiTitle").textContent=data.title||"Analiz";document.getElementById("aiConversion").textContent="%"+Number(data.conversion||0).toLocaleString("tr-TR");document.getElementById("aiPeak").textContent=data.peak_hour?String(data.peak_hour.hour).padStart(2,"0")+":00":"—";document.getElementById("aiSource").textContent=data.strongest_source?.source||"—";const renderList=(id,items,icon)=>document.getElementById(id).innerHTML=(items||[]).length?items.map(x=>`<div class="feature-item">${icon} ${esc(x)}</div>`).join(""):'<div class="feature-empty">Henüz veri yok.</div>';renderList("aiInsights",data.insights,"💡");renderList("aiRecommendations",data.recommendations,"→");}
 async function loadReviewBooster(){if(!currentBusiness?.permissions?.review)return;const data=await api("/api/business-review-booster");if(!data||data.error)return;window.currentReviewBooster=data;const status=document.getElementById("reviewStatus");status.textContent=data.enabled?"AKTİF":"KAPALI";status.className="feature-status "+(data.enabled?"on":"off");document.getElementById("reviewTitle").textContent=data.title||"—";document.getElementById("reviewText").textContent=data.text||"—";document.getElementById("reviewThreshold").textContent=Number(data.threshold||4)+"★";document.getElementById("reviewEnabled").value=data.enabled?"true":"false";document.getElementById("reviewThresholdInput").value=Number(data.threshold||4);document.getElementById("reviewTitleInput").value=data.title||"";document.getElementById("reviewTextInput").value=data.text||"";document.getElementById("reviewGoogleInput").value=currentBusiness.google_review||"";const link=document.getElementById("reviewGoogle");if(currentBusiness.google_review){link.href=currentBusiness.google_review;link.textContent="Bağlantıyı Aç →";}else{link.removeAttribute("href");link.textContent="Google bağlantısı eklenmemiş";}}
 function toggleReviewEditor(force){const el=document.getElementById("reviewEditor");el.style.display=(force===undefined?el.style.display==="none":!force)?"block":"none";}
@@ -6951,14 +6177,7 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
       await loadBusinessTableCodes();
     }catch(e){showToast(e?.message||'Durum değiştirilemedi.');}
   };
-  window.deleteBusinessTableCode=async function(id,name){
-    if(!confirm('“'+String(name||'Bu masa')+'” silinsin mi? Bu kayıt admin panelinden de kaldırılır.'))return;
-    try{
-      const result=await api('/api/nfc-tags/'+id,{method:'DELETE'});
-      if(result?.error)throw new Error(result.error);
-      showToast('Masa silindi.');await loadBusinessTableCodes();
-    }catch(e){showToast(e?.message||'Masa silinemedi.');}
-  };
+  window.deleteBusinessTableCode=async function(){showToast('QR / NFC kodları kalıcıdır; silinemez.');};
   async function copyText(value){
     try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);return true;}}catch(e){}
     try{
