@@ -2289,21 +2289,34 @@ app.delete(
   adminAuth,
   async (req, res) => {
 
+    const client = await pool.connect();
+
     try {
 
       const id = Number(req.params.id);
 
-      const result =
-        await pool.query(
+      if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({
+          error: 'Geçersiz işletme ID'
+        });
+      }
+
+      await client.query('BEGIN');
+
+      const business =
+        await client.query(
           `
-          DELETE FROM businesses
+          SELECT id, name
+          FROM businesses
           WHERE id=$1
-          RETURNING id
+          FOR UPDATE
           `,
           [id]
         );
 
-      if (!result.rows.length) {
+      if (!business.rows.length) {
+
+        await client.query('ROLLBACK');
 
         return res.status(404).json({
           error: 'İşletme bulunamadı'
@@ -2311,17 +2324,50 @@ app.delete(
 
       }
 
+      /*
+        events tablosunda business_id için eski veritabanlarında
+        FK/CASCADE olmayabilir. İşletme silinirken bu kayıtları
+        açıkça temizliyoruz. nfc_tags, campaigns, profile_designs
+        ve review_boosters ise kendi CASCADE kurallarıyla silinir.
+      */
+      await client.query(
+        `
+        DELETE FROM events
+        WHERE business_id=$1
+        `,
+        [id]
+      );
+
+      const result =
+        await client.query(
+          `
+          DELETE FROM businesses
+          WHERE id=$1
+          RETURNING id, name
+          `,
+          [id]
+        );
+
+      await client.query('COMMIT');
+
       res.json({
-        success: true
+        success: true,
+        business: result.rows[0]
       });
 
     } catch (error) {
 
-      console.error(error);
+      await client.query('ROLLBACK');
+
+      console.error('ADMIN BUSINESS DELETE ERROR:', error);
 
       res.status(500).json({
         error: 'İşletme silinemedi'
       });
+
+    } finally {
+
+      client.release();
 
     }
 
