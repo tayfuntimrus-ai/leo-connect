@@ -8,6 +8,7 @@ const QRCode = require('qrcode');
 const { Pool } = require('pg');
 const path = require('path');
 const crypto = require('crypto');
+const { createWebsiteCmsRouter } = require('./LEO-CONNECT-WEBSITE-CMS-MODULE-V1');
 
 const app = express();
 
@@ -611,7 +612,8 @@ async function initDatabase() {
     ON profile_designs(business_id)
   `);
 
-  console.log('PostgreSQL + NFC Tag Management hazır.');
+  await websiteCms.initWebsiteCmsDatabase();
+  console.log('PostgreSQL + NFC Tag Management + Website CMS hazır.');
 }
 
 
@@ -684,6 +686,13 @@ function adminAuth(req, res, next) {
     });
   }
 }
+
+
+/* =========================================================
+   WEBSITE CMS — SEPARATE CORPORATE WEBSITE
+========================================================= */
+const websiteCms = createWebsiteCmsRouter({ pool, adminAuth });
+app.use(websiteCms.router);
 
 
 /* =========================================================
@@ -2935,6 +2944,11 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
       FROM events e
       LEFT JOIN nfc_tags t ON t.id=e.nfc_tag_id
       WHERE e.business_id=$1
+        AND e.type IN ('qr_scan','qr','nfc',
+          'instagram','facebook','tiktok','youtube','linkedin','x',
+          'whatsapp','google_review','website',
+          'yemeksepeti','getir','trendyol-yemek','migros-yemek',
+          'rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email')
       ORDER BY e.created_at DESC
       LIMIT $2
     `, [req.user.id, limit]);
@@ -2943,7 +2957,13 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
         COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '15 minutes')::int AS last_15m,
         COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '60 minutes')::int AS last_60m,
         COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE)::int AS today
-      FROM events WHERE business_id=$1
+      FROM events
+      WHERE business_id=$1
+        AND type IN ('qr_scan','qr','nfc',
+          'instagram','facebook','tiktok','youtube','linkedin','x',
+          'whatsapp','google_review','website',
+          'yemeksepeti','getir','trendyol-yemek','migros-yemek',
+          'rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email')
     `, [req.user.id]);
     res.json({activities: result.rows, stats: stats.rows[0] || {last_15m:0,last_60m:0,today:0}});
   } catch(error) {
@@ -3135,18 +3155,32 @@ app.post('/api/event/:slug', async (req, res) => {
       'whatsapp',
       'phone',
       'instagram',
+      'facebook',
       'tiktok',
-      'website',
-      'menu',
+      'youtube',
+      'linkedin',
+      'x',
       'google_review',
+      'website',
+      'yemeksepeti',
+      'getir',
+      'trendyol-yemek',
+      'migros-yemek',
+      'rezervasyon',
+      'bilet',
+      'menu',
+      'location',
+      'tripadvisor',
+      'booking',
+      'telegram',
+      'email',
+      'iban',
+      'share',
       'review_open',
       'review_positive',
       'review_feedback',
       'campaign_view',
-      'campaign_click',
-      'location',
-      'iban',
-      'share'
+      'campaign_click'
     ];
 
     const allowedSources = ['', 'direct', 'qr', 'nfc'];
@@ -4401,8 +4435,19 @@ app.get(
       }
 
       /*
-        Önce profil görüntüleme.
+        Fiziksel temas tek bir event üretir.
+        /p/nfc/:code?source=qr ise QR olarak,
+        aksi halde NFC olarak kaydedilir.
       */
+      const physicalSource =
+        String(req.query.source || '').toLowerCase() === 'qr'
+          ? 'qr'
+          : 'nfc';
+
+      const physicalType =
+        physicalSource === 'qr'
+          ? 'qr_scan'
+          : 'nfc';
 
       await pool.query(
         `
@@ -4412,43 +4457,17 @@ app.get(
           source,
           nfc_tag_id
         )
-
         VALUES(
           $1,
-          'profile_view',
-          'nfc',
-          $2
+          $2,
+          $3,
+          $4
         )
         `,
         [
           tag.business_id,
-          tag.tag_id
-        ]
-      );
-
-
-      /*
-        Sonra gerçek NFC tap.
-      */
-
-      await pool.query(
-        `
-        INSERT INTO events(
-          business_id,
-          type,
-          source,
-          nfc_tag_id
-        )
-
-        VALUES(
-          $1,
-          'nfc',
-          'nfc',
-          $2
-        )
-        `,
-        [
-          tag.business_id,
+          physicalType,
+          physicalSource,
           tag.tag_id
         ]
       );
@@ -4514,43 +4533,10 @@ app.get(
       const business =
         result.rows[0];
 
-      /*
-        Profile view
-      */
+      const profileSource =
+        String(req.query.source || '').toLowerCase();
 
-      await pool.query(
-        `
-        INSERT INTO events(
-          business_id,
-          type,
-          source
-        )
-
-        VALUES(
-          $1,
-          'profile_view',
-          $2
-        )
-        `,
-        [
-          business.id,
-          req.query.source === 'qr'
-            ? 'qr'
-            : req.query.source === 'nfc'
-              ? 'nfc'
-              : 'direct'
-        ]
-      );
-
-
-      /*
-        QR
-      */
-
-      if (
-        req.query.source === 'qr'
-      ) {
-
+      if (profileSource === 'qr') {
         await pool.query(
           `
           INSERT INTO events(
@@ -4558,7 +4544,6 @@ app.get(
             type,
             source
           )
-
           VALUES(
             $1,
             'qr_scan',
@@ -4567,25 +4552,7 @@ app.get(
           `,
           [business.id]
         );
-
-      }
-
-
-      /*
-        Eski NFC bağlantıları:
-
-        /p/slug?source=nfc
-
-        Bunlar yeni tag sistemi kullanılmadan
-        oluşturulmuş NFC bağlantıları olabilir.
-
-        Backward compatibility korunuyor.
-      */
-
-      if (
-        req.query.source === 'nfc'
-      ) {
-
+      } else if (profileSource === 'nfc') {
         await pool.query(
           `
           INSERT INTO events(
@@ -4593,7 +4560,6 @@ app.get(
             type,
             source
           )
-
           VALUES(
             $1,
             'nfc',
@@ -4602,7 +4568,22 @@ app.get(
           `,
           [business.id]
         );
-
+      } else {
+        await pool.query(
+          `
+          INSERT INTO events(
+            business_id,
+            type,
+            source
+          )
+          VALUES(
+            $1,
+            'profile_view',
+            'direct'
+          )
+          `,
+          [business.id]
+        );
       }
 
 
