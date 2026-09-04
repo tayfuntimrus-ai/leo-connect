@@ -3331,7 +3331,7 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 
   </div>
 
-</section>
+
 
 
 <!-- ==================================================
@@ -3427,6 +3427,9 @@ https://..."></textarea>
     <button id="profileContentSaveButton" class="design-save-button" type="button" onclick="saveProfileContent()">✓ Profil İçeriğini Kaydet</button>
     <div id="profileContentMessage"></div>
   </div>
+</section>
+
+
 </section>
 
 
@@ -6265,7 +6268,7 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 
 <script id="leo-business-final-js">
 (function(){
-  const map={overview:{title:'Genel Bakış',ids:[]},profile:{title:'Profil',ids:['profile','profileContent']},connections:{title:'Dijital Kanallar',ids:[]},digital:{title:'QR & NFC',ids:['digital']},campaigns:{title:'Kampanyalar',ids:['campaignSection']},stats:{title:'İstatistikler',ids:['businessAnalyticsV3','performanceSection','reviewSection']}};
+  const map={overview:{title:'Genel Bakış',ids:[]},profile:{title:'Profil',ids:['profile']},connections:{title:'Dijital Kanallar',ids:[]},digital:{title:'QR & NFC',ids:['digital']},campaigns:{title:'Kampanyalar',ids:['campaignSection']},stats:{title:'İstatistikler',ids:['businessAnalyticsV3','performanceSection','reviewSection']}};
   window.showBusinessSection=function(name){
     const cfg=map[name]||map.overview;
     document.querySelectorAll('.bc-view').forEach(v=>v.classList.toggle('active',v.dataset.view===name));
@@ -6276,7 +6279,7 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
       el.style.display='none';
     });
     // Move original working V1 sections into the correct V2 view containers without cloning.
-    cfg.ids.forEach(id=>{const el=document.getElementById(id); if(el){el.style.display=el.dataset.bcOriginalDisplay||''; const mount=document.getElementById(name==='profile'?'bcProfileMount':name==='digital'?'bcDigitalMount':name==='campaigns'?'bcCampaignMount':'bcStatsMount'); if(mount && el.parentElement!==mount) mount.appendChild(el);}});
+    cfg.ids.forEach(id=>{const el=document.getElementById(id); if(el){el.style.display=el.dataset.bcOriginalDisplay||''; const mount=document.getElementById(name==='profile'?(id==='profile'?'bcProfileMount':'bcDesignMount'):name==='digital'?'bcDigitalMount':name==='campaigns'?'bcCampaignMount':'bcStatsMount'); if(mount && el.parentElement!==mount) mount.appendChild(el);}});
     document.getElementById('bcTopTitle').textContent=cfg.title;
     window.scrollTo({top:0,behavior:'smooth'});
     if(name==='digital' && typeof loadQR==='function'){try{loadQR()}catch(e){}}
