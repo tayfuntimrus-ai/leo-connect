@@ -1137,34 +1137,6 @@ body{
 
 
 /* ==================================================
-   LEO CONNECT PREMIUM PAYMENT V3
-================================================== */
-.premium-payment-section{position:relative;overflow:hidden;}
-.premium-payment-title .premium-payment-icon{display:grid;place-items:center;color:#e2b85b;}
-.premium-payment-icon svg{width:21px;height:21px;}
-.premium-payment-title strong{font-size:17px !important;letter-spacing:-.01em;}
-.premium-payment-title span{font-size:11px !important;color:#8f8f8f !important;margin-top:3px;}
-.premium-payment-card{position:relative;isolation:isolate;overflow:hidden;padding:22px;border-radius:22px;background:radial-gradient(circle at 92% 8%,rgba(214,173,85,.13),transparent 32%),linear-gradient(145deg,#1b1b1b 0%,#111 52%,#0d0d0d 100%);border:1px solid rgba(214,173,85,.24);box-shadow:0 18px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.045);}
-.payment-card-glow{position:absolute;inset:-35% -20% auto auto;width:180px;height:180px;border-radius:50%;background:rgba(214,173,85,.08);filter:blur(30px);pointer-events:none;z-index:-1;}
-.payment-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
-.payment-card-brand{font-size:10px;font-weight:800;letter-spacing:.2em;color:#cdbb91;}
-.payment-card-chip{width:28px;height:22px;border:1px solid rgba(226,184,91,.45);border-radius:6px;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;opacity:.9;}
-.payment-card-chip span{border-right:1px solid rgba(226,184,91,.35);}.payment-card-chip span:last-child{border-right:0;}
-.payment-label{font-size:9px;font-weight:700;letter-spacing:.16em;color:#777;}
-.premium-iban-number{margin-top:9px !important;color:#fff !important;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace !important;font-size:clamp(14px,4vw,21px) !important;font-weight:750 !important;letter-spacing:.025em !important;line-height:1.5 !important;white-space:normal !important;word-break:normal !important;overflow-wrap:anywhere !important;max-width:100% !important;box-sizing:border-box !important;font-variant-numeric:tabular-nums;text-shadow:0 1px 12px rgba(255,255,255,.06);}
-.premium-iban-number{overflow:hidden !important;max-inline-size:100% !important;}
-.premium-copy-button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;margin-top:15px;padding:11px 14px;border-radius:13px;cursor:pointer;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;}
-.premium-copy-button:hover{transform:translateY(-1px);}.premium-copy-button:active{transform:translateY(0);}
-.premium-copy-primary{color:#fff;border:1px solid rgba(226,184,91,.7);background:linear-gradient(135deg,#cfa354,#a77b36);box-shadow:0 8px 22px rgba(167,123,54,.2);}
-.premium-copy-secondary{width:auto;min-width:122px;margin:0;flex:0 0 auto;color:#ddd;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.035);}
-.copy-button-icon{display:grid;place-items:center;}.copy-button-icon svg{width:16px;height:16px;}
-.premium-copy-message{min-height:17px;margin-top:8px;text-align:center;color:#d9b765;font-size:10px;font-weight:700;letter-spacing:.02em;}
-.payment-card-divider{height:1px;margin:18px 0 17px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);}
-.payment-holder-block{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;}.premium-holder{margin-top:7px !important;font-size:17px !important;font-weight:750 !important;letter-spacing:-.01em;}.holder-message{margin-top:8px;text-align:right;}
-.payment-trust-note{display:flex;align-items:center;justify-content:center;gap:7px;margin:13px 2px 0;color:#777;font-size:9px;line-height:1.45;text-align:center;}.payment-trust-note svg{width:14px;height:14px;color:#b9934d;flex:0 0 14px;}
-@media(max-width:520px){.premium-payment-card{padding:16px !important;border-radius:20px;box-sizing:border-box;width:100%;max-width:100%;}.payment-card-top{margin-bottom:22px;}.premium-iban-number{display:block;width:100% !important;max-width:100% !important;min-width:0 !important;box-sizing:border-box !important;font-size:13px !important;letter-spacing:0 !important;line-height:1.45 !important;white-space:normal !important;word-break:normal !important;overflow-wrap:normal !important;hyphens:none !important;text-align:left !important;}.premium-copy-button{min-height:43px;padding-left:12px;padding-right:12px;}.payment-holder-block{align-items:stretch;flex-direction:column;gap:12px;}.premium-copy-secondary{width:100%;min-width:0;}.holder-message{text-align:center;}}
-
-/* ==================================================
    LEO CONNECT V2 — DYNAMIC PROFILE
 ================================================== */
 .dynamic-cover{
@@ -1217,86 +1189,6 @@ body{
   font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.1);
 }
 .dynamic-button.show{display:inline-flex!important;}
-
-/* ==================================================
-   SMART CAMPAIGNS
-================================================== */
-.smart-campaigns{
-  display:none;
-  margin-top:16px;
-}
-.smart-campaign{
-  position:relative;
-  overflow:hidden;
-  margin-top:12px;
-  padding:16px;
-  border:1px solid rgba(214,173,85,.24);
-  border-radius:16px;
-  background:
-    linear-gradient(145deg,rgba(214,173,85,.13),rgba(255,255,255,.025));
-  box-shadow:0 10px 30px rgba(0,0,0,.18);
-  text-align:left;
-}
-.smart-campaign:first-child{
-  margin-top:0;
-}
-.smart-campaign-badge{
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  margin-bottom:9px;
-  padding:5px 8px;
-  border-radius:999px;
-  background:rgba(214,173,85,.12);
-  border:1px solid rgba(214,173,85,.2);
-  color:var(--lc-gold-soft);
-  font-size:8px;
-  font-weight:900;
-  letter-spacing:.7px;
-  text-transform:uppercase;
-}
-.smart-campaign-title{
-  display:block;
-  margin:0 0 7px;
-  color:#fff;
-  font-size:14px;
-  line-height:1.35;
-  font-weight:900;
-}
-.smart-campaign-text{
-  display:block;
-  color:#d0d0d0;
-  font-size:11px;
-  line-height:1.6;
-  white-space:pre-wrap;
-}
-.smart-campaign-image{
-  display:block;
-  width:100%;
-  max-height:280px;
-  object-fit:cover;
-  margin-top:12px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.07);
-  background:#080808;
-}
-.smart-campaign-button{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  margin-top:12px;
-  padding:10px 14px;
-  border-radius:11px;
-  background:linear-gradient(135deg,var(--lc-gold),#9e7738);
-  color:#fff;
-  text-decoration:none;
-  font-size:9px;
-  font-weight:900;
-  border:1px solid rgba(255,255,255,.1);
-}
-.smart-campaign-button:hover{
-  filter:brightness(1.08);
-}
 .dynamic-gallery{
   display:none;margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;
 }
@@ -1356,13 +1248,18 @@ body{
 }
 
 
-/* BUSINESS BRAND HEADER TOGGLE */
-.top-brand.business-brand-active{padding:8px 16px !important;gap:10px;}
-.top-brand.business-brand-active .brand-lion{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(214,173,85,.28);border-radius:10px;overflow:hidden;background:#080808;}
-.top-business-logo{width:100%;height:100%;object-fit:contain;border-radius:8px;}
-.top-brand.business-brand-active .brand-name{font-size:14px !important;letter-spacing:.01em !important;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#category.hidden{display:none !important;}
-@media(max-width:520px){.top-brand.business-brand-active{max-width:calc(100% - 24px);}.top-brand.business-brand-active .brand-name{max-width:210px;font-size:13px !important;}}
+/* ==================================================
+   V2 — SMART CAMPAIGN PUBLIC LAYER
+================================================== */
+.smart-campaigns{display:grid;gap:14px;margin:18px 0}
+.smart-campaign{overflow:hidden;border:1px solid #c59a5245;border-radius:18px;background:linear-gradient(145deg,#151515,#090909);box-shadow:0 18px 45px #0008}
+.smart-campaign-media{width:100%;max-height:260px;object-fit:cover;display:none}
+.smart-campaign-body{padding:20px}
+.smart-campaign-kicker{font-size:9px;letter-spacing:.18em;color:#e0bd7b;font-weight:900}
+.smart-campaign-title{margin-top:7px;font-size:20px;font-weight:900}
+.smart-campaign-text{margin-top:8px;color:#9a9a9a;font-size:11px;line-height:1.65;white-space:pre-line}
+.smart-campaign-button{display:none;margin-top:14px;min-height:40px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,#c59a52,#9e7738);color:#fff;font-size:10px;font-weight:900;text-decoration:none}
+.smart-campaign-button.show{display:inline-flex;align-items:center;justify-content:center}
 
 </style>
 
@@ -1379,13 +1276,13 @@ body{
      BRAND
 ================================================== -->
 
-<div id="topBrand" class="top-brand">
+<div class="top-brand">
 
-  <div class="brand-lion" id="topBrandLogo">
-    <span class="leo-lion-logo" aria-hidden="true"></span>
+  <div class="brand-lion">
+    🦁
   </div>
 
-  <div class="brand-name" id="topBrandName">
+  <div class="brand-name">
     LEO <span>CONNECT</span>
   </div>
 
@@ -1489,11 +1386,14 @@ body{
   <span id="dynamicAnnouncementText"></span>
 </div>
 
-<!-- LEGACY CAMPAIGN SLOT DISABLED
-     Smart Campaigns is the single public campaign renderer. -->
-<div id="dynamicCampaign" class="dynamic-campaign" style="display:none!important" aria-hidden="true"></div>
+<div id="dynamicCampaign" class="dynamic-campaign">
+  <strong id="dynamicCampaignTitle"></strong>
+  <span id="dynamicCampaignText"></span>
+  <img id="dynamicCampaignImage" class="dynamic-media" alt="Kampanya görseli">
+  <a id="dynamicCampaignButton" class="dynamic-button" target="_blank" rel="noopener"></a>
+</div>
 
-<div id="smartCampaigns" class="smart-campaigns"></div>
+<div id="smartCampaignsPublic" class="smart-campaigns"></div>
 
 <div id="dynamicFeatured" class="dynamic-featured">
   <strong id="dynamicFeaturedTitle"></strong>
@@ -1845,36 +1745,115 @@ body{
 
 
 <!-- ==================================================
-     PREMIUM PAYMENT / IBAN
+     IBAN
 ================================================== -->
-<section id="ibanSection" class="section hidden premium-payment-section">
-  <div class="section-title premium-payment-title">
-    <div class="section-icon premium-payment-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.7"/>
-        <path d="M3 9h18" stroke="currentColor" stroke-width="1.7"/>
-        <path d="M7 14h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-        <circle cx="16.5" cy="14.5" r="1.2" fill="currentColor"/>
-      </svg>
+
+<section
+  id="ibanSection"
+  class="section hidden"
+>
+
+
+  <div class="section-title">
+
+    <div class="section-icon">
+      💳
     </div>
-    <div><strong>Ödeme Bilgileri</strong><span>Güvenli ödeme için hesap bilgileri</span></div>
-  </div>
-  <div class="premium-payment-card">
-    <div class="payment-card-glow"></div>
-    <div class="payment-card-top"><div class="payment-card-brand">LEO CONNECT</div><div class="payment-card-chip"><span></span><span></span><span></span></div></div>
-    <div class="payment-label">IBAN</div>
-    <div id="iban" class="iban-number premium-iban-number">-</div>
-    <button class="premium-copy-button premium-copy-primary" type="button" onclick="copyIBAN()"><span class="copy-button-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" stroke="currentColor" stroke-width="1.7"/></svg></span><span>IBAN'ı Kopyala</span></button>
-    <div id="ibanMessage" class="premium-copy-message" role="status" aria-live="polite"></div>
-    <div class="payment-card-divider"></div>
-    <div class="payment-holder-block">
-      <div><div class="payment-label">HESAP SAHİBİ</div><div id="ibanHolder" class="iban-holder premium-holder">-</div></div>
-      <button class="premium-copy-button premium-copy-secondary" type="button" onclick="copyIBANHolder()"><span class="copy-button-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" stroke="currentColor" stroke-width="1.7"/></svg></span><span>Adı Kopyala</span></button>
+
+    <div>
+
+      <strong>
+        Ödeme Bilgileri
+      </strong>
+
+      <span>
+        IBAN ve hesap sahibi bilgilerini görüntüle
+      </span>
+
     </div>
-    <div id="ibanHolderMessage" class="premium-copy-message holder-message" role="status" aria-live="polite"></div>
+
   </div>
-  <div class="payment-trust-note"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 19 6v5c0 4.7-2.9 8.2-7 10-4.1-1.8-7-5.3-7-10V6l7-3Z" stroke="currentColor" stroke-width="1.6"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Bilgileri kopyalamak için tek dokunuş yeterli.</span></div>
+
+
+  <div class="iban-card">
+
+
+    <!-- IBAN -->
+
+    <div class="iban-label">
+      IBAN
+    </div>
+
+
+    <div
+      id="iban"
+      class="iban-number"
+    >
+      -
+    </div>
+
+
+    <div class="iban-buttons">
+
+      <button
+        class="iban-button gold"
+        onclick="copyIBAN()"
+      >
+        IBAN'I KOPYALA
+      </button>
+
+    </div>
+
+
+    <div
+      id="ibanMessage"
+      class="iban-message"
+    ></div>
+
+
+
+    <!-- HESAP SAHİBİ -->
+
+    <div
+      class="iban-label"
+      style="margin-top:18px;"
+    >
+      HESAP SAHİBİ
+    </div>
+
+
+    <div
+      id="ibanHolder"
+      class="iban-holder"
+    >
+      -
+    </div>
+
+
+    <div class="iban-buttons">
+
+      <button
+        class="iban-button"
+        onclick="copyIBANHolder()"
+      >
+        ADI KOPYALA
+      </button>
+
+    </div>
+
+
+    <div
+      id="ibanHolderMessage"
+      class="iban-message"
+    ></div>
+
+
+  </div>
+
+
 </section>
+
+
 
 
 <section id="reviewBooster" class="review-booster hidden">
@@ -1953,7 +1932,6 @@ function renderReviewBooster(){
       stars.appendChild(b);
     }
   }
-  trackReviewEvent("review_open");
 }
 
 function handleReviewRating(rating){
@@ -1976,6 +1954,7 @@ function handleReviewRating(rating){
     a.target="_blank";
     a.rel="noopener";
     a.textContent="★ Google'da Değerlendir";
+    a.addEventListener("click",()=>trackReviewEvent("google_review"));
     if(actions) actions.appendChild(a);
     return;
   }
@@ -1989,6 +1968,7 @@ function handleReviewRating(rating){
     a.target="_blank";
     a.rel="noopener";
     a.textContent="💬 Bize Ulaş";
+    a.addEventListener("click",()=>trackReviewEvent("whatsapp"));
     if(actions) actions.appendChild(a);
   }else if(google){
     const a=document.createElement("a");
@@ -1997,6 +1977,7 @@ function handleReviewRating(rating){
     a.target="_blank";
     a.rel="noopener";
     a.textContent="★ Değerlendir";
+    a.addEventListener("click",()=>trackReviewEvent("google_review"));
     if(actions) actions.appendChild(a);
   }
 }
@@ -2351,100 +2332,6 @@ function dynamicYoutubeEmbed(value){
   }catch(e){ return ''; }
 }
 
-function renderSmartCampaigns(){
-  const box=document.getElementById('smartCampaigns');
-  if(!box) return;
-
-  box.innerHTML='';
-
-  // Smart Campaigns is the SINGLE public campaign renderer.
-  // Legacy profile_design campaign is intentionally not rendered here,
-  // so the same campaign cannot appear twice.
-  const campaigns=Array.isArray(business?.campaigns)
-    ? business.campaigns.slice(0,5)
-    : [];
-
-  console.log('[LEO CONNECT] Public campaigns:', campaigns);
-
-  if(!campaigns.length){
-    box.style.display='none';
-    return;
-  }
-
-  campaigns.forEach(c=>{
-    const card=document.createElement('div');
-    card.className='smart-campaign';
-
-    const badge=document.createElement('div');
-    badge.className='smart-campaign-badge';
-    badge.textContent='🔥 AKTİF KAMPANYA';
-    card.appendChild(badge);
-
-    if(String(c.title||'').trim()){
-      const title=document.createElement('strong');
-      title.className='smart-campaign-title';
-      title.textContent=String(c.title||'');
-      card.appendChild(title);
-    }
-
-    if(String(c.text||'').trim()){
-      const body=document.createElement('span');
-      body.className='smart-campaign-text';
-      body.textContent=String(c.text||'');
-      card.appendChild(body);
-    }
-
-    const imageUrl=dynamicSafeUrl(c.image_url);
-    if(imageUrl){
-      const img=document.createElement('img');
-      img.className='smart-campaign-image';
-      img.src=imageUrl;
-      img.alt=String(c.title||'Kampanya görseli');
-      img.loading='lazy';
-      img.onerror=()=>img.remove();
-      card.appendChild(img);
-    }
-
-    const buttonUrl=dynamicSafeUrl(c.button_url);
-    const buttonText=String(c.button_text||'').trim();
-
-    if(buttonUrl && buttonText){
-      const btn=document.createElement('a');
-      btn.className='smart-campaign-button';
-      btn.href=buttonUrl;
-      btn.textContent=buttonText;
-      btn.target='_blank';
-      btn.rel='noopener';
-      btn.addEventListener('click',()=>track('campaign'));
-      card.appendChild(btn);
-    }
-
-    box.appendChild(card);
-  });
-
-  box.style.display=box.children.length ? 'block' : 'block';
-}
-
-
-
-function renderV2DigitalChannels(){
-  const social=business?.social_links && typeof business.social_links==='object' ? business.social_links : {};
-  const custom=Array.isArray(business?.custom_links) ? business.custom_links : [];
-  const allowed=business?.social_platform_permissions && typeof business.social_platform_permissions==='object' ? business.social_platform_permissions : {};
-  const labels={instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',youtube:'YouTube',linkedin:'LinkedIn',x:'X',whatsapp:'WhatsApp',google:'Google',website:'Website',yemeksepeti:'Yemeksepeti',getir:'Getir','trendyol-yemek':'Trendyol Yemek','migros-yemek':'Migros Yemek',rezervasyon:'Rezervasyon',bilet:'Bilet / Etkinlik',menu:'Online Menü',location:'Konum',tripadvisor:'Tripadvisor',booking:'Booking',telegram:'Telegram',email:'E-posta'};
-  const icons={instagram:'📸',facebook:'f',tiktok:'🎵',youtube:'▶',linkedin:'in',x:'𝕏',whatsapp:'💬',google:'G',website:'🌐',yemeksepeti:'🍴',getir:'🟡','trendyol-yemek':'🟠','migros-yemek':'🛒',rezervasyon:'📅',bilet:'🎟️',menu:'📖',location:'📍',tripadvisor:'🦉',booking:'🏨',telegram:'✈️',email:'✉️'};
-  const entries=Object.keys(labels).filter(k=>allowed[k]!==false).map(k=>({type:k,title:labels[k],url:String(social[k]?.url||'').trim(),icon:icons[k]||'🔗'})).filter(x=>x.url);
-  const customEntries=custom.filter(x=>x&&x.url&&x.enabled!==false).map(x=>({type:'custom',title:String(x.title||'Bağlantı'),url:String(x.url),icon:x.icon||'🔗'}));
-  const all=entries.concat(customEntries);
-  const section=document.getElementById('socialSection');
-  if(!section)return;
-  if(!all.length){section.classList.add('hidden');section.innerHTML='';return;}
-  section.classList.remove('hidden');
-  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  section.innerHTML='<div class="section-title"><div class="section-icon">✨</div><div><strong>Dijital Kanallar</strong><span>İşletmeyle bağlantı kur</span></div></div><div class="link-grid">'+all.map(x=>'<a class="link" target="_blank" rel="noopener" href="'+(dynamicSafeUrl(x.url)||'#')+'" data-digital-type="'+esc(String(x.type).replace(/[^a-z0-9_-]/gi,''))+'"><div class="link-icon">'+esc(x.icon)+'</div><div class="link-text"><strong>'+esc(x.title)+'</strong><span>Bağlantıyı aç</span></div></a>').join('')+'</div>';
-  section.querySelectorAll('a[data-digital-type]').forEach(a=>a.addEventListener('click',()=>track('digital_'+a.dataset.digitalType)));
-}
-
 function renderDynamicProfile(){
   const d=business?.profile_design || {};
   const theme=String(d.theme||'midnight-gold');
@@ -2473,10 +2360,45 @@ function renderDynamicProfile(){
     announcementText.textContent=String(d.announcement_text||'');
   }
 
-  // Legacy profile_design campaign slot is intentionally disabled.
-  // Smart Campaigns below is the only public campaign renderer.
   const campaign=document.getElementById('dynamicCampaign');
-  if(campaign) campaign.style.display='none';
+  if(campaign){
+    const show=d.campaign_enabled && (d.campaign_title || d.campaign_text || d.campaign_image_url);
+    campaign.style.display=show?'block':'none';
+    document.getElementById('dynamicCampaignTitle').textContent=d.campaign_title||'Kampanya';
+    document.getElementById('dynamicCampaignText').textContent=d.campaign_text||'';
+    const img=document.getElementById('dynamicCampaignImage');
+    const imgUrl=dynamicSafeUrl(d.campaign_image_url);
+    if(imgUrl){img.src=imgUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}else img.style.display='none';
+    const btn=document.getElementById('dynamicCampaignButton');
+    const btnUrl=dynamicSafeUrl(d.campaign_button_url);
+    if(btnUrl && d.campaign_button_text){btn.href=btnUrl;btn.textContent=d.campaign_button_text;btn.classList.add('show');}else btn.classList.remove('show');
+    btn.onclick=()=>{ if(btnUrl) track('campaign'); };
+  }
+
+  /* V2 SMART CAMPAIGNS — scheduled campaigns take priority over legacy single campaign */
+  const smartBox=document.getElementById('smartCampaignsPublic');
+  const smartCampaigns=Array.isArray(business?.campaigns)?business.campaigns:[];
+  if(smartBox){
+    smartBox.innerHTML='';
+    if(smartCampaigns.length){
+      if(campaign) campaign.style.display='none';
+      smartCampaigns.slice(0,5).forEach(c=>{
+        const wrap=document.createElement('article');
+        wrap.className='smart-campaign';
+        const imageUrl=dynamicSafeUrl(c.image_url);
+        const buttonUrl=dynamicSafeUrl(c.button_url);
+        wrap.innerHTML=`<img class="smart-campaign-media" alt="Kampanya görseli"><div class="smart-campaign-body"><div class="smart-campaign-kicker">LEO CONNECT • ÖZEL FIRSAT</div><div class="smart-campaign-title"></div><div class="smart-campaign-text"></div><a class="smart-campaign-button" target="_blank" rel="noopener"></a></div>`;
+        const img=wrap.querySelector('.smart-campaign-media');
+        if(imageUrl){img.src=imageUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}
+        wrap.querySelector('.smart-campaign-title').textContent=String(c.title||'Kampanya');
+        wrap.querySelector('.smart-campaign-text').textContent=String(c.text||'');
+        const btn=wrap.querySelector('.smart-campaign-button');
+        if(buttonUrl && c.button_text){btn.href=buttonUrl;btn.textContent=String(c.button_text);btn.classList.add('show');btn.addEventListener('click',()=>track('campaign_click'));}
+        smartBox.appendChild(wrap);
+        track('campaign_view');
+      });
+    }
+  }
 
   const featured=document.getElementById('dynamicFeatured');
   if(featured){
@@ -2528,39 +2450,9 @@ function renderDynamicProfile(){
    RENDER
 ================================================== */
 
-function renderTopBusinessBrand(){
-  const d = business?.profile_design || {};
-  const enabled = d.business_brand_enabled !== false;
-  const brand = document.getElementById('topBrand');
-  const logoBox = document.getElementById('topBrandLogo');
-  const nameBox = document.getElementById('topBrandName');
-  if(!brand || !logoBox || !nameBox) return;
-
-  const name = String(business?.name || 'İşletme').trim();
-  const logoUrl = dynamicSafeUrl(business?.logo_url || '');
-
-  if(enabled){
-    nameBox.textContent = name;
-    logoBox.innerHTML = logoUrl
-      ? `<img src="${logoUrl}" alt="" class="top-business-logo">`
-      : `<span class="leo-lion-logo" aria-hidden="true"></span>`;
-    brand.classList.add('business-brand-active');
-  }else{
-    logoBox.innerHTML = `<span class="leo-lion-logo" aria-hidden="true"></span>`;
-    nameBox.innerHTML = `LEO <span>CONNECT</span>`;
-    brand.classList.remove('business-brand-active');
-  }
-
-  const category = document.getElementById('category');
-  if(category) category.classList.add('hidden');
-}
-
 function render(){
 
-  try{ renderDynamicProfile(); }catch(error){ console.error("Legacy profile render error:",error); }
-  renderTopBusinessBrand();
-  renderV2DigitalChannels();
-  renderSmartCampaigns();
+  renderDynamicProfile();
 
   /* V2 REVIEW BOOSTER */
   try{
@@ -2980,7 +2872,7 @@ function render(){
     document.getElementById(
       "iban"
     ).textContent =
-      formatIBANDisplay(business.iban);
+      business.iban;
 
 
     document.getElementById(
@@ -3007,12 +2899,6 @@ function render(){
 
 }
 
-
-/* PREMIUM IBAN DISPLAY */
-function formatIBANDisplay(value){
-  const raw=String(value||'').replace(/\s+/g,'').trim();
-  return raw ? raw.replace(/(.{4})/g,'$1 ').trim() : '';
-}
 
 /* ==================================================
    COPY IBAN
