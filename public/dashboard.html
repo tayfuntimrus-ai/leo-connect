@@ -2641,9 +2641,40 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
         <div class="bc-kpi"><small>TOPLAM</small><strong id="bcKpiTotal">0</strong><span>toplam aksiyon</span></div>
       </div>
 
-      <div class="bc-overview-grid">
-        <div class="bc-overview-card bc-overview-health"><div class="bc-card-head"><div><span>PROFİL DURUMU</span><h3>Profil sağlık skoru</h3></div><button type="button" onclick="showBusinessSection('profile')">Profili düzenle →</button></div><div class="bc-health-mini"><div id="bcScore" class="bc-score"><strong id="bcScoreText">0</strong></div><div><strong id="bcHealthTitle">Profil kontrol ediliyor</strong><p id="bcHealthMsg">Profil bilgileri analiz ediliyor...</p><div class="bc-progress"><i id="bcHealthFill"></i></div></div></div></div>
-        <div class="bc-overview-card"><div class="bc-card-head"><div><span>SON HAREKETLER</span><h3>Canlı aktivite</h3></div><button type="button" onclick="showBusinessSection('stats')">Tümünü gör →</button></div><div id="bcLiveMini" class="bc-list"><div class="bc-list-item"><div class="li-ico">…</div><div><strong>Aktiviteler yükleniyor</strong><span>Son hareketler hazırlanıyor</span></div></div></div></div>
+      <div id="bcOverviewModules" class="bc-overview-modules">
+<section id="liveSection" class="feature-box">
+  <div class="feature-head">
+    <div><div class="eyebrow">LIVE</div><h2>🔴 Canlı Takip</h2><p>İşletmenin son müşteri etkileşimlerini görüntüle.</p></div>
+    <button class="feature-btn" type="button" onclick="loadBusinessLive()">↻ Yenile</button>
+  </div>
+  <div class="live-kpis">
+    <div><small>SON 15 DK</small><strong id="live15">0</strong></div>
+    <div><small>SON 60 DK</small><strong id="live60">0</strong></div>
+    <div><small>BUGÜN</small><strong id="liveToday">0</strong></div>
+  </div>
+  <div id="liveActivityList" class="feature-list"><div class="feature-empty">Aktiviteler yükleniyor...</div></div>
+</section>
+
+<section id="aiSection" class="feature-box">
+  <div class="feature-head">
+    <div><div class="eyebrow">INTELLIGENCE</div><h2>🧠 LEO AI Insights</h2><p>Etkileşim verilerinden otomatik performans içgörüleri üretir.</p></div>
+    <div class="feature-periods">
+      <button type="button" class="active" onclick="loadAIInsights('7d',this)">7 Gün</button>
+      <button type="button" onclick="loadAIInsights('30d',this)">30 Gün</button>
+      <button type="button" onclick="loadAIInsights('all',this)">Tümü</button>
+    </div>
+  </div>
+  <div class="ai-score-row">
+    <div class="ai-score"><strong id="aiScore">0</strong><span id="aiTitle">Analiz hazırlanıyor</span></div>
+    <div class="ai-mini"><span>Dönüşüm</span><strong id="aiConversion">%0</strong></div>
+    <div class="ai-mini"><span>Yoğun saat</span><strong id="aiPeak">—</strong></div>
+    <div class="ai-mini"><span>Güçlü kaynak</span><strong id="aiSource">—</strong></div>
+  </div>
+  <div class="ai-columns">
+    <div><h3>İçgörüler</h3><div id="aiInsights" class="feature-list"><div class="feature-empty">Yükleniyor...</div></div></div>
+    <div><h3>Öneriler</h3><div id="aiRecommendations" class="feature-list"><div class="feature-empty">Yükleniyor...</div></div></div>
+  </div>
+</section>
       </div>
     </div>
 
@@ -4026,39 +4057,7 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 <!-- ==================================================
      LEO CONNECT BUSINESS CENTER MODULES
 ================================================== -->
-<section id="liveSection" class="feature-box">
-  <div class="feature-head">
-    <div><div class="eyebrow">LIVE</div><h2>🔴 Canlı Takip</h2><p>İşletmenin son müşteri etkileşimlerini görüntüle.</p></div>
-    <button class="feature-btn" type="button" onclick="loadBusinessLive()">↻ Yenile</button>
-  </div>
-  <div class="live-kpis">
-    <div><small>SON 15 DK</small><strong id="live15">0</strong></div>
-    <div><small>SON 60 DK</small><strong id="live60">0</strong></div>
-    <div><small>BUGÜN</small><strong id="liveToday">0</strong></div>
-  </div>
-  <div id="liveActivityList" class="feature-list"><div class="feature-empty">Aktiviteler yükleniyor...</div></div>
-</section>
 
-<section id="aiSection" class="feature-box">
-  <div class="feature-head">
-    <div><div class="eyebrow">INTELLIGENCE</div><h2>🧠 LEO AI Insights</h2><p>Etkileşim verilerinden otomatik performans içgörüleri üretir.</p></div>
-    <div class="feature-periods">
-      <button type="button" class="active" onclick="loadAIInsights('7d',this)">7 Gün</button>
-      <button type="button" onclick="loadAIInsights('30d',this)">30 Gün</button>
-      <button type="button" onclick="loadAIInsights('all',this)">Tümü</button>
-    </div>
-  </div>
-  <div class="ai-score-row">
-    <div class="ai-score"><strong id="aiScore">0</strong><span id="aiTitle">Analiz hazırlanıyor</span></div>
-    <div class="ai-mini"><span>Dönüşüm</span><strong id="aiConversion">%0</strong></div>
-    <div class="ai-mini"><span>Yoğun saat</span><strong id="aiPeak">—</strong></div>
-    <div class="ai-mini"><span>Güçlü kaynak</span><strong id="aiSource">—</strong></div>
-  </div>
-  <div class="ai-columns">
-    <div><h3>İçgörüler</h3><div id="aiInsights" class="feature-list"><div class="feature-empty">Yükleniyor...</div></div></div>
-    <div><h3>Öneriler</h3><div id="aiRecommendations" class="feature-list"><div class="feature-empty">Yükleniyor...</div></div></div>
-  </div>
-</section>
 
 <section id="profileDesign" class="box">
   <div class="box-head">
@@ -6951,7 +6950,7 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 
 <script id="leo-business-final-js">
 (function(){
-  const map={overview:{title:'Genel Bakış',ids:[]},profile:{title:'Profil',ids:['profile','profileDesign']},digital:{title:'QR & NFC',ids:['digital']},campaigns:{title:'Kampanyalar',ids:['campaignSection']},stats:{title:'İstatistikler',ids:['businessAnalyticsV3','performanceSection','liveSection','aiSection','reviewSection']}};
+  const map={overview:{title:'Genel Bakış',ids:[]},profile:{title:'Profil',ids:['profile','profileDesign']},digital:{title:'QR & NFC',ids:['digital']},campaigns:{title:'Kampanyalar',ids:['campaignSection']},stats:{title:'İstatistikler',ids:['businessAnalyticsV3','performanceSection','reviewSection']}};
   window.showBusinessSection=function(name){
     const cfg=map[name]||map.overview;
     document.querySelectorAll('.bc-view').forEach(v=>v.classList.toggle('active',v.dataset.view===name));
@@ -6968,18 +6967,14 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
     if(name==='digital' && typeof loadQR==='function'){try{loadQR()}catch(e){}}
     if(name==='digital' && typeof loadBusinessTableCodes==='function'){try{setTimeout(()=>loadBusinessTableCodes(),50)}catch(e){}}
     if(name==='campaigns' && typeof loadBusinessCampaigns==='function'){try{loadBusinessCampaigns()}catch(e){}}
-    if(name==='stats'){try{if(typeof loadBusinessAnalytics==='function')loadBusinessAnalytics('7d');if(typeof loadBusinessLive==='function')loadBusinessLive();if(typeof loadAIInsights==='function')loadAIInsights('7d');if(typeof loadReviewBooster==='function')loadReviewBooster();if(typeof startLiveRefresh==='function')startLiveRefresh()}catch(e){console.error('Business stats load error',e)}} else if(typeof stopLiveRefresh==='function')stopLiveRefresh();
+    if(name==='overview'){try{if(typeof loadBusinessLive==='function')loadBusinessLive();if(typeof loadAIInsights==='function')loadAIInsights('7d');if(typeof startLiveRefresh==='function')startLiveRefresh()}catch(e){console.error('Business overview live/AI load error',e)}} else if(name==='stats'){try{if(typeof loadBusinessAnalytics==='function')loadBusinessAnalytics('7d');if(typeof loadReviewBooster==='function')loadReviewBooster();if(typeof stopLiveRefresh==='function')stopLiveRefresh()}catch(e){console.error('Business stats load error',e)}} else if(typeof stopLiveRefresh==='function')stopLiveRefresh();
   };
   window.bcScrollTo=function(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});};
   window.bcSelectTheme=function(theme){const sel=document.getElementById('design_theme');if(!sel)return;sel.value=theme;sel.dispatchEvent(new Event('change',{bubbles:true}));const save=document.querySelector('#profileDesign .design-save-button, #profileDesign button[type=submit]');if(typeof updateDesignPreview==='function')updateDesignPreview();if(save)save.click();};
   function syncKpis(){
     const pairs=[['profileViews','bcKpiProfile'],['qrViews','bcKpiQR'],['nfcViews','bcKpiNFC'],['whatsappViews','bcKpiWA'],['phoneViews','bcKpiPhone'],['totalViews','bcKpiTotal']];
     pairs.forEach(([a,b])=>{const x=document.getElementById(a),y=document.getElementById(b);if(x&&y)y.textContent=x.textContent||'0';});
-    const hs=document.getElementById('healthScore'), ht=document.getElementById('healthTitle'), hm=document.getElementById('healthMessage'), hf=document.getElementById('healthFill');
-    if(hs){document.getElementById('bcScoreText').textContent=hs.textContent||'0';const n=Number(hs.textContent)||0;document.getElementById('bcScore').style.setProperty('--score',(n*3.6)+'deg');document.getElementById('bcHealthFill').style.width=n+'%';}
-    if(ht)document.getElementById('bcHealthTitle').textContent=ht.textContent; if(hm)document.getElementById('bcHealthMsg').textContent=hm.textContent;
   }
-  function syncLive(){const src=document.getElementById('liveActivityList'),dst=document.getElementById('bcLiveMini');if(!src||!dst)return;const items=[...src.querySelectorAll('.feature-item')].slice(0,5);if(!items.length)return;dst.innerHTML=items.map(x=>`<div class="bc-list-item"><div class="li-ico">⚡</div><div><strong>${x.querySelector('strong')?.textContent||'Aktivite'}</strong><span>Son hareket</span></div><div class="li-right">●</div></div>`).join('');}
   function boot(){
     const profileLink=document.getElementById('headerProfile');
     const topLink=document.getElementById('bcProfileLink');
