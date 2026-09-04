@@ -1526,163 +1526,17 @@ body{
   class="section hidden"
 >
 
-
   <div class="section-title">
-
     <div class="section-icon">
       ✨
     </div>
-
     <div>
-
-      <strong>
-        Dijital Kanallar
-      </strong>
-
-      <span>
-        İşletmeyi online keşfet
-      </span>
-
+      <strong>Dijital Kanallar</strong>
+      <span>İşletmenin bağladığı tüm kanallar</span>
     </div>
-
   </div>
 
-
-  <div class="link-grid">
-
-
-    <a
-      id="instagramLink"
-      class="link hidden"
-      target="_blank"
-      rel="noopener"
-    >
-
-      <div class="link-icon">
-        📸
-      </div>
-
-      <div class="link-text">
-
-        <strong>
-          Instagram
-        </strong>
-
-        <span>
-          Instagram profilini aç
-        </span>
-
-      </div>
-
-    </a>
-
-
-    <a
-      id="tiktokLink"
-      class="link hidden"
-      target="_blank"
-      rel="noopener"
-    >
-
-      <div class="link-icon">
-        🎵
-      </div>
-
-      <div class="link-text">
-
-        <strong>
-          TikTok
-        </strong>
-
-        <span>
-          TikTok profilini aç
-        </span>
-
-      </div>
-
-    </a>
-
-
-    <a
-      id="googleLink"
-      class="link hidden"
-      target="_blank"
-      rel="noopener"
-    >
-
-      <div class="link-icon">
-        ⭐
-      </div>
-
-      <div class="link-text">
-
-        <strong>
-          Google'da Değerlendir
-        </strong>
-
-        <span>
-          Deneyimini paylaş
-        </span>
-
-      </div>
-
-    </a>
-
-
-    <a
-      id="websiteLink"
-      class="link hidden"
-      target="_blank"
-      rel="noopener"
-    >
-
-      <div class="link-icon">
-        🌐
-      </div>
-
-      <div class="link-text">
-
-        <strong>
-          Web Sitesi
-        </strong>
-
-        <span>
-          İnternet sitesini aç
-        </span>
-
-      </div>
-
-    </a>
-
-
-    <a
-      id="menuLink"
-      class="link hidden"
-      target="_blank"
-      rel="noopener"
-    >
-
-      <div class="link-icon">
-        📋
-      </div>
-
-      <div class="link-text">
-
-        <strong>
-          Menü
-        </strong>
-
-        <span>
-          Menüyü görüntüle
-        </span>
-
-      </div>
-
-    </a>
-
-
-  </div>
-
+  <div id="dynamicDigitalChannels" class="link-grid"></div>
 
 </section>
 
@@ -2244,6 +2098,86 @@ function renderLogo(){
 
 
 /* ==================================================
+   DIGITAL CHANNELS — V2 INTEGRATION
+================================================== */
+
+function renderDigitalChannels(){
+  const section=document.getElementById("socialSection");
+  const mount=document.getElementById("dynamicDigitalChannels");
+  if(!section || !mount || !business) return;
+
+  const names={
+    instagram:"Instagram",facebook:"Facebook",tiktok:"TikTok",youtube:"YouTube",
+    linkedin:"LinkedIn",x:"X",whatsapp:"WhatsApp",google:"Google",website:"Website",
+    yemeksepeti:"Yemeksepeti",getir:"Getir",'trendyol-yemek':"Trendyol Yemek",
+    'migros-yemek':"Migros Yemek",rezervasyon:"Rezervasyon",bilet:"Bilet / Etkinlik",
+    menu:"Online Menü",location:"Konum",tripadvisor:"Tripadvisor",booking:"Booking",
+    telegram:"Telegram",email:"E-posta"
+  };
+
+  const iconSlug={
+    instagram:"instagram",facebook:"facebook",tiktok:"tiktok",youtube:"youtube",
+    linkedin:"linkedin",x:"x",whatsapp:"whatsapp",google:"google",website:"globe",
+    yemeksepeti:"yemeksepeti",getir:"getir",'trendyol-yemek':"trendyol",
+    'migros-yemek':"migros",rezervasyon:"calendar",bilet:"ticket",
+    menu:"book-open",location:"map-pin",tripadvisor:"tripadvisor",booking:"booking-com",
+    telegram:"telegram",email:"gmail"
+  };
+
+  const legacyMap={instagram:"instagram",tiktok:"tiktok",whatsapp:"whatsapp",google:"google_review",website:"website",menu:"menu"};
+  const links=(business.social_links && typeof business.social_links==='object') ? business.social_links : {};
+  const allowed=(business.social_platform_permissions && typeof business.social_platform_permissions==='object') ? business.social_platform_permissions : {};
+  const custom=Array.isArray(business.custom_links) ? business.custom_links : [];
+
+  const rows=[];
+  Object.keys(names).forEach(key=>{
+    if(Object.keys(allowed).length && allowed[key]===false) return;
+    const item=links[key] || {};
+    let url=typeof item==='string' ? item : item.url;
+    if(!url && legacyMap[key]) url=business[legacyMap[key]] || '';
+    url=String(url||'').trim();
+    if(!url) return;
+    if(typeof item==='object' && item.enabled===false && !legacyMap[key]) return;
+    rows.push({key,name:names[key],url});
+  });
+
+  custom.forEach((item,i)=>{
+    const url=String(item?.url||'').trim();
+    const title=String(item?.title||'').trim();
+    if(url && title) rows.push({key:'custom-'+i,name:title,url,custom:true,icon:item?.icon||'🔗'});
+  });
+
+  mount.innerHTML=rows.map(row=>{
+    const icon=row.custom
+      ? `<span style="font-size:24px">${escProfile(row.icon)}</span>`
+      : `<img class="brand-icon-svg" src="https://cdn.simpleicons.org/${encodeURIComponent(iconSlug[row.key]||row.key)}/FFFFFF" alt="${escProfile(row.name)}" width="24" height="24" loading="lazy">`;
+    return `<a class="link" href="${safeUrl(row.url)||'#'}" target="_blank" rel="noopener" data-digital-key="${escProfile(row.key)}">
+      <div class="link-icon">${icon}</div>
+      <div class="link-text"><strong>${escProfile(row.name)}</strong><span>Bağlantıyı aç</span></div>
+    </a>`;
+  }).join('');
+
+  if(!rows.length){
+    mount.innerHTML='';
+    section.classList.add('hidden');
+    return;
+  }
+
+  section.classList.remove('hidden');
+  mount.querySelectorAll('[data-digital-key]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const key=el.getAttribute('data-digital-key');
+      const eventKey=key==='google'?'google_review':key;
+      if(['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google_review','website','yemeksepeti','getir','trendyol-yemek','migros-yemek','rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email'].includes(eventKey)) track(eventKey);
+    });
+  });
+}
+
+function escProfile(value){
+  return String(value??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+/* ==================================================
    LINK HELPER
 ================================================== */
 
@@ -2393,6 +2327,7 @@ function renderDynamicProfile(){
         const btn=wrap.querySelector('.smart-campaign-button');
         if(buttonUrl && c.button_text){btn.href=buttonUrl;btn.textContent=String(c.button_text);btn.classList.add('show');btn.addEventListener('click',()=>track('campaign_click'));}
         smartBox.appendChild(wrap);
+        track('campaign_view');
       });
     }
   }
@@ -2740,85 +2675,10 @@ function render(){
   }
 
 
-  /* SOCIAL */
+  /* DIGITAL CHANNELS — BUSINESS → CUSTOMER PROFILE */
 
-  let socialCount = 0;
+  renderDigitalChannels();
 
-
-  if(
-    setupLink(
-      "instagramLink",
-      business.instagram,
-      "instagram"
-    )
-  ){
-
-    socialCount++;
-
-  }
-
-
-  if(
-    setupLink(
-      "tiktokLink",
-      business.tiktok,
-      "tiktok"
-    )
-  ){
-
-    socialCount++;
-
-  }
-
-
-  if(
-    setupLink(
-      "googleLink",
-      business.google_review,
-      "google_review"
-    )
-  ){
-
-    socialCount++;
-
-  }
-
-
-  if(
-    setupLink(
-      "websiteLink",
-      business.website,
-      "website"
-    )
-  ){
-
-    socialCount++;
-
-  }
-
-
-  if(
-    setupLink(
-      "menuLink",
-      business.menu,
-      "menu"
-    )
-  ){
-
-    socialCount++;
-
-  }
-
-
-  if(socialCount){
-
-    document.getElementById(
-      "socialSection"
-    ).classList.remove(
-      "hidden"
-    );
-
-  }
 
 
   /* CONTACT */
