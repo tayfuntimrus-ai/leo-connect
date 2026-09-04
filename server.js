@@ -2941,7 +2941,13 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
       FROM events e
       LEFT JOIN nfc_tags t ON t.id=e.nfc_tag_id
       WHERE e.business_id=$1
-        AND e.type <> 'campaign_view'
+        AND e.type IN (
+          'qr_scan','qr','nfc',
+          'instagram','facebook','tiktok','youtube','linkedin','x',
+          'whatsapp','google_review','website','yemeksepeti','getir',
+          'trendyol-yemek','migros-yemek','rezervasyon','bilet','menu',
+          'location','tripadvisor','booking','telegram','email'
+        )
       ORDER BY e.created_at DESC
       LIMIT $2
     `, [req.user.id, limit]);
@@ -2950,7 +2956,15 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
         COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '15 minutes')::int AS last_15m,
         COUNT(*) FILTER (WHERE created_at >= NOW()-INTERVAL '60 minutes')::int AS last_60m,
         COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE)::int AS today
-      FROM events WHERE business_id=$1 AND type <> 'campaign_view'
+      FROM events
+      WHERE business_id=$1
+        AND type IN (
+          'qr_scan','qr','nfc',
+          'instagram','facebook','tiktok','youtube','linkedin','x',
+          'whatsapp','google_review','website','yemeksepeti','getir',
+          'trendyol-yemek','migros-yemek','rezervasyon','bilet','menu',
+          'location','tripadvisor','booking','telegram','email'
+        )
     `, [req.user.id]);
     res.json({activities: result.rows, stats: stats.rows[0] || {last_15m:0,last_60m:0,today:0}});
   } catch(error) {
@@ -3142,18 +3156,32 @@ app.post('/api/event/:slug', async (req, res) => {
       'whatsapp',
       'phone',
       'instagram',
+      'facebook',
       'tiktok',
-      'website',
-      'menu',
+      'youtube',
+      'linkedin',
+      'x',
       'google_review',
+      'website',
+      'yemeksepeti',
+      'getir',
+      'trendyol-yemek',
+      'migros-yemek',
+      'rezervasyon',
+      'bilet',
+      'menu',
+      'location',
+      'tripadvisor',
+      'booking',
+      'telegram',
+      'email',
+      'share',
+      'iban',
       'review_open',
       'review_positive',
       'review_feedback',
       'campaign_view',
-      'campaign_click',
-      'location',
-      'iban',
-      'share'
+      'campaign_click'
     ];
 
     const allowedSources = ['', 'direct', 'qr', 'nfc'];
@@ -3192,10 +3220,17 @@ app.post('/api/event/:slug', async (req, res) => {
 
     let nfcTagId = null;
 
-    if (source === 'nfc') {
+    /*
+      Masa / nokta QR ve NFC bağlantıları aynı nfc_tags kaydını
+      kullanır. Böylece masadan gelen tüm sonraki dijital aksiyonlar
+      da aynı masaya bağlanır.
+    */
+    if (source === 'nfc' || source === 'qr') {
       if (!nfcCode) {
         return res.status(400).json({
-          error: 'NFC kodu gerekli'
+          error: source === 'qr'
+            ? 'QR masa kodu gerekli'
+            : 'NFC kodu gerekli'
         });
       }
 
@@ -3213,7 +3248,9 @@ app.post('/api/event/:slug', async (req, res) => {
 
       if (!tag.rows.length) {
         return res.status(400).json({
-          error: 'NFC etiketi doğrulanamadı'
+          error: source === 'qr'
+            ? 'QR masa kodu doğrulanamadı'
+            : 'NFC etiketi doğrulanamadı'
         });
       }
 
