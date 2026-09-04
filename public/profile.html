@@ -1516,7 +1516,6 @@ function renderReviewBooster(){
       stars.appendChild(b);
     }
   }
-  trackReviewEvent("review_open");
 }
 
 function handleReviewRating(rating){
@@ -1591,12 +1590,10 @@ async function getBusiness(){
 
   if(
     pathParts[0] === "p" &&
-    pathParts[1] === "nfc"
+    pathParts[1] === "nfc" &&
+    source !== "qr"
   ){
-    source =
-      source === "qr"
-        ? "qr"
-        : "nfc";
+    source = "nfc";
   }
 
   let endpoint = "";
@@ -1717,7 +1714,7 @@ async function track(
             type,
             source: source || 'direct',
             nfc_code:
-              (source === 'nfc' || source === 'qr')
+              source === 'nfc'
                 ? nfcCode
                 : ''
           })
