@@ -1932,6 +1932,7 @@ function renderReviewBooster(){
       stars.appendChild(b);
     }
   }
+  trackReviewEvent("review_open");
 }
 
 function handleReviewRating(rating){
@@ -1954,7 +1955,6 @@ function handleReviewRating(rating){
     a.target="_blank";
     a.rel="noopener";
     a.textContent="★ Google'da Değerlendir";
-    a.addEventListener("click",()=>trackReviewEvent("google_review"));
     if(actions) actions.appendChild(a);
     return;
   }
@@ -1968,7 +1968,6 @@ function handleReviewRating(rating){
     a.target="_blank";
     a.rel="noopener";
     a.textContent="💬 Bize Ulaş";
-    a.addEventListener("click",()=>trackReviewEvent("whatsapp"));
     if(actions) actions.appendChild(a);
   }else if(google){
     const a=document.createElement("a");
@@ -1977,7 +1976,6 @@ function handleReviewRating(rating){
     a.target="_blank";
     a.rel="noopener";
     a.textContent="★ Değerlendir";
-    a.addEventListener("click",()=>trackReviewEvent("google_review"));
     if(actions) actions.appendChild(a);
   }
 }
@@ -2395,7 +2393,6 @@ function renderDynamicProfile(){
         const btn=wrap.querySelector('.smart-campaign-button');
         if(buttonUrl && c.button_text){btn.href=buttonUrl;btn.textContent=String(c.button_text);btn.classList.add('show');btn.addEventListener('click',()=>track('campaign_click'));}
         smartBox.appendChild(wrap);
-        track('campaign_view');
       });
     }
   }
