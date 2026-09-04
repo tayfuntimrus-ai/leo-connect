@@ -1,3 +1,5 @@
+.profile-content-box{margin-top:16px}.profile-content-divider{border-top:1px solid var(--bc-line);padding-top:16px}.profile-content-box .design-toggle{min-height:38px}.profile-content-box .design-save-row{margin-top:14px}
+
 <!doctype html>
 <html lang="tr">
 
@@ -6052,15 +6054,30 @@ function formatEventType(type){
     whatsapp:{icon:"💬",label:"WhatsApp'a tıklandı"},
     phone:{icon:"☎️",label:"Telefon numarasına tıklandı"},
     instagram:{icon:"📸",label:"Instagram'a tıklandı"},
+    facebook:{icon:"📘",label:"Facebook'a tıklandı"},
     tiktok:{icon:"🎵",label:"TikTok'a tıklandı"},
+    youtube:{icon:"▶️",label:"YouTube'a tıklandı"},
+    linkedin:{icon:"💼",label:"LinkedIn'e tıklandı"},
+    x:{icon:"𝕏",label:"X'e tıklandı"},
     google_review:{icon:"⭐",label:"Google yorumlarına gidildi"},
-    review_open:{icon:"⭐",label:"Yorum sayfası açıldı"},
-    review_positive:{icon:"👍",label:"Olumlu yorum seçildi"},
-    review_feedback:{icon:"💬",label:"Yorum geri bildirimi gönderildi"},
     website:{icon:"🌐",label:"Web sitesine tıklandı"},
+    yemeksepeti:{icon:"🍴",label:"Yemeksepeti'ne tıklandı"},
+    getir:{icon:"🛵",label:"Getir'e tıklandı"},
+    "trendyol-yemek":{icon:"🟠",label:"Trendyol Yemek'e tıklandı"},
+    "migros-yemek":{icon:"🛒",label:"Migros Yemek'e tıklandı"},
+    rezervasyon:{icon:"📅",label:"Rezervasyona tıklandı"},
+    bilet:{icon:"🎟️",label:"Bilete tıklandı"},
     menu:{icon:"📋",label:"Menü açıldı"},
     location:{icon:"📍",label:"Konum açıldı"},
+    tripadvisor:{icon:"🧭",label:"Tripadvisor'a tıklandı"},
+    booking:{icon:"🏨",label:"Booking'e tıklandı"},
+    telegram:{icon:"✈️",label:"Telegram'a tıklandı"},
+    email:{icon:"✉️",label:"E-posta'ya tıklandı"},
+    iban:{icon:"🏦",label:"IBAN görüntülendi"},
     share:{icon:"↗️",label:"Profil paylaşıldı"},
+    review_open:{icon:"⭐",label:"Yorum alanı açıldı"},
+    review_positive:{icon:"👍",label:"Olumlu yorum seçildi"},
+    review_feedback:{icon:"💬",label:"Yorum geri bildirimi gönderildi"},
     campaign_view:{icon:"🚀",label:"Kampanya görüntülendi"},
     campaign_click:{icon:"🚀",label:"Kampanyaya tıklandı"}
   };
@@ -6092,8 +6109,11 @@ async function loadBusinessLive(){
   document.getElementById("liveActivityList").innerHTML=rows.length
     ? rows.map(x=>{
         const time=x.created_at?new Date(x.created_at).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
-        const extra=x.nfc_name?` • ${esc(x.nfc_name)}`:"";
-        return `<div class="feature-item"><strong>${esc(formatEventType(x.type))}</strong>${extra}<span style="float:right;color:#666">${esc(time)}</span></div>`;
+        const label=esc(formatEventType(x.type));
+        const itemLabel=x.nfc_name
+          ? `<strong>${esc(x.nfc_name)}</strong><span> / ${label}</span>`
+          : `<strong>${label}</strong>`;
+        return `<div class="feature-item">${itemLabel}<span style="float:right;color:#666">${esc(time)}</span></div>`;
       }).join("")
     : '<div class="feature-empty">Henüz aktivite yok.</div>';
 }
