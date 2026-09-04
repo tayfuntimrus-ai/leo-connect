@@ -1,3 +1,5 @@
+.profile-content-box{margin-top:16px}.profile-content-divider{border-top:1px solid var(--bc-line);padding-top:16px}.profile-content-box .design-toggle{min-height:38px}.profile-content-box .design-save-row{margin-top:14px}
+
 <!doctype html>
 <html lang="tr">
 
@@ -3268,70 +3270,47 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 
 
   <div class="form-grid">
-    <div class="field">
-
-      <label>
-        ÇALIŞMA SAATLERİ
-      </label>
-
-      <input
-        id="hours"
-        placeholder="11:00 - 23:59"
-      >
-
-    </div>
-
-
 
     <div class="field">
-
-      <label>
-        IBAN
-      </label>
-
-      <input
-        id="iban"
-        placeholder="TR..."
-      >
-
+      <label>İŞLETME ADI</label>
+      <input id="name" placeholder="İşletme adı">
     </div>
-
-
 
     <div class="field">
-
-      <label>
-        IBAN SAHİBİ
-      </label>
-
-      <input
-        id="iban_holder"
-        placeholder="Ad Soyad"
-      >
-
+      <label>KATEGORİ</label>
+      <input id="category" placeholder="Restoran, Klinik, Kuaför...">
     </div>
-
-
 
     <div class="field full">
-
-      <label>
-        LOGO GÖRSEL URL
-      </label>
-
-      <input
-        id="logo_url"
-        placeholder="https://..."
-        oninput="previewLogo()"
-      >
-
-      <span class="field-hint">
-        Logo bağlantısını eklediğinde üstteki önizleme güncellenir.
-      </span>
-
+      <label>İŞLETME AÇIKLAMASI</label>
+      <textarea id="description" placeholder="İşletmen hakkında kısa açıklama..."></textarea>
     </div>
 
+    <div class="field">
+      <label>TELEFON</label>
+      <input id="phone" placeholder="05XXXXXXXXX">
+    </div>
 
+    <div class="field">
+      <label>ÇALIŞMA SAATLERİ</label>
+      <input id="hours" placeholder="11:00 - 23:59">
+    </div>
+
+    <div class="field">
+      <label>IBAN</label>
+      <input id="iban" placeholder="TR...">
+    </div>
+
+    <div class="field">
+      <label>IBAN SAHİBİ</label>
+      <input id="iban_holder" placeholder="Ad Soyad">
+    </div>
+
+    <div class="field full">
+      <label>LOGO GÖRSEL URL</label>
+      <input id="logo_url" placeholder="https://..." oninput="previewLogo()">
+      <span class="field-hint">Logo bağlantısını eklediğinde üstteki önizleme güncellenir.</span>
+    </div>
 
   </div>
 
@@ -3354,6 +3333,101 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 
 </section>
 
+
+<!-- ==================================================
+     CUSTOMER PROFILE CONTENT
+================================================== -->
+<section id="profileContent" class="box profile-content-box">
+  <div class="box-head">
+    <div>
+      <div class="eyebrow">MÜŞTERİ PROFİLİ</div>
+      <h2>Profil İçeriği</h2>
+      <p>Müşterinin profilinde işletmenle ilgili öne çıkan içerikleri yönet.</p>
+    </div>
+  </div>
+
+  <div class="design-grid">
+    <div class="design-field full">
+      <label>DUYURU</label>
+      <div class="design-toggle">
+        <span>Profildə duyuruyu göster</span>
+        <label class="switch">
+          <input id="design_announcement_enabled" type="checkbox">
+          <span class="switch-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="design-field full">
+      <label>DUYURU METNİ</label>
+      <input id="design_announcement_text" maxlength="180" placeholder="Bugün 23:00'e kadar açığız...">
+    </div>
+
+    <div class="design-field full profile-content-divider">
+      <label>ÖNE ÇIKAN İÇERİK</label>
+      <div class="design-toggle">
+        <span>Öne çıkan alanı müşteri profilinde göster</span>
+        <label class="switch">
+          <input id="design_featured_enabled" type="checkbox">
+          <span class="switch-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="design-field full">
+      <label>ÖNE ÇIKAN BAŞLIK</label>
+      <input id="design_featured_title" maxlength="90" placeholder="Öne çıkan ürünün veya hizmetin">
+    </div>
+
+    <div class="design-field full">
+      <label>ÖNE ÇIKAN AÇIKLAMA</label>
+      <textarea id="design_featured_text" maxlength="240" placeholder="Müşterinin ilk görmesini istediğin içeriği anlat..."></textarea>
+    </div>
+
+    <div class="design-field">
+      <label>ÖNE ÇIKAN GÖRSEL URL</label>
+      <input id="design_featured_image_url" placeholder="https://...">
+    </div>
+
+    <div class="design-field">
+      <label>BUTON</label>
+      <input id="design_featured_button_text" maxlength="40" placeholder="İncele">
+    </div>
+
+    <div class="design-field full">
+      <label>BUTON URL</label>
+      <input id="design_featured_button_url" placeholder="https://...">
+    </div>
+
+    <div class="design-field full profile-content-divider">
+      <label>GALERİ</label>
+      <textarea id="design_gallery" placeholder="Her satıra bir görsel URL'si yaz.
+https://...
+https://..."></textarea>
+      <div class="design-help">En fazla 30 görsel. Müşteri profilinde galeri olarak gösterilir.</div>
+    </div>
+
+    <div class="design-field full">
+      <label>VİDEO</label>
+      <div class="design-toggle">
+        <span>Video alanını müşteri profilinde göster</span>
+        <label class="switch">
+          <input id="design_video_enabled" type="checkbox">
+          <span class="switch-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="design-field full">
+      <input id="design_video_url" placeholder="https://youtube.com/...">
+    </div>
+  </div>
+
+  <div class="design-save-row">
+    <button id="profileContentSaveButton" class="design-save-button" type="button" onclick="saveProfileContent()">✓ Profil İçeriğini Kaydet</button>
+    <div id="profileContentMessage"></div>
+  </div>
+</section>
 
 
 <!-- ==================================================
@@ -4119,7 +4193,6 @@ const fields = [
   "description",
 
   "phone",
-  "whatsapp",
 
   "iban",
   "iban_holder",
@@ -5054,7 +5127,7 @@ function applyPermissions(business){
 
   setDisplay("quickQR",p.qr);setDisplay("quickNFC",p.nfc);
   setDisplay("qrCard",p.qr);setDisplay("nfcCard",p.nfc);setDisplay("digital",p.qr||p.nfc);
-  setDisplay("profile",p.profile);setDisplay("saveButton",p.profile);
+  setDisplay("profile",p.profile);setDisplay("saveButton",p.profile);setDisplay("profileContent",p.profile);
   document.querySelectorAll('a[href="#profile"]').forEach(el=>el.style.display=p.profile?"":"none");
 
   const qrStat=document.getElementById("qrViews")?.closest(".stat");
@@ -5084,6 +5157,135 @@ function applyPermissions(business){
       }
     }
   });
+}
+
+/* ==================================================
+   CUSTOMER PROFILE CONTENT
+================================================== */
+let profileContentState = {
+  announcement_text: '',
+  announcement_enabled: false,
+  featured_title: '',
+  featured_text: '',
+  featured_image_url: '',
+  featured_button_text: '',
+  featured_button_url: '',
+  featured_enabled: false,
+  gallery: [],
+  video_url: '',
+  video_enabled: false
+};
+
+function setProfileContentField(id, value){
+  const el = document.getElementById(id);
+  if(el) el.value = value ?? '';
+}
+
+function loadProfileContentIntoForm(data){
+  const d = data || {};
+  profileContentState = {
+    ...profileContentState,
+    announcement_text: String(d.announcement_text || ''),
+    announcement_enabled: d.announcement_enabled === true,
+    featured_title: String(d.featured_title || ''),
+    featured_text: String(d.featured_text || ''),
+    featured_image_url: String(d.featured_image_url || ''),
+    featured_button_text: String(d.featured_button_text || ''),
+    featured_button_url: String(d.featured_button_url || ''),
+    featured_enabled: d.featured_enabled === true,
+    gallery: Array.isArray(d.gallery) ? d.gallery : [],
+    video_url: String(d.video_url || ''),
+    video_enabled: d.video_enabled === true
+  };
+
+  setProfileContentField('design_announcement_text', profileContentState.announcement_text);
+  setProfileContentField('design_featured_title', profileContentState.featured_title);
+  setProfileContentField('design_featured_text', profileContentState.featured_text);
+  setProfileContentField('design_featured_image_url', profileContentState.featured_image_url);
+  setProfileContentField('design_featured_button_text', profileContentState.featured_button_text);
+  setProfileContentField('design_featured_button_url', profileContentState.featured_button_url);
+  setProfileContentField('design_video_url', profileContentState.video_url);
+  setProfileContentField(
+    'design_gallery',
+    profileContentState.gallery.map(item => typeof item === 'string' ? item : item?.url || '').filter(Boolean).join('\n')
+  );
+
+  const checks = [
+    ['design_announcement_enabled', profileContentState.announcement_enabled],
+    ['design_featured_enabled', profileContentState.featured_enabled],
+    ['design_video_enabled', profileContentState.video_enabled]
+  ];
+  checks.forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if(el) el.checked = value === true;
+  });
+}
+
+async function loadProfileContent(){
+  if(!currentBusiness?.permissions?.profile) return;
+  try{
+    const data = await api('/api/business-profile-design?fresh='+Date.now(), {cache:'no-store'});
+    if(data && !data.error) loadProfileContentIntoForm(data);
+  }catch(error){
+    console.error('PROFILE CONTENT LOAD ERROR:', error);
+  }
+}
+
+async function saveProfileContent(){
+  const button = document.getElementById('profileContentSaveButton');
+  const message = document.getElementById('profileContentMessage');
+  const value = id => document.getElementById(id)?.value?.trim() || '';
+  const checked = id => document.getElementById(id)?.checked === true;
+
+  const payload = {
+    ...profileContentState,
+    announcement_text: value('design_announcement_text'),
+    announcement_enabled: checked('design_announcement_enabled'),
+    featured_title: value('design_featured_title'),
+    featured_text: value('design_featured_text'),
+    featured_image_url: value('design_featured_image_url'),
+    featured_button_text: value('design_featured_button_text'),
+    featured_button_url: value('design_featured_button_url'),
+    featured_enabled: checked('design_featured_enabled'),
+    gallery: value('design_gallery').split(/\r?\n/).map(x => x.trim()).filter(Boolean).slice(0,30).map(url => ({url})),
+    video_url: value('design_video_url'),
+    video_enabled: checked('design_video_enabled')
+  };
+
+  button?.classList.add('loading');
+  if(button) button.textContent = 'Kaydediliyor...';
+  if(message) message.textContent = '';
+
+  try{
+    const current = await api('/api/business-profile-design?fresh='+Date.now(), {cache:'no-store'});
+    if(current?.error) throw new Error(current.error);
+
+    const merged = {
+      ...current,
+      ...payload,
+      theme: current.theme || 'midnight-gold',
+      accent_color: current.accent_color || '#D4AF37',
+      cover_url: current.cover_url || '',
+      cover_position: current.cover_position || 'center',
+      business_brand_enabled: current.business_brand_enabled !== false
+    };
+
+    const result = await api('/api/business-profile-design', {
+      method:'PUT',
+      body: JSON.stringify(merged)
+    });
+
+    if(result?.error) throw new Error(result.error);
+    loadProfileContentIntoForm(result);
+    if(message) message.textContent = 'Kaydedildi.';
+    showToast('Profil içeriği güncellendi.');
+  }catch(error){
+    if(message) message.textContent = error?.message || 'Kaydedilemedi.';
+    showToast(error?.message || 'Profil içeriği kaydedilemedi.');
+  }finally{
+    button?.classList.remove('loading');
+    if(button) button.textContent = '✓ Profil İçeriğini Kaydet';
+  }
 }
 
 /* ==================================================
@@ -5200,6 +5402,7 @@ async function load(){
 
 
   previewLogo();
+  loadProfileContent();
 
 
 
