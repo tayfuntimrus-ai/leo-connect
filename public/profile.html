@@ -92,66 +92,6 @@ body{
 
 
 /* ==================================================
-   TOP BRAND
-================================================== */
-
-.top-brand{
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:9px;
-
-  margin-bottom:22px;
-
-}
-
-
-.brand-lion{
-
-  width:38px;
-
-  height:38px;
-
-  display:grid;
-
-  place-items:center;
-
-  border-radius:12px;
-
-  background:#050505;
-
-  border:
-    1px solid #c59a5260;
-
-  font-size:21px;
-
-}
-
-
-.brand-name{
-
-  font-size:13px;
-
-  font-weight:800;
-
-  letter-spacing:.15em;
-
-}
-
-
-.brand-name span{
-
-  color:
-    var(--gold-light);
-
-}
-
-
-/* ==================================================
    HERO
 ================================================== */
 
@@ -1050,15 +990,6 @@ body{
     #070707 !important;
 }
 .page{max-width:720px !important; padding-top:18px !important;}
-.top-brand{
-  position:sticky;top:10px;z-index:20;
-  width:max-content;margin:0 auto 18px !important;
-  padding:9px 15px !important;border:1px solid var(--lc-border);
-  border-radius:999px;background:rgba(8,8,8,.78);backdrop-filter:blur(16px);
-  box-shadow:0 12px 35px rgba(0,0,0,.35), inset 0 0 18px rgba(214,173,85,.035);
-}
-.brand-lion{filter:drop-shadow(0 0 12px rgba(214,173,85,.25));}
-.brand-name{letter-spacing:.12em !important;}
 .hero{
   position:relative;overflow:hidden;margin-top:4px !important;
   padding:44px 24px 30px !important;border:1px solid var(--lc-border);
@@ -1135,6 +1066,46 @@ body{
 }
 
 
+
+
+
+/* ==================================================
+   PROFILE BRAND POSITION
+================================================== */
+.page{
+  display:flex;
+  flex-direction:column;
+}
+.footer{
+  margin-top:32px !important;
+  padding:30px 12px 34px !important;
+  border-top:1px solid rgba(197,154,82,.28);
+  text-align:center;
+  color:var(--gold-light);
+  font-size:10px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+}
+.footer::before{
+  content:'🦁';
+  display:block;
+  width:38px;
+  height:38px;
+  margin:0 auto 10px;
+  padding-top:9px;
+  border:1px solid rgba(197,154,82,.5);
+  border-radius:12px;
+  background:rgba(197,154,82,.06);
+  box-shadow:0 0 24px rgba(197,154,82,.08);
+  font-size:18px;
+  letter-spacing:0;
+}
+.footer .powered{
+  margin-top:9px;
+  color:#8f774f;
+  font-size:8px;
+  letter-spacing:.16em;
+}
 
 /* ==================================================
    LEO CONNECT V2 — DYNAMIC PROFILE
@@ -1270,24 +1241,6 @@ body{
 
 
 <div class="page">
-
-
-<!-- ==================================================
-     BRAND
-================================================== -->
-
-<div class="top-brand">
-
-  <div class="brand-lion">
-    🦁
-  </div>
-
-  <div class="brand-name">
-    LEO <span>CONNECT</span>
-  </div>
-
-</div>
-
 
 
 <!-- ==================================================
@@ -2945,5 +2898,3 @@ getBusiness();
 </body>
 
 </html>
-
-
