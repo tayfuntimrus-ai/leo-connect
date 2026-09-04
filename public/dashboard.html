@@ -2485,15 +2485,11 @@ main{
 
 
 /* ==================================================
-   PROFILE CONTROL CENTER — CONNECTION FIRST UI
+   DIGITAL CHANNELS
 ================================================== */
-.profile-control-center{margin:0 0 18px;padding:20px;border:1px solid #c59a5238;border-radius:20px;background:linear-gradient(145deg,#15120d,#0d0d0d);box-shadow:0 18px 50px rgba(0,0,0,.24)}
-.pcc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.pcc-head h3{margin:6px 0 4px;font-size:19px}.pcc-head p{margin:0;color:#777;font-size:10px;line-height:1.5}.pcc-badge{padding:6px 9px;border-radius:999px;border:1px solid #c59a5240;background:#c59a5212;color:#e0bd7b;font-size:8px;font-weight:900;white-space:nowrap}
-.pcc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:16px}.pcc-card{min-height:132px;text-align:left;border:1px solid #292929;background:#101010;color:#fff;border-radius:15px;padding:15px;cursor:pointer;transition:.18s}.pcc-card:hover{transform:translateY(-2px);border-color:#c59a5260;background:#141414}.pcc-icon{display:grid;place-items:center;width:35px;height:35px;border-radius:11px;background:#c59a5212;border:1px solid #c59a5230;font-size:17px;margin-bottom:12px}.pcc-card strong{display:block;font-size:11px}.pcc-card small{display:block;color:#666;font-size:9px;line-height:1.45;margin-top:5px;min-height:27px}.pcc-card b{display:block;color:#e0bd7b;font-size:9px;margin-top:9px}
-.pcc-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.pcc-panel{margin-top:12px;padding:15px;border:1px solid #292929;border-radius:15px;background:#0b0b0b}.pcc-panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.pcc-panel-head strong{font-size:12px}.pcc-panel-head span{font-size:9px;color:#666}.pcc-conn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pcc-conn{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px;border:1px solid #292929;border-radius:12px;background:#101010}.pcc-conn-main{display:flex;align-items:center;gap:9px;min-width:0}.pcc-conn-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#171717}.pcc-conn-main strong{display:block;font-size:10px}.pcc-conn-main small{display:block;color:#666;font-size:8px;margin-top:2px;max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pcc-connect{border:1px solid #3b3322;background:#17130c;color:#e0bd7b;border-radius:9px;padding:7px 9px;font-size:8px;font-weight:900;cursor:pointer;white-space:nowrap}.pcc-connect.on{border-color:#3f6f4e;background:#102016;color:#70d08d}
-.pcc-theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.pcc-theme{padding:12px;border:1px solid #292929;border-radius:12px;background:#101010;color:#fff;text-align:left;cursor:pointer}.pcc-theme strong{display:block;font-size:10px}.pcc-theme small{display:block;color:#666;font-size:8px;margin-top:4px}.pcc-theme.active{border-color:#c59a5270;background:#c59a5212}.pcc-custom{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}.pcc-custom input{flex:1;min-width:140px;border:1px solid #292929;border-radius:9px;background:#101010;color:#fff;padding:9px;font-size:9px}.pcc-custom button{border:1px solid #c59a5250;background:#c59a5212;color:#e0bd7b;border-radius:9px;padding:9px 11px;font-size:9px;font-weight:800}
-@media(max-width:900px){.pcc-grid{grid-template-columns:1fr 1fr}.pcc-conn-grid{grid-template-columns:1fr 1fr}.pcc-theme-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.pcc-head{display:block}.pcc-badge{display:inline-block;margin-top:10px}.pcc-grid,.pcc-conn-grid,.pcc-theme-grid{grid-template-columns:1fr}.pcc-actions .action{flex:1}}
+.pcc-panel{padding:15px;border:1px solid #292929;border-radius:15px;background:#0b0b0b}.pcc-panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.pcc-panel-head strong{font-size:12px}.pcc-panel-head span{font-size:9px;color:#666}.pcc-conn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pcc-conn{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px;border:1px solid #292929;border-radius:12px;background:#101010}.pcc-conn-main{display:flex;align-items:center;gap:9px;min-width:0}.pcc-conn-main strong{display:block;font-size:10px}.pcc-conn-main small{display:block;color:#666;font-size:8px;margin-top:2px;max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pcc-connect{border:1px solid #3b3322;background:#17130c;color:#e0bd7b;border-radius:9px;padding:7px 9px;font-size:8px;font-weight:900;cursor:pointer;white-space:nowrap}.pcc-connect.on{border-color:#3f6f4e;background:#102016;color:#70d08d}.pcc-custom{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}.pcc-custom input{flex:1;min-width:140px;border:1px solid #292929;border-radius:9px;background:#101010;color:#fff;padding:9px;font-size:9px}.pcc-custom button{border:1px solid #c59a5250;background:#c59a5212;color:#e0bd7b;border-radius:9px;padding:9px 11px;font-size:9px;font-weight:800}
+@media(max-width:900px){.pcc-conn-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.pcc-conn-grid{grid-template-columns:1fr}.pcc-custom input{min-width:100%}}
 
 </style>
 </style>
@@ -2563,8 +2559,8 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 .bc-kpis{grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;margin-bottom:16px}.bc-kpi{min-height:104px;padding:14px;border-radius:14px;background:linear-gradient(145deg,#111720,#0d1118);border:1px solid var(--bc-line)}.bc-kpi small{font-size:7px;letter-spacing:.12em;color:#7e8795}.bc-kpi strong{font-size:24px;margin:10px 0 3px}.bc-kpi span{font-size:8px;color:#69727f}.bc-kpi-main{border-color:#5c4824;background:linear-gradient(145deg,#16140f,#10141a)}
 
 .bc-overview-grid{grid-template-columns:1fr 1fr;gap:16px}.bc-overview-card{padding:17px;border-radius:15px;border:1px solid var(--bc-line);background:#0f141c}.bc-card-head button{border:0;background:transparent;color:#dbb56c;font:inherit;font-size:8px;font-weight:800;cursor:pointer}.bc-health-mini{grid-template-columns:84px 1fr;gap:15px;margin-top:14px}.bc-score{width:76px;height:76px}.bc-health-mini strong{font-size:12px}.bc-health-mini p{font-size:9px;margin:6px 0 9px}.bc-health-mini .bc-progress{height:7px}.bc-list{gap:7px;margin-top:13px}.bc-list-item{padding:9px;border-radius:10px}.bc-list-item .li-ico{width:28px;height:28px}.bc-list-item strong{font-size:9px}.bc-list-item span{font-size:8px}
-.bc-profile-intro{display:flex;align-items:center;gap:11px;padding:13px 15px;border:1px solid #4d4026;background:linear-gradient(145deg,#16140f,#10151b);border-radius:14px;margin-bottom:13px}.bc-profile-intro-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#221b0e;color:#dfb765;border:1px solid #624c28;font-size:17px}.bc-profile-intro strong{display:block;font-size:10px}.bc-profile-intro span{display:block;margin-top:3px;color:#777f8b;font-size:8px}.bc-subnav-clean{margin-bottom:12px}.bc-subnav-clean button{padding:8px 11px;font-size:8px}
-.bc-theme-strip{padding:15px;margin-bottom:14px}.bc-theme-choices{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:11px}.bc-theme-choice{min-height:72px;padding:10px;text-align:left;border:1px solid #242c38;border-radius:11px;background:#10151c;color:#fff;cursor:pointer}.bc-theme-choice:hover{border-color:#7e6232}.bc-theme-choice span{display:block;color:#68717d;font-size:7px}.bc-theme-choice strong{display:block;margin-top:4px;font-size:9px}.bc-theme-choice small{display:block;margin-top:3px;color:#69727f;font-size:7px}
+
+.bc-theme-choice span{display:block;color:#68717d;font-size:7px}.bc-theme-choice strong{display:block;margin-top:4px;font-size:9px}.bc-theme-choice small{display:block;margin-top:3px;color:#69727f;font-size:7px}
 .bc-digital-help{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px;padding:13px 15px;border-radius:14px;border:1px solid #292f38;background:#0f141b}.bc-digital-help strong{display:block;font-size:10px}.bc-digital-help span{display:block;margin-top:3px;color:#777f8a;font-size:8px}.bc-digital-help button{border:0;background:transparent;color:#d8b36b;font:inherit;font-size:8px;font-weight:900;cursor:pointer;white-space:nowrap}
 .bc-stats-notice{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:13px;background:#0f141b;border:1px solid #2a313b;margin-bottom:14px}.bc-stats-notice strong{font-size:9px;color:#e3bd74;white-space:nowrap}.bc-stats-notice span{color:#7e8793;font-size:8px;line-height:1.45}
 .bc-main-shell .box,.bc-main-shell .feature-box,.bc-main-shell .analytics-v3,.bc-main-shell .performance,.bc-main-shell .profile-hero,.bc-main-shell .health,.bc-main-shell .stats{border-color:var(--bc-line)!important;background:linear-gradient(145deg,#11161f,#0d1118)!important;border-radius:15px!important}
@@ -2591,6 +2587,7 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
   <nav class="bc-nav">
     <button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="ico bc-icon">⌂</span><span>Genel Bakış</span></button>
     <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="ico bc-icon">⌘</span><span>Profil</span></button>
+    <button data-bc="connections" onclick="showBusinessSection('connections')"><span class="ico bc-icon">↗</span><span>Dijital Kanallar</span></button>
     <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="ico bc-icon">▦</span><span>QR & NFC</span></button>
     <button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="ico bc-icon">✦</span><span>Kampanyalar</span></button>
     <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="ico bc-icon">▥</span><span>İstatistikler</span></button>
@@ -2679,11 +2676,26 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
     </div>
 
     <div class="bc-view" data-view="profile">
-      <div class="bc-section-title bc-section-title-large"><div><div class="bc-kicker">PROFİL MERKEZİ</div><h1>Profil</h1><p>İşletme bilgilerinden dijital bağlantılara ve müşteri profilinin tasarımına kadar her şeyi tek yerden yönet.</p></div><a id="bcProfileProfilePage" class="bc-ghost" target="_blank" rel="noopener">Müşteri profilini gör ↗</a></div>
-      <div class="bc-profile-intro"><div class="bc-profile-intro-icon">⌘</div><div><strong>Profilinin 4 ana alanı</strong><span>İşletme bilgileri → Dijital bağlantılar → Ödeme → Görünüm & tasarım</span></div></div>
-      <div class="bc-subnav bc-subnav-clean"><button class="active" onclick="bcScrollTo('profile')">İşletme Bilgileri</button><button onclick="bcScrollTo('profileDesign')">Görünüm & Tema</button></div>
-      <div class="bc-actions-panel bc-theme-strip"><div class="bc-actions-head"><strong>GÖRÜNÜM & TEMA</strong><span>4 premium tema</span></div><div class="bc-theme-choices"><button class="bc-theme-choice" onclick="bcSelectTheme('midnight-gold')"><span>01</span><strong>Midnight Gold</strong><small>Siyah / altın premium</small></button><button class="bc-theme-choice" onclick="bcSelectTheme('obsidian')"><span>02</span><strong>Obsidian</strong><small>Ultra dark / tech</small></button><button class="bc-theme-choice" onclick="bcSelectTheme('champagne')"><span>03</span><strong>Champagne</strong><small>Sıcak / lüks</small></button><button class="bc-theme-choice" onclick="bcSelectTheme('pure-light')"><span>04</span><strong>Pure Light</strong><small>Aydınlık / premium</small></button></div></div>
-      <div id="bcProfileMount"></div><div id="bcDesignMount"></div>
+      <div class="bc-section-title bc-section-title-large">
+        <div>
+          <div class="bc-kicker">PROFİL MERKEZİ</div>
+          <h1>İşletme Profili</h1>
+          <p>İşletme bilgilerini ve ödeme bilgilerini tek yerden yönet.</p>
+        </div>
+        <a id="bcProfileProfilePage" class="bc-ghost" target="_blank" rel="noopener">Müşteri profilini gör ↗</a>
+      </div>
+      <div id="bcProfileMount"></div>
+    </div>
+
+    <div class="bc-view" data-view="connections">
+      <div class="bc-section-title bc-section-title-large">
+        <div>
+          <div class="bc-kicker">DİJİTAL ERİŞİM</div>
+          <h1>Dijital Kanallar</h1>
+          <p>Instagram, Facebook, TikTok, YouTube, Yemeksepeti ve diğer bağlantılarını yönet.</p>
+        </div>
+      </div>
+      <div id="bcConnectionsMount"><div id="profileConnectionPanel" class="pcc-panel"></div></div>
     </div>
 
     <div class="bc-view" data-view="digital">
@@ -2708,6 +2720,7 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 <div class="bc-mobile-nav">
   <button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="mi">⌂</span>Genel</button>
   <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="mi">⌘</span>Profil</button>
+  <button data-bc="connections" onclick="showBusinessSection('connections')"><span class="mi">↗</span>Dijital</button>
   <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="mi">▦</span>QR/NFC</button>
   <button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="mi">✦</span>Kampanya</button>
   <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="mi">▥</span>İstatistik</button>
@@ -3236,38 +3249,7 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
   class="box"
 >
 
-<div id="profileControlCenter" class="profile-control-center">
-  <div class="pcc-head">
-    <div>
-      <div class="eyebrow">PROFİL MERKEZİ</div>
-      <h3>İşletme Profilini Yönet</h3>
-      <p>Temel bilgiler, bağlantılar, ödeme ve görünümü tek yerden düzenle.</p>
-    </div>
-    <span class="pcc-badge">MÜŞTERİ PROFİLİ</span>
-  </div>
 
-  <div class="pcc-grid">
-    <button type="button" class="pcc-card" onclick="openProfileGroup('info')">
-      <span class="pcc-icon">🏢</span><strong>İşletme Bilgileri</strong><small>Ad, kategori, açıklama, telefon, adres, saatler</small><b>Düzenle →</b>
-    </button>
-    <button type="button" class="pcc-card" onclick="openProfileGroup('connections')">
-      <span class="pcc-icon">🔗</span><strong>Dijital Bağlantılar</strong><small>Instagram, Facebook, TikTok, Google, Website ve diğerleri</small><b>Hesapları Bağla →</b>
-    </button>
-    <button type="button" class="pcc-card" onclick="openProfileGroup('payment')">
-      <span class="pcc-icon">₺</span><strong>Ödeme Bilgileri</strong><small>IBAN ve hesap sahibi bilgileri</small><b>Düzenle →</b>
-    </button>
-    <button type="button" class="pcc-card" onclick="openProfileGroup('appearance')">
-      <span class="pcc-icon">✦</span><strong>Görünüm & Tema</strong><small>4 premium tema ve profil tasarımı</small><b>Tema Seç →</b>
-    </button>
-  </div>
-
-  <div class="pcc-actions">
-    <button type="button" class="action gold" onclick="save()">✓ Tüm Profil Bilgilerini Kaydet</button>
-    <a id="pccPublicProfile" class="action" target="_blank" rel="noopener">👁 Müşteri Profilini Aç</a>
-  </div>
-
-  <div id="profileConnectionPanel" class="pcc-panel" style="display:none"></div>
-</div>
 
 
   <div class="box-head">
@@ -4059,225 +4041,7 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 ================================================== -->
 
 
-<section id="profileDesign" class="box">
-  <div class="box-head">
-    <div>
-      <div class="eyebrow">V2 • PROFILE DESIGN</div>
-      <h2>Profil Tasarım Merkezi</h2>
-      <p>Profilinin müşteriye görünen vitrinini tek merkezden tasarla ve canlı önizlemede kontrol et.</p>
-    </div>
-    <div class="design-badge">V2 ACTIVE</div>
-  </div>
 
-  <div class="profile-design-shell">
-    <div class="design-editor">
-      <div class="design-section-title">
-        <div>
-          <h3>Görünüm ve içerik</h3>
-          <p>Değişiklikler kaydedilene kadar mevcut profilin etkilenmez.</p>
-        </div>
-      </div>
-
-      <div class="design-grid">
-        <div class="design-field">
-          <label>TEMA</label>
-          <select id="design_theme" oninput="updateDesignPreview()" onchange="updateDesignPreview()">
-            <option value="midnight-gold">Midnight Gold</option>
-            <option value="obsidian">Obsidian</option>
-            <option value="champagne">Champagne</option>
-            <option value="pure-light">Pure Light</option>
-          </select>
-        </div>
-
-        <div class="design-field">
-          <label>VURGU RENGİ</label>
-          <div class="design-color-row">
-            <input id="design_accent_picker" type="color" value="#D4AF37" oninput="syncDesignColor('picker')">
-            <input id="design_accent" type="text" value="#D4AF37" maxlength="7" oninput="syncDesignColor('text')">
-          </div>
-        </div>
-
-        <div class="design-field full">
-          <label>KAPAK GÖRSEL URL</label>
-          <input id="design_cover_url" placeholder="https://..." oninput="updateDesignPreview()">
-          <div class="design-help">Profilin üst bölümünde premium kapak alanı olarak kullanılır.</div>
-        </div>
-
-        <div class="design-field">
-          <label>KAPAK POZİSYONU</label>
-          <select id="design_cover_position" oninput="updateDesignPreview()">
-            <option value="center">Merkez</option>
-            <option value="top">Üst</option>
-            <option value="bottom">Alt</option>
-            <option value="left">Sol</option>
-            <option value="right">Sağ</option>
-          </select>
-        </div>
-
-        <div class="design-field">
-          <label>İŞLETME MARKASI</label>
-          <div class="design-toggle">
-            <span>Müşteri profilinde işletme logosu ve adını göster</span>
-            <label class="switch">
-              <input id="design_business_brand_enabled" type="checkbox" onchange="updateDesignPreview()">
-              <span class="switch-track"></span>
-            </label>
-          </div>
-          <div class="design-help">Açıkken üstte LEO CONNECT yerine işletmenin logosu ve adı görünür. Kapalıyken LEO CONNECT görünümü korunur.</div>
-        </div>
-
-        <div class="design-field">
-          <label>DUYURU DURUMU</label>
-          <div class="design-toggle">
-            <span>Duyuruyu göster</span>
-            <label class="switch">
-              <input id="design_announcement_enabled" type="checkbox" onchange="updateDesignPreview()">
-              <span class="switch-track"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="design-field full">
-          <label>DUYURU METNİ</label>
-          <input id="design_announcement_text" maxlength="180" placeholder="Bugün 23:00'e kadar açığız..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field full">
-          <label>KAMPANYA BAŞLIĞI</label>
-          <input id="design_campaign_title" maxlength="90" placeholder="Bu haftanın özel fırsatı" oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field full">
-          <label>KAMPANYA METNİ</label>
-          <textarea id="design_campaign_text" maxlength="240" placeholder="Müşterilerine özel kampanyanı burada duyur..." oninput="updateDesignPreview()"></textarea>
-        </div>
-
-        <div class="design-field">
-          <label>KAMPANYA GÖRSEL URL</label>
-          <input id="design_campaign_image_url" placeholder="https://..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field">
-          <label>KAMPANYA DURUMU</label>
-          <div class="design-toggle">
-            <span>Kampanyayı göster</span>
-            <label class="switch">
-              <input id="design_campaign_enabled" type="checkbox" onchange="updateDesignPreview()">
-              <span class="switch-track"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="design-field">
-          <label>BUTTON METNİ</label>
-          <input id="design_campaign_button_text" maxlength="40" placeholder="Detayları Gör" oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field">
-          <label>BUTTON URL</label>
-          <input id="design_campaign_button_url" placeholder="https://..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field full">
-          <label>ÖNE ÇIKAN BAŞLIK</label>
-          <input id="design_featured_title" maxlength="90" placeholder="Öne çıkan ürünün veya hizmetin" oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field full">
-          <label>ÖNE ÇIKAN AÇIKLAMA</label>
-          <textarea id="design_featured_text" maxlength="240" placeholder="Müşterinin ilk görmesini istediğin içeriği anlat..." oninput="updateDesignPreview()"></textarea>
-        </div>
-
-        <div class="design-field">
-          <label>ÖNE ÇIKAN GÖRSEL URL</label>
-          <input id="design_featured_image_url" placeholder="https://..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field">
-          <label>ÖNE ÇIKAN DURUMU</label>
-          <div class="design-toggle">
-            <span>İçeriği göster</span>
-            <label class="switch">
-              <input id="design_featured_enabled" type="checkbox" onchange="updateDesignPreview()">
-              <span class="switch-track"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="design-field">
-          <label>BUTTON METNİ</label>
-          <input id="design_featured_button_text" maxlength="40" placeholder="İncele" oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field">
-          <label>BUTTON URL</label>
-          <input id="design_featured_button_url" placeholder="https://..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field full">
-          <label>GALERİ GÖRSELLERİ</label>
-          <textarea id="design_gallery" placeholder="Her satıra bir görsel URL'si yaz.&#10;https://...&#10;https://..." oninput="updateDesignPreview()"></textarea>
-          <div class="design-help">İlk aşamada URL tabanlı galeri kullanıyoruz. En fazla 30 görsel kaydedilir.</div>
-        </div>
-
-        <div class="design-field">
-          <label>VİDEO URL</label>
-          <input id="design_video_url" placeholder="https://youtube.com/..." oninput="updateDesignPreview()">
-        </div>
-
-        <div class="design-field">
-          <label>VİDEO DURUMU</label>
-          <div class="design-toggle">
-            <span>Videoyu göster</span>
-            <label class="switch">
-              <input id="design_video_enabled" type="checkbox" onchange="updateDesignPreview()">
-              <span class="switch-track"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="design-save-row">
-        <button id="designSaveButton" class="design-save-button" type="button" onclick="saveProfileDesign()">✓ Tasarımı Kaydet</button>
-        <div id="designMessage"></div>
-      </div>
-    </div>
-
-    <div class="design-preview-box">
-      <div class="design-section-title">
-        <div>
-          <h3>Canlı önizleme <span id="previewLiveStatus" style="display:inline-block;margin-left:7px;font-size:9px;letter-spacing:.08em;color:#6fd08a;font-weight:900;">● CANLI</span></h3>
-          <p>Müşterinin göreceği yeni vitrin yapısının hızlı önizlemesi.</p>
-        </div>
-      </div>
-
-      <div id="designPreview" class="preview-frame">
-        <div id="previewCover" class="preview-cover"></div>
-        <div class="preview-body">
-          <div id="previewLogo" class="preview-logo"><span class="leo-lion-logo" aria-hidden="true"></span></div>
-          <div id="previewName" class="preview-name">İşletme</div>
-          <div id="previewCategory" class="preview-category">İŞLETME</div>
-          <div id="previewAnnouncement" class="preview-announcement" style="display:none">
-            <strong>📢 Duyuru</strong>
-            <span id="previewAnnouncementText"></span>
-          </div>
-          <div id="previewCampaign" class="preview-campaign" style="display:none">
-            <strong id="previewCampaignTitle"></strong>
-            <span id="previewCampaignText"></span>
-            <span id="previewCampaignButton" class="preview-button" style="display:none"></span>
-          </div>
-          <div id="previewFeatured" class="preview-featured" style="display:none">
-            <strong id="previewFeaturedTitle"></strong>
-            <span id="previewFeaturedText"></span>
-            <span id="previewFeaturedButton" class="preview-button" style="display:none"></span>
-          </div>
-          <div id="previewGallery" class="preview-gallery"></div>
-          <div id="previewVideo" class="preview-video" style="display:none">🎬 Video içeriği eklendi</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 
 <!-- ==================================================
@@ -5537,465 +5301,6 @@ async function loadBusinessAnalytics(period='7d'){
    LOAD
 ================================================== */
 
-const designFields = [
-  "design_theme",
-  "design_accent",
-  "design_cover_url",
-  "design_cover_position",
-  "design_announcement_text",
-  "design_campaign_title",
-  "design_campaign_text",
-  "design_campaign_image_url",
-  "design_campaign_button_text",
-  "design_campaign_button_url",
-  "design_featured_title",
-  "design_featured_text",
-  "design_featured_image_url",
-  "design_featured_button_text",
-  "design_featured_button_url",
-  "design_gallery",
-  "design_video_url"
-];
-
-let profileDesign = {
-  theme:"midnight-gold",
-  accent_color:"#D4AF37",
-  cover_url:"",
-  cover_position:"center",
-  announcement_text:"",
-  announcement_enabled:false,
-  campaign_title:"",
-  campaign_text:"",
-  campaign_image_url:"",
-  campaign_button_text:"",
-  campaign_button_url:"",
-  campaign_enabled:false,
-  featured_title:"",
-  featured_text:"",
-  featured_image_url:"",
-  featured_button_text:"",
-  featured_button_url:"",
-  featured_enabled:false,
-  gallery:[],
-  video_url:"",
-  video_enabled:false
-};
-
-function safeDesignColor(value){
-  const v = String(value || "").trim();
-  return /^#[0-9a-fA-F]{6}$/.test(v) ? v : "#D4AF37";
-}
-
-function syncDesignColor(source){
-  const text = document.getElementById("design_accent");
-  const picker = document.getElementById("design_accent_picker");
-  if(!text || !picker) return;
-
-  if(source === "picker"){
-    text.value = picker.value.toUpperCase();
-  }else{
-    const value = text.value.trim();
-    if(/^#[0-9a-fA-F]{6}$/.test(value)) picker.value = value;
-  }
-  updateDesignPreview();
-}
-
-function getDesignForm(){
-  const val = id => document.getElementById(id)?.value?.trim() || "";
-  const checked = id => document.getElementById(id)?.checked === true;
-  const gallery = val("design_gallery")
-    .split(/\r?\n/)
-    .map(x => x.trim())
-    .filter(Boolean)
-    .slice(0,30)
-    .map(url => ({url}));
-
-  return {
-    theme: val("design_theme") || "midnight-gold",
-    accent_color: safeDesignColor(val("design_accent")),
-    cover_url: val("design_cover_url"),
-    cover_position: val("design_cover_position") || "center",
-    business_brand_enabled: checked("design_business_brand_enabled"),
-    announcement_text: val("design_announcement_text"),
-    announcement_enabled: checked("design_announcement_enabled"),
-    campaign_title: val("design_campaign_title"),
-    campaign_text: val("design_campaign_text"),
-    campaign_image_url: val("design_campaign_image_url"),
-    campaign_button_text: val("design_campaign_button_text"),
-    campaign_button_url: val("design_campaign_button_url"),
-    campaign_enabled: checked("design_campaign_enabled"),
-    featured_title: val("design_featured_title"),
-    featured_text: val("design_featured_text"),
-    featured_image_url: val("design_featured_image_url"),
-    featured_button_text: val("design_featured_button_text"),
-    featured_button_url: val("design_featured_button_url"),
-    featured_enabled: checked("design_featured_enabled"),
-    gallery,
-    video_url: val("design_video_url"),
-    video_enabled: checked("design_video_enabled")
-  };
-}
-
-function setDesignField(id, value){
-  const el = document.getElementById(id);
-  if(el) el.value = value ?? "";
-}
-
-function loadDesignIntoForm(data){
-  profileDesign = {
-    ...profileDesign,
-    ...(data || {})
-  };
-
-  setDesignField("design_theme", profileDesign.theme || "midnight-gold");
-  setDesignField("design_accent", safeDesignColor(profileDesign.accent_color));
-  setDesignField("design_cover_url", profileDesign.cover_url);
-  setDesignField("design_cover_position", profileDesign.cover_position || "center");
-  setDesignField("design_announcement_text", profileDesign.announcement_text);
-  setDesignField("design_campaign_title", profileDesign.campaign_title);
-  setDesignField("design_campaign_text", profileDesign.campaign_text);
-  setDesignField("design_campaign_image_url", profileDesign.campaign_image_url);
-  setDesignField("design_campaign_button_text", profileDesign.campaign_button_text);
-  setDesignField("design_campaign_button_url", profileDesign.campaign_button_url);
-  setDesignField("design_featured_title", profileDesign.featured_title);
-  setDesignField("design_featured_text", profileDesign.featured_text);
-  setDesignField("design_featured_image_url", profileDesign.featured_image_url);
-  setDesignField("design_featured_button_text", profileDesign.featured_button_text);
-  setDesignField("design_featured_button_url", profileDesign.featured_button_url);
-  setDesignField("design_video_url", profileDesign.video_url);
-
-  const gallery = Array.isArray(profileDesign.gallery) ? profileDesign.gallery : [];
-  setDesignField("design_gallery", gallery.map(item => typeof item === "string" ? item : item?.url || "").filter(Boolean).join("\n"));
-
-  const checks = [
-    ["design_business_brand_enabled", profileDesign.business_brand_enabled !== false],
-    ["design_announcement_enabled", profileDesign.announcement_enabled],
-    ["design_campaign_enabled", profileDesign.campaign_enabled],
-    ["design_featured_enabled", profileDesign.featured_enabled],
-    ["design_video_enabled", profileDesign.video_enabled]
-  ];
-  checks.forEach(([id, value]) => {
-    const el = document.getElementById(id);
-    if(el) el.checked = value === true;
-  });
-
-  const picker = document.getElementById("design_accent_picker");
-  if(picker) picker.value = safeDesignColor(profileDesign.accent_color);
-
-  updateDesignPreview();
-}
-
-function updateDesignPreview(){
-  try{
-    const data = getDesignForm();
-    const root = document.getElementById("designPreview");
-    if(!root) return;
-
-    const theme = data.theme || "midnight-gold";
-    root.className = "preview-frame theme-" + theme;
-    /* Theme is applied directly to the preview root so it never depends on nested CSS selectors. */
-    const themeMap = {
-      "midnight-gold": {bg:"#101010", color:"#fff"},
-      "obsidian": {bg:"#050505", color:"#fff"},
-      "champagne": {bg:"#17120b", color:"#fff"},
-      "pure-light": {bg:"#f5f2eb", color:"#151515"}
-    };
-    const themeStyle = themeMap[theme] || themeMap["midnight-gold"];
-    root.style.background = themeStyle.bg;
-    root.style.color = themeStyle.color;
-    root.style.setProperty("--preview-accent", data.accent_color);
-    root.style.setProperty("--lc-gold", data.accent_color);
-    root.style.setProperty("--gold-light", data.accent_color);
-
-    /* COVER */
-    const cover = document.getElementById("previewCover");
-    if(cover){
-      cover.style.backgroundPosition = data.cover_position || "center";
-      cover.style.backgroundImage = data.cover_url
-        ? `linear-gradient(180deg,transparent 20%,rgba(0,0,0,.82) 100%), url("${String(data.cover_url).replace(/"/g,'\\"')}")`
-        : "radial-gradient(circle at 80% 20%,#c59a5230,transparent 35%),linear-gradient(145deg,#1d1d1d,#090909)";
-    }
-
-    /* BUSINESS */
-    const name = document.getElementById("previewName");
-    const category = document.getElementById("previewCategory");
-    const brandOn = data.business_brand_enabled !== false;
-
-    if(name){
-      name.textContent = brandOn ? (currentBusiness?.name || "İşletme") : "LEO CONNECT";
-    }
-
-    if(category){
-      category.style.display = "none";
-    }
-
-    /* LOGO */
-    const logo = document.getElementById("previewLogo");
-
-    if(logo){
-      const logoUrl = brandOn ? (currentBusiness?.logo_url || "") : "";
-
-      logo.innerHTML = logoUrl
-        ? `<img src="${esc(logoUrl)}" alt="">`
-        : '<span class="leo-lion-logo" aria-hidden="true"></span>';
-    }
-
-    /* ANNOUNCEMENT */
-    const announcement =
-      document.getElementById("previewAnnouncement");
-
-    const announcementText =
-      document.getElementById("previewAnnouncementText");
-
-    if(announcement && announcementText){
-      const enabled =
-        data.announcement_enabled === true &&
-        !!data.announcement_text;
-
-      announcement.style.display =
-        enabled ? "block" : "none";
-
-      announcementText.textContent =
-        data.announcement_text || "";
-    }
-
-    /* CAMPAIGN */
-    const campaign =
-      document.getElementById("previewCampaign");
-
-    if(campaign){
-      const show =
-        data.campaign_enabled === true &&
-        !!(data.campaign_title || data.campaign_text);
-
-      campaign.style.display =
-        show ? "block" : "none";
-
-      if(data.campaign_image_url){
-        campaign.style.backgroundImage =
-          `linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.72)), url("${String(data.campaign_image_url).replace(/"/g,'\\"')}")`;
-        campaign.style.backgroundSize = "cover";
-        campaign.style.backgroundPosition = "center";
-      }else{
-        campaign.style.backgroundImage = "none";
-      }
-
-      const title =
-        document.getElementById("previewCampaignTitle");
-
-      const text =
-        document.getElementById("previewCampaignText");
-
-      const button =
-        document.getElementById("previewCampaignButton");
-
-      if(title){
-        title.textContent =
-          data.campaign_title || "Kampanya";
-      }
-
-      if(text){
-        text.textContent =
-          data.campaign_text || "Kampanya detayları";
-      }
-
-      if(button){
-        button.style.display =
-          data.campaign_button_text
-            ? "inline-flex"
-            : "none";
-
-        button.textContent =
-          data.campaign_button_text || "";
-      }
-    }
-
-    /* FEATURED */
-    const featured =
-      document.getElementById("previewFeatured");
-
-    if(featured){
-      const show =
-        data.featured_enabled === true &&
-        !!(data.featured_title || data.featured_text);
-
-      featured.style.display =
-        show ? "block" : "none";
-
-      if(data.featured_image_url){
-        featured.style.backgroundImage =
-          `linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.68)), url("${String(data.featured_image_url).replace(/"/g,'\\"')}")`;
-        featured.style.backgroundSize = "cover";
-        featured.style.backgroundPosition = "center";
-      }else{
-        featured.style.backgroundImage = "none";
-      }
-
-      const title =
-        document.getElementById("previewFeaturedTitle");
-
-      const text =
-        document.getElementById("previewFeaturedText");
-
-      const button =
-        document.getElementById("previewFeaturedButton");
-
-      if(title){
-        title.textContent =
-          data.featured_title || "Öne Çıkan";
-      }
-
-      if(text){
-        text.textContent =
-          data.featured_text || "Öne çıkan içerik";
-      }
-
-      if(button){
-        button.style.display =
-          data.featured_button_text
-            ? "inline-flex"
-            : "none";
-
-        button.textContent =
-          data.featured_button_text || "";
-      }
-    }
-
-    /* GALLERY */
-    const galleryBox =
-      document.getElementById("previewGallery");
-
-    if(galleryBox){
-      const gallery =
-        Array.isArray(data.gallery)
-          ? data.gallery
-          : [];
-
-      galleryBox.innerHTML =
-        gallery
-          .slice(0,6)
-          .map(item => {
-            const url =
-              typeof item === "string"
-                ? item
-                : item?.url || "";
-
-            return url
-              ? `<div><img src="${esc(url)}" alt=""></div>`
-              : "";
-          })
-          .join("");
-    }
-
-    /* VIDEO */
-    const video =
-      document.getElementById("previewVideo");
-
-    if(video){
-      video.style.display =
-        data.video_enabled && data.video_url
-          ? "block"
-          : "none";
-    }
-
-    /* LIVE INDICATOR */
-    const live =
-      document.getElementById("previewLiveStatus");
-
-    if(live){
-      live.textContent = "● CANLI";
-    }
-
-  }catch(error){
-    console.error("LEO CONNECT preview error:", error);
-
-    const message =
-      document.getElementById("designMessage");
-
-    if(message && !message.textContent){
-      message.textContent =
-        "Önizleme güncellenemedi.";
-    }
-  }
-}
-
-/* Gerçek canlı önizleme: inline handler'a ek olarak
-   tüm tasarım alanlarını merkezi olarak dinle. */
-function initLiveDesignPreview(){
-  const container = document.getElementById("profileDesign");
-  if(!container) return;
-
-  const refresh = function(){
-    try{ updateDesignPreview(); }catch(error){ console.error("LEO CONNECT preview refresh error:", error); }
-  };
-
-  /* Capture phase ensures the listener survives any dashboard navigation/rendering. */
-  container.addEventListener("input", function(event){
-    if(event.target && event.target.matches("input, textarea, select")) refresh();
-  }, true);
-
-  container.addEventListener("change", function(event){
-    if(event.target && event.target.matches("input, textarea, select")) refresh();
-  }, true);
-
-  refresh();
-}
-
-
-async function loadProfileDesign(){
-  const result = await api("/api/business-profile-design");
-  if(result && !result.error){
-    const design = result.design && typeof result.design === "object"
-      ? result.design
-      : result;
-    loadDesignIntoForm(design);
-    updateDesignPreview();
-  }else if(result?.error){
-    const msg = document.getElementById("designMessage");
-    if(msg) msg.textContent = result.error;
-  }
-}
-
-async function saveProfileDesign(){
-  const button = document.getElementById("designSaveButton");
-  const message = document.getElementById("designMessage");
-  const data = getDesignForm();
-
-  if(!button || !message) return;
-
-  button.disabled = true;
-  button.textContent = "Kaydediliyor...";
-  message.textContent = "";
-
-  const result = await api("/api/business-profile-design", {
-    method:"PUT",
-    body:JSON.stringify(data)
-  });
-
-  if(result && !result.error){
-    const savedDesign = result.design && typeof result.design === "object"
-      ? result.design
-      : result;
-    profileDesign = savedDesign;
-    loadDesignIntoForm(savedDesign);
-    updateDesignPreview();
-    message.textContent = "✓ Profil tasarımı kaydedildi.";
-    showToast("Profil tasarımı güncellendi.");
-  }else{
-    message.textContent = result?.error || "Tasarım kaydedilemedi.";
-    showToast("Tasarım kaydedilirken hata oluştu.");
-  }
-
-  button.disabled = false;
-  button.textContent = "✓ Tasarımı Kaydet";
-  setTimeout(() => { message.textContent = ""; }, 3500);
-}
-
-
-
-
-
-
 async function load(){
 
   const business =
@@ -6014,13 +5319,6 @@ async function load(){
     business;
 
   applyPermissions(business);
-
-  try{
-    await loadProfileDesign();
-    initLiveDesignPreview();
-  }catch(error){
-    console.error("PROFILE DESIGN LOAD ERROR:", error);
-  }
 
   const analyticsCard=document.getElementById('businessAnalyticsV3');
   if(analyticsCard){
@@ -6847,16 +6145,12 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
   const esc2=v=>String(v??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
   let settings={allowed_platforms:{},social_links:{},custom_links:[]};
 
-  let settingsLoaded=false;
   async function loadSettings(){
     try{
       const data=await api('/api/business-v2-settings?fresh='+Date.now(),{cache:'no-store'});
-      if(data&&!data.error){settings={...data,allowed_platforms:(data.allowed_platforms&&typeof data.allowed_platforms==='object')?data.allowed_platforms:{}};window.leoProfileSettings=settings;settingsLoaded=true;renderConnections();return true;}
+      if(data&&!data.error){settings={...data,allowed_platforms:(data.allowed_platforms&&typeof data.allowed_platforms==='object')?data.allowed_platforms:{}};window.leoProfileSettings=settings;renderConnections();return true;}
       throw new Error(data?.error||'Profil ayarları alınamadı');
-    }catch(e){settingsLoaded=false;console.warn('Profile connection settings:',e);const panel=document.getElementById('profileConnectionPanel');if(panel)panel.innerHTML='<div class="pcc-panel-head"><div><strong>Bağlantı izinleri alınamadı</strong><span>Lütfen tekrar deneyin.</span></div></div>';return false;}
-  }
-  function publicUrl(){
-    return document.getElementById('headerProfile')?.href||'';
+    }catch(e){console.warn('Profile connection settings:',e);const panel=document.getElementById('profileConnectionPanel');if(panel)panel.innerHTML='<div class="pcc-panel-head"><div><strong>Bağlantı izinleri alınamadı</strong><span>Lütfen tekrar deneyin.</span></div></div>';return false;}
   }
   function renderConnections(){
     const panel=document.getElementById('profileConnectionPanel'); if(!panel)return;
@@ -6864,7 +6158,7 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
     const links=settings.social_links||{};
     const platforms=Object.keys(names).filter(k=>Object.keys(allowed).length===0 || allowed[k]!==false);
     panel.innerHTML=`
-      <div class="pcc-panel-head"><div><strong>🔗 Dijital Bağlantılar</strong><span>Bağla dediğinde müşteri profilinde görünür.</span></div><button type="button" class="action" onclick="closeProfileGroup()">Kapat</button></div>
+      <div class="pcc-panel-head"><div><strong>🔗 Dijital Bağlantılar</strong><span>Bağladığın kanallar müşteri profilinde görünür.</span></div></div>
       <div class="pcc-conn-grid">
         ${platforms.map(k=>{
           const item=links[k]||{};
@@ -6876,25 +6170,11 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
       ${(settings.custom_links||[]).length?`<div style="margin-top:10px;display:grid;gap:6px">${settings.custom_links.map((x,i)=>`<div class="pcc-conn"><div class="pcc-conn-main"><div class="pcc-conn-icon">${esc2(x.icon||'🔗')}</div><div><strong>${esc2(x.title)}</strong><small>${esc2(x.url)}</small></div></div><button type="button" class="pcc-connect" onclick="removeProfileCustomLink(${i})">Sil</button></div>`).join('')}</div>`:''}
     `;
   }
-  window.openProfileGroup=async function(group){
-    const panel=document.getElementById('profileConnectionPanel'); if(!panel)return;
-    panel.style.display='block';
-    if(group==='connections'){panel.innerHTML='<div class="pcc-panel-head"><div><strong>Dijital Bağlantılar</strong><span>Admin izinleri kontrol ediliyor…</span></div></div>';panel.scrollIntoView({behavior:'smooth',block:'center'});const ok=await loadSettings();if(ok)renderConnections();return;}
-    if(group==='info'){document.querySelector('#profile .form-grid')?.scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('name')?.focus();return;}
-    if(group==='payment'){document.getElementById('iban')?.scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('iban')?.focus();return;}
-    if(group==='appearance'){
-      panel.innerHTML=`<div class="pcc-panel-head"><div><strong>✦ Görünüm & Tema</strong><span>4 premium tema arasından seçim yap.</span></div><button type="button" class="action" onclick="closeProfileGroup()">Kapat</button></div>
-      <div class="pcc-theme-grid">
-        <button type="button" class="pcc-theme" onclick="selectProfileTheme('midnight-gold')"><strong>Midnight Gold</strong><small>Siyah / altın premium</small></button>
-        <button type="button" class="pcc-theme" onclick="selectProfileTheme('obsidian')"><strong>Obsidian</strong><small>Ultra dark / tech</small></button>
-        <button type="button" class="pcc-theme" onclick="selectProfileTheme('champagne')"><strong>Champagne</strong><small>Sıcak / lüks</small></button>
-        <button type="button" class="pcc-theme" onclick="selectProfileTheme('pure-light')"><strong>Pure Light</strong><small>Aydınlık / premium</small></button>
-      </div>
-      <div class="pcc-actions" style="margin-top:10px"><button type="button" class="action" onclick="document.getElementById('profileDesign')?.scrollIntoView({behavior:'smooth',block:'start'})">Detaylı Profil Tasarımını Aç →</button></div>`;
-      panel.style.display='block';panel.scrollIntoView({behavior:'smooth',block:'center'});return;
-    }
+  window.loadBusinessConnections=async function(){
+    const panel=document.getElementById('profileConnectionPanel');
+    if(panel) panel.style.display='block';
+    return await loadSettings();
   };
-  window.closeProfileGroup=function(){const p=document.getElementById('profileConnectionPanel');if(p)p.style.display='none';};
   window.connectProfilePlatform=async function(type){
     const label=names[type]||type;
     const current=settings.social_links?.[type]?.url||document.getElementById(legacyMap[type]||'')?.value||'';
@@ -6931,14 +6211,7 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
     const next=(settings.custom_links||[]).filter((_,i)=>i!==index);
     try{const r=await api('/api/business-custom-links',{method:'PUT',body:JSON.stringify({custom_links:next})});settings.custom_links=r.custom_links||next;renderConnections();showToast('Özel bağlantı kaldırıldı.');}catch(e){showToast(e.message||'Bağlantı silinemedi.');}
   };
-  window.selectProfileTheme=async function(theme){
-    try{
-      const r=await api('/api/business-theme',{method:'PUT',body:JSON.stringify({theme,accent_color:'#D4AF37'})});
-      if(typeof loadProfileDesign==='function') await loadProfileDesign();
-      if(typeof updateDesignPreview==='function') updateDesignPreview();
-      showToast((r.theme_name||theme)+' teması seçildi.');
-    }catch(e){showToast(e.message||'Tema kaydedilemedi.');}
-  };
+
   const originalLoad=window.load;
   if(typeof originalLoad==='function'){
     window.load=async function(){await originalLoad.apply(this,arguments);await loadSettings();const p=document.getElementById('pccPublicProfile');const h=document.getElementById('headerProfile');if(p&&h)p.href=h.href;};
@@ -6950,7 +6223,7 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 
 <script id="leo-business-final-js">
 (function(){
-  const map={overview:{title:'Genel Bakış',ids:[]},profile:{title:'Profil',ids:['profile','profileDesign']},digital:{title:'QR & NFC',ids:['digital']},campaigns:{title:'Kampanyalar',ids:['campaignSection']},stats:{title:'İstatistikler',ids:['businessAnalyticsV3','performanceSection','reviewSection']}};
+  const map={overview:{title:'Genel Bakış',ids:[]},profile:{title:'Profil',ids:['profile']},connections:{title:'Dijital Kanallar',ids:[]},digital:{title:'QR & NFC',ids:['digital']},campaigns:{title:'Kampanyalar',ids:['campaignSection']},stats:{title:'İstatistikler',ids:['businessAnalyticsV3','performanceSection','reviewSection']}};
   window.showBusinessSection=function(name){
     const cfg=map[name]||map.overview;
     document.querySelectorAll('.bc-view').forEach(v=>v.classList.toggle('active',v.dataset.view===name));
@@ -6967,10 +6240,9 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
     if(name==='digital' && typeof loadQR==='function'){try{loadQR()}catch(e){}}
     if(name==='digital' && typeof loadBusinessTableCodes==='function'){try{setTimeout(()=>loadBusinessTableCodes(),50)}catch(e){}}
     if(name==='campaigns' && typeof loadBusinessCampaigns==='function'){try{loadBusinessCampaigns()}catch(e){}}
+    if(name==='connections' && typeof loadBusinessConnections==='function'){try{loadBusinessConnections()}catch(e){}}
     if(name==='overview'){try{if(typeof loadBusinessLive==='function')loadBusinessLive();if(typeof loadAIInsights==='function')loadAIInsights('7d');if(typeof startLiveRefresh==='function')startLiveRefresh()}catch(e){console.error('Business overview live/AI load error',e)}} else if(name==='stats'){try{if(typeof loadBusinessAnalytics==='function')loadBusinessAnalytics('7d');if(typeof loadReviewBooster==='function')loadReviewBooster();if(typeof stopLiveRefresh==='function')stopLiveRefresh()}catch(e){console.error('Business stats load error',e)}} else if(typeof stopLiveRefresh==='function')stopLiveRefresh();
   };
-  window.bcScrollTo=function(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});};
-  window.bcSelectTheme=function(theme){const sel=document.getElementById('design_theme');if(!sel)return;sel.value=theme;sel.dispatchEvent(new Event('change',{bubbles:true}));const save=document.querySelector('#profileDesign .design-save-button, #profileDesign button[type=submit]');if(typeof updateDesignPreview==='function')updateDesignPreview();if(save)save.click();};
   function syncKpis(){
     const pairs=[['profileViews','bcKpiProfile'],['qrViews','bcKpiQR'],['nfcViews','bcKpiNFC'],['whatsappViews','bcKpiWA'],['phoneViews','bcKpiPhone'],['totalViews','bcKpiTotal']];
     pairs.forEach(([a,b])=>{const x=document.getElementById(a),y=document.getElementById(b);if(x&&y)y.textContent=x.textContent||'0';});
