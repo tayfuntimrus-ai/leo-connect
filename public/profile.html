@@ -574,123 +574,6 @@ body{
 }
 
 
-/* ==================================================
-   INFO LIST
-================================================== */
-
-.info-list{
-
-  display:flex;
-
-  flex-direction:column;
-
-  gap:8px;
-
-}
-
-
-.info-row{
-
-  display:flex;
-
-  align-items:center;
-
-  gap:11px;
-
-  padding:12px;
-
-  border-radius:12px;
-
-  border:
-    1px solid #242424;
-
-  background:#101010;
-
-}
-
-
-.info-icon{
-
-  width:34px;
-
-  height:34px;
-
-  flex:none;
-
-  display:grid;
-
-  place-items:center;
-
-  border-radius:10px;
-
-  background:#080808;
-
-  font-size:15px;
-
-}
-
-
-.info-content{
-
-  min-width:0;
-
-  flex:1;
-
-}
-
-
-.info-label{
-
-  display:block;
-
-  color:#555;
-
-  font-size:8px;
-
-  letter-spacing:.1em;
-
-}
-
-
-.info-value{
-
-  display:block;
-
-  margin-top:4px;
-
-  color:#ddd;
-
-  font-size:11px;
-
-  word-break:break-word;
-
-}
-
-
-.info-action{
-
-  padding:
-    7px 9px;
-
-  border-radius:8px;
-
-  border:
-    1px solid #333;
-
-  background:#181818;
-
-  color:var(--gold-light);
-
-  font-size:8px;
-
-  font-weight:800;
-
-  text-decoration:none;
-
-  cursor:pointer;
-
-}
-
 
 /* ==================================================
    IBAN
@@ -1361,112 +1244,6 @@ body{
   <div class="dynamic-video-label">VİDEO</div>
   <div id="dynamicVideoFrame"></div>
 </div>
-
-
-<!-- ==================================================
-     CONTACT
-================================================== -->
-
-<section
-  id="contactSection"
-  class="section hidden"
->
-
-
-  <div class="section-title">
-
-    <div class="section-icon">
-      📍
-    </div>
-
-    <div>
-
-      <strong>
-        İletişim
-      </strong>
-
-      <span>
-        İşletmeye ulaş
-      </span>
-
-    </div>
-
-  </div>
-
-
-  <div class="info-list">
-
-
-    <div
-      id="locationRow"
-      class="info-row hidden"
-    >
-
-      <div class="info-icon">
-        📍
-      </div>
-
-      <div class="info-content">
-
-        <span class="info-label">
-          KONUM
-        </span>
-
-        <span
-          id="address"
-          class="info-value"
-        ></span>
-
-      </div>
-
-      <a
-        id="locationLink"
-        class="info-action"
-        target="_blank"
-        rel="noopener"
-      >
-        AÇ
-      </a>
-
-    </div>
-
-
-    <div
-      id="phoneRow"
-      class="info-row hidden"
-    >
-
-      <div class="info-icon">
-        📞
-      </div>
-
-      <div class="info-content">
-
-        <span class="info-label">
-          TELEFON
-        </span>
-
-        <span
-          id="phone"
-          class="info-value"
-        ></span>
-
-      </div>
-
-      <a
-        id="phoneLink"
-        class="info-action"
-      >
-        ARA
-      </a>
-
-    </div>
-
-
-  </div>
-
-
-</section>
 
 
 
@@ -2442,25 +2219,6 @@ function render(){
 
 
     document.getElementById(
-      "phoneLink"
-    ).href =
-      phoneHref;
-
-
-    document.getElementById(
-      "phone"
-    ).textContent =
-      phone;
-
-
-    document.getElementById(
-      "phoneRow"
-    ).classList.remove(
-      "hidden"
-    );
-
-
-    document.getElementById(
       "phoneButton"
     ).addEventListener(
       "click",
@@ -2473,19 +2231,6 @@ function render(){
       }
     );
 
-
-    document.getElementById(
-      "phoneLink"
-    ).addEventListener(
-      "click",
-      function(){
-
-        track(
-          "phone"
-        );
-
-      }
-    );
 
   }else{
 
@@ -2579,86 +2324,10 @@ function render(){
   }
 
 
-  /* LOCATION */
-
-  if(
-    business.address
-  ){
-
-    document.getElementById(
-      "address"
-    ).textContent =
-      business.address;
-
-
-    const location =
-      safeUrl(
-        business.address
-      );
-
-
-    if(location){
-
-      document.getElementById(
-        "locationLink"
-      ).href =
-        location;
-
-
-      document.getElementById(
-        "locationLink"
-      ).addEventListener(
-        "click",
-        function(){
-
-          track(
-            "location"
-          );
-
-        }
-      );
-
-    }else{
-
-      document.getElementById(
-        "locationLink"
-      ).style.display =
-        "none";
-
-    }
-
-
-    document.getElementById(
-      "locationRow"
-    ).classList.remove(
-      "hidden"
-    );
-
-  }
-
-
   /* DIGITAL CHANNELS — BUSINESS → CUSTOMER PROFILE */
 
   renderDigitalChannels();
 
-
-
-  /* CONTACT */
-
-  const hasContact =
-    !!business.phone ||
-    !!business.address;
-
-
-  if(hasContact){
-
-    document.getElementById(
-      "contactSection"
-    ).classList.remove(
-      "hidden"
-    );
-
-  }
 
 
   /* HOURS */
