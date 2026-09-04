@@ -1,11 +1,3 @@
-LEO CONNECT – ADIM 2
-TAM SERVER.JS
-
-Mevcut server.js dosyanın TAMAMINI silip aşağıdaki kodun TAMAMINI yapıştır.
-Bu dosya orijinal repo baz alınarak hazırlandı; yalnızca müşteri profilinin güncel veriyi alması için cache başlıkları eklendi.
-
-==================== KOD ====================
-
 require('dotenv').config();
 
 const express = require('express');
@@ -3553,9 +3545,10 @@ app.put('/api/business-review-booster', auth, requireBusinessPermission('review'
 app.get(
   '/api/profile/:slug',
   async (req, res) => {
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.set('Pragma', 'no-cache');
-  res.set('Expires', '0');
+
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
 
     try {
 
@@ -3642,9 +3635,10 @@ app.get(
 app.get(
   '/api/profile-by-nfc/:code',
   async (req, res) => {
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.set('Pragma', 'no-cache');
-  res.set('Expires', '0');
+
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
 
     try {
 
@@ -4912,6 +4906,3 @@ initDatabase()
     process.exit(1);
 
   });
-
-
-==================== KOD SONU ====================
