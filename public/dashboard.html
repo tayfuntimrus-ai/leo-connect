@@ -1,3 +1,4 @@
+.profile-content-box{margin-top:16px}.profile-content-divider{border-top:1px solid var(--bc-line);padding-top:16px}.profile-content-box .design-toggle{min-height:38px}.profile-content-box .design-save-row{margin-top:14px}
 
 <!doctype html>
 <html lang="tr">
@@ -276,6 +277,16 @@ header{
 
   color:#fff;
 
+}
+
+.logout-button{
+  background:#101010;
+  border-color:#343434;
+}
+
+.logout-button:hover{
+  border-color:#c59a52;
+  color:#fff;
 }
 
 
@@ -2107,10 +2118,7 @@ main{
 .feature-status{padding:7px 10px;border-radius:999px;font-size:9px;font-weight:900;white-space:nowrap}.feature-status.on{background:#18351f;color:#8fe0a0;border:1px solid #285b35}.feature-status.off{background:#211616;color:#d88f8f;border:1px solid #4d2929}
 .live-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.live-kpis>div,.ai-mini,.ai-score{padding:14px;border:1px solid #292929;border-radius:13px;background:#0c0c0c}
 .live-kpis small,.ai-mini span,.ai-score span,.review-card small{display:block;color:#666;font-size:8px;letter-spacing:.1em;font-weight:900}.live-kpis strong{display:block;font-size:22px;margin-top:5px}
-.feature-list{display:grid;gap:8px}.feature-item{padding:11px 13px;border:1px solid #252525;border-radius:11px;background:#0b0b0b;color:#aaa;font-size:10px;line-height:1.55}
-.live-place{font-size:12px;font-weight:800;color:#ddd}
-.live-event{margin-top:4px;color:#9b9b9b;font-size:11px}
-.feature-empty{padding:18px;text-align:center;color:#666;font-size:10px;border:1px dashed #292929;border-radius:11px}
+.feature-list{display:grid;gap:8px}.feature-item{padding:11px 13px;border:1px solid #252525;border-radius:11px;background:#0b0b0b;color:#aaa;font-size:10px;line-height:1.55}.feature-empty{padding:18px;text-align:center;color:#666;font-size:10px;border:1px dashed #292929;border-radius:11px}
 .ai-score-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px}.ai-score strong{font-size:30px;display:inline-block;margin-right:9px;color:var(--gold-light)}.ai-mini strong{display:block;font-size:15px;margin-top:6px;color:#eee}
 .ai-columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}.ai-columns h3{font-size:12px;margin:0 0 8px}
 .review-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px}.review-card{padding:14px;border:1px solid #292929;border-radius:13px;background:#0c0c0c}.review-card strong,.review-card span,.review-card a{display:block;margin-top:6px;color:#ddd;font-size:11px;line-height:1.5}.review-card span{color:#777}.review-card a{color:var(--gold-light);text-decoration:none;font-weight:800}
@@ -2789,6 +2797,14 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
     >
       Site
     </a>
+
+    <button
+      type="button"
+      class="header-button logout-button"
+      onclick="logoutBusiness()"
+    >
+      ↪ Çıkış
+    </button>
 
   </div>
 
@@ -4188,8 +4204,26 @@ if(!token){
 
 
 /* ==================================================
+   BUSINESS LOGOUT
+================================================== */
+
+function logoutBusiness(){
+
+  localStorage.removeItem(
+    "token"
+  );
+
+  window.location.href =
+    "/login";
+
+}
+
+
+/* ==================================================
    FIELDS
 ================================================== */
+
+
 
 const fields = [
 
@@ -6013,36 +6047,22 @@ load();
 function esc(value){return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
 function formatEventType(type){
   const events={
+    profile_view:{icon:"👤",label:"Profil görüntülendi"},
     qr:{icon:"📱",label:"QR kod tarandı"},
     qr_scan:{icon:"📱",label:"QR kod tarandı"},
     nfc:{icon:"📡",label:"NFC dokunuldu"},
-    instagram:{icon:"📸",label:"Instagram'a tıklandı"},
-    facebook:{icon:"🔵",label:"Facebook'a tıklandı"},
-    tiktok:{icon:"🎵",label:"TikTok'a tıklandı"},
-    youtube:{icon:"▶️",label:"YouTube'a tıklandı"},
-    linkedin:{icon:"💼",label:"LinkedIn'e tıklandı"},
-    x:{icon:"𝕏",label:"X'e tıklandı"},
     whatsapp:{icon:"💬",label:"WhatsApp'a tıklandı"},
-    google_review:{icon:"🔎",label:"Google'a tıklandı"},
-    website:{icon:"🌐",label:"Website'e tıklandı"},
-    yemeksepeti:{icon:"🛵",label:"Yemeksepeti'ne tıklandı"},
-    getir:{icon:"🟣",label:"Getir'e tıklandı"},
-    "trendyol-yemek":{icon:"🟠",label:"Trendyol Yemek'e tıklandı"},
-    "migros-yemek":{icon:"🟠",label:"Migros Yemek'e tıklandı"},
-    rezervasyon:{icon:"📅",label:"Rezervasyona tıklandı"},
-    bilet:{icon:"🎟️",label:"Bilet / Etkinlik'e tıklandı"},
-    menu:{icon:"📋",label:"Online Menü'ye tıklandı"},
-    location:{icon:"📍",label:"Konuma tıklandı"},
-    tripadvisor:{icon:"🟢",label:"Tripadvisor'a tıklandı"},
-    booking:{icon:"🔵",label:"Booking'e tıklandı"},
-    telegram:{icon:"✈️",label:"Telegram'a tıklandı"},
-    email:{icon:"✉️",label:"E-posta'ya tıklandı"},
-    share:{icon:"↗️",label:"Profil paylaşıldı"},
-    iban:{icon:"💳",label:"IBAN görüntülendi"},
-    profile_view:{icon:"👤",label:"Profil görüntülendi"},
+    phone:{icon:"☎️",label:"Telefon numarasına tıklandı"},
+    instagram:{icon:"📸",label:"Instagram'a tıklandı"},
+    tiktok:{icon:"🎵",label:"TikTok'a tıklandı"},
+    google_review:{icon:"⭐",label:"Google yorumlarına gidildi"},
     review_open:{icon:"⭐",label:"Yorum sayfası açıldı"},
     review_positive:{icon:"👍",label:"Olumlu yorum seçildi"},
     review_feedback:{icon:"💬",label:"Yorum geri bildirimi gönderildi"},
+    website:{icon:"🌐",label:"Web sitesine tıklandı"},
+    menu:{icon:"📋",label:"Menü açıldı"},
+    location:{icon:"📍",label:"Konum açıldı"},
+    share:{icon:"↗️",label:"Profil paylaşıldı"},
     campaign_view:{icon:"🚀",label:"Kampanya görüntülendi"},
     campaign_click:{icon:"🚀",label:"Kampanyaya tıklandı"}
   };
@@ -6074,10 +6094,8 @@ async function loadBusinessLive(){
   document.getElementById("liveActivityList").innerHTML=rows.length
     ? rows.map(x=>{
         const time=x.created_at?new Date(x.created_at).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
-        const place=x.nfc_name
-          ? `<span class="live-place">${esc(x.nfc_name)}</span>`
-          : `<span class="live-place">Genel Profil</span>`;
-        return `<div class="feature-item"><strong>${place}</strong><div class="live-event">${esc(formatEventType(x.type))}</div><span style="float:right;color:#666">${esc(time)}</span></div>`;
+        const extra=x.nfc_name?` • ${esc(x.nfc_name)}`:"";
+        return `<div class="feature-item"><strong>${esc(formatEventType(x.type))}</strong>${extra}<span style="float:right;color:#666">${esc(time)}</span></div>`;
       }).join("")
     : '<div class="feature-empty">Henüz aktivite yok.</div>';
 }
