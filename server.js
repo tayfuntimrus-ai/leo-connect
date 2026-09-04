@@ -1,3 +1,14 @@
+LEO CONNECT – ADIM 2
+
+DOSYA: server.js
+
+YAPILACAK:
+Mevcut server.js dosyanın TAMAMINI sil ve aşağıdaki kodun TAMAMINI yapıştır.
+
+NOT: dashboard.html'ye bu adımda dokunma.
+
+==================== KOD BAŞLANGICI ====================
+
 require('dotenv').config();
 
 const express = require('express');
@@ -3546,6 +3557,11 @@ app.get(
   '/api/profile/:slug',
   async (req, res) => {
 
+    // Public business profiles must always read the latest saved content.
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+
     try {
 
       const slug =
@@ -3631,6 +3647,11 @@ app.get(
 app.get(
   '/api/profile-by-nfc/:code',
   async (req, res) => {
+
+    // NFC public profiles must always read the latest saved content.
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
 
     try {
 
@@ -4898,3 +4919,6 @@ initDatabase()
     process.exit(1);
 
   });
+
+
+==================== KOD SONU ====================
