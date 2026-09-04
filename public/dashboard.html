@@ -1,3 +1,5 @@
+.profile-content-box{margin-top:16px}.profile-content-divider{border-top:1px solid var(--bc-line);padding-top:16px}.profile-content-box .design-toggle{min-height:38px}.profile-content-box .design-save-row{margin-top:14px}
+
 <!doctype html>
 <html lang="tr">
 
@@ -5612,7 +5614,7 @@ async function save(){
   /* WHATSAPP */
 
   const whatsappNumber =
-    data.whatsapp.replace(
+    String(data.whatsapp || "").replace(
       /\D/g,
       ""
     );
@@ -5622,7 +5624,7 @@ async function save(){
   if(
     whatsappNumber &&
     !/^https?:\/\//i.test(
-      data.whatsapp
+      String(data.whatsapp || "")
     )
   ){
 
