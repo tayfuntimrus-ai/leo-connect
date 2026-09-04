@@ -121,8 +121,8 @@ function normalizeSocialLinks(value){
   const out={};
   for(const key of LEO_V2_SOCIAL_PLATFORMS){
     const item=raw[key];
-    if(typeof item==='string') out[key]={url:item.trim().slice(0,2000),enabled:true};
-    else if(item && typeof item==='object') out[key]={url:String(item.url||'').trim().slice(0,2000),enabled:item.enabled!==false,label:String(item.label||'').trim().slice(0,80)};
+    if(typeof item==='string') out[key]={url:item.trim().slice(0,2000),enabled:true,icon_url:''};
+    else if(item && typeof item==='object') out[key]={url:String(item.url||'').trim().slice(0,2000),enabled:item.enabled!==false,label:String(item.label||'').trim().slice(0,80),icon_url:String(item.icon_url||'').trim().slice(0,2000)};
   }
   return out;
 }
@@ -136,6 +136,7 @@ function normalizeCustomLinks(value){
     title:String(item?.title || '').trim().slice(0,80),
     url:String(item?.url || '').trim().slice(0,2000),
     icon:String(item?.icon || '🔗').trim().slice(0,8),
+    icon_url:String(item?.icon_url || '').trim().slice(0,2000),
     enabled:item?.enabled!==false,
     sort_order:Number.isFinite(Number(item?.sort_order)) ? Number(item.sort_order) : i
   })).filter(x=>x.title && x.url);
