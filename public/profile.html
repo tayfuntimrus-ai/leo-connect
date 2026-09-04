@@ -1593,7 +1593,10 @@ async function getBusiness(){
     pathParts[0] === "p" &&
     pathParts[1] === "nfc"
   ){
-    source = "nfc";
+    source =
+      source === "qr"
+        ? "qr"
+        : "nfc";
   }
 
   let endpoint = "";
@@ -1714,7 +1717,7 @@ async function track(
             type,
             source: source || 'direct',
             nfc_code:
-              source === 'nfc'
+              (source === 'nfc' || source === 'qr')
                 ? nfcCode
                 : ''
           })
