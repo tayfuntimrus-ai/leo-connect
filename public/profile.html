@@ -17,9 +17,100 @@
 <div class="section bottom-grid"><div id="socialMini" class="mini"><h3>Bizi Takip Edin</h3><div class="socials"><a id="socialInstagram" class="hidden" href="#" target="_blank" rel="noopener">◎</a><a id="socialTiktok" class="hidden" href="#" target="_blank" rel="noopener">♪</a></div></div><div id="paymentMini" class="mini"><h3>Ödeme Bilgileri</h3><div class="pay"><span class="pay-icon">▣</span><strong>IBAN ile Öde</strong></div></div></div>
 <section id="ibanSection" class="hidden"><div id="iban">-</div><div id="ibanHolder">-</div><button onclick="copyIBAN()">IBAN Kopyala</button><div id="ibanMessage"></div><button onclick="copyIBANHolder()">Adı Kopyala</button><div id="ibanHolderMessage"></div></section>
 <section id="socialSection" class="hidden"><a id="instagramLink" class="hidden"></a><a id="tiktokLink" class="hidden"></a><a id="googleLink" class="hidden"></a><a id="websiteLink" class="hidden"></a><a id="menuLink" class="hidden"></a></section>
-<div id="dynamicFeatured" class="hidden"><strong id="dynamicFeaturedTitle"></strong><span id="dynamicFeaturedText"></span><img id="dynamicFeaturedImage"></div><div id="dynamicVideo" class="hidden"><div id="dynamicVideoFrame"></div></div><section id="reviewBooster" class="hidden"><div id="reviewBoosterTitle"></div><div id="reviewBoosterText"></div><div id="reviewBoosterStars"></div><div id="reviewBoosterMessage"></div><div id="reviewBoosterActions"></div></section>
-<footer class="footer">Powered by <b>LEO CONNECT</b><br><span>Daha Fazla Bağlantı&nbsp; | &nbsp;Daha Fazla Müşteri</span></footer>
-</main><script>
+<div id="dynamicFeatured" class="hidden"><strong id="dynamicFeaturedTitle"></strong><span id="dynamicFeaturedText"></span><img id="dynamicFeaturedImage"><a id="dynamicFeaturedButton" target="_blank" rel="noopener"></a></div><div id="dynamicVideo" class="hidden"><div id="dynamicVideoFrame"></div></div><section id="reviewBooster" class="hidden"><div id="reviewBoosterTitle"></div><div id="reviewBoosterText"></div><div id="reviewBoosterStars"></div><div id="reviewBoosterMessage"></div><div id="reviewBoosterActions"></div></section>
+<footer class="footer"><span class="leo-signature">Leo Connect ile çalışıyor</span></footer>
+</main>
+
+<style id="leo-accent-layer">
+/* ============================================================
+   ISLETMEYE OZEL VURGU + SABIT LEO CONNECT IMZASI
+
+   --lc-gold isletmenin sectigi accent_color ile doldurulur
+   (renderDynamicProfile icinde). Varsayilani marka amberi.
+
+   --lc-on-accent, vurgu zemini uzerindeki METIN rengidir. Isletme
+   acik bir renk sectiginde beyaz yazi okunmaz hale gelecegi icin
+   JS tarafinda parlaklik hesaplanip koyu/acik olarak ayarlanir.
+   ============================================================ */
+:root{
+  --lc-gold:#EF9F27;
+  --lc-on-accent:#17120A;
+  --lc-gold-wash:rgba(239,159,39,.14);
+  --leo-brand:#EF9F27;   /* imza icin SABIT marka rengi, isletmeye bagli degil */
+}
+
+/* --- Siparis Ver: vurgu rengiyle one cikar --- */
+#utilityOrder{
+  background:var(--lc-gold) !important;
+  border-color:var(--lc-gold) !important;
+  color:var(--lc-on-accent) !important;
+  font-weight:900 !important;
+}
+#utilityOrder span{ color:inherit !important; }
+
+/* --- One cikan blok: vurgu cercevesi ve baslik --- */
+#dynamicFeatured{
+  border:1px solid var(--lc-gold);
+  box-shadow:0 0 0 3px var(--lc-gold-wash);
+}
+#dynamicFeaturedTitle{ color:var(--lc-gold); }
+
+/* One cikan butonu markup'ta HIC YOKTU; JS onu ariyor ama bulamiyordu,
+   bu yuzden panelde girilen buton metni ve linki musteriye hic
+   gorunmuyordu. Element eklendi.
+   Gorunurluk .show ile yonetiliyor (JS bu sinifi ekliyor). */
+#dynamicFeaturedButton{ display:none; }
+#dynamicFeaturedButton.show{
+  display:inline-block;
+  margin-top:14px;
+  padding:11px 18px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:800;
+  text-decoration:none;
+  background:var(--lc-gold);
+  border:1px solid var(--lc-gold);
+  color:var(--lc-on-accent);
+}
+
+/* --- Duyuru ve kampanya vurgulari --- */
+#dynamicAnnouncement{ border-left:3px solid var(--lc-gold); }
+#dynamicCampaignButton,
+.smart-campaign-button{
+  background:var(--lc-gold) !important;
+  border-color:var(--lc-gold) !important;
+  color:var(--lc-on-accent) !important;
+}
+.smart-campaign-kicker{ color:var(--lc-gold) !important; }
+
+/* --- Leo Connect imzasi: HER ZAMAN sabit marka rengi --- */
+.footer{
+  text-align:center;
+  padding:26px 0 18px;
+}
+.leo-signature{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  letter-spacing:.09em;
+  color:#7c828c;
+  opacity:.85;
+}
+.leo-signature::before{
+  content:"🦁";
+  font-size:11px;
+  filter:saturate(.9);
+}
+.leo-signature::after{
+  content:"";
+  width:5px;height:5px;border-radius:50%;
+  background:var(--leo-brand);
+  margin-left:2px;
+}
+</style>
+
+<script>
 
 
 
@@ -532,14 +623,58 @@ function renderPreviewProducts(){
   box.classList.remove('hidden');
 }
 
+/* ==================================================
+   ISLETMEYE OZEL VURGU RENGI
+
+   Isletme kendi rengini secebiliyor. Renk KOYU da ACIK da olabilecegi
+   icin uzerindeki yazi rengi sabit olamaz: parlaklik hesaplanip
+   koyu ya da acik metin seciliyor. Aksi halde acik sari secen bir
+   isletmede beyaz yazi okunmaz hale gelirdi.
+
+   Sunucu da ayni dogrulamayi yapiyor (normalizeAccentColor); buradaki
+   kontrol ikinci kat koruma — deger CSS'e yaziliyor.
+================================================== */
+const LEO_BRAND_ACCENT='#EF9F27';
+
+function normalizeAccent(value){
+  const raw=String(value==null?'':value).trim();
+  if(/^#[0-9a-f]{6}$/i.test(raw)) return raw.toUpperCase();
+  if(/^#[0-9a-f]{3}$/i.test(raw)) return ('#'+raw.slice(1).split('').map(c=>c+c).join('')).toUpperCase();
+  return LEO_BRAND_ACCENT;
+}
+
+/* WCAG bagil parlaklik */
+function relLuminance(hex){
+  const v=[1,3,5].map(i=>parseInt(hex.substr(i,2),16)/255)
+    .map(c=>c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4));
+  return 0.2126*v[0]+0.7152*v[1]+0.0722*v[2];
+}
+
+function applyBusinessAccent(value){
+  const accent=normalizeAccent(value);
+  const L=relLuminance(accent);
+  /* koyu metin kontrasti: (L+0.05)/0.05   acik metin: 1.05/(L+0.05) */
+  const onAccent=((L+0.05)/0.05) >= (1.05/(L+0.05)) ? '#17120A' : '#FFFFFF';
+  const root=document.documentElement.style;
+  root.setProperty('--lc-gold',accent);
+  root.setProperty('--lc-on-accent',onAccent);
+  /* Soluk halka rengi. color-mix() eski mobil tarayicilarda desteklenmiyor,
+     bu yuzden rgba burada hesaplaniyor. */
+  const r=parseInt(accent.substr(1,2),16),
+        g=parseInt(accent.substr(3,2),16),
+        b=parseInt(accent.substr(5,2),16);
+  root.setProperty('--lc-gold-wash',`rgba(${r},${g},${b},.14)`);
+}
+
+/* Isletme verisi gelmeden once de marka rengiyle basla */
+applyBusinessAccent(LEO_BRAND_ACCENT);
+
 function renderDynamicProfile(){
   const d=business?.profile_design || {};
   const theme=String(d.theme||'midnight-gold');
   document.body.classList.remove('theme-obsidian','theme-champagne','theme-pure-light');
   if(theme!=='midnight-gold') document.body.classList.add('theme-'+theme);
-  if(d.accent_color && /^#[0-9a-f]{6}$/i.test(String(d.accent_color))){
-    document.documentElement.style.setProperty('--lc-gold',d.accent_color);
-  }
+  applyBusinessAccent(d.accent_color);
 
   const cover=document.getElementById('dynamicCover');
   const coverImg=document.getElementById('dynamicCoverImage');

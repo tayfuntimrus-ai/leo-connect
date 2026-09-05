@@ -288,9 +288,35 @@ function normalizeCustomLinks(value){
   })).filter(x=>x.title && x.url);
 }
 
+/*
+  ISLETMEYE OZEL VURGU RENGI
+
+  Musteri profil sayfasindaki vurgu rengi isletme basina secilebilir ve
+  profile.html icinde --lc-gold degiskenine yazilir.
+
+  Varsayilan, Leo Connect marka amberi. Isletme kendi rengini secmediyse
+  marka rengini gorur.
+
+  DIKKAT: bu deger tarayicida style.setProperty('--lc-gold', deger)
+  icine gidiyor. Dogrulanmazsa CSS enjeksiyonuna acik olur; bu yuzden
+  normalizeAccentColor() ile SUNUCUDA da 6 haneli hex'e zorlanir.
+  (profile.html ayrica istemcide de kontrol ediyor — iki kat koruma.)
+*/
+const LEO_BRAND_ACCENT = '#EF9F27';
+const LEGACY_DEFAULT_ACCENT = '#D4AF37';
+
+function normalizeAccentColor(value) {
+  const raw = String(value == null ? '' : value).trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(raw)) return raw.toUpperCase();
+  if (/^#[0-9a-fA-F]{3}$/.test(raw)) {
+    return ('#' + raw.slice(1).split('').map(c => c + c).join('')).toUpperCase();
+  }
+  return LEO_BRAND_ACCENT;
+}
+
 const DYNAMIC_PROFILE_DEFAULTS = {
   theme: 'midnight-gold',
-  accent_color: '#D4AF37',
+  accent_color: LEO_BRAND_ACCENT,
   cover_url: '',
   cover_position: 'center',
   announcement_text: '',
@@ -787,7 +813,7 @@ async function initDatabase() {
       id SERIAL PRIMARY KEY,
       business_id INTEGER NOT NULL UNIQUE REFERENCES businesses(id) ON DELETE CASCADE,
       theme TEXT NOT NULL DEFAULT 'midnight-gold',
-      accent_color TEXT NOT NULL DEFAULT '#D4AF37',
+      accent_color TEXT NOT NULL DEFAULT '#EF9F27',
       cover_url TEXT DEFAULT '',
       cover_position TEXT DEFAULT 'center',
       announcement_text TEXT DEFAULT '',
@@ -816,6 +842,40 @@ async function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_profile_designs_business_id
     ON profile_designs(business_id)
   `);
+
+
+  /*
+    VURGU RENGI VARSAYILANINI MARKA AMBERINE TASI
+
+    CREATE TABLE IF NOT EXISTS yalnizca yeni veritabanlarini etkiler;
+    var olan tabloda kolon varsayilani ayrica degistirilmeli.
+
+    Eski varsayilanda (#D4AF37) DURAN satirlar da tasiniyor. Bu guvenli:
+    isletme panelinde renk secici BU SURUMDEN ONCE HIC YOKTU, yani o
+    degeri hicbir isletme bilerek secmemisti — hepsi varsayilandi.
+    Bilerek baska bir renk secilmis satirlara dokunulmuyor.
+
+    try/catch icinde: basarisiz olsa bile sunucu acilmaya devam etmeli.
+  */
+  try {
+    await pool.query(`
+      ALTER TABLE profile_designs
+      ALTER COLUMN accent_color SET DEFAULT '${LEO_BRAND_ACCENT}'
+    `);
+
+    const moved = await pool.query(
+      `UPDATE profile_designs
+          SET accent_color = $1
+        WHERE UPPER(accent_color) = $2`,
+      [LEO_BRAND_ACCENT, LEGACY_DEFAULT_ACCENT]
+    );
+
+    if (moved.rowCount > 0) {
+      console.log(`${moved.rowCount} işletmenin vurgu rengi marka amberine taşındı.`);
+    }
+  } catch (error) {
+    console.error('Vurgu rengi varsayılanı taşınamadı, sunucu yine de başlatılıyor:', error.message);
+  }
 
   console.log('PostgreSQL + NFC Tag Management hazır.');
 }
@@ -2914,7 +2974,7 @@ app.get('/api/business-v2-settings', auth, requireBusinessPermission('profile'),
     const d=await pool.query(`SELECT theme,accent_color FROM profile_designs WHERE business_id=$1 LIMIT 1`,[req.user.id]);
     const design=d.rows[0]||{};
     const theme=LEO_V2_THEMES[design.theme] ? design.theme : 'midnight-gold';
-    res.json({theme,themes:LEO_V2_THEMES,theme_permission:r.rows[0].profile_theme_permission!==false,accent_color:design.accent_color||'#D4AF37',social_links:normalizeSocialLinks(r.rows[0].social_links),custom_links:normalizeCustomLinks(r.rows[0].custom_links),allowed_platforms:normalizeAllowedPlatforms(r.rows[0].social_platform_permissions)});
+    res.json({theme,themes:LEO_V2_THEMES,theme_permission:r.rows[0].profile_theme_permission!==false,accent_color:normalizeAccentColor(design.accent_color),social_links:normalizeSocialLinks(r.rows[0].social_links),custom_links:normalizeCustomLinks(r.rows[0].custom_links),allowed_platforms:normalizeAllowedPlatforms(r.rows[0].social_platform_permissions)});
   }catch(e){console.error('V2 SETTINGS GET ERROR:',e);res.status(500).json({error:'Profil ayarları alınamadı'});}
 });
 
@@ -2925,7 +2985,7 @@ app.put('/api/business-theme', auth, requireBusinessPermission('profile'), async
     if(b.rows[0].profile_theme_permission===false) return res.status(403).json({error:'Tema değiştirme yetkisi admin tarafından kapatıldı'});
     const theme=String(req.body?.theme||'').trim();
     if(!LEO_V2_THEMES[theme]) return res.status(400).json({error:'Geçersiz tema'});
-    const accent=String(req.body?.accent_color||'').trim().slice(0,30)||'#D4AF37';
+    const accent=normalizeAccentColor(req.body?.accent_color);
     const r=await pool.query(`INSERT INTO profile_designs(business_id,theme,accent_color,updated_at) VALUES($1,$2,$3,CURRENT_TIMESTAMP) ON CONFLICT(business_id) DO UPDATE SET theme=EXCLUDED.theme,accent_color=EXCLUDED.accent_color,updated_at=CURRENT_TIMESTAMP RETURNING theme,accent_color`,[req.user.id,theme,accent]);
     res.json({theme:r.rows[0].theme,accent_color:r.rows[0].accent_color,theme_name:LEO_V2_THEMES[r.rows[0].theme].name});
   }catch(e){console.error('BUSINESS THEME UPDATE ERROR:',e);res.status(500).json({error:'Tema kaydedilemedi'});}
@@ -2960,7 +3020,7 @@ app.put('/api/business-custom-links', auth, requireBusinessPermission('profile')
 app.get('/api/admin/business/:id/v2-settings', adminAuth, async (req,res)=>{
   try{
     const id=Number(req.params.id);
-    const r=await pool.query(`SELECT b.id,b.name,b.profile_theme_permission,b.social_links,b.custom_links,b.social_platform_permissions,COALESCE(pd.theme,'midnight-gold') theme,COALESCE(pd.accent_color,'#D4AF37') accent_color FROM businesses b LEFT JOIN profile_designs pd ON pd.business_id=b.id WHERE b.id=$1 LIMIT 1`,[id]);
+    const r=await pool.query(`SELECT b.id,b.name,b.profile_theme_permission,b.social_links,b.custom_links,b.social_platform_permissions,COALESCE(pd.theme,'midnight-gold') theme,COALESCE(pd.accent_color,'#EF9F27') accent_color FROM businesses b LEFT JOIN profile_designs pd ON pd.business_id=b.id WHERE b.id=$1 LIMIT 1`,[id]);
     if(!r.rows.length) return res.status(404).json({error:'İşletme bulunamadı'});
     const row=r.rows[0];
     res.json({id:row.id,name:row.name,theme:LEO_V2_THEMES[row.theme]?row.theme:'midnight-gold',themes:LEO_V2_THEMES,theme_permission:row.profile_theme_permission!==false,accent_color:row.accent_color,social_links:normalizeSocialLinks(row.social_links),custom_links:normalizeCustomLinks(row.custom_links),allowed_platforms:normalizeAllowedPlatforms(row.social_platform_permissions)});
@@ -2971,7 +3031,7 @@ app.put('/api/admin/business/:id/theme', adminAuth, async (req,res)=>{
   try{
     const id=Number(req.params.id), theme=String(req.body?.theme||'').trim();
     if(!LEO_V2_THEMES[theme]) return res.status(400).json({error:'Geçersiz tema'});
-    const accent=String(req.body?.accent_color||'').trim().slice(0,30)||'#D4AF37';
+    const accent=normalizeAccentColor(req.body?.accent_color);
     const r=await pool.query(`INSERT INTO profile_designs(business_id,theme,accent_color,updated_at) VALUES($1,$2,$3,CURRENT_TIMESTAMP) ON CONFLICT(business_id) DO UPDATE SET theme=EXCLUDED.theme,accent_color=EXCLUDED.accent_color,updated_at=CURRENT_TIMESTAMP RETURNING theme,accent_color`,[id,theme,accent]);
     res.json({theme:r.rows[0].theme,accent_color:r.rows[0].accent_color,theme_name:LEO_V2_THEMES[r.rows[0].theme].name});
   }catch(e){console.error('ADMIN THEME UPDATE ERROR:',e);res.status(500).json({error:'Tema kaydedilemedi'});}
@@ -3484,7 +3544,7 @@ app.put('/api/business-profile-design', auth, requireBusinessPermission('profile
     const values = [
       req.user.id,
       str(body.theme, 80) || DYNAMIC_PROFILE_DEFAULTS.theme,
-      str(body.accent_color, 30) || DYNAMIC_PROFILE_DEFAULTS.accent_color,
+      normalizeAccentColor(body.accent_color),
       str(body.cover_url, 2000),
       str(body.cover_position, 50) || 'center',
       str(body.announcement_text, 1000),
