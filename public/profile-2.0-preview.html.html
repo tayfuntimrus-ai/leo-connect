@@ -1,0 +1,2488 @@
+<!doctype html>
+<html lang="tr">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1"
+>
+
+<meta
+  name="theme-color"
+  content="#080808"
+>
+
+<title>LEO CONNECT</title>
+
+<style>
+
+:root{
+  --gold:#c59a52;
+  --gold-light:#e0bd7b;
+  --black:#080808;
+  --dark:#101010;
+  --dark-2:#151515;
+  --border:#292929;
+  --muted:#858585;
+  --green:#45c27a;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+
+  margin:0;
+
+  min-height:100vh;
+
+  background:
+
+    radial-gradient(
+      circle at 50% -10%,
+      #c59a5222,
+      transparent 35%
+    ),
+
+    radial-gradient(
+      circle at 100% 50%,
+      #c59a5210,
+      transparent 30%
+    ),
+
+    #080808;
+
+  color:#fff;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+}
+
+
+/* ==================================================
+   PAGE
+================================================== */
+
+.page{
+
+  width:min(
+    520px,
+    100%
+  );
+
+  min-height:100vh;
+
+  margin:auto;
+
+  padding:
+    22px 18px 45px;
+
+}
+
+
+/* ==================================================
+   TOP BRAND
+================================================== */
+
+.top-brand{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:9px;
+
+  margin-bottom:22px;
+
+}
+
+
+.brand-lion{
+
+  width:38px;
+
+  height:38px;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:12px;
+
+  background:#050505;
+
+  border:
+    1px solid #c59a5260;
+
+  font-size:21px;
+
+}
+
+
+.brand-name{
+
+  font-size:13px;
+
+  font-weight:800;
+
+  letter-spacing:.15em;
+
+}
+
+
+.brand-name span{
+
+  color:
+    var(--gold-light);
+
+}
+
+
+/* ==================================================
+   HERO
+================================================== */
+
+.hero{
+
+  position:relative;
+
+  overflow:hidden;
+
+  text-align:center;
+
+  padding:
+    30px 22px 27px;
+
+  border-radius:28px;
+
+  border:
+    1px solid #c59a5245;
+
+  background:
+
+    radial-gradient(
+      circle at 50% 0%,
+      #c59a5218,
+      transparent 45%
+    ),
+
+    linear-gradient(
+      145deg,
+      #171717,
+      #0c0c0c
+    );
+
+  box-shadow:
+    0 30px 90px #00000080;
+
+}
+
+
+.hero::before{
+
+  content:"";
+
+  position:absolute;
+
+  width:220px;
+
+  height:220px;
+
+  top:-150px;
+
+  left:50%;
+
+  transform:
+    translateX(-50%);
+
+  border-radius:50%;
+
+  border:
+    1px solid #c59a5215;
+
+}
+
+
+.logo{
+
+  position:relative;
+
+  z-index:2;
+
+  width:120px;
+
+  height:120px;
+
+  margin:
+    0 auto 18px;
+
+  display:grid;
+
+  place-items:center;
+
+  overflow:hidden;
+
+  border-radius:30px;
+
+  background:#050505;
+
+  border:
+    1px solid #c59a5270;
+
+  box-shadow:
+    0 18px 45px #000;
+
+}
+
+
+.logo img{
+
+  width:100%;
+
+  height:100%;
+
+  object-fit:cover;
+
+}
+
+
+.logo-placeholder{
+
+  font-size:48px;
+
+}
+
+
+.business-name{
+
+  position:relative;
+
+  z-index:2;
+
+  margin:0;
+
+  font-size:30px;
+
+  line-height:1.15;
+
+  font-weight:800;
+
+  letter-spacing:-.02em;
+
+  word-break:break-word;
+
+}
+
+
+.category{
+
+  display:inline-block;
+
+  margin-top:10px;
+
+  padding:
+    7px 12px;
+
+  border-radius:999px;
+
+  background:#c59a5212;
+
+  border:
+    1px solid #c59a5235;
+
+  color:
+    var(--gold-light);
+
+  font-size:10px;
+
+  font-weight:700;
+
+  letter-spacing:.06em;
+
+}
+
+
+.description{
+
+  position:relative;
+
+  z-index:2;
+
+  margin:
+    15px auto 0;
+
+  max-width:410px;
+
+  color:#929292;
+
+  font-size:13px;
+
+  line-height:1.65;
+
+}
+
+
+/* ==================================================
+   CONNECTION STATUS
+================================================== */
+
+.status{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:7px;
+
+  margin-top:16px;
+
+  color:#626262;
+
+  font-size:9px;
+
+  letter-spacing:.12em;
+
+}
+
+
+.status-dot{
+
+  width:6px;
+
+  height:6px;
+
+  border-radius:50%;
+
+  background:
+    var(--green);
+
+  box-shadow:
+    0 0 10px #45c27a88;
+
+}
+
+
+/* ==================================================
+   PRIMARY ACTIONS
+================================================== */
+
+.actions{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:10px;
+
+  margin-top:18px;
+
+}
+
+
+.action{
+
+  min-height:52px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:8px;
+
+  padding:
+    13px 10px;
+
+  border-radius:13px;
+
+  border:
+    1px solid #303030;
+
+  background:#151515;
+
+  color:#fff;
+
+  text-decoration:none;
+
+  font-size:12px;
+
+  font-weight:800;
+
+  transition:
+    transform .15s,
+    border-color .15s;
+
+}
+
+
+.action:active{
+
+  transform:
+    scale(.98);
+
+}
+
+
+.action.gold{
+
+  background:
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
+    );
+
+  border-color:
+    #c59a52;
+
+}
+
+
+/* ==================================================
+   SECTION
+================================================== */
+
+.section{
+
+  margin-top:15px;
+
+  padding:19px;
+
+  border-radius:21px;
+
+  border:
+    1px solid var(--border);
+
+  background:
+    linear-gradient(
+      145deg,
+      #141414,
+      #0d0d0d
+    );
+
+}
+
+
+.section-title{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:9px;
+
+  margin-bottom:13px;
+
+}
+
+
+.section-icon{
+
+  width:34px;
+
+  height:34px;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:10px;
+
+  background:#080808;
+
+  border:
+    1px solid #c59a5230;
+
+  font-size:16px;
+
+}
+
+
+.section-title strong{
+
+  font-size:13px;
+
+}
+
+
+.section-title span{
+
+  display:block;
+
+  margin-top:3px;
+
+  color:#555;
+
+  font-size:9px;
+
+}
+
+
+/* ==================================================
+   LINK GRID
+================================================== */
+
+.link-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:9px;
+
+}
+
+
+.link{
+
+  min-height:50px;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:9px;
+
+  padding:
+    11px;
+
+  border-radius:12px;
+
+  border:
+    1px solid #282828;
+
+  background:#101010;
+
+  color:#fff;
+
+  text-decoration:none;
+
+}
+
+
+.link-icon{
+
+  width:30px;
+
+  height:30px;
+
+  flex:none;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:9px;
+
+  background:#080808;
+
+  font-size:14px;
+
+}
+
+
+.link-text{
+
+  min-width:0;
+
+}
+
+
+.link-text strong{
+
+  display:block;
+
+  font-size:10px;
+
+}
+
+
+.link-text span{
+
+  display:block;
+
+  margin-top:3px;
+
+  color:#555;
+
+  font-size:8px;
+
+  overflow:hidden;
+
+  white-space:nowrap;
+
+  text-overflow:ellipsis;
+
+}
+
+
+/* ==================================================
+   INFO LIST
+================================================== */
+
+.info-list{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:8px;
+
+}
+
+
+.info-row{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:11px;
+
+  padding:12px;
+
+  border-radius:12px;
+
+  border:
+    1px solid #242424;
+
+  background:#101010;
+
+}
+
+
+.info-icon{
+
+  width:34px;
+
+  height:34px;
+
+  flex:none;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:10px;
+
+  background:#080808;
+
+  font-size:15px;
+
+}
+
+
+.info-content{
+
+  min-width:0;
+
+  flex:1;
+
+}
+
+
+.info-label{
+
+  display:block;
+
+  color:#555;
+
+  font-size:8px;
+
+  letter-spacing:.1em;
+
+}
+
+
+.info-value{
+
+  display:block;
+
+  margin-top:4px;
+
+  color:#ddd;
+
+  font-size:11px;
+
+  word-break:break-word;
+
+}
+
+
+.info-action{
+
+  padding:
+    7px 9px;
+
+  border-radius:8px;
+
+  border:
+    1px solid #333;
+
+  background:#181818;
+
+  color:var(--gold-light);
+
+  font-size:8px;
+
+  font-weight:800;
+
+  text-decoration:none;
+
+  cursor:pointer;
+
+}
+
+
+/* ==================================================
+   IBAN
+================================================== */
+
+.iban-card{
+
+  padding:16px;
+
+  border-radius:15px;
+
+  background:
+
+    linear-gradient(
+      135deg,
+      #171717,
+      #0d0d0d
+    );
+
+  border:
+    1px solid #c59a5230;
+
+}
+
+
+.iban-label{
+
+  color:#666;
+
+  font-size:8px;
+
+  letter-spacing:.12em;
+
+}
+
+
+.iban-number{
+
+  margin-top:9px;
+
+  color:#fff;
+
+  font-size:13px;
+
+  font-weight:800;
+
+  letter-spacing:.04em;
+
+  word-break:break-all;
+
+}
+
+
+.iban-holder{
+
+  margin-top:8px;
+
+  color:#fff;
+
+  font-size:13px;
+
+  font-weight:800;
+
+  word-break:break-word;
+
+}
+
+
+.iban-buttons{
+
+  display:flex;
+
+  gap:8px;
+
+  margin-top:12px;
+
+}
+
+
+.iban-button{
+
+  flex:1;
+
+  padding:10px;
+
+  border-radius:9px;
+
+  border:
+    1px solid #333;
+
+  background:#171717;
+
+  color:#ddd;
+
+  font-size:9px;
+
+  font-weight:800;
+
+  cursor:pointer;
+
+}
+
+
+.iban-button.gold{
+
+  background:
+    linear-gradient(
+      135deg,
+      #c59a52,
+      #9e7738
+    );
+
+  border-color:
+    #c59a52;
+
+  color:#fff;
+
+}
+
+
+.iban-message{
+
+  min-height:14px;
+
+  margin-top:8px;
+
+  color:
+    var(--gold-light);
+
+  font-size:9px;
+
+}
+
+
+/* ==================================================
+   HOURS
+================================================== */
+
+.hours-card{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+  padding:14px;
+
+  border-radius:13px;
+
+  background:#101010;
+
+  border:
+    1px solid #242424;
+
+}
+
+
+.hours-icon{
+
+  width:38px;
+
+  height:38px;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:11px;
+
+  background:#080808;
+
+  font-size:18px;
+
+}
+
+
+.hours-content strong{
+
+  display:block;
+
+  font-size:10px;
+
+}
+
+
+.hours-content span{
+
+  display:block;
+
+  margin-top:5px;
+
+  color:#aaa;
+
+  font-size:11px;
+
+}
+
+
+/* ==================================================
+   FOOTER
+================================================== */
+
+.footer{
+
+  margin-top:25px;
+
+  text-align:center;
+
+  color:#3d3d3d;
+
+  font-size:8px;
+
+  letter-spacing:.16em;
+
+}
+
+
+.powered{
+
+  margin-top:7px;
+
+  color:#292929;
+
+  font-size:8px;
+
+}
+
+
+/* ==================================================
+   HIDDEN
+================================================== */
+
+.hidden{
+
+  display:none !important;
+
+}
+
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+@media(max-width:380px){
+
+  .page{
+
+    padding-left:12px;
+
+    padding-right:12px;
+
+  }
+
+
+  .hero{
+
+    padding-left:16px;
+
+    padding-right:16px;
+
+  }
+
+
+  .link-grid{
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  .actions{
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+}
+
+
+/* ==================================================
+   LEO CONNECT PROFILE V2 — PREMIUM LAYER
+================================================== */
+:root{
+  --lc-gold:#d6ad55;
+  --lc-gold-soft:#f1d58c;
+  --lc-bg:#070707;
+  --lc-card:rgba(18,18,18,.88);
+  --lc-border:rgba(214,173,85,.20);
+}
+body{
+  background:
+    radial-gradient(circle at 50% -10%,rgba(214,173,85,.16),transparent 34%),
+    radial-gradient(circle at 0% 45%,rgba(214,173,85,.055),transparent 28%),
+    #070707 !important;
+}
+.page{max-width:720px !important; padding-top:18px !important;}
+.top-brand{
+  position:sticky;top:10px;z-index:20;
+  width:max-content;margin:0 auto 18px !important;
+  padding:9px 15px !important;border:1px solid var(--lc-border);
+  border-radius:999px;background:rgba(8,8,8,.78);backdrop-filter:blur(16px);
+  box-shadow:0 12px 35px rgba(0,0,0,.35), inset 0 0 18px rgba(214,173,85,.035);
+}
+.brand-lion{filter:drop-shadow(0 0 12px rgba(214,173,85,.25));}
+.brand-name{letter-spacing:.12em !important;}
+.hero{
+  position:relative;overflow:hidden;margin-top:4px !important;
+  padding:44px 24px 30px !important;border:1px solid var(--lc-border);
+  border-radius:30px !important;
+  background:linear-gradient(145deg,rgba(22,22,22,.96),rgba(8,8,8,.98));
+  box-shadow:0 28px 70px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.035);
+}
+.hero:before{
+  content:"";position:absolute;width:280px;height:280px;left:50%;top:-180px;transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(214,173,85,.20),transparent 68%);pointer-events:none;
+}
+.logo{
+  position:relative;z-index:1;width:132px !important;height:132px !important;
+  margin:0 auto 20px !important;padding:6px !important;
+  border:1px solid rgba(214,173,85,.52) !important;border-radius:34px !important;
+  background:linear-gradient(145deg,#151515,#080808) !important;
+  box-shadow:0 0 0 7px rgba(214,173,85,.045),0 20px 45px rgba(0,0,0,.48),0 0 34px rgba(214,173,85,.12);
+}
+.logo img,.logo-placeholder{border-radius:27px !important;}
+.business-name{
+  font-size:clamp(30px,7vw,46px) !important;line-height:1.05 !important;
+  letter-spacing:-.035em !important;text-shadow:0 8px 28px rgba(0,0,0,.5);
+}
+.category{
+  display:inline-flex !important;margin:12px auto 0 !important;padding:7px 13px !important;
+  border:1px solid var(--lc-border);border-radius:999px;background:rgba(214,173,85,.055);
+  color:var(--lc-gold-soft) !important;letter-spacing:.08em !important;
+}
+.description{max-width:560px;margin:16px auto 0 !important;color:#c9c9c9 !important;line-height:1.65 !important;}
+.status{
+  width:max-content;margin:20px auto 0 !important;padding:8px 12px !important;
+  border:1px solid rgba(214,173,85,.13);border-radius:999px;background:rgba(255,255,255,.025);
+  font-size:10px !important;letter-spacing:.12em !important;
+}
+.actions{margin-top:22px !important;gap:10px !important;}
+.action{
+  min-height:52px !important;border-radius:16px !important;border:1px solid var(--lc-border) !important;
+  box-shadow:0 10px 25px rgba(0,0,0,.25) !important;transition:transform .2s ease,box-shadow .2s ease !important;
+}
+.action:hover{transform:translateY(-2px);box-shadow:0 15px 32px rgba(0,0,0,.35) !important;}
+.section{
+  margin-top:16px !important;padding:22px !important;border:1px solid rgba(255,255,255,.07);
+  border-radius:24px !important;background:var(--lc-card) !important;
+  box-shadow:0 18px 45px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.025);
+  backdrop-filter:blur(12px);
+}
+.section-title{margin-bottom:18px !important;}
+.section-icon{
+  width:42px !important;height:42px !important;border-radius:13px !important;
+  border:1px solid var(--lc-border);background:rgba(214,173,85,.07) !important;
+}
+.info-row,.link,.hours-card,.iban-card{
+  border:1px solid rgba(255,255,255,.07) !important;background:rgba(255,255,255,.025) !important;
+  border-radius:17px !important;
+}
+.info-row{transition:border-color .2s ease,transform .2s ease;}
+.info-row:hover,.link:hover{border-color:rgba(214,173,85,.25) !important;transform:translateY(-1px);}
+.link{min-height:70px !important;}
+.link-icon{border-radius:13px !important;background:rgba(214,173,85,.07) !important;}
+.info-action{color:var(--lc-gold-soft) !important;}
+.hours-card{padding:18px !important;}
+.iban-card{box-shadow:inset 0 1px 0 rgba(255,255,255,.025) !important;}
+.iban-number{font-size:clamp(15px,4vw,20px) !important;letter-spacing:.035em;word-break:break-word;}
+.iban-button{border-radius:12px !important;transition:transform .2s ease !important;}
+.iban-button:hover{transform:translateY(-1px);}
+.footer{opacity:.8 !important;padding:28px 10px 34px !important;}
+.footer .powered{color:var(--lc-gold) !important;letter-spacing:.14em;}
+@media(max-width:520px){
+  .page{padding:10px 12px 0 !important;}
+  .hero{padding:34px 17px 22px !important;border-radius:24px !important;}
+  .section{padding:17px !important;border-radius:20px !important;}
+  .logo{width:112px !important;height:112px !important;border-radius:29px !important;}
+  .logo img,.logo-placeholder{border-radius:22px !important;}
+}
+
+
+
+/* ==================================================
+   LEO CONNECT V2 — DYNAMIC PROFILE
+================================================== */
+.dynamic-cover{
+  display:none;
+  position:relative;
+  min-height:190px;
+  margin:-24px -24px 22px;
+  overflow:hidden;
+  border-radius:24px 24px 0 0;
+  background:linear-gradient(145deg,#191919,#0a0a0a);
+  border-bottom:1px solid rgba(214,173,85,.16);
+}
+.dynamic-cover img{
+  width:100%;height:100%;min-height:190px;display:block;object-fit:cover;
+}
+.dynamic-cover::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 30%,rgba(7,7,7,.72) 100%);
+}
+.dynamic-announcement,
+.dynamic-campaign,
+.dynamic-featured,
+.dynamic-video{
+  display:none;
+  margin-top:16px;
+  padding:16px;
+  border-radius:18px;
+  border:1px solid rgba(214,173,85,.18);
+  background:linear-gradient(145deg,rgba(214,173,85,.09),rgba(255,255,255,.025));
+  text-align:left;
+}
+.dynamic-announcement strong,
+.dynamic-campaign strong,
+.dynamic-featured strong{
+  display:block;color:var(--lc-gold-soft);font-size:12px;margin-bottom:7px;
+}
+.dynamic-announcement span,
+.dynamic-campaign span,
+.dynamic-featured span{
+  display:block;color:#d0d0d0;font-size:11px;line-height:1.55;
+}
+.dynamic-media{
+  display:none;width:100%;margin-top:12px;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.07);background:#080808;
+}
+.dynamic-media img{display:block;width:100%;max-height:260px;object-fit:cover;}
+.dynamic-button{
+  display:none!important;width:max-content;margin-top:12px;padding:9px 13px;border-radius:11px;
+  background:linear-gradient(135deg,var(--lc-gold),#9e7738);color:#fff;text-decoration:none;
+  font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.1);
+}
+.dynamic-button.show{display:inline-flex!important;}
+.dynamic-gallery{
+  display:none;margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;
+}
+.dynamic-gallery:empty{display:none;}
+.dynamic-gallery-item{aspect-ratio:1/1;border-radius:13px;overflow:hidden;background:#101010;border:1px solid rgba(255,255,255,.06);}
+.dynamic-gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.dynamic-video iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:13px;display:block;}
+.dynamic-video-label{color:#888;font-size:9px;margin-bottom:8px;letter-spacing:.08em;font-weight:800;}
+.theme-obsidian{--lc-gold:#9aa0aa;--lc-gold-soft:#e0e4ea;}
+.theme-champagne{--lc-gold:#d8b36a;--lc-gold-soft:#f5dfae;}
+.theme-pure-light{--lc-gold:#a47a2d;--lc-gold-soft:#6e4d16;}
+.theme-pure-light .hero,.theme-pure-light .section{background:linear-gradient(145deg,#fff,#f4f1e9)!important;color:#151515;}
+.theme-pure-light .business-name,.theme-pure-light .section-title strong{color:#151515;}
+.theme-pure-light .description,.theme-pure-light .info-value,.theme-pure-light .link-text strong{color:#333!important;}
+.theme-pure-light .category{background:rgba(164,122,45,.08);}
+@media(max-width:520px){
+  .dynamic-cover{margin:-17px -17px 18px;border-radius:20px 20px 0 0;min-height:155px;}
+  .dynamic-cover img{min-height:155px;}
+  .dynamic-gallery{grid-template-columns:repeat(2,1fr);}
+}
+
+
+.review-booster{
+  margin:18px 0;
+  padding:20px;
+  border-radius:18px;
+  border:1px solid #c59a5245;
+  background:linear-gradient(145deg,#151515,#090909);
+  box-shadow:0 18px 45px #0008;
+  text-align:center;
+}
+.review-booster.hidden{display:none}
+.review-booster-icon{
+  width:46px;height:46px;margin:0 auto 10px;
+  display:grid;place-items:center;border-radius:14px;
+  border:1px solid #c59a5260;color:#e0bd7b;font-size:21px;
+}
+.review-booster-title{font-size:17px;font-weight:900}
+.review-booster-text{margin:7px auto 0;max-width:480px;color:#8a8a8a;font-size:10px;line-height:1.6}
+.review-booster-stars{display:flex;justify-content:center;gap:6px;margin-top:17px}
+.review-star{
+  width:40px;height:40px;border-radius:12px;border:1px solid #3b3b3b;
+  background:#111;color:#e0bd7b;font-size:21px;cursor:pointer;
+}
+.review-star:hover{border-color:#c59a52;background:#1a1a1a}
+.review-booster-message{margin-top:13px;color:#777;font-size:9px;line-height:1.6}
+.review-google-button,.review-whatsapp-button{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-top:13px;min-height:40px;padding:9px 14px;border-radius:10px;
+  text-decoration:none;font-size:10px;font-weight:900;
+}
+.review-google-button{background:linear-gradient(135deg,#c59a52,#9e7738);color:#fff}
+.review-whatsapp-button{border:1px solid #3b3b3b;background:#111;color:#ddd;margin-left:7px}
+@media(max-width:430px){
+  .review-star{width:35px;height:35px}
+  .review-whatsapp-button{margin-left:0}
+}
+
+
+/* ==================================================
+   V2 — SMART CAMPAIGN PUBLIC LAYER
+================================================== */
+.smart-campaigns{display:grid;gap:14px;margin:18px 0}
+.smart-campaign{overflow:hidden;border:1px solid #c59a5245;border-radius:18px;background:linear-gradient(145deg,#151515,#090909);box-shadow:0 18px 45px #0008}
+.smart-campaign-media{width:100%;max-height:260px;object-fit:cover;display:none}
+.smart-campaign-body{padding:20px}
+.smart-campaign-kicker{font-size:9px;letter-spacing:.18em;color:#e0bd7b;font-weight:900}
+.smart-campaign-title{margin-top:7px;font-size:20px;font-weight:900}
+.smart-campaign-text{margin-top:8px;color:#9a9a9a;font-size:11px;line-height:1.65;white-space:pre-line}
+.smart-campaign-button{display:none;margin-top:14px;min-height:40px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,#c59a52,#9e7738);color:#fff;font-size:10px;font-weight:900;text-decoration:none}
+.smart-campaign-button.show{display:inline-flex;align-items:center;justify-content:center}
+
+</style>
+
+<style id="leo-profile-20">
+:root{--p20-bg:#f5f3ee;--p20-card:#fff;--p20-text:#171717;--p20-muted:#707070;--p20-line:#e9e6df;--p20-accent:#c59a52;--p20-accent-soft:#f5ead5}
+html,body{background:var(--p20-bg)!important;color:var(--p20-text)!important}body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif!important;-webkit-font-smoothing:antialiased}.page{width:min(520px,100%);padding:0 12px 28px!important}.top-brand{position:relative!important;top:auto!important;width:auto!important;margin:0 -12px!important;padding:12px 16px!important;justify-content:flex-start!important;background:rgba(245,243,238,.94)!important;border:0!important;border-bottom:1px solid var(--p20-line)!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:blur(14px)}.brand-lion{width:34px!important;height:34px!important;border-radius:11px!important;background:#171717!important;border:0!important;font-size:17px!important}.brand-name{font-size:12px!important;color:#202020!important;letter-spacing:.14em!important}.brand-name span{color:#9b7330!important}.hero{margin-top:12px!important;padding:0!important;border:0!important;border-radius:26px!important;overflow:hidden!important;background:var(--p20-card)!important;color:var(--p20-text)!important;box-shadow:0 12px 36px rgba(40,35,25,.08)!important}.dynamic-cover{margin:0!important;min-height:190px!important;border:0!important;border-radius:0!important;background:#ddd!important}.dynamic-cover img{min-height:190px!important}.logo{width:104px!important;height:104px!important;margin:-52px auto 14px!important;position:relative;z-index:4;border:5px solid var(--p20-card)!important;border-radius:28px!important;background:#fff!important;box-shadow:0 10px 30px rgba(0,0,0,.15)!important}.logo img,.logo-placeholder{border-radius:23px!important}.logo-placeholder{color:#222!important}.business-name{padding:0 18px!important;color:#171717!important;font-size:30px!important;line-height:1.08!important;letter-spacing:-.035em!important}.category{margin-top:9px!important;padding:6px 10px!important;background:var(--p20-accent-soft)!important;border:0!important;color:#76551f!important;font-size:10px!important;letter-spacing:.05em!important}.description{padding:0 24px!important;margin:12px auto 0!important;color:#6d6d6d!important;font-size:13px!important;line-height:1.55!important}.status{margin:13px auto 0!important;padding:0!important;border:0!important;background:transparent!important;color:#737373!important;font-size:10px!important;letter-spacing:.03em!important}.status-dot{width:7px!important;height:7px!important;box-shadow:none!important}.actions{padding:18px!important;margin-top:0!important;gap:8px!important;grid-template-columns:repeat(2,1fr)!important}.action{min-height:48px!important;border-radius:14px!important;border:1px solid var(--p20-line)!important;background:#fff!important;color:#1d1d1d!important;box-shadow:none!important;font-size:11px!important}.action.gold{background:#1b1b1b!important;color:#fff!important;border-color:#1b1b1b!important}.section{margin-top:12px!important;padding:17px!important;border:1px solid var(--p20-line)!important;border-radius:21px!important;background:var(--p20-card)!important;color:var(--p20-text)!important;box-shadow:0 8px 26px rgba(40,35,25,.055)!important}.section-title{margin-bottom:12px!important}.section-icon{width:34px!important;height:34px!important;border-radius:11px!important;border:0!important;background:#f5f2eb!important;font-size:15px!important}.section-title strong{color:#1d1d1d!important;font-size:13px!important}.section-title span{color:#999!important}.link-grid{gap:8px!important}.link{min-height:58px!important;padding:10px!important;border:1px solid var(--p20-line)!important;border-radius:14px!important;background:#faf9f6!important;color:#1d1d1d!important}.link-icon{width:32px!important;height:32px!important;border-radius:10px!important;background:#f0ede6!important}.link-text strong{color:#202020!important;font-size:10px!important}.link-text span{color:#999!important}.info-list{gap:7px!important}.info-row,.hours-card,.iban-card{border:1px solid var(--p20-line)!important;background:#faf9f6!important;border-radius:14px!important}.info-row{padding:10px!important}.info-icon,.hours-icon{width:32px!important;height:32px!important;border-radius:10px!important;background:#f0ede6!important}.info-label{color:#9b9b9b!important}.info-value{color:#333!important}.info-action{color:#76551f!important;background:#f5ead5!important;border:0!important}.hours-card{padding:13px!important}.hours-content strong{color:#444!important}.hours-content span{color:#666!important}.iban-card{box-shadow:none!important}.iban-label{color:#999!important}.iban-number{color:#222!important}.iban-holder{color:#222!important}.iban-button{border:1px solid var(--p20-line)!important;background:#fff!important;color:#333!important}.iban-button.gold{background:#1b1b1b!important;border-color:#1b1b1b!important;color:#fff!important}.dynamic-announcement,.dynamic-campaign,.dynamic-featured,.dynamic-video{margin:12px 0 0!important;padding:16px!important;border-radius:19px!important;border:1px solid var(--p20-line)!important;background:#fff!important;color:#171717!important;box-shadow:0 8px 26px rgba(40,35,25,.055)!important}.dynamic-announcement strong,.dynamic-campaign strong,.dynamic-featured strong{color:#76551f!important}.dynamic-announcement span,.dynamic-campaign span,.dynamic-featured span{color:#666!important}.dynamic-button,.smart-campaign-button{background:#1b1b1b!important;color:#fff!important;border:0!important;border-radius:12px!important}.dynamic-gallery{gap:7px!important;margin-top:12px!important}.dynamic-gallery-item{border:0!important;border-radius:14px!important}.smart-campaigns{gap:12px!important;margin:12px 0!important}.smart-campaign{border:1px solid var(--p20-line)!important;border-radius:20px!important;background:#fff!important;box-shadow:0 8px 26px rgba(40,35,25,.055)!important}.smart-campaign-media{max-height:230px!important}.smart-campaign-body{padding:17px!important}.smart-campaign-kicker{color:#9b7330!important;font-size:8px!important}.smart-campaign-title{color:#171717!important;font-size:19px!important}.smart-campaign-text{color:#666!important}.review-booster{margin:12px 0!important;padding:18px!important;border-radius:20px!important;border:1px solid var(--p20-line)!important;background:#fff!important;color:#171717!important;box-shadow:0 8px 26px rgba(40,35,25,.055)!important}.review-booster-icon{width:40px!important;height:40px!important;border:0!important;background:#f5ead5!important;color:#9b7330!important;border-radius:12px!important}.review-booster-title{color:#171717!important;font-size:16px!important}.review-booster-text{color:#777!important}.review-star{width:38px!important;height:38px!important;border-radius:11px!important;border:1px solid var(--p20-line)!important;background:#faf9f6!important;color:#b88732!important}.review-google-button{background:#1b1b1b!important;border-radius:11px!important}.review-whatsapp-button{border:1px solid var(--p20-line)!important;background:#fff!important;color:#333!important;border-radius:11px!important}.footer{margin-top:20px!important;padding:12px 5px 8px!important;color:#aaa!important;opacity:1!important;font-size:8px!important;letter-spacing:.1em!important}.footer .powered{color:#9b7330!important;font-size:8px!important;letter-spacing:.1em!important}.hidden{display:none!important}@media(max-width:380px){.page{padding-left:9px!important;padding-right:9px!important}.top-brand{margin-left:-9px!important;margin-right:-9px!important}.business-name{font-size:27px!important}.actions{padding:14px!important}}
+</style>
+</head>
+
+
+<body>
+<div class="page">
+<div class="top-brand"><div class="brand-lion">🦁</div><div class="brand-name">LEO <span>CONNECT</span></div></div>
+<section class="hero">
+<div id="dynamicCover" class="dynamic-cover"><img id="dynamicCoverImage" alt="Profil kapak görseli"></div>
+<div class="logo"><span id="logoPlaceholder" class="logo-placeholder">🦁</span><img id="logo" style="display:none" alt="İşletme logosu"></div>
+<h1 id="name" class="business-name">İşletme</h1><div id="category" class="category">İşletme</div><p id="description" class="description">Dijital işletme profili</p>
+<div class="status"><span class="status-dot"></span><span>Açık</span><span>•</span><span id="heroHours">Dijital profil</span></div>
+<div class="actions"><a id="phoneButton" class="action gold" href="#">📞 Ara</a><a id="whatsappButton" class="action" href="#" target="_blank" rel="noopener">💬 WhatsApp</a></div>
+</section>
+<div id="dynamicAnnouncement" class="dynamic-announcement"><strong>📢 Duyuru</strong><span id="dynamicAnnouncementText"></span></div>
+<div id="smartCampaignsPublic" class="smart-campaigns"></div>
+<div id="dynamicCampaign" class="dynamic-campaign"><strong id="dynamicCampaignTitle"></strong><span id="dynamicCampaignText"></span><img id="dynamicCampaignImage" class="dynamic-media" alt="Kampanya görseli"><a id="dynamicCampaignButton" class="dynamic-button" target="_blank" rel="noopener"></a></div>
+<div id="dynamicFeatured" class="dynamic-featured"><strong id="dynamicFeaturedTitle"></strong><span id="dynamicFeaturedText"></span><img id="dynamicFeaturedImage" class="dynamic-media" alt="Öne çıkan içerik görseli"><a id="dynamicFeaturedButton" class="dynamic-button" target="_blank" rel="noopener"></a></div>
+<div id="dynamicGallery" class="dynamic-gallery"></div><div id="dynamicVideo" class="dynamic-video"><div class="dynamic-video-label">VİDEO</div><div id="dynamicVideoFrame"></div></div>
+<section id="contactSection" class="section hidden"><div class="section-title"><div class="section-icon">📍</div><div><strong>İletişim</strong><span>Bize kolayca ulaşın</span></div></div><div class="info-list"><div id="locationRow" class="info-row hidden"><div class="info-icon">📍</div><div class="info-content"><span class="info-label">KONUM</span><span id="address" class="info-value"></span></div><a id="locationLink" class="info-action" target="_blank" rel="noopener">AÇ</a></div><div id="phoneRow" class="info-row hidden"><div class="info-icon">📞</div><div class="info-content"><span class="info-label">TELEFON</span><span id="phone" class="info-value"></span></div><a id="phoneLink" class="info-action">ARA</a></div></div></section>
+<section id="socialSection" class="section hidden"><div class="section-title"><div class="section-icon">✦</div><div><strong>Bizi Takip Edin</strong><span>Diğer kanallarımız</span></div></div><div class="link-grid"><a id="instagramLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">📸</div><div class="link-text"><strong>Instagram</strong><span>Profili aç</span></div></a><a id="tiktokLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">🎵</div><div class="link-text"><strong>TikTok</strong><span>Profili aç</span></div></a><a id="googleLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">⭐</div><div class="link-text"><strong>Google'da Değerlendir</strong><span>Deneyimini paylaş</span></div></a><a id="websiteLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">🌐</div><div class="link-text"><strong>Web Sitesi</strong><span>Siteyi aç</span></div></a><a id="menuLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">📋</div><div class="link-text"><strong>Menü</strong><span>Menüyü görüntüle</span></div></a></div></section>
+<section id="hoursSection" class="section hidden"><div class="section-title"><div class="section-icon">🕐</div><div><strong>Çalışma Saatleri</strong><span>Ne zaman açığız?</span></div></div><div class="hours-card"><div class="hours-icon">🕐</div><div class="hours-content"><strong>AÇIKLIK DURUMU</strong><span id="hours">-</span></div></div></section>
+<section id="ibanSection" class="section hidden"><div class="section-title"><div class="section-icon">💳</div><div><strong>Ödeme Bilgileri</strong><span>Güvenli ve kolay ödeme</span></div></div><div class="iban-card"><div class="iban-label">IBAN</div><div id="iban" class="iban-number">-</div><div class="iban-buttons"><button class="iban-button gold" onclick="copyIBAN()">IBAN'I KOPYALA</button></div><div id="ibanMessage" class="iban-message"></div><div class="iban-label" style="margin-top:16px">HESAP SAHİBİ</div><div id="ibanHolder" class="iban-holder">-</div><div class="iban-buttons"><button class="iban-button" onclick="copyIBANHolder()">ADI KOPYALA</button></div><div id="ibanHolderMessage" class="iban-message"></div></div></section>
+<section id="reviewBooster" class="review-booster hidden"><div class="review-booster-icon">★</div><div id="reviewBoosterTitle" class="review-booster-title">Deneyimini bizimle paylaş</div><div id="reviewBoosterText" class="review-booster-text">Memnun kaldıysan Google’da bizi değerlendir.</div><div id="reviewBoosterStars" class="review-booster-stars"></div><div id="reviewBoosterMessage" class="review-booster-message"></div><div id="reviewBoosterActions"></div></section>
+<div class="footer">LEO CONNECT • DIGITAL BUSINESS PROFILE<div class="powered">DOKUN • BAĞLAN • KEŞFET • BÜYÜT</div></div>
+</div>
+<script>
+
+
+
+/* ==================================================
+   REVIEW BOOSTER
+================================================== */
+
+function trackReviewEvent(type){
+  try{
+    const slug = business?.slug;
+    if(!slug) return;
+    fetch("/api/event/" + encodeURIComponent(slug),{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({type,source:source || "direct",nfc_code:nfcCode || ""})
+    }).catch(()=>{});
+  }catch(_){}
+}
+
+function renderReviewBooster(){
+  const cfg = business?.review_booster || {};
+  const box = document.getElementById("reviewBooster");
+  if(!box || cfg.enabled !== true) return;
+
+  const google = safeUrl(business.google_review);
+  const whatsapp = safeUrl(business.whatsapp);
+  if(!google && !whatsapp) return;
+
+  box.classList.remove("hidden");
+  const title = document.getElementById("reviewBoosterTitle");
+  const text = document.getElementById("reviewBoosterText");
+  const stars = document.getElementById("reviewBoosterStars");
+  if(title) title.textContent = cfg.title || "Deneyimini bizimle paylaş";
+  if(text) text.textContent = cfg.text || "";
+  if(stars){
+    stars.innerHTML = "";
+    for(let i=1;i<=5;i++){
+      const b=document.createElement("button");
+      b.type="button";
+      b.className="review-star";
+      b.textContent="☆";
+      b.setAttribute("aria-label",i+" yıldız");
+      b.onclick=()=>handleReviewRating(i);
+      stars.appendChild(b);
+    }
+  }
+  trackReviewEvent("review_open");
+}
+
+function handleReviewRating(rating){
+  const cfg = business?.review_booster || {};
+  const msg=document.getElementById("reviewBoosterMessage");
+  const actions=document.getElementById("reviewBoosterActions");
+  if(msg) msg.textContent="";
+  if(actions) actions.innerHTML="";
+
+  const threshold = Number(cfg.threshold || 4);
+  const google = safeUrl(business.google_review);
+  const whatsapp = safeUrl(business.whatsapp);
+
+  if(rating >= threshold && google){
+    trackReviewEvent("review_positive");
+    if(msg) msg.textContent = cfg.success_title || "Teşekkürler!";
+    const a=document.createElement("a");
+    a.className="review-google-button";
+    a.href=google;
+    a.target="_blank";
+    a.rel="noopener";
+    a.textContent="★ Google'da Değerlendir";
+    if(actions) actions.appendChild(a);
+    return;
+  }
+
+  trackReviewEvent("review_feedback");
+  if(msg) msg.textContent = cfg.low_text || "Yaşadığın sorunu bize ilet, seninle ilgilenelim.";
+  if(whatsapp){
+    const a=document.createElement("a");
+    a.className="review-whatsapp-button";
+    a.href=whatsapp;
+    a.target="_blank";
+    a.rel="noopener";
+    a.textContent="💬 Bize Ulaş";
+    if(actions) actions.appendChild(a);
+  }else if(google){
+    const a=document.createElement("a");
+    a.className="review-google-button";
+    a.href=google;
+    a.target="_blank";
+    a.rel="noopener";
+    a.textContent="★ Değerlendir";
+    if(actions) actions.appendChild(a);
+  }
+}
+
+/* ==================================================
+   GLOBAL
+================================================== */
+
+let business = null;
+let nfcCode = '';
+
+let source =
+  new URLSearchParams(
+    window.location.search
+  ).get("source")
+  || "";
+
+
+/* ==================================================
+   API
+================================================== */
+
+async function getBusiness(){
+
+  const pathParts =
+    window.location.pathname
+      .split("/")
+      .filter(Boolean);
+
+  if(
+    pathParts[0] === "p" &&
+    pathParts[1] === "nfc"
+  ){
+    source = "nfc";
+  }
+
+  let endpoint = "";
+
+  /*
+    QR / normal profile:
+      /p/:slug
+
+    NFC:
+      /p/nfc/:code
+
+    NFC kodunu işletme slug'ı gibi kullanmıyoruz.
+  */
+  if(
+    pathParts.length >= 3 &&
+    pathParts[0] === "p" &&
+    pathParts[1] === "nfc"
+  ){
+
+    const code =
+      pathParts[2];
+
+    nfcCode = code || '';
+
+    if(!code){
+      showError();
+      return;
+    }
+
+    endpoint =
+      "/api/profile-by-nfc/" +
+      encodeURIComponent(code);
+
+  }else{
+
+    const slug =
+      pathParts[1] || pathParts[0] || "";
+
+    if(!slug){
+      showError();
+      return;
+    }
+
+    endpoint =
+      "/api/profile/" +
+      encodeURIComponent(slug);
+
+  }
+
+  try{
+
+    const response =
+      await fetch(endpoint);
+
+    if(!response.ok){
+      showError();
+      return;
+    }
+
+    business =
+      await response.json();
+
+    render();
+
+  }catch(error){
+
+    console.error(
+      "Profile loading error:",
+      error
+    );
+
+    showError();
+
+  }
+
+}
+
+
+/* ==================================================
+   TRACK
+================================================== */
+
+async function track(
+  type
+){
+
+  if(!business?.slug)
+    return;
+
+
+  try{
+
+    await fetch(
+
+      "/api/event/" +
+      encodeURIComponent(
+        business.slug
+      ),
+
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify({
+            type,
+            source: source || 'direct',
+            nfc_code:
+              source === 'nfc'
+                ? nfcCode
+                : ''
+          })
+
+      }
+
+    );
+
+  }catch(error){
+
+    console.error(
+      "Tracking error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ==================================================
+   SAFE URL
+================================================== */
+
+function safeUrl(
+  value
+){
+
+  if(!value)
+    return "";
+
+  const url =
+    String(value)
+      .trim();
+
+
+  if(
+    /^https?:\/\//i.test(
+      url
+    )
+  ){
+
+    return url;
+
+  }
+
+
+  return "";
+
+}
+
+
+/* ==================================================
+   LOGO
+================================================== */
+
+function renderLogo(){
+
+  const url =
+    safeUrl(
+      business.logo_url
+    );
+
+
+  const img =
+    document.getElementById(
+      "logo"
+    );
+
+
+  const placeholder =
+    document.getElementById(
+      "logoPlaceholder"
+    );
+
+
+  if(!url){
+
+    img.style.display =
+      "none";
+
+    placeholder.style.display =
+      "block";
+
+    return;
+
+  }
+
+
+  img.onload =
+    function(){
+
+      img.style.display =
+        "block";
+
+      placeholder.style.display =
+        "none";
+
+    };
+
+
+  img.onerror =
+    function(){
+
+      img.style.display =
+        "none";
+
+      placeholder.style.display =
+        "block";
+
+    };
+
+
+  img.src =
+    url;
+
+}
+
+
+/* ==================================================
+   LINK HELPER
+================================================== */
+
+function setupLink(
+  id,
+  value,
+  eventType
+){
+
+  const element =
+    document.getElementById(
+      id
+    );
+
+
+  if(!element)
+    return false;
+
+
+  const url =
+    safeUrl(
+      value
+    );
+
+
+  if(!url){
+
+    element.classList.add(
+      "hidden"
+    );
+
+    return false;
+
+  }
+
+
+  element.href =
+    url;
+
+
+  element.addEventListener(
+    "click",
+    function(){
+
+      track(
+        eventType
+      );
+
+    }
+  );
+
+
+  element.classList.remove(
+    "hidden"
+  );
+
+
+  return true;
+
+}
+
+
+
+
+/* ==================================================
+   V2 — DYNAMIC PROFILE RENDERER
+================================================== */
+function dynamicSafeUrl(value){
+  const url=String(value||'').trim();
+  return /^https?:\/\//i.test(url) ? url : '';
+}
+
+function dynamicYoutubeEmbed(value){
+  const url=dynamicSafeUrl(value);
+  if(!url) return '';
+  try{
+    const u=new URL(url);
+    let id='';
+    if(u.hostname.includes('youtu.be')) id=u.pathname.replace(/^\//,'').split('/')[0];
+    if(u.hostname.includes('youtube.com')){
+      id=u.searchParams.get('v') || (u.pathname.match(/\/embed\/([^/]+)/)||[])[1] || (u.pathname.match(/\/shorts\/([^/]+)/)||[])[1] || '';
+    }
+    return id ? 'https://www.youtube.com/embed/'+encodeURIComponent(id)+'?rel=0' : '';
+  }catch(e){ return ''; }
+}
+
+function renderDynamicProfile(){
+  const d=business?.profile_design || {};
+  const theme=String(d.theme||'midnight-gold');
+  document.body.classList.remove('theme-obsidian','theme-champagne','theme-pure-light');
+  if(theme!=='midnight-gold') document.body.classList.add('theme-'+theme);
+  if(d.accent_color && /^#[0-9a-f]{6}$/i.test(String(d.accent_color))){
+    document.documentElement.style.setProperty('--lc-gold',d.accent_color);
+  }
+
+  const cover=document.getElementById('dynamicCover');
+  const coverImg=document.getElementById('dynamicCoverImage');
+  const coverUrl=dynamicSafeUrl(d.cover_url);
+  if(cover && coverImg && coverUrl){
+    cover.style.display='block';
+    coverImg.src=coverUrl;
+    const pos=['center','top','bottom','left','right'].includes(d.cover_position) ? d.cover_position : 'center';
+    coverImg.style.objectPosition=pos;
+    coverImg.onerror=()=>{cover.style.display='none';};
+  }
+
+  const announcement=document.getElementById('dynamicAnnouncement');
+  const announcementText=document.getElementById('dynamicAnnouncementText');
+  if(announcement && announcementText){
+    const show=d.announcement_enabled && String(d.announcement_text||'').trim();
+    announcement.style.display=show?'block':'none';
+    announcementText.textContent=String(d.announcement_text||'');
+  }
+
+  const campaign=document.getElementById('dynamicCampaign');
+  if(campaign){
+    const show=d.campaign_enabled && (d.campaign_title || d.campaign_text || d.campaign_image_url);
+    campaign.style.display=show?'block':'none';
+    document.getElementById('dynamicCampaignTitle').textContent=d.campaign_title||'Kampanya';
+    document.getElementById('dynamicCampaignText').textContent=d.campaign_text||'';
+    const img=document.getElementById('dynamicCampaignImage');
+    const imgUrl=dynamicSafeUrl(d.campaign_image_url);
+    if(imgUrl){img.src=imgUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}else img.style.display='none';
+    const btn=document.getElementById('dynamicCampaignButton');
+    const btnUrl=dynamicSafeUrl(d.campaign_button_url);
+    if(btnUrl && d.campaign_button_text){btn.href=btnUrl;btn.textContent=d.campaign_button_text;btn.classList.add('show');}else btn.classList.remove('show');
+    btn.onclick=()=>{ if(btnUrl) track('campaign'); };
+  }
+
+  /* V2 SMART CAMPAIGNS — scheduled campaigns take priority over legacy single campaign */
+  const smartBox=document.getElementById('smartCampaignsPublic');
+  const smartCampaigns=Array.isArray(business?.campaigns)?business.campaigns:[];
+  if(smartBox){
+    smartBox.innerHTML='';
+    if(smartCampaigns.length){
+      if(campaign) campaign.style.display='none';
+      smartCampaigns.slice(0,5).forEach(c=>{
+        const wrap=document.createElement('article');
+        wrap.className='smart-campaign';
+        const imageUrl=dynamicSafeUrl(c.image_url);
+        const buttonUrl=dynamicSafeUrl(c.button_url);
+        wrap.innerHTML=`<img class="smart-campaign-media" alt="Kampanya görseli"><div class="smart-campaign-body"><div class="smart-campaign-kicker">LEO CONNECT • ÖZEL FIRSAT</div><div class="smart-campaign-title"></div><div class="smart-campaign-text"></div><a class="smart-campaign-button" target="_blank" rel="noopener"></a></div>`;
+        const img=wrap.querySelector('.smart-campaign-media');
+        if(imageUrl){img.src=imageUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}
+        wrap.querySelector('.smart-campaign-title').textContent=String(c.title||'Kampanya');
+        wrap.querySelector('.smart-campaign-text').textContent=String(c.text||'');
+        const btn=wrap.querySelector('.smart-campaign-button');
+        if(buttonUrl && c.button_text){btn.href=buttonUrl;btn.textContent=String(c.button_text);btn.classList.add('show');btn.addEventListener('click',()=>track('campaign_click'));}
+        smartBox.appendChild(wrap);
+        track('campaign_view');
+      });
+    }
+  }
+
+  const featured=document.getElementById('dynamicFeatured');
+  if(featured){
+    const show=d.featured_enabled && (d.featured_title || d.featured_text || d.featured_image_url);
+    featured.style.display=show?'block':'none';
+    document.getElementById('dynamicFeaturedTitle').textContent=d.featured_title||'Öne Çıkan';
+    document.getElementById('dynamicFeaturedText').textContent=d.featured_text||'';
+    const img=document.getElementById('dynamicFeaturedImage');
+    const imgUrl=dynamicSafeUrl(d.featured_image_url);
+    if(imgUrl){img.src=imgUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}else img.style.display='none';
+    const btn=document.getElementById('dynamicFeaturedButton');
+    const btnUrl=dynamicSafeUrl(d.featured_button_url);
+    if(btnUrl && d.featured_button_text){btn.href=btnUrl;btn.textContent=d.featured_button_text;btn.classList.add('show');}else btn.classList.remove('show');
+    btn.onclick=()=>{ if(btnUrl) track('featured'); };
+  }
+
+  const galleryBox=document.getElementById('dynamicGallery');
+  if(galleryBox){
+    galleryBox.innerHTML='';
+    const gallery=Array.isArray(d.gallery)?d.gallery:[];
+    gallery.slice(0,30).forEach(item=>{
+      const url=dynamicSafeUrl(typeof item==='string'?item:item?.url||'');
+      if(!url) return;
+      const cell=document.createElement('div');
+      cell.className='dynamic-gallery-item';
+      const img=document.createElement('img');
+      img.src=url;img.alt='';
+      img.onerror=()=>cell.remove();
+      cell.appendChild(img);galleryBox.appendChild(cell);
+    });
+    galleryBox.style.display=galleryBox.children.length?'grid':'none';
+  }
+
+  const video=document.getElementById('dynamicVideo');
+  const frame=document.getElementById('dynamicVideoFrame');
+  if(video && frame){
+    const embed=dynamicYoutubeEmbed(d.video_url);
+    if(d.video_enabled && embed){
+      frame.innerHTML='';
+      const iframe=document.createElement('iframe');
+      iframe.src=embed;iframe.title='İşletme videosu';iframe.loading='lazy';iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';iframe.allowFullscreen=true;
+      frame.appendChild(iframe);video.style.display='block';
+    }else{frame.innerHTML='';video.style.display='none';}
+  }
+}
+
+
+/* ==================================================
+   RENDER
+================================================== */
+
+function render(){
+
+  renderDynamicProfile();
+
+  /* V2 REVIEW BOOSTER */
+  try{
+    renderReviewBooster();
+  }catch(error){
+    console.error("Review Booster render error:", error);
+  }
+
+  document.title =
+    (
+      business.name
+      || "LEO CONNECT"
+    ) +
+    " — LEO CONNECT";
+
+
+  /* NAME */
+
+  document.getElementById(
+    "name"
+  ).textContent =
+    business.name
+    ||
+    "İşletme";
+
+
+  /* CATEGORY */
+
+  const category =
+    document.getElementById(
+      "category"
+    );
+
+
+  if(
+    business.category
+  ){
+
+    category.textContent =
+      business.category;
+
+    category.classList.remove(
+      "hidden"
+    );
+
+  }else{
+
+    category.classList.add(
+      "hidden"
+    );
+
+  }
+
+
+  /* DESCRIPTION */
+
+  document.getElementById(
+    "description"
+  ).textContent =
+    business.description
+    ||
+    "Dijital işletme profili";
+
+
+  /* LOGO */
+
+  renderLogo();
+
+
+  /* PHONE */
+
+  const phone =
+    String(
+      business.phone
+      || ""
+    ).trim();
+
+
+  if(phone){
+
+    const phoneHref =
+      "tel:" +
+      phone.replace(
+        /\s+/g,
+        ""
+      );
+
+
+    document.getElementById(
+      "phoneButton"
+    ).href =
+      phoneHref;
+
+
+    document.getElementById(
+      "phoneLink"
+    ).href =
+      phoneHref;
+
+
+    document.getElementById(
+      "phone"
+    ).textContent =
+      phone;
+
+
+    document.getElementById(
+      "phoneRow"
+    ).classList.remove(
+      "hidden"
+    );
+
+
+    document.getElementById(
+      "phoneButton"
+    ).addEventListener(
+      "click",
+      function(){
+
+        track(
+          "phone"
+        );
+
+      }
+    );
+
+
+    document.getElementById(
+      "phoneLink"
+    ).addEventListener(
+      "click",
+      function(){
+
+        track(
+          "phone"
+        );
+
+      }
+    );
+
+  }else{
+
+    document.getElementById(
+      "phoneButton"
+    ).classList.add(
+      "hidden"
+    );
+
+  }
+
+
+  /* WHATSAPP */
+
+  let whatsapp =
+    String(
+      business.whatsapp
+      || ""
+    ).trim();
+
+
+  if(
+    whatsapp &&
+    !/^https?:\/\//i.test(
+      whatsapp
+    )
+  ){
+
+    const number =
+      whatsapp.replace(
+        /\D/g,
+        ""
+      );
+
+
+    if(number){
+
+      whatsapp =
+        "https://wa.me/" +
+        (
+          number.startsWith("90")
+            ? number
+            : "90" + number
+        );
+
+    }
+
+  }
+
+
+  if(
+    /^https?:\/\//i.test(
+      whatsapp
+    )
+  ){
+
+    const whatsappButton =
+      document.getElementById(
+        "whatsappButton"
+      );
+
+
+    whatsappButton.href =
+      whatsapp;
+
+
+    whatsappButton.classList.remove(
+      "hidden"
+    );
+
+
+    whatsappButton.addEventListener(
+      "click",
+      function(){
+
+        track(
+          "whatsapp"
+        );
+
+      }
+    );
+
+  }else{
+
+    document.getElementById(
+      "whatsappButton"
+    ).classList.add(
+      "hidden"
+    );
+
+  }
+
+
+  /* LOCATION */
+
+  if(
+    business.address
+  ){
+
+    document.getElementById(
+      "address"
+    ).textContent =
+      business.address;
+
+
+    const location =
+      safeUrl(
+        business.address
+      );
+
+
+    if(location){
+
+      document.getElementById(
+        "locationLink"
+      ).href =
+        location;
+
+
+      document.getElementById(
+        "locationLink"
+      ).addEventListener(
+        "click",
+        function(){
+
+          track(
+            "location"
+          );
+
+        }
+      );
+
+    }else{
+
+      document.getElementById(
+        "locationLink"
+      ).style.display =
+        "none";
+
+    }
+
+
+    document.getElementById(
+      "locationRow"
+    ).classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  /* SOCIAL */
+
+  let socialCount = 0;
+
+
+  if(
+    setupLink(
+      "instagramLink",
+      business.instagram,
+      "instagram"
+    )
+  ){
+
+    socialCount++;
+
+  }
+
+
+  if(
+    setupLink(
+      "tiktokLink",
+      business.tiktok,
+      "tiktok"
+    )
+  ){
+
+    socialCount++;
+
+  }
+
+
+  if(
+    setupLink(
+      "googleLink",
+      business.google_review,
+      "google_review"
+    )
+  ){
+
+    socialCount++;
+
+  }
+
+
+  if(
+    setupLink(
+      "websiteLink",
+      business.website,
+      "website"
+    )
+  ){
+
+    socialCount++;
+
+  }
+
+
+  if(
+    setupLink(
+      "menuLink",
+      business.menu,
+      "menu"
+    )
+  ){
+
+    socialCount++;
+
+  }
+
+
+  if(socialCount){
+
+    document.getElementById(
+      "socialSection"
+    ).classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  /* CONTACT */
+
+  const hasContact =
+    !!business.phone ||
+    !!business.address;
+
+
+  if(hasContact){
+
+    document.getElementById(
+      "contactSection"
+    ).classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  /* HOURS */
+
+  if(
+    business.hours
+  ){
+
+    document.getElementById(
+      "hours"
+    ).textContent =
+      business.hours;
+
+
+    document.getElementById(
+      "hoursSection"
+    ).classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  /* IBAN */
+
+  if(
+    business.iban
+  ){
+
+    document.getElementById(
+      "iban"
+    ).textContent =
+      business.iban;
+
+
+    document.getElementById(
+      "ibanHolder"
+    ).textContent =
+      business.iban_holder
+      ||
+      "IBAN sahibi";
+
+
+    document.getElementById(
+      "ibanSection"
+    ).classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  /* SOURCE TRACKING
+     QR ve NFC girişleri server tarafında kaydedilir.
+     Burada tekrar event göndermiyoruz; böylece çift sayım oluşmaz.
+  */
+
+}
+
+
+/* ==================================================
+   COPY IBAN
+================================================== */
+
+async function copyIBAN(){
+
+  if(
+    !business?.iban
+  )
+    return;
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      business.iban
+    );
+
+
+    document.getElementById(
+      "ibanMessage"
+    ).textContent =
+      "✓ IBAN kopyalandı.";
+
+
+    track(
+      "iban"
+    );
+
+
+    setTimeout(
+      function(){
+
+        document.getElementById(
+          "ibanMessage"
+        ).textContent =
+          "";
+
+      },
+      2500
+    );
+
+
+  }catch(error){
+
+    document.getElementById(
+      "ibanMessage"
+    ).textContent =
+      business.iban;
+
+  }
+
+}
+
+
+/* ==================================================
+   COPY IBAN HOLDER
+================================================== */
+
+async function copyIBANHolder(){
+
+  if(
+    !business?.iban_holder
+  )
+    return;
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      business.iban_holder
+    );
+
+
+    document.getElementById(
+      "ibanHolderMessage"
+    ).textContent =
+      "✓ Hesap sahibi adı kopyalandı.";
+
+
+    track(
+      "iban"
+    );
+
+
+    setTimeout(
+      function(){
+
+        document.getElementById(
+          "ibanHolderMessage"
+        ).textContent =
+          "";
+
+      },
+      2500
+    );
+
+
+  }catch(error){
+
+    document.getElementById(
+      "ibanHolderMessage"
+    ).textContent =
+      business.iban_holder;
+
+  }
+
+}
+
+
+/* ==================================================
+   ERROR
+================================================== */
+
+function showError(){
+
+  document.body.innerHTML = `
+
+    <div
+      style="
+        min-height:100vh;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:30px;
+        background:#080808;
+        color:#fff;
+        font-family:Arial,sans-serif;
+        text-align:center;
+      "
+    >
+
+      <div>
+
+        <div
+          style="
+            font-size:50px;
+            margin-bottom:20px;
+          "
+        >
+          🦁
+        </div>
+
+        <h2>
+          Profil bulunamadı
+        </h2>
+
+        <p
+          style="
+            color:#777;
+            font-size:13px;
+          "
+        >
+          Bu işletme profili mevcut değil veya bağlantı geçersiz.
+        </p>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ==================================================
+   START
+================================================== */
+
+getBusiness();
+
+</script>
+
+
+
+
+</body>
+
+</html>
+</body>
+</html>
