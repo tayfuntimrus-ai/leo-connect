@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -12,13 +13,96 @@ const crypto = require('crypto');
 const app = express();
 
 const PORT = process.env.PORT || 10000;
-const SECRET = process.env.JWT_SECRET || 'leo-connect-change-this-secret';
+
+/*
+  JWT_SECRET zorunludur.
+
+  Onceden burada `|| 'leo-connect-change-this-secret'` seklinde bir yedek
+  deger vardi. Ortam degiskeni tanimli degilse tum token'lar depoda
+  herkesin okuyabilecegi sabit bir anahtarla imzalaniyordu; bu durumda
+  herhangi biri gecerli bir admin token'i uretebilirdi.
+
+  Artik DATABASE_URL ile ayni muamele goruyor: yoksa surec baslamaz.
+*/
+const LEAKED_DEFAULT_SECRET = 'leo-connect-change-this-secret';
+
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET tanımlı değil. Sunucu başlatılmıyor.');
+  console.error('Render > Environment bölümünden JWT_SECRET ekleyin.');
+  console.error('Üretmek için: node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'hex\'))"');
+  process.exit(1);
+}
+
+const SECRET = process.env.JWT_SECRET;
+
+/*
+  Zayif deger tespiti sunucuyu DURDURMAZ; beklenmedik kesinti olusturmamak
+  icin yalnizca uyarir. Log'da bu satiri goruyorsaniz degeri degistirin.
+*/
+if (SECRET === LEAKED_DEFAULT_SECRET) {
+  console.warn('!!! UYARI: JWT_SECRET, depoda açıkta duran eski varsayılan değere eşit.');
+  console.warn('!!! Bu değer herkes tarafından bilinebilir. Hemen değiştirin.');
+} else if (SECRET.length < 32) {
+  console.warn(`UYARI: JWT_SECRET çok kısa (${SECRET.length} karakter). En az 32 karakter önerilir.`);
+}
 
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+/* =========================================================
+   RATE LIMIT
+========================================================= */
+
+/*
+  Render uygulamayi bir ters proxy arkasinda calistirir.
+
+  Bu ayar OLMADAN req.ip her istekte proxy'nin adresini dondurur; rate
+  limit tum ziyaretcileri TEK bir istemci sayar ve ilk limit dolan
+  herkesi disari kilitler. "1" tek hop guvenilir demektir: req.ip,
+  X-Forwarded-For zincirinin son (gercek istemci) degeri olur.
+*/
+app.set('trust proxy', 1);
+
+/*
+  Giris denemeleri.
+
+  skipSuccessfulRequests sayesinde yalnizca BASARISIZ denemeler sayilir,
+  boylece normal kullanan bir isletme limite takilmaz; kaba kuvvet
+  denemesi ise 15 dakikada 15 hatadan sonra durur.
+*/
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 15,
+  skipSuccessfulRequests: true,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Çok fazla başarısız deneme. Lütfen 15 dakika sonra tekrar deneyin.' }
+});
+
+/*
+  Public event ucu.
+
+  Musteriler giris yapmadigi icin kimlik dogrulamasi yok; limit, analitigi
+  betikle sisirmeyi engellemek icin. Ayni isletmedeki musteriler cogu zaman
+  ayni WiFi (tek public IP) uzerinden gelir, bu yuzden esik yuksek tutuldu.
+*/
+const eventLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 300,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Çok fazla istek. Lütfen biraz bekleyin.' }
+});
+
+app.use('/api/login', loginLimiter);
+app.use('/api/admin/login', loginLimiter);
+app.use('/api/card-login', loginLimiter);
+app.use('/api/register', loginLimiter);
+app.use('/api/event', eventLimiter);
 
 
 /* =========================================================
