@@ -1407,6 +1407,18 @@ let source =
 
 async function getBusiness(){
 
+  /*
+    PUBLIC PROFILE 2.0 PREVIEW
+    ---------------------------
+    This standalone preview can load a real business by query string:
+      /profile-2.0-preview.html?slug=deneme-zelo
+
+    The existing live /p/:slug and /p/nfc/:code routing remains unchanged.
+  */
+  const params = new URLSearchParams(window.location.search);
+  const previewSlug =
+    String(params.get("slug") || "").trim();
+
   const pathParts =
     window.location.pathname
       .split("/")
@@ -1452,8 +1464,14 @@ async function getBusiness(){
 
   }else{
 
+    /*
+      Preview mode takes priority when ?slug=... is present.
+      Normal /p/:slug routing still works exactly as before.
+    */
     const slug =
-      pathParts[1] || pathParts[0] || "";
+      previewSlug ||
+      (pathParts[0] === "p" ? pathParts[1] : pathParts[0]) ||
+      "";
 
     if(!slug){
       showError();
