@@ -31,11 +31,27 @@ function trackReviewEvent(type){
   try{
     const slug = business?.slug;
     if(!slug) return;
-    fetch("/api/event/" + encodeURIComponent(slug),{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({type,source:source || "direct",nfc_code:nfcCode || ""})
-    }).catch(()=>{});
+    const bases = [
+      window.location.origin,
+      "https://leo-connect.onrender.com"
+    ].filter((value, index, arr) => value && arr.indexOf(value) === index);
+    const payload = JSON.stringify({
+      type,
+      source:source || "direct",
+      nfc_code:nfcCode || ""
+    });
+    (async()=>{
+      for(const base of bases){
+        try{
+          const r = await fetch(base + "/api/event/" + encodeURIComponent(slug),{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:payload
+          });
+          if(r.ok) break;
+        }catch(_){}
+      }
+    })();
   }catch(_){}
 }
 
@@ -158,6 +174,11 @@ async function getBusiness(){
     source = "nfc";
   }
 
+  const API_BASES = [
+    window.location.origin,
+    "https://leo-connect.onrender.com"
+  ].filter((value, index, arr) => value && arr.indexOf(value) === index);
+
   let endpoint = "";
 
   /*
@@ -213,17 +234,34 @@ async function getBusiness(){
 
   try{
 
-    const response =
-      await fetch(endpoint);
+    let response = null;
+    let lastError = null;
 
-    if(!response.ok){
+    for(const base of API_BASES){
+      try{
+        const candidate = await fetch(base + endpoint, {
+          method: "GET",
+          cache: "no-store"
+        });
+
+        if(candidate.ok){
+          response = candidate;
+          break;
+        }
+
+        lastError = new Error("HTTP " + candidate.status + " from " + base + endpoint);
+      }catch(error){
+        lastError = error;
+      }
+    }
+
+    if(!response){
+      console.error("Profile API unavailable:", lastError);
       showError();
       return;
     }
 
-    business =
-      await response.json();
-
+    business = await response.json();
     render();
 
   }catch(error){
