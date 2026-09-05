@@ -148,6 +148,30 @@ function createNfcCode() {
 }
 
 
+/*
+  PROFIL ACILISI SAYILAN EVENT TIPLERI
+
+  Bir profil acilisi sunucu tarafinda su tiplerden TAM OLARAK BIRINI uretir:
+
+    /p/:slug                -> profile_view   (source: direct)
+    /p/:slug?source=qr      -> qr_scan
+    /p/:slug?source=nfc     -> nfc
+    /p/nfc/:code            -> nfc
+    /p/nfc/:code?source=qr  -> qr_scan
+
+  'qr' eski kayitlar icin listede tutuluyor.
+
+  Daha once panellerdeki "Profil Goruntuleme" metrigi yalnizca
+  type='profile_view' sayiyordu. Fiziksel temas tek event uretecek sekilde
+  duzeltildikten sonra QR ve NFC okutmalari bu tipi hic uretmez oldu, yani
+  urunun asil kullanim bicimi metrikte hic gorunmuyordu ve sayi neredeyse
+  hep sifir kaliyordu.
+
+  Tek kaynaktan yonetiliyor ki sorgular yeniden birbirinden ayrismasin.
+*/
+const PROFILE_OPEN_TYPES = `('profile_view','qr_scan','qr','nfc')`;
+
+
 function publicBusiness(row) {
   if (!row) return null;
   const allowed = normalizeAllowedPlatforms(row.social_platform_permissions);
@@ -594,6 +618,62 @@ async function initDatabase() {
   `);
 
 
+  /*
+    events.business_id FOREIGN KEY
+
+    nfc_tag_id icin kisit vardi ama business_id icin yoktu. Bir isletme
+    silindiginde event kayitlari oksuz kaliyor ve tabloda birikiyordu.
+
+    Bu blok bilerek try/catch icinde: kisit eklenemezse bile sunucu
+    ACILMAYA DEVAM ETMELI. initDatabase() hata firlatirsa surec kapanir
+    ve site tamamen erisilemez olur; oksuz kayit temizligi bunu
+    goze alacak kadar kritik degil.
+  */
+  try {
+    const constraintExists = await pool.query(`
+      SELECT 1
+      FROM pg_constraint
+      WHERE conname = 'fk_events_business'
+        AND conrelid = 'events'::regclass
+      LIMIT 1
+    `);
+
+    if (!constraintExists.rows.length) {
+      const orphans = await pool.query(`
+        SELECT COUNT(*)::int AS n
+        FROM events e
+        WHERE NOT EXISTS (
+          SELECT 1 FROM businesses b WHERE b.id = e.business_id
+        )
+      `);
+
+      const orphanCount = orphans.rows[0] ? Number(orphans.rows[0].n) : 0;
+
+      if (orphanCount > 0) {
+        console.warn(`events tablosunda ${orphanCount} öksüz kayıt bulundu, temizleniyor...`);
+        await pool.query(`
+          DELETE FROM events e
+          WHERE NOT EXISTS (
+            SELECT 1 FROM businesses b WHERE b.id = e.business_id
+          )
+        `);
+        console.warn(`${orphanCount} öksüz kayıt silindi.`);
+      }
+
+      await pool.query(`
+        ALTER TABLE events
+        ADD CONSTRAINT fk_events_business
+        FOREIGN KEY (business_id)
+        REFERENCES businesses(id)
+        ON DELETE CASCADE
+      `);
+
+      console.log('events.business_id foreign key eklendi.');
+    }
+  } catch (error) {
+    console.error('events foreign key eklenemedi, sunucu yine de başlatılıyor:', error.message);
+  }
+
 
   /* V2 — INDEPENDENT PERSONAL BUSINESS CARDS */
   await pool.query(`
@@ -931,7 +1011,7 @@ app.get('/api/admin/overview', adminAuth, async (req, res) => {
     const profiles = await pool.query(`
       SELECT COUNT(*)::int AS count
       FROM events
-      WHERE type='profile_view'
+      WHERE type IN ${PROFILE_OPEN_TYPES}
     `);
 
     const qr = await pool.query(`
@@ -1031,7 +1111,7 @@ app.get('/api/admin/businesses', adminAuth, async (req, res) => {
           SELECT COUNT(*)
           FROM events e
           WHERE e.business_id = b.id
-          AND e.type = 'profile_view'
+          AND e.type IN ${PROFILE_OPEN_TYPES}
         ),0)::int AS profile_views,
 
         COALESCE((
@@ -1456,7 +1536,7 @@ app.get(
       const totals = await pool.query(`
         SELECT
           COUNT(*)::int AS total_events,
-          COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
+          COUNT(*) FILTER (WHERE type IN ${PROFILE_OPEN_TYPES})::int AS profile_views,
           COUNT(*) FILTER (WHERE type='qr_scan')::int AS qr_scans,
           COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
           COUNT(*) FILTER (WHERE type='phone')::int AS phone_clicks,
@@ -1473,7 +1553,7 @@ app.get(
       const daily = await pool.query(`
         SELECT
           DATE(created_at) AS date,
-          COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
+          COUNT(*) FILTER (WHERE type IN ${PROFILE_OPEN_TYPES})::int AS profile_views,
           COUNT(*) FILTER (WHERE type='qr_scan')::int AS qr_scans,
           COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
           COUNT(*)::int AS total_events
@@ -1490,7 +1570,7 @@ app.get(
           COUNT(*)::int AS events,
           COUNT(*) FILTER (WHERE type='qr_scan')::int AS qr_scans,
           COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
-          COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views
+          COUNT(*) FILTER (WHERE type IN ${PROFILE_OPEN_TYPES})::int AS profile_views
         FROM events
         WHERE ${periodWhere}
         GROUP BY EXTRACT(HOUR FROM created_at)
@@ -2955,7 +3035,7 @@ app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'),
     const totals = await pool.query(`
       SELECT
         COUNT(*)::int AS total_events,
-        COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
+        COUNT(*) FILTER (WHERE type IN ${PROFILE_OPEN_TYPES})::int AS profile_views,
         COUNT(*) FILTER (WHERE type IN ('qr_scan','qr'))::int AS qr_scans,
         COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps,
         COUNT(*) FILTER (WHERE type='phone')::int AS phone_clicks,
@@ -2970,7 +3050,7 @@ app.get('/api/business-analytics', auth, requireBusinessPermission('analytics'),
     const daily = await pool.query(`
       SELECT TO_CHAR(created_at::date,'YYYY-MM-DD') AS day,
         COUNT(*)::int AS events,
-        COUNT(*) FILTER (WHERE type='profile_view')::int AS profile_views,
+        COUNT(*) FILTER (WHERE type IN ${PROFILE_OPEN_TYPES})::int AS profile_views,
         COUNT(*) FILTER (WHERE type IN ('qr_scan','qr'))::int AS qr_scans,
         COUNT(*) FILTER (WHERE type='nfc')::int AS nfc_taps
       FROM events WHERE ${where}
@@ -3064,7 +3144,7 @@ app.get('/api/business-ai-insights', auth, requireBusinessPermission('ai'), asyn
     const params=[req.user.id];
     const totalsQ=await pool.query(`SELECT
       COUNT(*)::int total_events,
-      COUNT(*) FILTER(WHERE type='profile_view')::int profile_views,
+      COUNT(*) FILTER(WHERE type IN ${PROFILE_OPEN_TYPES})::int profile_views,
       COUNT(*) FILTER(WHERE type IN ('qr_scan','qr'))::int qr,
       COUNT(*) FILTER(WHERE type='nfc')::int nfc,
       COUNT(*) FILTER(WHERE type='whatsapp')::int whatsapp,
@@ -3131,7 +3211,7 @@ app.get('/api/stats', auth, async (req, res) => {
           COUNT(*)::int AS total_events,
 
           COUNT(*) FILTER(
-            WHERE type='profile_view'
+            WHERE type IN ${PROFILE_OPEN_TYPES}
           )::int AS profile_views,
 
           COUNT(*) FILTER(
