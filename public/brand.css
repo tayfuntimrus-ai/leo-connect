@@ -1,0 +1,109 @@
+/* ============================================================
+   LEO CONNECT — MARKA KİMLİĞİ
+   Tek kaynak. Panel sayfaları kendi değişkenlerini buradan besler.
+
+   Kapsam: admin paneli, işletme paneli, QR/NFC merkezleri, giriş
+   ekranları ve kartvizit panelleri — yani SABİT arayüz.
+
+   Kapsam DIŞI: profile.html ve business-card.html. Onlar müşteriye
+   açılan sayfalar; işletmelerin kendi seçtiği tema ve vurgu rengi
+   orada geçerli, marka rengi onları ezmemeli.
+
+   KONTRAST NOTLARI (WCAG, #0f1115 zemin üzerinde ölçüldü)
+     --leo-accent       #EF9F27   8.69:1  metin/ikon için güvenli
+     --leo-accent-hi    #F8BC5C  11.10:1  vurgulu başlık, hover
+     --leo-accent-deep  #854F0B   2.81:1  SADECE DEKORATİF
+                                          kenarlık, ayraç, ince dolgu
+                                          metin veya okunması gereken
+                                          ikon için KULLANMAYIN
+
+     Amber zemin üzerine metin KOYU olmalı:
+       #17120A üzerinde  8.57:1  ✔
+       beyaz    üzerinde 2.17:1  ✘ okunmaz
+   ============================================================ */
+
+:root{
+  /* — zemin ve yüzeyler — */
+  --leo-ground:        #0f1115;   /* ana zemin */
+  --leo-ground-deep:   #0a0c10;   /* sidebar, kuyular, en dip */
+  --leo-surface:       #161920;   /* panel, kart */
+  --leo-surface-2:     #1c202a;   /* yükseltilmiş yüzey, input */
+  --leo-line:          #272c36;   /* kenarlık */
+  --leo-line-soft:     #1d2129;   /* ince ayraç */
+
+  /* — metin — */
+  --leo-text:          #f3f5f8;
+  --leo-text-dim:      #c3cad4;
+  --leo-muted:         #929ba8;
+
+  /* — imza vurgu — */
+  --leo-accent:        #ef9f27;   /* ana buton, aktif durum, ikon */
+  --leo-accent-hi:     #f8bc5c;   /* hover, parlak vurgu */
+  --leo-accent-deep:   #854f0b;   /* dekoratif kenarlık/dolgu */
+  --leo-on-accent:     #17120a;   /* amber zemin üzerine metin */
+
+  --leo-accent-wash:   rgba(239,159,39,.12);
+  --leo-accent-line:   rgba(239,159,39,.28);
+  --leo-accent-glow:   rgba(239,159,39,.20);
+
+  /* — amber tonlu koyu yüzey (rozet, seçili satır) — */
+  --leo-accent-dark:   #191308;
+
+  /* — semantik — */
+  --leo-green:         #45c27a;
+  --leo-red:           #e8705f;
+  --leo-blue:          #5ea7ff;
+
+  /* — biçim — */
+  --leo-radius:        16px;
+  --leo-shadow:        0 22px 60px rgba(0,0,0,.45);
+  --leo-shadow-sm:     0 8px 24px rgba(0,0,0,.30);
+}
+
+/* ------------------------------------------------------------
+   AÇIK TEMA (yalnızca admin panelinde body.light olarak var)
+
+   #EF9F27 açık zeminde 1.95:1 — metin için yetersiz. Bu yüzden
+   açık temada vurgu METNİ koyu tona (#854F0B, 6.04:1) döner;
+   amber yalnızca dolgu olarak kalır.
+   ------------------------------------------------------------ */
+body.light{
+  --leo-ground:        #f3f4f1;
+  --leo-ground-deep:   #ffffff;
+  --leo-surface:       #ffffff;
+  --leo-surface-2:     #f6f7f4;
+  --leo-line:          #dfe2dc;
+  --leo-line-soft:     #eaece7;
+
+  --leo-text:          #16181a;
+  --leo-text-dim:      #3f454c;
+  --leo-muted:         #67707a;
+
+  --leo-accent:        #854f0b;   /* açık zeminde okunabilir vurgu */
+  --leo-accent-hi:     #a4620d;
+  --leo-accent-deep:   #d7a05a;
+  --leo-on-accent:     #ffffff;
+
+  --leo-accent-wash:   rgba(239,159,39,.16);
+  --leo-accent-line:   rgba(133,79,11,.30);
+  --leo-accent-glow:   rgba(239,159,39,.22);
+  --leo-accent-dark:   #fbf3e4;
+
+  --leo-shadow:        0 18px 45px rgba(25,35,28,.10);
+  --leo-shadow-sm:     0 6px 18px rgba(25,35,28,.08);
+}
+
+/* ------------------------------------------------------------
+   Ortak birincil buton görünümü.
+   Amber zemin + koyu metin kuralını tek yerde sabitler.
+   ------------------------------------------------------------ */
+.leo-btn-primary{
+  background: var(--leo-accent);
+  color: var(--leo-on-accent);
+  border: 1px solid var(--leo-accent);
+  font-weight: 700;
+}
+.leo-btn-primary:hover{
+  background: var(--leo-accent-hi);
+  border-color: var(--leo-accent-hi);
+}
