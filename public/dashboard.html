@@ -2556,6 +2556,19 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
 .profile-content-box{margin-top:16px}
 .profile-content-divider{border-top:1px solid var(--bc-line);padding-top:16px}
 .profile-content-box .design-toggle{min-height:38px}
+/* Isletmeye ozel vurgu rengi secici */
+.accent-picker{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  border:1px solid var(--bc-line);border-radius:12px;padding:12px 14px;background:var(--leo-surface-2)}
+.accent-picker input[type=color]{width:52px;height:52px;padding:0;border:1px solid var(--bc-line);
+  border-radius:12px;background:transparent;cursor:pointer;flex:0 0 auto}
+.accent-picker input[type=color]::-webkit-color-swatch-wrapper{padding:3px}
+.accent-picker input[type=color]::-webkit-color-swatch{border:0;border-radius:9px}
+.accent-copy{flex:1 1 220px;min-width:0}
+.accent-copy strong{display:block;font-family:ui-monospace,Consolas,monospace;font-size:14px;letter-spacing:.04em}
+.accent-copy span{display:block;font-size:11px;color:var(--bc-muted);margin-top:3px;line-height:1.5}
+.accent-reset{flex:0 0 auto;border:1px solid var(--bc-line);background:transparent;
+  color:var(--bc-muted);border-radius:9px;padding:8px 12px;font-size:11px;font-weight:700;cursor:pointer}
+.accent-reset:hover{color:var(--leo-accent);border-color:var(--leo-accent)}
 .profile-content-box .design-save-row{margin-top:14px}
 body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 .bc-sidebar{width:252px;padding:22px 14px 16px;background:linear-gradient(180deg,#0a0c10,#0a0c10);border-right:1px solid var(--bc-line);gap:13px;box-shadow:18px 0 50px rgba(0,0,0,.14)}
@@ -3363,9 +3376,21 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 
   <div class="design-grid">
     <div class="design-field full">
+      <label>VURGU RENGİ</label>
+      <div class="accent-picker">
+        <input id="design_accent_color" type="color" value="#EF9F27" aria-label="Vurgu rengi seç">
+        <div class="accent-copy">
+          <strong id="design_accent_value">#EF9F27</strong>
+          <span>Müşteri profilindeki “Sipariş Ver” butonu ve öne çıkan vurgular bu rengi kullanır.</span>
+        </div>
+        <button type="button" id="design_accent_reset" class="accent-reset">Markaya dön</button>
+      </div>
+    </div>
+
+    <div class="design-field full">
       <label>DUYURU</label>
       <div class="design-toggle">
-        <span>Profildə duyuruyu göster</span>
+        <span>Profilde duyuruyu göster</span>
         <label class="switch">
           <input id="design_announcement_enabled" type="checkbox">
           <span class="switch-track"></span>
@@ -5217,6 +5242,38 @@ function setProfileContentField(id, value){
   if(el) el.value = value ?? '';
 }
 
+/* ---- Isletmeye ozel vurgu rengi ---- */
+const LEO_BRAND_ACCENT = '#EF9F27';
+
+function normalizeAccent(value){
+  const raw = String(value == null ? '' : value).trim();
+  if(/^#[0-9a-f]{6}$/i.test(raw)) return raw.toUpperCase();
+  if(/^#[0-9a-f]{3}$/i.test(raw)) return ('#'+raw.slice(1).split('').map(c=>c+c).join('')).toUpperCase();
+  return LEO_BRAND_ACCENT;
+}
+
+function setAccentField(value){
+  const color = normalizeAccent(value);
+  const input = document.getElementById('design_accent_color');
+  const label = document.getElementById('design_accent_value');
+  if(input) input.value = color;
+  if(label) label.textContent = color;
+  return color;
+}
+
+document.addEventListener('input', e => {
+  if(e.target && e.target.id === 'design_accent_color'){
+    const label = document.getElementById('design_accent_value');
+    if(label) label.textContent = normalizeAccent(e.target.value);
+  }
+});
+
+document.addEventListener('click', e => {
+  if(e.target && e.target.id === 'design_accent_reset'){
+    setAccentField(LEO_BRAND_ACCENT);
+  }
+});
+
 function loadProfileContentIntoForm(data){
   const d = data || {};
   profileContentState = {
@@ -5231,9 +5288,11 @@ function loadProfileContentIntoForm(data){
     featured_enabled: d.featured_enabled === true,
     gallery: Array.isArray(d.gallery) ? d.gallery : [],
     video_url: String(d.video_url || ''),
-    video_enabled: d.video_enabled === true
+    video_enabled: d.video_enabled === true,
+    accent_color: normalizeAccent(d.accent_color)
   };
 
+  setAccentField(profileContentState.accent_color);
   setProfileContentField('design_announcement_text', profileContentState.announcement_text);
   setProfileContentField('design_featured_title', profileContentState.featured_title);
   setProfileContentField('design_featured_text', profileContentState.featured_text);
@@ -5285,7 +5344,8 @@ async function saveProfileContent(){
     featured_enabled: checked('design_featured_enabled'),
     gallery: value('design_gallery').split(/\r?\n/).map(x => x.trim()).filter(Boolean).slice(0,30).map(url => ({url})),
     video_url: value('design_video_url'),
-    video_enabled: checked('design_video_enabled')
+    video_enabled: checked('design_video_enabled'),
+    accent_color: normalizeAccent(document.getElementById('design_accent_color')?.value)
   };
 
   button?.classList.add('loading');
@@ -5300,7 +5360,6 @@ async function saveProfileContent(){
       ...current,
       ...payload,
       theme: current.theme || 'midnight-gold',
-      accent_color: current.accent_color || '#ef9f27',
       cover_url: current.cover_url || '',
       cover_position: current.cover_position || 'center',
       business_brand_enabled: current.business_brand_enabled !== false
