@@ -1,0 +1,27 @@
+# Bağımlılıklar
+node_modules/
+
+# Ortam değişkenleri — ASLA commit edilmemeli
+.env
+.env.*
+!.env.example
+
+# Loglar
+*.log
+npm-debug.log*
+logs/
+
+# İşletim sistemi
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editör
+.vscode/
+.idea/
+*.swp
+
+# Geçici
+tmp/
+temp/
+*.tmp
