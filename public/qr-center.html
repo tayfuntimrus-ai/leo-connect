@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080808">
+  <meta name="theme-color" content="#0f1115">
   <title>QR Center — LEO CONNECT</title>
+  <link rel="stylesheet" href="/brand.css">
 
   <style>
     * {
@@ -13,23 +14,24 @@
       padding: 0;
     }
 
+    /* Renkler /brand.css icindeki marka token'larindan gelir. */
     :root {
-      --bg: #070707;
-      --card: #101010;
-      --card2: #151515;
-      --gold: #d4af37;
-      --gold2: #f1d77a;
-      --text: #f7f4ea;
-      --muted: #9d9a91;
-      --border: rgba(212,175,55,.18);
-      --green: #54d98c;
+      --bg: var(--leo-ground);
+      --card: var(--leo-surface);
+      --card2: var(--leo-surface-2);
+      --gold: var(--leo-accent);
+      --gold2: var(--leo-accent-hi);
+      --text: var(--leo-text);
+      --muted: var(--leo-muted);
+      --border: var(--leo-accent-line);
+      --green: var(--leo-green);
     }
 
     body {
       min-height: 100vh;
       background:
-        radial-gradient(circle at 50% -10%, rgba(212,175,55,.14), transparent 35%),
-        linear-gradient(180deg, #080808 0%, #050505 100%);
+        radial-gradient(circle at 50% -10%, rgba(239,159,39,.14), transparent 35%),
+        linear-gradient(180deg, #0a0c10 0%, #0a0c10 100%);
       color: var(--text);
       font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
@@ -70,11 +72,11 @@
       display: grid;
       place-items: center;
       background:
-        linear-gradient(145deg, #f2d879, #b38a20);
-      color: #080808;
+        linear-gradient(145deg,#f8bc5c,#ef9f27);
+      color: #0a0c10;
       font-size: 25px;
       font-weight: 900;
-      box-shadow: 0 8px 30px rgba(212,175,55,.2);
+      box-shadow: 0 8px 30px rgba(239,159,39,.2);
     }
 
     .brand-text strong {
@@ -103,7 +105,7 @@
     }
 
     .back-btn:hover {
-      border-color: rgba(212,175,55,.45);
+      border-color: rgba(239,159,39,.45);
       transform: translateY(-1px);
     }
 
@@ -116,7 +118,7 @@
       border-radius: 28px;
       padding: 30px;
       background:
-        radial-gradient(circle at 90% 0%, rgba(212,175,55,.12), transparent 35%),
+        radial-gradient(circle at 90% 0%, rgba(239,159,39,.12), transparent 35%),
         linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
       box-shadow: 0 25px 80px rgba(0,0,0,.35);
       margin-bottom: 20px;
@@ -128,7 +130,7 @@
       right: 30px;
       bottom: -35px;
       font-size: 180px;
-      color: rgba(212,175,55,.035);
+      color: rgba(239,159,39,.035);
       pointer-events: none;
     }
 
@@ -192,7 +194,7 @@
       height: 48px;
       border-radius: 14px;
       object-fit: cover;
-      border: 1px solid rgba(212,175,55,.3);
+      border: 1px solid rgba(239,159,39,.3);
       background: #111;
     }
 
@@ -220,7 +222,7 @@
       border-radius: 26px;
       background: #fff;
       box-shadow:
-        0 0 0 1px rgba(212,175,55,.25),
+        0 0 0 1px rgba(239,159,39,.25),
         0 25px 80px rgba(0,0,0,.5);
     }
 
@@ -237,8 +239,8 @@
       gap: 7px;
       padding: 7px 11px;
       border-radius: 999px;
-      border: 1px solid rgba(84,217,140,.2);
-      background: rgba(84,217,140,.07);
+      border: 1px solid rgba(69,194,122,.2);
+      background: rgba(69,194,122,.07);
       color: var(--green);
       font-size: 11px;
       font-weight: 700;
@@ -273,7 +275,7 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       text-align: left;
-      color: #d8d4ca;
+      color: #c3cad4;
       font-size: 12px;
       padding-left: 8px;
     }
@@ -281,7 +283,7 @@
     .copy-mini {
       flex: 0 0 auto;
       border: 1px solid var(--border);
-      background: rgba(212,175,55,.08);
+      background: rgba(239,159,39,.08);
       color: var(--gold2);
       border-radius: 10px;
       padding: 9px 11px;
@@ -311,13 +313,13 @@
 
     .action:hover {
       transform: translateY(-2px);
-      border-color: rgba(212,175,55,.4);
-      background: rgba(212,175,55,.07);
+      border-color: rgba(239,159,39,.4);
+      background: rgba(239,159,39,.07);
     }
 
     .action.primary {
-      border-color: rgba(212,175,55,.35);
-      background: linear-gradient(135deg, rgba(212,175,55,.2), rgba(212,175,55,.06));
+      border-color: rgba(239,159,39,.35);
+      background: linear-gradient(135deg, rgba(239,159,39,.2), rgba(239,159,39,.06));
       color: var(--gold2);
     }
 
@@ -353,9 +355,9 @@
     .big-stat {
       padding: 22px;
       border-radius: 18px;
-      border: 1px solid rgba(212,175,55,.18);
+      border: 1px solid rgba(239,159,39,.18);
       background:
-        radial-gradient(circle at 90% 0%, rgba(212,175,55,.12), transparent 45%),
+        radial-gradient(circle at 90% 0%, rgba(239,159,39,.12), transparent 45%),
         rgba(0,0,0,.18);
       margin-bottom: 12px;
     }
@@ -425,7 +427,7 @@
       display: grid;
       place-items: center;
       border-radius: 11px;
-      background: rgba(212,175,55,.08);
+      background: rgba(239,159,39,.08);
       color: var(--gold2);
       font-size: 16px;
       flex: 0 0 auto;
@@ -487,9 +489,9 @@
       margin-top: 15px;
       padding: 13px 15px;
       border-radius: 13px;
-      border: 1px solid rgba(212,175,55,.14);
-      background: rgba(212,175,55,.045);
-      color: #c9c5bb;
+      border: 1px solid rgba(239,159,39,.14);
+      background: rgba(239,159,39,.045);
+      color: #c3cad4;
       font-size: 11px;
       line-height: 1.6;
     }
@@ -498,7 +500,7 @@
 
     footer {
       text-align: center;
-      color: #68655e;
+      color: #929ba8;
       font-size: 10px;
       padding: 30px 0 10px;
       letter-spacing: .08em;
@@ -515,8 +517,8 @@
       pointer-events: none;
       padding: 13px 18px;
       border-radius: 13px;
-      background: #171717;
-      border: 1px solid rgba(212,175,55,.3);
+      background: #1c202a;
+      border: 1px solid rgba(239,159,39,.3);
       color: var(--text);
       box-shadow: 0 15px 40px rgba(0,0,0,.45);
       font-size: 12px;
@@ -536,7 +538,7 @@
       inset: 0;
       display: grid;
       place-items: center;
-      background: #070707;
+      background: #0a0c10;
       z-index: 999;
       transition: .3s;
     }
@@ -550,7 +552,7 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      border: 3px solid rgba(212,175,55,.15);
+      border: 3px solid rgba(239,159,39,.15);
       border-top-color: var(--gold);
       animation: spin .8s linear infinite;
     }

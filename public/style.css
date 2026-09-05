@@ -1,9 +1,9 @@
 *{box-sizing:border-box}
-body{margin:0;font-family:Inter,Arial,sans-serif;background:#f6f4ef;color:#171717}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#f3f5f8;color:#1c202a}
 a{text-decoration:none;color:inherit}
-header{height:76px;background:#0f0f0f;color:#fff;padding:0 7%;display:flex;align-items:center;justify-content:space-between}
+header{height:76px;background:#0f1115;color:#fff;padding:0 7%;display:flex;align-items:center;justify-content:space-between}
 header b{letter-spacing:.08em}
-header span,small,.gold{color:#c59a50}
+header span,small,.gold{color:#ef9f27}
 nav{display:flex;gap:26px;font-size:13px;color:#bbb}
 
 .hero{
@@ -13,7 +13,7 @@ display:grid;
 grid-template-columns:1.25fr .75fr;
 gap:40px;
 align-items:center;
-background:radial-gradient(circle at 80% 20%,#4b3a1d 0,#181818 32%,#0d0d0d 65%);
+background:radial-gradient(circle at 80% 20%,#854f0b 0,#1c202a 32%,#0f1115 65%);
 color:#fff
 }
 
@@ -24,7 +24,7 @@ letter-spacing:-.055em;
 margin:16px 0
 }
 
-.hero h1 em{color:#d2aa63;font-style:normal}
+.hero h1 em{color:#ef9f27;font-style:normal}
 
 .hero p{
 color:#aaa;
@@ -35,7 +35,7 @@ max-width:650px
 
 .btn,button{
 display:inline-block;
-background:#c69a50;
+background:#ef9f27;
 color:#111;
 border:0;
 border-radius:6px;
@@ -89,14 +89,14 @@ gap:18px
 
 .card{
 padding:30px;
-border:1px solid #e7e2d8;
+border:1px solid #c3cad4;
 border-radius:14px;
 background:#fff
 }
 
 .dark .card{
-background:#181818;
-border-color:#292929
+background:#1c202a;
+border-color:#272c36
 }
 
 .card h3{font-size:24px}
@@ -146,7 +146,7 @@ min-height:100vh;
 padding:35px 0;
 display:grid;
 place-items:center;
-background:linear-gradient(#111,#292014)
+background:linear-gradient(#111,#191308)
 }
 
 .profile .box{
