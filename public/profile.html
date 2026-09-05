@@ -1,1475 +1,25 @@
 <!doctype html>
-<html lang="tr">
-
-<head>
-
-<meta charset="utf-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1"
->
-
-<meta
-  name="theme-color"
-  content="#080808"
->
-
-<title>LEO CONNECT</title>
-
-<style>
-
-:root{
-  --gold:#c59a52;
-  --gold-light:#e0bd7b;
-  --black:#080808;
-  --dark:#101010;
-  --dark-2:#151515;
-  --border:#292929;
-  --muted:#858585;
-  --green:#45c27a;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-html{
-  scroll-behavior:smooth;
-}
-
-body{
-
-  margin:0;
-
-  min-height:100vh;
-
-  background:
-
-    radial-gradient(
-      circle at 50% -10%,
-      #c59a5222,
-      transparent 35%
-    ),
-
-    radial-gradient(
-      circle at 100% 50%,
-      #c59a5210,
-      transparent 30%
-    ),
-
-    #080808;
-
-  color:#fff;
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-}
-
-
-/* ==================================================
-   PAGE
-================================================== */
-
-.page{
-
-  width:min(
-    520px,
-    100%
-  );
-
-  min-height:100vh;
-
-  margin:auto;
-
-  padding:
-    22px 18px 45px;
-
-}
-
-
-/* ==================================================
-   HERO
-================================================== */
-
-.hero{
-
-  position:relative;
-
-  overflow:hidden;
-
-  text-align:center;
-
-  padding:
-    30px 22px 27px;
-
-  border-radius:28px;
-
-  border:
-    1px solid #c59a5245;
-
-  background:
-
-    radial-gradient(
-      circle at 50% 0%,
-      #c59a5218,
-      transparent 45%
-    ),
-
-    linear-gradient(
-      145deg,
-      #171717,
-      #0c0c0c
-    );
-
-  box-shadow:
-    0 30px 90px #00000080;
-
-}
-
-
-.hero::before{
-
-  content:"";
-
-  position:absolute;
-
-  width:220px;
-
-  height:220px;
-
-  top:-150px;
-
-  left:50%;
-
-  transform:
-    translateX(-50%);
-
-  border-radius:50%;
-
-  border:
-    1px solid #c59a5215;
-
-}
-
-
-.logo{
-
-  position:relative;
-
-  z-index:2;
-
-  width:120px;
-
-  height:120px;
-
-  margin:
-    0 auto 18px;
-
-  display:grid;
-
-  place-items:center;
-
-  overflow:hidden;
-
-  border-radius:30px;
-
-  background:#050505;
-
-  border:
-    1px solid #c59a5270;
-
-  box-shadow:
-    0 18px 45px #000;
-
-}
-
-
-.logo img{
-
-  width:100%;
-
-  height:100%;
-
-  object-fit:cover;
-
-}
-
-
-.logo-placeholder{
-
-  font-size:48px;
-
-}
-
-
-.business-name{
-
-  position:relative;
-
-  z-index:2;
-
-  margin:0;
-
-  font-size:30px;
-
-  line-height:1.15;
-
-  font-weight:800;
-
-  letter-spacing:-.02em;
-
-  word-break:break-word;
-
-}
-
-
-.category{
-
-  display:inline-block;
-
-  margin-top:10px;
-
-  padding:
-    7px 12px;
-
-  border-radius:999px;
-
-  background:#c59a5212;
-
-  border:
-    1px solid #c59a5235;
-
-  color:
-    var(--gold-light);
-
-  font-size:10px;
-
-  font-weight:700;
-
-  letter-spacing:.06em;
-
-}
-
-
-.description{
-
-  position:relative;
-
-  z-index:2;
-
-  margin:
-    15px auto 0;
-
-  max-width:410px;
-
-  color:#929292;
-
-  font-size:13px;
-
-  line-height:1.65;
-
-}
-
-
-/* ==================================================
-   CONNECTION STATUS
-================================================== */
-
-.status{
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:7px;
-
-  margin-top:16px;
-
-  color:#626262;
-
-  font-size:9px;
-
-  letter-spacing:.12em;
-
-}
-
-
-.status-dot{
-
-  width:6px;
-
-  height:6px;
-
-  border-radius:50%;
-
-  background:
-    var(--green);
-
-  box-shadow:
-    0 0 10px #45c27a88;
-
-}
-
-
-/* ==================================================
-   PRIMARY ACTIONS
-================================================== */
-
-.actions{
-
-  display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap:10px;
-
-  margin-top:18px;
-
-}
-
-
-.action{
-
-  min-height:52px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:8px;
-
-  padding:
-    13px 10px;
-
-  border-radius:13px;
-
-  border:
-    1px solid #303030;
-
-  background:#151515;
-
-  color:#fff;
-
-  text-decoration:none;
-
-  font-size:12px;
-
-  font-weight:800;
-
-  transition:
-    transform .15s,
-    border-color .15s;
-
-}
-
-
-.action:active{
-
-  transform:
-    scale(.98);
-
-}
-
-
-.action.gold{
-
-  background:
-    linear-gradient(
-      135deg,
-      #c59a52,
-      #9e7738
-    );
-
-  border-color:
-    #c59a52;
-
-}
-
-
-/* ==================================================
-   SECTION
-================================================== */
-
-.section{
-
-  margin-top:15px;
-
-  padding:19px;
-
-  border-radius:21px;
-
-  border:
-    1px solid var(--border);
-
-  background:
-    linear-gradient(
-      145deg,
-      #141414,
-      #0d0d0d
-    );
-
-}
-
-
-.section-title{
-
-  display:flex;
-
-  align-items:center;
-
-  gap:9px;
-
-  margin-bottom:13px;
-
-}
-
-
-.section-icon{
-
-  width:34px;
-
-  height:34px;
-
-  display:grid;
-
-  place-items:center;
-
-  border-radius:10px;
-
-  background:#080808;
-
-  border:
-    1px solid #c59a5230;
-
-  font-size:16px;
-
-}
-
-
-.section-title strong{
-
-  font-size:13px;
-
-}
-
-
-.section-title span{
-
-  display:block;
-
-  margin-top:3px;
-
-  color:#555;
-
-  font-size:9px;
-
-}
-
-
-/* ==================================================
-   LINK GRID
-================================================== */
-
-.link-grid{
-
-  display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap:9px;
-
-}
-
-
-.link{
-
-  min-height:50px;
-
-  display:flex;
-
-  align-items:center;
-
-  gap:9px;
-
-  padding:
-    11px;
-
-  border-radius:12px;
-
-  border:
-    1px solid #282828;
-
-  background:#101010;
-
-  color:#fff;
-
-  text-decoration:none;
-
-}
-
-
-.link-icon{
-
-  width:30px;
-
-  height:30px;
-
-  flex:none;
-
-  display:grid;
-
-  place-items:center;
-
-  border-radius:9px;
-
-  background:#080808;
-
-  font-size:14px;
-
-}
-
-
-.link-text{
-
-  min-width:0;
-
-}
-
-
-.link-text strong{
-
-  display:block;
-
-  font-size:10px;
-
-}
-
-
-.link-text span{
-
-  display:block;
-
-  margin-top:3px;
-
-  color:#555;
-
-  font-size:8px;
-
-  overflow:hidden;
-
-  white-space:nowrap;
-
-  text-overflow:ellipsis;
-
-}
-
-
-
-/* ==================================================
-   IBAN
-================================================== */
-
-.iban-card{
-
-  padding:16px;
-
-  border-radius:15px;
-
-  background:
-
-    linear-gradient(
-      135deg,
-      #171717,
-      #0d0d0d
-    );
-
-  border:
-    1px solid #c59a5230;
-
-}
-
-
-.iban-label{
-
-  color:#666;
-
-  font-size:8px;
-
-  letter-spacing:.12em;
-
-}
-
-
-.iban-number{
-
-  margin-top:9px;
-
-  color:#fff;
-
-  font-size:13px;
-
-  font-weight:800;
-
-  letter-spacing:.04em;
-
-  word-break:break-all;
-
-}
-
-
-.iban-holder{
-
-  margin-top:8px;
-
-  color:#fff;
-
-  font-size:13px;
-
-  font-weight:800;
-
-  word-break:break-word;
-
-}
-
-
-.iban-buttons{
-
-  display:flex;
-
-  gap:8px;
-
-  margin-top:12px;
-
-}
-
-
-.iban-button{
-
-  flex:1;
-
-  padding:10px;
-
-  border-radius:9px;
-
-  border:
-    1px solid #333;
-
-  background:#171717;
-
-  color:#ddd;
-
-  font-size:9px;
-
-  font-weight:800;
-
-  cursor:pointer;
-
-}
-
-
-.iban-button.gold{
-
-  background:
-    linear-gradient(
-      135deg,
-      #c59a52,
-      #9e7738
-    );
-
-  border-color:
-    #c59a52;
-
-  color:#fff;
-
-}
-
-
-.iban-message{
-
-  min-height:14px;
-
-  margin-top:8px;
-
-  color:
-    var(--gold-light);
-
-  font-size:9px;
-
-}
-
-
-/* ==================================================
-   HOURS
-================================================== */
-
-.hours-card{
-
-  display:flex;
-
-  align-items:center;
-
-  gap:12px;
-
-  padding:14px;
-
-  border-radius:13px;
-
-  background:#101010;
-
-  border:
-    1px solid #242424;
-
-}
-
-
-.hours-icon{
-
-  width:38px;
-
-  height:38px;
-
-  display:grid;
-
-  place-items:center;
-
-  border-radius:11px;
-
-  background:#080808;
-
-  font-size:18px;
-
-}
-
-
-.hours-content strong{
-
-  display:block;
-
-  font-size:10px;
-
-}
-
-
-.hours-content span{
-
-  display:block;
-
-  margin-top:5px;
-
-  color:#aaa;
-
-  font-size:11px;
-
-}
-
-
-/* ==================================================
-   FOOTER
-================================================== */
-
-.footer{
-
-  margin-top:25px;
-
-  text-align:center;
-
-  color:#3d3d3d;
-
-  font-size:8px;
-
-  letter-spacing:.16em;
-
-}
-
-
-.powered{
-
-  margin-top:7px;
-
-  color:#292929;
-
-  font-size:8px;
-
-}
-
-
-/* ==================================================
-   HIDDEN
-================================================== */
-
-.hidden{
-
-  display:none !important;
-
-}
-
-
-/* ==================================================
-   MOBILE
-================================================== */
-
-@media(max-width:380px){
-
-  .page{
-
-    padding-left:12px;
-
-    padding-right:12px;
-
-  }
-
-
-  .hero{
-
-    padding-left:16px;
-
-    padding-right:16px;
-
-  }
-
-
-  .link-grid{
-
-    grid-template-columns:
-      1fr;
-
-  }
-
-
-  .actions{
-
-    grid-template-columns:
-      1fr;
-
-  }
-
-}
-
-
-/* ==================================================
-   LEO CONNECT PROFILE V2 — PREMIUM LAYER
-================================================== */
-:root{
-  --lc-gold:#d6ad55;
-  --lc-gold-soft:#f1d58c;
-  --lc-bg:#070707;
-  --lc-card:rgba(18,18,18,.88);
-  --lc-border:rgba(214,173,85,.20);
-}
-body{
-  background:
-    radial-gradient(circle at 50% -10%,rgba(214,173,85,.16),transparent 34%),
-    radial-gradient(circle at 0% 45%,rgba(214,173,85,.055),transparent 28%),
-    #070707 !important;
-}
-.page{max-width:720px !important; padding-top:18px !important;}
-.hero{
-  position:relative;overflow:hidden;margin-top:4px !important;
-  padding:44px 24px 30px !important;border:1px solid var(--lc-border);
-  border-radius:30px !important;
-  background:linear-gradient(145deg,rgba(22,22,22,.96),rgba(8,8,8,.98));
-  box-shadow:0 28px 70px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.035);
-}
-.hero:before{
-  content:"";position:absolute;width:280px;height:280px;left:50%;top:-180px;transform:translateX(-50%);
-  background:radial-gradient(circle,rgba(214,173,85,.20),transparent 68%);pointer-events:none;
-}
-.logo{
-  position:relative;z-index:1;width:132px !important;height:132px !important;
-  margin:0 auto 20px !important;padding:6px !important;
-  border:1px solid rgba(214,173,85,.52) !important;border-radius:34px !important;
-  background:linear-gradient(145deg,#151515,#080808) !important;
-  box-shadow:0 0 0 7px rgba(214,173,85,.045),0 20px 45px rgba(0,0,0,.48),0 0 34px rgba(214,173,85,.12);
-}
-.logo img,.logo-placeholder{border-radius:27px !important;}
-.business-name{
-  font-size:clamp(30px,7vw,46px) !important;line-height:1.05 !important;
-  letter-spacing:-.035em !important;text-shadow:0 8px 28px rgba(0,0,0,.5);
-}
-.category{
-  display:inline-flex !important;margin:12px auto 0 !important;padding:7px 13px !important;
-  border:1px solid var(--lc-border);border-radius:999px;background:rgba(214,173,85,.055);
-  color:var(--lc-gold-soft) !important;letter-spacing:.08em !important;
-}
-.description{max-width:560px;margin:16px auto 0 !important;color:#c9c9c9 !important;line-height:1.65 !important;}
-.status{
-  width:max-content;margin:20px auto 0 !important;padding:8px 12px !important;
-  border:1px solid rgba(214,173,85,.13);border-radius:999px;background:rgba(255,255,255,.025);
-  font-size:10px !important;letter-spacing:.12em !important;
-}
-.actions{margin-top:22px !important;gap:10px !important;}
-.action{
-  min-height:52px !important;border-radius:16px !important;border:1px solid var(--lc-border) !important;
-  box-shadow:0 10px 25px rgba(0,0,0,.25) !important;transition:transform .2s ease,box-shadow .2s ease !important;
-}
-.action:hover{transform:translateY(-2px);box-shadow:0 15px 32px rgba(0,0,0,.35) !important;}
-.section{
-  margin-top:16px !important;padding:22px !important;border:1px solid rgba(255,255,255,.07);
-  border-radius:24px !important;background:var(--lc-card) !important;
-  box-shadow:0 18px 45px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.025);
-  backdrop-filter:blur(12px);
-}
-.section-title{margin-bottom:18px !important;}
-.section-icon{
-  width:42px !important;height:42px !important;border-radius:13px !important;
-  border:1px solid var(--lc-border);background:rgba(214,173,85,.07) !important;
-}
-.info-row,.link,.hours-card,.iban-card{
-  border:1px solid rgba(255,255,255,.07) !important;background:rgba(255,255,255,.025) !important;
-  border-radius:17px !important;
-}
-.info-row{transition:border-color .2s ease,transform .2s ease;}
-.info-row:hover,.link:hover{border-color:rgba(214,173,85,.25) !important;transform:translateY(-1px);}
-.link{min-height:70px !important;}
-.link-icon{border-radius:13px !important;background:rgba(214,173,85,.07) !important;}
-.info-action{color:var(--lc-gold-soft) !important;}
-.hours-card{padding:18px !important;}
-.iban-card{box-shadow:inset 0 1px 0 rgba(255,255,255,.025) !important;}
-.iban-number{font-size:clamp(15px,4vw,20px) !important;letter-spacing:.035em;word-break:break-word;}
-.iban-button{border-radius:12px !important;transition:transform .2s ease !important;}
-.iban-button:hover{transform:translateY(-1px);}
-.footer{opacity:.8 !important;padding:28px 10px 34px !important;}
-.footer .powered{color:var(--lc-gold) !important;letter-spacing:.14em;}
-@media(max-width:520px){
-  .page{padding:10px 12px 0 !important;}
-  .hero{padding:34px 17px 22px !important;border-radius:24px !important;}
-  .section{padding:17px !important;border-radius:20px !important;}
-  .logo{width:112px !important;height:112px !important;border-radius:29px !important;}
-  .logo img,.logo-placeholder{border-radius:22px !important;}
-}
-
-
-
-
-
-/* ==================================================
-   PROFILE BRAND POSITION
-================================================== */
-.page{
-  display:flex;
-  flex-direction:column;
-}
-.footer{
-  margin-top:32px !important;
-  padding:30px 12px 34px !important;
-  border-top:1px solid rgba(197,154,82,.28);
-  text-align:center;
-  color:var(--gold-light);
-  font-size:10px;
-  letter-spacing:.22em;
-  text-transform:uppercase;
-}
-.footer::before{
-  content:'🦁';
-  display:block;
-  width:38px;
-  height:38px;
-  margin:0 auto 10px;
-  padding-top:9px;
-  border:1px solid rgba(197,154,82,.5);
-  border-radius:12px;
-  background:rgba(197,154,82,.06);
-  box-shadow:0 0 24px rgba(197,154,82,.08);
-  font-size:18px;
-  letter-spacing:0;
-}
-.footer .powered{
-  margin-top:9px;
-  color:#8f774f;
-  font-size:8px;
-  letter-spacing:.16em;
-}
-
-/* ==================================================
-   LEO CONNECT V2 — DYNAMIC PROFILE
-================================================== */
-.dynamic-cover{
-  display:none;
-  position:relative;
-  min-height:190px;
-  margin:-24px -24px 22px;
-  overflow:hidden;
-  border-radius:24px 24px 0 0;
-  background:linear-gradient(145deg,#191919,#0a0a0a);
-  border-bottom:1px solid rgba(214,173,85,.16);
-}
-.dynamic-cover img{
-  width:100%;height:100%;min-height:190px;display:block;object-fit:cover;
-}
-.dynamic-cover::after{
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(to bottom,transparent 30%,rgba(7,7,7,.72) 100%);
-}
-.dynamic-announcement,
-.dynamic-campaign,
-.dynamic-featured,
-.dynamic-video{
-  display:none;
-  margin-top:16px;
-  padding:16px;
-  border-radius:18px;
-  border:1px solid rgba(214,173,85,.18);
-  background:linear-gradient(145deg,rgba(214,173,85,.09),rgba(255,255,255,.025));
-  text-align:left;
-}
-.dynamic-announcement strong,
-.dynamic-campaign strong,
-.dynamic-featured strong{
-  display:block;color:var(--lc-gold-soft);font-size:12px;margin-bottom:7px;
-}
-.dynamic-announcement span,
-.dynamic-campaign span,
-.dynamic-featured span{
-  display:block;color:#d0d0d0;font-size:11px;line-height:1.55;
-}
-.dynamic-media{
-  display:none;width:100%;margin-top:12px;border-radius:14px;overflow:hidden;
-  border:1px solid rgba(255,255,255,.07);background:#080808;
-}
-.dynamic-media img{display:block;width:100%;max-height:260px;object-fit:cover;}
-.dynamic-button{
-  display:none!important;width:max-content;margin-top:12px;padding:9px 13px;border-radius:11px;
-  background:linear-gradient(135deg,var(--lc-gold),#9e7738);color:#fff;text-decoration:none;
-  font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.1);
-}
-.dynamic-button.show{display:inline-flex!important;}
-.dynamic-gallery{
-  display:none;margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;
-}
-.dynamic-gallery:empty{display:none;}
-.dynamic-gallery-item{aspect-ratio:1/1;border-radius:13px;overflow:hidden;background:#101010;border:1px solid rgba(255,255,255,.06);}
-.dynamic-gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
-.dynamic-video iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:13px;display:block;}
-.dynamic-video-label{color:#888;font-size:9px;margin-bottom:8px;letter-spacing:.08em;font-weight:800;}
-.theme-obsidian{--lc-gold:#9aa0aa;--lc-gold-soft:#e0e4ea;}
-.theme-champagne{--lc-gold:#d8b36a;--lc-gold-soft:#f5dfae;}
-.theme-pure-light{--lc-gold:#a47a2d;--lc-gold-soft:#6e4d16;}
-.theme-pure-light .hero,.theme-pure-light .section{background:linear-gradient(145deg,#fff,#f4f1e9)!important;color:#151515;}
-.theme-pure-light .business-name,.theme-pure-light .section-title strong{color:#151515;}
-.theme-pure-light .description,.theme-pure-light .info-value,.theme-pure-light .link-text strong{color:#333!important;}
-.theme-pure-light .category{background:rgba(164,122,45,.08);}
-@media(max-width:520px){
-  .dynamic-cover{margin:-17px -17px 18px;border-radius:20px 20px 0 0;min-height:155px;}
-  .dynamic-cover img{min-height:155px;}
-  .dynamic-gallery{grid-template-columns:repeat(2,1fr);}
-}
-
-
-.review-booster{
-  margin:18px 0;
-  padding:20px;
-  border-radius:18px;
-  border:1px solid #c59a5245;
-  background:linear-gradient(145deg,#151515,#090909);
-  box-shadow:0 18px 45px #0008;
-  text-align:center;
-}
-.review-booster.hidden{display:none}
-.review-booster-icon{
-  width:46px;height:46px;margin:0 auto 10px;
-  display:grid;place-items:center;border-radius:14px;
-  border:1px solid #c59a5260;color:#e0bd7b;font-size:21px;
-}
-.review-booster-title{font-size:17px;font-weight:900}
-.review-booster-text{margin:7px auto 0;max-width:480px;color:#8a8a8a;font-size:10px;line-height:1.6}
-.review-booster-stars{display:flex;justify-content:center;gap:6px;margin-top:17px}
-.review-star{
-  width:40px;height:40px;border-radius:12px;border:1px solid #3b3b3b;
-  background:#111;color:#e0bd7b;font-size:21px;cursor:pointer;
-}
-.review-star:hover{border-color:#c59a52;background:#1a1a1a}
-.review-booster-message{margin-top:13px;color:#777;font-size:9px;line-height:1.6}
-.review-google-button,.review-whatsapp-button{
-  display:inline-flex;align-items:center;justify-content:center;
-  margin-top:13px;min-height:40px;padding:9px 14px;border-radius:10px;
-  text-decoration:none;font-size:10px;font-weight:900;
-}
-.review-google-button{background:linear-gradient(135deg,#c59a52,#9e7738);color:#fff}
-.review-whatsapp-button{border:1px solid #3b3b3b;background:#111;color:#ddd;margin-left:7px}
-@media(max-width:430px){
-  .review-star{width:35px;height:35px}
-  .review-whatsapp-button{margin-left:0}
-}
-
-
-/* ==================================================
-   V2 — SMART CAMPAIGN PUBLIC LAYER
-================================================== */
-.smart-campaigns{display:grid;gap:14px;margin:18px 0}
-.smart-campaign{overflow:hidden;border:1px solid #c59a5245;border-radius:18px;background:linear-gradient(145deg,#151515,#090909);box-shadow:0 18px 45px #0008}
-.smart-campaign-media{width:100%;max-height:260px;object-fit:cover;display:none}
-.smart-campaign-body{padding:20px}
-.smart-campaign-kicker{font-size:9px;letter-spacing:.18em;color:#e0bd7b;font-weight:900}
-.smart-campaign-title{margin-top:7px;font-size:20px;font-weight:900}
-.smart-campaign-text{margin-top:8px;color:#9a9a9a;font-size:11px;line-height:1.65;white-space:pre-line}
-.smart-campaign-button{display:none;margin-top:14px;min-height:40px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,#c59a52,#9e7738);color:#fff;font-size:10px;font-weight:900;text-decoration:none}
-.smart-campaign-button.show{display:inline-flex;align-items:center;justify-content:center}
-
-</style>
-
-</head>
-
-
-<body>
-
-
-<div class="page">
-
-
-<!-- ==================================================
-     HERO
-================================================== -->
-
-<section class="hero">
-
-
-  <div class="logo">
-
-    <span
-      id="logoPlaceholder"
-      class="logo-placeholder"
-    >
-      🦁
-    </span>
-
-    <img
-      id="logo"
-      style="display:none"
-      alt="İşletme logosu"
-    >
-
-  </div>
-
-
-  <h1
-    id="name"
-    class="business-name"
-  >
-    İşletme
-  </h1>
-
-
-  <div
-    id="category"
-    class="category"
-  >
-    İşletme
-  </div>
-
-
-  <p
-    id="description"
-    class="description"
-  >
-    Dijital işletme profili
-  </p>
-
-
-  <div class="status">
-
-    <span class="status-dot"></span>
-
-    LEO CONNECT DİJİTAL PROFİL
-
-  </div>
-
-
-  <div class="actions">
-
-    <a
-      id="phoneButton"
-      class="action gold"
-      href="#"
-    >
-      📞 Ara
-    </a>
-
-
-    <a
-      id="whatsappButton"
-      class="action"
-      href="#"
-      target="_blank"
-      rel="noopener"
-    >
-      💬 WhatsApp
-    </a>
-
-  </div>
-
-
-</section>
-
-<!-- ==================================================
-     V2 — DYNAMIC PROFILE CONTENT
-================================================== -->
-<div id="dynamicCover" class="dynamic-cover">
-  <img id="dynamicCoverImage" alt="Profil kapak görseli">
-</div>
-
-<div id="dynamicAnnouncement" class="dynamic-announcement">
-  <strong>📢 Duyuru</strong>
-  <span id="dynamicAnnouncementText"></span>
-</div>
-
-<div id="dynamicCampaign" class="dynamic-campaign">
-  <strong id="dynamicCampaignTitle"></strong>
-  <span id="dynamicCampaignText"></span>
-  <img id="dynamicCampaignImage" class="dynamic-media" alt="Kampanya görseli">
-  <a id="dynamicCampaignButton" class="dynamic-button" target="_blank" rel="noopener"></a>
-</div>
-
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><title>LEO CONNECT</title><style>
+:root{--bg:#090909;--surface:#111;--surface2:#171717;--line:#2b2b2b;--gold:#d8ad61;--gold2:#f2d08d;--text:#fff;--muted:#aaa;--green:#49d16d}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#050505;color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}.profile-shell{width:min(560px,100%);margin:auto;padding:0 12px 28px}.topbar{height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;background:rgba(5,5,5,.92);backdrop-filter:blur(16px);border-bottom:1px solid #262626}.brand{display:flex;align-items:center;gap:9px;font-weight:900;letter-spacing:.12em}.brand-mark{width:34px;height:34px;border-radius:11px;border:1px solid #b9893e;background:#0b0b0b;display:grid;place-items:center;font-size:18px}.brand b{color:var(--gold)}.top-actions{display:flex;gap:7px}.top-pill{border:1px solid #3a3a3a;background:#141414;color:#fff;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:800}.hero{margin-top:10px;border:1px solid #333;border-radius:28px;overflow:hidden;background:#0c0c0c;box-shadow:0 25px 70px rgba(0,0,0,.5)}.cover{height:300px;position:relative;background:linear-gradient(135deg,#272015,#090909);display:none}.cover img{width:100%;height:100%;object-fit:cover;display:block}.cover:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.02) 20%,rgba(8,8,8,.35) 55%,#0b0b0b 100%)}.hero-content{position:relative;padding:0 20px 20px;margin-top:-74px;z-index:2;background:linear-gradient(180deg,transparent,#0b0b0b 72px)}.logo{width:116px;height:116px;border-radius:50%;overflow:hidden;border:4px solid #fff;background:#080808;box-shadow:0 12px 35px #000;display:grid;place-items:center}.logo img{width:100%;height:100%;object-fit:cover}.logo-placeholder{font-size:40px}.title-row{display:flex;align-items:center;gap:8px;margin-top:14px}.business-name{font-size:30px;line-height:1.02;margin:0;font-weight:900;letter-spacing:-.045em}.verified{width:23px;height:23px;border-radius:50%;background:var(--gold2);color:#111;display:grid;place-items:center;font-size:13px;font-weight:900}.category{font-size:14px;color:#d0d0d0;margin-top:6px}.description{font-size:14px;line-height:1.5;color:#c8c8c8;margin:9px 0 0;max-width:470px}.meta{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:14px;font-size:13px;color:#ddd}.meta strong{color:var(--green)}.dot{width:10px;height:10px;background:var(--green);border-radius:50%;box-shadow:0 0 12px #49d16d80}.sep{color:#555}.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}.quick a{min-height:78px;border-radius:18px;text-decoration:none;color:#fff;background:#171717;border:1px solid #3a3a3a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font-weight:800}.quick .ico{font-size:26px;line-height:1}.quick .phone{color:#63dc7b}.quick .wa{color:#63dc7b}.quick .ig{color:#f08aa1}.quick .loc{color:var(--gold2)}.section{margin-top:14px}.section-head{display:flex;align-items:end;justify-content:space-between;padding:0 4px 9px}.section-head h2{font-size:18px;margin:0;font-weight:900}.section-head a{font-size:11px;color:#ddd;text-decoration:none}.announcement,.campaign{border:1px solid #343434;border-radius:18px;background:#111;padding:15px 16px}.announcement .kicker{font-size:11px;font-weight:900;color:var(--gold2);letter-spacing:.05em;margin-bottom:7px}.announcement-text{font-size:13px;line-height:1.45;color:#ddd}.campaign{overflow:hidden;padding:0;position:relative}.campaign img{width:100%;height:210px;object-fit:cover;display:none}.campaign-body{padding:16px}.campaign-badge{display:inline-block;background:#d62d2d;color:#fff;border-radius:999px;padding:6px 10px;font-size:10px;font-weight:900}.campaign-title{font-size:22px;font-weight:900;margin-top:8px}.campaign-text{font-size:13px;color:#bbb;margin-top:5px}.campaign-btn{display:inline-flex;margin-top:12px;padding:11px 16px;border-radius:999px;background:var(--gold2);color:#111;text-decoration:none;font-size:12px;font-weight:900}.smart-campaigns{display:grid;gap:12px;margin-top:14px}.smart-campaign{border:1px solid #3a3a3a;border-radius:20px;overflow:hidden;background:#121212}.smart-campaign-media{width:100%;height:210px;object-fit:cover;display:none}.smart-campaign-body{padding:16px}.smart-campaign-kicker{font-size:10px;color:var(--gold2);font-weight:900}.smart-campaign-title{font-size:22px;font-weight:900;margin-top:7px}.smart-campaign-text{font-size:13px;color:#bbb;margin-top:5px;line-height:1.45}.smart-campaign-button{display:none;margin-top:12px;padding:11px 15px;border-radius:999px;background:var(--gold2);color:#111;text-decoration:none;font-size:12px;font-weight:900}.smart-campaign-button.show{display:inline-flex}.featured{margin-top:15px}.products{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.product{border:1px solid #343434;border-radius:17px;overflow:hidden;background:#141414}.product img{width:100%;height:128px;object-fit:cover;display:block}.product-body{padding:10px}.product-name{font-size:12px;font-weight:900}.product-desc{font-size:9px;color:#999;margin-top:4px;line-height:1.35}.product-action{display:flex;align-items:center;justify-content:space-between;margin-top:8px}.product-action span{font-size:11px;color:var(--gold2);font-weight:900}.plus{width:27px;height:27px;border-radius:50%;background:var(--gold2);color:#111;display:grid;place-items:center;font-size:18px;font-weight:900}.utility{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}.utility a{min-height:68px;border:1px solid #333;border-radius:16px;background:#141414;text-decoration:none;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:10px;font-weight:800}.utility span{font-size:21px;color:var(--gold2)}.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.gallery-item{aspect-ratio:1;overflow:hidden;border-radius:14px;border:1px solid #333}.gallery-item img{width:100%;height:100%;object-fit:cover}.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.info-card{border:1px solid #333;border-radius:17px;background:#141414;padding:13px;min-height:105px}.info-card .info-icon{font-size:21px;color:var(--gold2)}.info-card small{display:block;color:#777;font-size:8px;letter-spacing:.08em;margin-top:9px}.info-card strong{display:block;font-size:11px;margin-top:4px;line-height:1.4}.info-card span{display:block;color:#aaa;font-size:9px;margin-top:3px;line-height:1.4}.google{display:flex;align-items:center;gap:12px;border:1px solid #333;border-radius:18px;background:#141414;padding:14px}.g{font-size:30px;font-weight:900}.google-main{flex:1}.google-main strong{font-size:20px}.stars{color:#f1b53c;letter-spacing:1px}.google-main small{display:block;color:#999;font-size:9px;margin-top:4px}.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mini{border:1px solid #333;border-radius:17px;background:#141414;padding:14px}.mini h3{font-size:13px;margin:0 0 11px}.socials{display:flex;gap:8px}.socials a{width:38px;height:38px;border-radius:10px;background:#090909;display:grid;place-items:center;color:#fff;text-decoration:none;font-size:18px}.pay{display:flex;align-items:center;gap:9px}.pay-icon{width:38px;height:38px;border-radius:11px;background:#090909;display:grid;place-items:center;color:var(--gold2)}.footer{text-align:center;color:#777;font-size:10px;padding:20px 0 0}.footer b{color:#fff}.hidden{display:none!important}
+@media(max-width:430px){.profile-shell{padding:0 8px 25px}.cover{height:270px}.hero-content{padding-left:17px;padding-right:17px}.business-name{font-size:27px}.quick{gap:6px}.quick a{min-height:72px}.products{gap:6px}.product img{height:110px}.info-grid{grid-template-columns:1fr 1fr}.info-card:last-child{grid-column:1/-1}.utility{gap:6px}.utility a{min-height:64px}}
+</style></head><body><main class="profile-shell">
+<header class="topbar"><div class="brand"><span class="brand-mark">🦁</span><span>LEO <b>CONNECT</b></span></div><div class="top-actions"><button class="top-pill">🇹🇷 TR⌄</button><button class="top-pill" type="button" onclick="navigator.share?.({title:document.title,url:location.href})">↗ Paylaş</button></div></header>
+<section class="hero"><div id="dynamicCover" class="cover"><img id="dynamicCoverImage" alt="Kapak"></div><div class="hero-content"><div class="logo"><span id="logoPlaceholder" class="logo-placeholder">🦁</span><img id="logo" style="display:none" alt="İşletme logosu"></div><div class="title-row"><h1 id="name" class="business-name">İşletme</h1><span class="verified">✓</span></div><div id="category" class="category">İşletme</div><p id="description" class="description">Dijital işletme profili</p><div class="meta"><span>📍</span><span id="heroAddress">Adres</span><span class="dot"></span><strong id="heroStatus">LEO CONNECT</strong><span class="sep">|</span><span id="heroHours">Çalışma saatleri</span></div><div class="quick"><a id="phoneButton" href="#"><span class="ico phone">☎</span><span>Ara</span></a><a id="whatsappButton" href="#" target="_blank" rel="noopener"><span class="ico wa">◉</span><span>WhatsApp</span></a><a id="previewInstagram" class="hidden" href="#" target="_blank" rel="noopener"><span class="ico ig">◎</span><span>Instagram</span></a><a id="previewLocation" class="hidden" href="#" target="_blank" rel="noopener"><span class="ico loc">⌖</span><span>Konum</span></a></div></div></section>
+<div id="dynamicAnnouncement" class="section announcement"><div class="kicker">📢 DUYURU</div><div id="dynamicAnnouncementText" class="announcement-text"></div></div>
 <div id="smartCampaignsPublic" class="smart-campaigns"></div>
-
-<div id="dynamicFeatured" class="dynamic-featured">
-  <strong id="dynamicFeaturedTitle"></strong>
-  <span id="dynamicFeaturedText"></span>
-  <img id="dynamicFeaturedImage" class="dynamic-media" alt="Öne çıkan içerik görseli">
-  <a id="dynamicFeaturedButton" class="dynamic-button" target="_blank" rel="noopener"></a>
-</div>
-
-<div id="dynamicGallery" class="dynamic-gallery"></div>
-
-<div id="dynamicVideo" class="dynamic-video">
-  <div class="dynamic-video-label">VİDEO</div>
-  <div id="dynamicVideoFrame"></div>
-</div>
-
-
-
-<!-- ==================================================
-     SOCIAL
-================================================== -->
-
-<section
-  id="socialSection"
-  class="section hidden"
->
-
-  <div class="section-title">
-    <div class="section-icon">
-      ✨
-    </div>
-    <div>
-      <strong>Dijital Kanallar</strong>
-      <span>İşletmenin bağladığı tüm kanallar</span>
-    </div>
-  </div>
-
-  <div id="dynamicDigitalChannels" class="link-grid"></div>
-
-</section>
-
-
-
-<!-- ==================================================
-     HOURS
-================================================== -->
-
-<section
-  id="hoursSection"
-  class="section hidden"
->
-
-
-  <div class="section-title">
-
-    <div class="section-icon">
-      🕐
-    </div>
-
-    <div>
-
-      <strong>
-        Çalışma Saatleri
-      </strong>
-
-      <span>
-        İşletmenin çalışma zamanı
-      </span>
-
-    </div>
-
-  </div>
-
-
-  <div class="hours-card">
-
-    <div class="hours-icon">
-      🕐
-    </div>
-
-    <div class="hours-content">
-
-      <strong>
-        AÇIKLIK DURUMU
-      </strong>
-
-      <span id="hours">
-        -
-      </span>
-
-    </div>
-
-  </div>
-
-
-</section>
-
-
-
-<!-- ==================================================
-     IBAN
-================================================== -->
-
-<section
-  id="ibanSection"
-  class="section hidden"
->
-
-
-  <div class="section-title">
-
-    <div class="section-icon">
-      💳
-    </div>
-
-    <div>
-
-      <strong>
-        Ödeme Bilgileri
-      </strong>
-
-      <span>
-        IBAN ve hesap sahibi bilgilerini görüntüle
-      </span>
-
-    </div>
-
-  </div>
-
-
-  <div class="iban-card">
-
-
-    <!-- IBAN -->
-
-    <div class="iban-label">
-      IBAN
-    </div>
-
-
-    <div
-      id="iban"
-      class="iban-number"
-    >
-      -
-    </div>
-
-
-    <div class="iban-buttons">
-
-      <button
-        class="iban-button gold"
-        onclick="copyIBAN()"
-      >
-        IBAN'I KOPYALA
-      </button>
-
-    </div>
-
-
-    <div
-      id="ibanMessage"
-      class="iban-message"
-    ></div>
-
-
-
-    <!-- HESAP SAHİBİ -->
-
-    <div
-      class="iban-label"
-      style="margin-top:18px;"
-    >
-      HESAP SAHİBİ
-    </div>
-
-
-    <div
-      id="ibanHolder"
-      class="iban-holder"
-    >
-      -
-    </div>
-
-
-    <div class="iban-buttons">
-
-      <button
-        class="iban-button"
-        onclick="copyIBANHolder()"
-      >
-        ADI KOPYALA
-      </button>
-
-    </div>
-
-
-    <div
-      id="ibanHolderMessage"
-      class="iban-message"
-    ></div>
-
-
-  </div>
-
-
-</section>
-
-
-
-
-<section id="reviewBooster" class="review-booster hidden">
-  <div class="review-booster-icon">★</div>
-  <div id="reviewBoosterTitle" class="review-booster-title">Deneyimini bizimle paylaş</div>
-  <div id="reviewBoosterText" class="review-booster-text">Memnun kaldıysan Google’da bizi değerlendir.</div>
-  <div id="reviewBoosterStars" class="review-booster-stars"></div>
-  <div id="reviewBoosterMessage" class="review-booster-message"></div>
-  <div id="reviewBoosterActions"></div>
-</section>
-
-
-<!-- ==================================================
-     FOOTER
-================================================== -->
-
-<div class="footer">
-
-  LEO CONNECT • DIGITAL BUSINESS PROFILE
-
-  <div class="powered">
-    DOKUN • BAĞLAN • KEŞFET • BÜYÜT
-  </div>
-
-</div>
-
-
-</div>
-
-
-
-<script>
+<div id="dynamicCampaign" class="section campaign"><img id="dynamicCampaignImage" alt="Kampanya"><div class="campaign-body"><span class="campaign-badge">🔥 BUGÜNE ÖZEL</span><div id="dynamicCampaignTitle" class="campaign-title"></div><div id="dynamicCampaignText" class="campaign-text"></div><a id="dynamicCampaignButton" class="campaign-btn hidden" target="_blank" rel="noopener"></a></div></div>
+<section id="featuredProducts" class="section featured hidden"><div class="section-head"><h2>♛ Öne Çıkan Lezzetler</h2><a id="featuredSeeAll" href="#">Tümünü Gör →</a></div><div id="productGrid" class="products"></div></section>
+<div class="utility"><a id="utilityMenu" href="#"><span>🍽</span>Menü</a><a id="utilityWebsite" href="#"><span>◎</span>Web Sitesi</a><a id="utilityReserve" href="#"><span>▣</span>Rezervasyon</a><a id="utilityOrder" href="#"><span>🛍</span>Sipariş Ver</a></div>
+<section id="gallerySection" class="section"><div class="section-head"><h2>▣ Galeri</h2><a href="#dynamicGallery">Tüm Fotoğraflar →</a></div><div id="dynamicGallery" class="gallery"></div></section>
+<a id="phoneLink" class="hidden"></a><div class="section info-grid"><div id="hoursSection" class="info-card"><div class="info-icon">◷</div><small>ÇALIŞMA SAATLERİ</small><strong id="hours">Her gün 09:00 - 23:00</strong><span>Açık olduğunuz saatler</span></div><div id="contactSection" class="info-card"><div class="info-icon">☎</div><small>İLETİŞİM</small><strong id="phone">-</strong><span>Bize kolayca ulaşın</span></div><div class="info-card"><div class="info-icon">⌖</div><small>ADRES</small><strong id="address">-</strong><a id="locationLink" target="_blank" rel="noopener" style="color:#d8ad61;font-size:10px">Haritada Gör →</a></div></div>
+<div id="googleCard" class="section google"><div class="g">G</div><div class="google-main"><strong>Google Yorumları</strong><span class="stars">★★★★★</span><small id="googleCardText">İşletmenin Google değerlendirme bağlantısı</small></div><a id="googleCardLink" class="google-card-link hidden" target="_blank" rel="noopener">Değerlendir →</a></div>
+<div class="section bottom-grid"><div id="socialMini" class="mini"><h3>Bizi Takip Edin</h3><div class="socials"><a id="socialInstagram" class="hidden" href="#" target="_blank" rel="noopener">◎</a><a id="socialTiktok" class="hidden" href="#" target="_blank" rel="noopener">♪</a></div></div><div id="paymentMini" class="mini"><h3>Ödeme Bilgileri</h3><div class="pay"><span class="pay-icon">▣</span><strong>IBAN ile Öde</strong></div></div></div>
+<section id="ibanSection" class="hidden"><div id="iban">-</div><div id="ibanHolder">-</div><button onclick="copyIBAN()">IBAN Kopyala</button><div id="ibanMessage"></div><button onclick="copyIBANHolder()">Adı Kopyala</button><div id="ibanHolderMessage"></div></section>
+<section id="socialSection" class="hidden"><a id="instagramLink" class="hidden"></a><a id="tiktokLink" class="hidden"></a><a id="googleLink" class="hidden"></a><a id="websiteLink" class="hidden"></a><a id="menuLink" class="hidden"></a></section>
+<div id="dynamicFeatured" class="hidden"><strong id="dynamicFeaturedTitle"></strong><span id="dynamicFeaturedText"></span><img id="dynamicFeaturedImage"></div><div id="dynamicVideo" class="hidden"><div id="dynamicVideoFrame"></div></div><section id="reviewBooster" class="hidden"><div id="reviewBoosterTitle"></div><div id="reviewBoosterText"></div><div id="reviewBoosterStars"></div><div id="reviewBoosterMessage"></div><div id="reviewBoosterActions"></div></section>
+<footer class="footer">Powered by <b>LEO CONNECT</b><br><span>Daha Fazla Bağlantı&nbsp; | &nbsp;Daha Fazla Müşteri</span></footer>
+</main><script>
 
 
 
@@ -1481,11 +31,27 @@ function trackReviewEvent(type){
   try{
     const slug = business?.slug;
     if(!slug) return;
-    fetch("/api/event/" + encodeURIComponent(slug),{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({type,source:source || "direct",nfc_code:nfcCode || ""})
-    }).catch(()=>{});
+    const bases = [
+      window.location.origin,
+      "https://leo-connect.onrender.com"
+    ].filter((value, index, arr) => value && arr.indexOf(value) === index);
+    const payload = JSON.stringify({
+      type,
+      source:source || "direct",
+      nfc_code:nfcCode || ""
+    });
+    (async()=>{
+      for(const base of bases){
+        try{
+          const r = await fetch(base + "/api/event/" + encodeURIComponent(slug),{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:payload
+          });
+          if(r.ok) break;
+        }catch(_){}
+      }
+    })();
   }catch(_){}
 }
 
@@ -1516,6 +82,7 @@ function renderReviewBooster(){
       stars.appendChild(b);
     }
   }
+  trackReviewEvent("review_open");
 }
 
 function handleReviewRating(rating){
@@ -1583,6 +150,18 @@ let source =
 
 async function getBusiness(){
 
+  /*
+    PUBLIC PROFILE 2.0 PREVIEW
+    ---------------------------
+    This standalone preview can load a real business by query string:
+      /profile-2.0-preview.html?slug=deneme-zelo
+
+    The existing live /p/:slug and /p/nfc/:code routing remains unchanged.
+  */
+  const params = new URLSearchParams(window.location.search);
+  const previewSlug =
+    String(params.get("slug") || "").trim();
+
   const pathParts =
     window.location.pathname
       .split("/")
@@ -1590,11 +169,15 @@ async function getBusiness(){
 
   if(
     pathParts[0] === "p" &&
-    pathParts[1] === "nfc" &&
-    source !== "qr"
+    pathParts[1] === "nfc"
   ){
     source = "nfc";
   }
+
+  const API_BASES = [
+    window.location.origin,
+    "https://leo-connect.onrender.com"
+  ].filter((value, index, arr) => value && arr.indexOf(value) === index);
 
   let endpoint = "";
 
@@ -1625,13 +208,18 @@ async function getBusiness(){
 
     endpoint =
       "/api/profile-by-nfc/" +
-      encodeURIComponent(code) +
-      "?fresh=" + Date.now();
+      encodeURIComponent(code);
 
   }else{
 
+    /*
+      Preview mode takes priority when ?slug=... is present.
+      Normal /p/:slug routing still works exactly as before.
+    */
     const slug =
-      pathParts[1] || pathParts[0] || "";
+      previewSlug ||
+      (pathParts[0] === "p" ? pathParts[1] : pathParts[0]) ||
+      "";
 
     if(!slug){
       showError();
@@ -1640,29 +228,40 @@ async function getBusiness(){
 
     endpoint =
       "/api/profile/" +
-      encodeURIComponent(slug) +
-      "?fresh=" + Date.now();
+      encodeURIComponent(slug);
 
   }
 
   try{
 
-    const response =
-      await fetch(endpoint, {
-        cache: "no-store",
-        headers: {
-          "Cache-Control": "no-cache"
-        }
-      });
+    let response = null;
+    let lastError = null;
 
-    if(!response.ok){
+    for(const base of API_BASES){
+      try{
+        const candidate = await fetch(base + endpoint, {
+          method: "GET",
+          cache: "no-store"
+        });
+
+        if(candidate.ok){
+          response = candidate;
+          break;
+        }
+
+        lastError = new Error("HTTP " + candidate.status + " from " + base + endpoint);
+      }catch(error){
+        lastError = error;
+      }
+    }
+
+    if(!response){
+      console.error("Profile API unavailable:", lastError);
       showError();
       return;
     }
 
-    business =
-      await response.json();
-
+    business = await response.json();
     render();
 
   }catch(error){
@@ -1835,88 +434,6 @@ function renderLogo(){
 
 
 /* ==================================================
-   DIGITAL CHANNELS — V2 INTEGRATION
-================================================== */
-
-function renderDigitalChannels(){
-  const section=document.getElementById("socialSection");
-  const mount=document.getElementById("dynamicDigitalChannels");
-  if(!section || !mount || !business) return;
-
-  const names={
-    instagram:"Instagram",facebook:"Facebook",tiktok:"TikTok",youtube:"YouTube",
-    linkedin:"LinkedIn",x:"X",whatsapp:"WhatsApp",google:"Google",website:"Website",
-    yemeksepeti:"Yemeksepeti",getir:"Getir",'trendyol-yemek':"Trendyol Yemek",
-    'migros-yemek':"Migros Yemek",rezervasyon:"Rezervasyon",bilet:"Bilet / Etkinlik",
-    menu:"Online Menü",location:"Konum",tripadvisor:"Tripadvisor",booking:"Booking",
-    telegram:"Telegram",email:"E-posta"
-  };
-
-  const iconSlug={
-    instagram:"instagram",facebook:"facebook",tiktok:"tiktok",youtube:"youtube",
-    linkedin:"linkedin",x:"x",whatsapp:"whatsapp",google:"google",website:"globe",
-    yemeksepeti:"yemeksepeti",getir:"getir",'trendyol-yemek':"trendyol",
-    'migros-yemek':"migros",rezervasyon:"calendar",bilet:"ticket",
-    menu:"book-open",location:"map-pin",tripadvisor:"tripadvisor",booking:"booking-com",
-    telegram:"telegram",email:"gmail"
-  };
-
-  const legacyMap={instagram:"instagram",tiktok:"tiktok",whatsapp:"whatsapp",google:"google_review",website:"website",menu:"menu"};
-  const links=(business.social_links && typeof business.social_links==='object') ? business.social_links : {};
-  const allowed=(business.social_platform_permissions && typeof business.social_platform_permissions==='object') ? business.social_platform_permissions : {};
-  const custom=Array.isArray(business.custom_links) ? business.custom_links : [];
-
-  const rows=[];
-  Object.keys(names).forEach(key=>{
-    if(Object.keys(allowed).length && allowed[key]===false) return;
-    const item=links[key] || {};
-    let url=typeof item==='string' ? item : item.url;
-    if(!url && legacyMap[key]) url=business[legacyMap[key]] || '';
-    url=String(url||'').trim();
-    if(!url) return;
-    if(typeof item==='object' && item.enabled===false && !legacyMap[key]) return;
-    rows.push({key,name:names[key],url,icon_url:typeof item==='object' ? String(item.icon_url||'').trim() : ''});
-  });
-
-  custom.forEach((item,i)=>{
-    const url=String(item?.url||'').trim();
-    const title=String(item?.title||'').trim();
-    if(url && title) rows.push({key:'custom-'+i,name:title,url,custom:true,icon:item?.icon||'🔗',icon_url:String(item?.icon_url||'').trim()});
-  });
-
-  mount.innerHTML=rows.map(row=>{
-    const icon=row.icon_url
-      ? `<img class="brand-icon-svg" src="${safeUrl(row.icon_url)||'#'}" alt="${escProfile(row.name)}" width="24" height="24" loading="lazy">`
-      : row.custom
-        ? `<span style="font-size:24px">${escProfile(row.icon)}</span>`
-        : `<img class="brand-icon-svg" src="https://cdn.simpleicons.org/${encodeURIComponent(iconSlug[row.key]||row.key)}/FFFFFF" alt="${escProfile(row.name)}" width="24" height="24" loading="lazy">`;
-    return `<a class="link" href="${safeUrl(row.url)||'#'}" target="_blank" rel="noopener" data-digital-key="${escProfile(row.key)}">
-      <div class="link-icon">${icon}</div>
-      <div class="link-text"><strong>${escProfile(row.name)}</strong><span>Bağlantıyı aç</span></div>
-    </a>`;
-  }).join('');
-
-  if(!rows.length){
-    mount.innerHTML='';
-    section.classList.add('hidden');
-    return;
-  }
-
-  section.classList.remove('hidden');
-  mount.querySelectorAll('[data-digital-key]').forEach(el=>{
-    el.addEventListener('click',()=>{
-      const key=el.getAttribute('data-digital-key');
-      const eventKey=key==='google'?'google_review':key;
-      if(['instagram','facebook','tiktok','youtube','linkedin','x','whatsapp','google_review','website','yemeksepeti','getir','trendyol-yemek','migros-yemek','rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email'].includes(eventKey)) track(eventKey);
-    });
-  });
-}
-
-function escProfile(value){
-  return String(value??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-}
-
-/* ==================================================
    LINK HELPER
 ================================================== */
 
@@ -2003,6 +520,18 @@ function dynamicYoutubeEmbed(value){
   }catch(e){ return ''; }
 }
 
+function renderPreviewProducts(){
+  const box=document.getElementById('featuredProducts');
+  const grid=document.getElementById('productGrid');
+  if(!box||!grid) return;
+  const gallery=Array.isArray(business?.profile_design?.gallery)?business.profile_design.gallery:[];
+  const items=gallery.slice(0,3).map((item,i)=>({url:typeof item==='string'?item:item?.url||'',name:['Çikolatalı Waffle','Acai Bowl','Smoothie'][i]})).filter(x=>/^https?:\/\//i.test(String(x.url)));
+  if(!items.length){box.classList.add('hidden');return;}
+  grid.innerHTML='';
+  items.forEach(item=>{const card=document.createElement('article');card.className='product-card';card.innerHTML=`<img src="${item.url}" alt="${item.name}"><div class="product-body"><strong>${item.name}</strong><span>İşletmenin öne çıkan ürünü</span><div class="product-more">Detayları Gör →</div></div>`;grid.appendChild(card);});
+  box.classList.remove('hidden');
+}
+
 function renderDynamicProfile(){
   const d=business?.profile_design || {};
   const theme=String(d.theme||'midnight-gold');
@@ -2082,8 +611,11 @@ function renderDynamicProfile(){
     if(imgUrl){img.src=imgUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';};}else img.style.display='none';
     const btn=document.getElementById('dynamicFeaturedButton');
     const btnUrl=dynamicSafeUrl(d.featured_button_url);
-    if(btnUrl && d.featured_button_text){btn.href=btnUrl;btn.textContent=d.featured_button_text;btn.classList.add('show');}else btn.classList.remove('show');
-    btn.onclick=()=>{ if(btnUrl) track('featured'); };
+    if(btn){
+      if(btnUrl && d.featured_button_text){btn.href=btnUrl;btn.textContent=d.featured_button_text;btn.classList.add('show');}
+      else btn.classList.remove('show');
+      btn.onclick=()=>{ if(btnUrl) track('featured'); };
+    }
   }
 
   const galleryBox=document.getElementById('dynamicGallery');
@@ -2101,6 +633,8 @@ function renderDynamicProfile(){
       cell.appendChild(img);galleryBox.appendChild(cell);
     });
     galleryBox.style.display=galleryBox.children.length?'grid':'none';
+    const gallerySection=document.getElementById('gallerySection');
+    if(gallerySection) gallerySection.style.display=galleryBox.children.length?'block':'none';
   }
 
   const video=document.getElementById('dynamicVideo');
@@ -2121,9 +655,47 @@ function renderDynamicProfile(){
    RENDER
 ================================================== */
 
+function wirePreviewUtilities(){
+  const setup=(id,url,trackType)=>{
+    const a=document.getElementById(id);
+    const u=safeUrl(url);
+    if(!a) return false;
+    if(u){
+      a.href=u;
+      a.target="_blank";
+      a.rel="noopener";
+      a.classList.remove("hidden");
+      if(trackType) a.onclick=()=>track(trackType);
+      return true;
+    }
+    a.classList.add("hidden");
+    return false;
+  };
+
+  setup("utilityMenu",business?.menu,"menu");
+  setup("utilityWebsite",business?.website,"website");
+
+  const custom=Array.isArray(business?.custom_links)?business.custom_links.filter(x=>x && x.enabled!==false && safeUrl(x.url)) : [];
+  const findCustom=(terms)=>custom.find(x=>terms.some(t=>String(x.title||x.label||"").toLowerCase().includes(t)));
+  const reserve=findCustom(["rezerv","randevu","booking"]);
+  const order=findCustom(["sipariş","siparis","yemeksepeti","getir","trendyol","migros"]);
+  const reserveLink=document.getElementById("utilityReserve");
+  const orderLink=document.getElementById("utilityOrder");
+  if(reserve){ reserveLink.href=reserve.url; reserveLink.target="_blank"; reserveLink.rel="noopener"; reserveLink.classList.remove("hidden"); reserveLink.querySelector("span").textContent="▣"; reserveLink.lastChild.textContent=reserve.title||"Rezervasyon"; reserveLink.onclick=()=>track("reservation"); }
+  else if(reserveLink){ reserveLink.classList.add("hidden"); }
+  if(order){ orderLink.href=order.url; orderLink.target="_blank"; orderLink.rel="noopener"; orderLink.classList.remove("hidden"); orderLink.lastChild.textContent=order.title||"Sipariş Ver"; orderLink.onclick=()=>track("order"); }
+  else if(orderLink){ orderLink.classList.add("hidden"); }
+
+  const utility=document.querySelector('.utility');
+  if(utility && [...utility.children].every(x=>x.classList.contains('hidden'))) utility.classList.add('hidden');
+}
+
+
 function render(){
 
   renderDynamicProfile();
+  // Ürün verisi için ayrı bir gerçek menü/veri kaynağımız yok; galeri görsellerinden sahte ürün adı üretmiyoruz.
+  wirePreviewUtilities();
 
   /* V2 REVIEW BOOSTER */
   try{
@@ -2187,6 +759,19 @@ function render(){
     ||
     "Dijital işletme profili";
 
+  const heroAddress = document.getElementById("heroAddress");
+  const heroHours = document.getElementById("heroHours");
+  const heroStatus = document.getElementById("heroStatus");
+  if(heroAddress){
+    heroAddress.textContent = String(business.address || "Adres bilgisi eklenmemiş");
+  }
+  if(heroHours){
+    heroHours.textContent = String(business.hours || "Çalışma saatleri eklenmemiş");
+  }
+  if(heroStatus){
+    heroStatus.textContent = business.hours ? "Çalışma Saatleri" : "LEO CONNECT";
+  }
+
 
   /* LOGO */
 
@@ -2219,6 +804,19 @@ function render(){
 
 
     document.getElementById(
+      "phoneLink"
+    ).href =
+      phoneHref;
+
+
+    document.getElementById(
+      "phone"
+    ).textContent =
+      phone;
+
+
+
+    document.getElementById(
       "phoneButton"
     ).addEventListener(
       "click",
@@ -2231,6 +829,19 @@ function render(){
       }
     );
 
+
+    document.getElementById(
+      "phoneLink"
+    ).addEventListener(
+      "click",
+      function(){
+
+        track(
+          "phone"
+        );
+
+      }
+    );
 
   }else{
 
@@ -2324,10 +935,155 @@ function render(){
   }
 
 
-  /* DIGITAL CHANNELS — BUSINESS → CUSTOMER PROFILE */
+  /* LOCATION */
 
-  renderDigitalChannels();
+  if(
+    business.address
+  ){
 
+    document.getElementById(
+      "address"
+    ).textContent =
+      business.address;
+
+
+    const location =
+      safeUrl(
+        business.address
+      );
+
+
+    if(location){
+
+      document.getElementById(
+        "locationLink"
+      ).href =
+        location;
+
+
+      document.getElementById(
+        "locationLink"
+      ).addEventListener(
+        "click",
+        function(){
+
+          track(
+            "location"
+          );
+
+        }
+      );
+
+    }else{
+
+      document.getElementById(
+        "locationLink"
+      ).style.display =
+        "none";
+
+    }
+
+
+  }
+
+
+  /* SOCIAL */
+
+  let socialCount = 0;
+
+
+  if(
+    setupLink(
+      "instagramLink",
+      business.instagram,
+      "instagram"
+    )
+  ){
+
+    socialCount++;
+
+  }
+
+
+  if(
+    setupLink(
+      "tiktokLink",
+      business.tiktok,
+      "tiktok"
+    )
+  ){
+
+    socialCount++;
+
+  }
+
+
+  if(
+    setupLink(
+      "googleLink",
+      business.google_review,
+      "google_review"
+    )
+  ){
+
+    socialCount++;
+
+  }
+
+
+  if(
+    setupLink(
+      "websiteLink",
+      business.website,
+      "website"
+    )
+  ){
+
+    socialCount++;
+
+  }
+
+
+  if(
+    setupLink(
+      "menuLink",
+      business.menu,
+      "menu"
+    )
+  ){
+
+    socialCount++;
+
+  }
+
+
+  if(socialCount){
+
+    document.getElementById(
+      "socialSection"
+    ).classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  /* CONTACT */
+
+  const hasContact =
+    !!business.phone ||
+    !!business.address;
+
+
+  if(hasContact){
+
+    document.getElementById(
+      "contactSection"
+    ).classList.remove(
+      "hidden"
+    );
+
+  }
 
 
   /* HOURS */
@@ -2379,6 +1135,63 @@ function render(){
 
   }
 
+
+  /* PUBLIC PROFILE 2.0 QUICK ACTIONS */
+  const instaPreview = document.getElementById("previewInstagram");
+  const instagramUrl = safeUrl(business.instagram);
+  if(instaPreview && instagramUrl){
+    instaPreview.href = instagramUrl;
+    instaPreview.classList.remove("hidden");
+    instaPreview.addEventListener("click",()=>track("instagram"));
+  }
+
+  const locationPreview = document.getElementById("previewLocation");
+  if(locationPreview && business.address){
+    locationPreview.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(String(business.address));
+    locationPreview.classList.remove("hidden");
+    locationPreview.addEventListener("click",()=>track("location"));
+  }
+
+  const menuPreview = document.getElementById("previewMenu");
+  const menuUrl = safeUrl(business.menu);
+  if(menuPreview && menuUrl){
+    menuPreview.href = menuUrl;
+    menuPreview.classList.remove("hidden");
+    menuPreview.addEventListener("click",()=>track("menu"));
+  }
+
+  const websitePreview = document.getElementById("previewWebsite");
+  const websiteUrl = safeUrl(business.website);
+  if(websitePreview && websiteUrl){
+    websitePreview.href = websiteUrl;
+    websitePreview.classList.remove("hidden");
+    websitePreview.addEventListener("click",()=>track("website"));
+  }
+
+  /* REAL GOOGLE REVIEW CARD */
+  const googleCard=document.getElementById("googleCard");
+  const googleCardLink=document.getElementById("googleCardLink");
+  const googleUrl=safeUrl(business.google_review);
+  if(googleCard){
+    if(googleUrl){
+      googleCard.classList.remove("hidden");
+      if(googleCardLink){googleCardLink.href=googleUrl;googleCardLink.classList.remove("hidden");googleCardLink.onclick=()=>track("google_review");}
+    }else{
+      googleCard.classList.add("hidden");
+    }
+  }
+
+  /* REAL SOCIAL/PAYMENT CARDS */
+  const socialMini=document.getElementById("socialMini");
+  const socialInstagram=document.getElementById("socialInstagram");
+  const socialTiktok=document.getElementById("socialTiktok");
+  let visibleSocial=0;
+  if(socialInstagram && safeUrl(business.instagram)){socialInstagram.href=safeUrl(business.instagram);socialInstagram.classList.remove("hidden");socialInstagram.onclick=()=>track("instagram");visibleSocial++;}
+  if(socialTiktok && safeUrl(business.tiktok)){socialTiktok.href=safeUrl(business.tiktok);socialTiktok.classList.remove("hidden");socialTiktok.onclick=()=>track("tiktok");visibleSocial++;}
+  if(socialMini && !visibleSocial) socialMini.classList.add("hidden");
+
+  const paymentMini=document.getElementById("paymentMini");
+  if(paymentMini && !business.iban) paymentMini.classList.add("hidden");
 
   /* SOURCE TRACKING
      QR ve NFC girişleri server tarafında kaydedilir.
@@ -2559,11 +1372,4 @@ function showError(){
 
 getBusiness();
 
-</script>
-
-
-
-
-</body>
-
-</html>
+</script></body></html>
