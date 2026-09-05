@@ -6079,7 +6079,9 @@ function formatEventType(type){
     review_positive:{icon:"👍",label:"Olumlu yorum seçildi"},
     review_feedback:{icon:"💬",label:"Yorum geri bildirimi gönderildi"},
     campaign_view:{icon:"🚀",label:"Kampanya görüntülendi"},
-    campaign_click:{icon:"🚀",label:"Kampanyaya tıklandı"}
+    campaign_click:{icon:"🚀",label:"Kampanyaya tıklandı"},
+    featured_click:{icon:"✨",label:"Öne çıkana tıklandı"},
+    order:{icon:"🧾",label:"Sipariş bağlantısına tıklandı"}
   };
   const e=events[type];
   return e ? `${e.icon} ${e.label}` : `🔔 ${type||"Yeni etkileşim"}`;
