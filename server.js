@@ -366,7 +366,10 @@ function nfcTagPublic(row) {
     code: row.code,
     url,
     is_active: row.is_active,
-    tap_count: Number(row.tap_count || 0),
+    tap_count: Number(row.tap_count || row.nfc_count || 0),
+    qr_count: Number(row.qr_count || 0),
+    nfc_count: Number(row.nfc_count || row.tap_count || 0),
+    total_count: Number(row.total_count || ((Number(row.qr_count || 0)) + (Number(row.nfc_count || row.tap_count || 0)))),
     last_tap: row.last_tap || null,
     created_at: row.created_at,
     updated_at: row.updated_at
@@ -3765,11 +3768,32 @@ app.get('/api/nfc-tags', auth, requireBusinessPermission('nfc'), async (req, res
             AND e.type='nfc'
           ),0)::int AS tap_count,
 
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type='qr_scan'
+          ),0)::int AS qr_count,
+
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type='nfc'
+          ),0)::int AS nfc_count,
+
+          COALESCE((
+            SELECT COUNT(*)
+            FROM events e
+            WHERE e.nfc_tag_id=t.id
+            AND e.type IN ('nfc','qr_scan')
+          ),0)::int AS total_count,
+
           (
             SELECT MAX(e.created_at)
             FROM events e
             WHERE e.nfc_tag_id=t.id
-            AND e.type='nfc'
+            AND e.type IN ('nfc','qr_scan')
           ) AS last_tap
 
         FROM nfc_tags t
@@ -3876,6 +3900,60 @@ app.get(
 
   }
 );
+
+
+/*
+   STABLE PUBLIC TABLE QR IMAGE
+   Uses the existing NFC tag code as the single source of truth.
+   The image URL is deterministic, public, and cacheable so the Business
+   Dashboard never depends on several authenticated JSON requests.
+
+   dashboard.html tableQRImageUrl() bu adresi <img src> olarak kullanır.
+   Route silinirse fallback index.html döndürür ve QR görselleri bozulur.
+*/
+app.get('/qr/nfc/:code.png', async (req, res) => {
+  try {
+    const code = String(req.params.code || '').trim();
+    if (!code) return res.status(404).send('QR bulunamadı');
+
+    const result = await pool.query(
+      `SELECT t.code,b.slug FROM nfc_tags t INNER JOIN businesses b ON b.id=t.business_id WHERE t.code=$1 LIMIT 1`,
+      [code]
+    );
+    if (!result.rows.length) return res.status(404).send('QR bulunamadı');
+
+    const baseUrl = process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get('host')}`;
+    const publicUrl = `${baseUrl}/p/nfc/${encodeURIComponent(result.rows[0].code)}?source=qr`;
+    const png = await QRCode.toBuffer(publicUrl, { type:'png', width:700, margin:2, errorCorrectionLevel:'H' });
+
+    res.set('Content-Type','image/png');
+    res.set('Cache-Control','public, max-age=31536000, immutable');
+    res.set('ETag', `"nfc-qr-${result.rows[0].code}"`);
+    return res.end(png);
+  } catch (error) {
+    console.error('PUBLIC TABLE QR ERROR:', error);
+    return res.status(500).send('QR oluşturulamadı');
+  }
+});
+
+
+/*
+   TABLE / POINT QR JSON (legacy-compatible)
+   Uses the existing NFC tag URL; no second QR database is created.
+*/
+app.get('/api/nfc-tags/:id/qr', auth, requireBusinessPermission('nfc'), async (req, res) => {
+  try {
+    const id=Number(req.params.id);
+    if(!Number.isInteger(id)||id<=0) return res.status(400).json({error:'Geçersiz NFC etiketi'});
+    const result=await pool.query(`SELECT id,business_id,name,placement,code,is_active FROM nfc_tags WHERE id=$1 AND business_id=$2 LIMIT 1`,[id,req.user.id]);
+    if(!result.rows.length) return res.status(404).json({error:'NFC etiketi bulunamadı'});
+    const baseUrl=process.env.PUBLIC_URL||process.env.RENDER_EXTERNAL_URL||`${req.protocol}://${req.get('host')}`;
+    const url=`${baseUrl}/p/nfc/${result.rows[0].code}?source=qr`;
+    const qr=await QRCode.toDataURL(url,{width:900,margin:2,errorCorrectionLevel:'H'});
+    res.set('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');res.set('Pragma','no-cache');res.set('Expires','0');
+    res.json({...result.rows[0],url,qr});
+  } catch(error) {console.error('BUSINESS NFC QR ERROR:',error);res.status(500).json({error:'Masa / nokta QR kodu oluşturulamadı'});}
+});
 
 
 /*
