@@ -1261,6 +1261,47 @@ body{
 .smart-campaign-button{display:none;margin-top:14px;min-height:40px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,#c59a52,#9e7738);color:#fff;font-size:10px;font-weight:900;text-decoration:none}
 .smart-campaign-button.show{display:inline-flex;align-items:center;justify-content:center}
 
+
+/* ==================================================
+   PUBLIC PROFILE 2.0 — REFERENCE UI
+   Dark premium mobile-first profile, matching the
+   LEO CONNECT product mockup rather than a theme-only swap.
+================================================== */
+body{background:#050505!important;color:#fff!important;font-family:Inter,Arial,Helvetica,sans-serif!important;}
+.lc-public{width:min(430px,100%);margin:0 auto;padding:14px 14px 34px;background:linear-gradient(180deg,#080808 0%,#050505 55%,#070707 100%);min-height:100vh;}
+.lc-topbar{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 4px 10px;border-bottom:1px solid #242424;margin-bottom:12px;}
+.lc-brand{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:900;letter-spacing:.13em;}
+.lc-brand b{color:#c9a15b;}
+.lc-brand-mark{width:31px;height:31px;border-radius:10px;display:grid;place-items:center;background:#101010;border:1px solid #c59a5255;font-size:17px;}
+.lc-lang{border:1px solid #3a3a3a;background:#111;color:#d6d6d6;border-radius:8px;padding:6px 8px;font-size:9px;font-weight:800;}
+.lc-hero{position:relative;overflow:hidden;border:1px solid #292929;border-radius:24px;background:radial-gradient(circle at 50% 0%,#c59a5217,transparent 38%),linear-gradient(145deg,#111,#080808);box-shadow:0 22px 70px #000c;}
+.lc-hero-inner{position:relative;text-align:center;padding:28px 18px 20px;}
+.lc-cover{display:none;height:120px;overflow:hidden;position:relative;border-bottom:1px solid #292929;}
+.lc-cover img{width:100%;height:100%;object-fit:cover;opacity:.72;}
+.lc-logo-wrap{width:104px;height:104px;margin:0 auto 15px;border-radius:28px;overflow:hidden;display:grid;place-items:center;background:#0b0b0b;border:1px solid #c59a5270;box-shadow:0 14px 40px #000;}
+.lc-logo{width:100%;height:100%;object-fit:cover;}
+.lc-logo-placeholder{font-size:40px;}
+.lc-name{margin:0;font-size:26px;line-height:1.12;letter-spacing:-.03em;font-weight:900;}
+.lc-category{display:inline-block;margin-top:9px;padding:6px 11px;border-radius:999px;background:#c59a5218;border:1px solid #c59a5240;color:#e0bd7b;font-size:9px;font-weight:800;}
+.lc-description{max-width:330px;margin:13px auto 0;color:#999;font-size:11px;line-height:1.55;}
+.lc-status{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;color:#777;font-size:9px;}
+.lc-status span{width:6px;height:6px;border-radius:50%;background:#48c982;box-shadow:0 0 9px #48c98288;}
+.lc-status b{color:#bfbfbf;font-weight:700;}.lc-status i{font-style:normal;color:#555}.lc-status em{font-style:normal;}
+.lc-social-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:18px;}
+.lc-circle-action{min-width:0;text-decoration:none;color:#fff;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.lc-circle-action span{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#111;border:1px solid #303030;color:#e1b765;font-size:17px;box-shadow:inset 0 1px #ffffff08;}
+.lc-circle-action small{font-size:8px;color:#8e8e8e;font-weight:700;}
+.lc-primary-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:17px;}
+.lc-primary{min-height:43px;border-radius:10px;border:1px solid #353535;background:#121212;color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;}
+.lc-primary.gold{background:linear-gradient(135deg,#d0a557,#9e7738);border-color:#d0a557;color:#fff;}
+.lc-announcement,.lc-content-card,.dynamic-campaign,.dynamic-featured{margin-top:12px;padding:16px;border-radius:18px;border:1px solid #292929;background:linear-gradient(145deg,#111,#0b0b0b);box-shadow:0 12px 30px #0005;}
+.lc-announcement{font-size:10px;color:#bcbcbc;line-height:1.55;}.lc-kicker{color:#d3a85d;font-size:9px;font-weight:900;letter-spacing:.08em;margin-bottom:7px;}
+.lc-section-head{display:flex;align-items:center;gap:10px;margin-bottom:13px;}.lc-section-head>span{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#151515;border:1px solid #292929;color:#e0bd7b;font-size:15px;}.lc-section-head strong{display:block;font-size:12px}.lc-section-head small{display:block;color:#666;font-size:8px;margin-top:3px;}
+.lc-info-list{display:grid;gap:8px;}.lc-info-row{display:grid;grid-template-columns:35px 1fr auto;align-items:center;gap:9px;padding:10px;border-radius:12px;border:1px solid #252525;background:#0c0c0c;}.lc-info-icon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:#151515;color:#d4a95c}.lc-info-row small{display:block;color:#666;font-size:7px;letter-spacing:.1em}.lc-info-row p{margin:4px 0 0;color:#ccc;font-size:9px;line-height:1.4}.lc-info-row>a{padding:7px 9px;border-radius:8px;background:#c59a5220;color:#e0bd7b;border:1px solid #c59a5230;text-decoration:none;font-size:8px;font-weight:900;}
+.link-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}.link{display:flex!important;align-items:center;gap:9px;padding:10px;border-radius:12px;background:#0c0c0c;border:1px solid #252525;text-decoration:none;color:#fff;min-width:0;}.link-icon{width:31px;height:31px;border-radius:9px;display:grid;place-items:center;background:#151515;color:#e0bd7b;font-size:14px;flex:none}.link-text strong{display:block;font-size:9px}.link-text span{display:block;color:#666;font-size:7px;margin-top:3px}.hours-card{display:flex;align-items:center;gap:11px;padding:12px;border-radius:12px;background:#0c0c0c;border:1px solid #252525}.hours-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#151515;color:#e0bd7b}.hours-content strong{display:block;color:#666;font-size:7px;letter-spacing:.1em}.hours-content span{display:block;margin-top:4px;color:#ddd;font-size:9px;line-height:1.4}.iban-card{padding:14px;border-radius:14px;background:linear-gradient(135deg,#16120c,#0d0d0d);border:1px solid #c59a5230}.iban-label{color:#666;font-size:7px;letter-spacing:.12em}.iban-number,.iban-holder{margin-top:7px;color:#fff;font-size:10px;font-weight:800;word-break:break-all}.iban-buttons{display:flex;gap:7px;margin-top:9px}.iban-button{flex:1;padding:9px;border-radius:9px;border:1px solid #333;background:#151515;color:#ddd;font-size:8px;font-weight:900}.iban-button.gold{background:linear-gradient(135deg,#c59a52,#9e7738);border-color:#c59a52;color:#fff}.iban-message{min-height:12px;margin-top:6px;color:#e0bd7b;font-size:8px}.lc-footer{text-align:center;padding:18px 4px 0;color:#555;font-size:7px;letter-spacing:.08em}.lc-footer b{color:#ddd}.lc-footer span{color:#c59a52;margin:0 4px}.powered{color:#444;font-size:7px;}
+.dynamic-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:12px;}.dynamic-gallery-item{aspect-ratio:1;border-radius:12px;overflow:hidden;border:1px solid #252525;background:#111}.dynamic-gallery-item img{width:100%;height:100%;object-fit:cover;display:block}.dynamic-video{margin-top:12px}.dynamic-video-label{color:#666;font-size:8px;font-weight:800;margin:0 0 6px}.dynamic-video iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:14px}.review-booster{margin-top:12px;padding:17px;border-radius:18px;background:linear-gradient(145deg,#17130c,#0d0d0d);border:1px solid #c59a5240;text-align:center}.review-booster-icon{color:#d0a557;font-size:20px}.review-booster-title{font-weight:900;font-size:13px;margin-top:5px}.review-booster-text{color:#777;font-size:9px;margin-top:5px}.review-booster-stars{display:flex;justify-content:center;gap:4px;margin-top:10px}.review-star{background:transparent;border:0;color:#d0a557;font-size:23px;cursor:pointer}.review-booster-message{color:#e0bd7b;font-size:9px;margin-top:7px}.review-google-button,.review-whatsapp-button{display:inline-flex;margin-top:9px;padding:9px 12px;border-radius:9px;background:#c59a52;color:#fff;text-decoration:none;font-size:9px;font-weight:900}.smart-campaign{margin-top:12px;border-radius:18px;overflow:hidden;border:1px solid #292929;background:#101010}.smart-campaign-media{width:100%;max-height:210px;object-fit:cover}.smart-campaign-body{padding:13px}.smart-campaign-kicker{font-size:7px;color:#d0a557;letter-spacing:.1em;font-weight:900}.smart-campaign-title{font-size:12px;font-weight:900;margin-top:5px}.smart-campaign-text{font-size:9px;color:#777;margin-top:5px;line-height:1.5}.smart-campaign-button{display:none;margin-top:9px;padding:8px 10px;border-radius:8px;background:#c59a52;color:#fff;text-decoration:none;font-size:8px;font-weight:900}.smart-campaign-button.show{display:inline-flex}.dynamic-media{width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-top:10px}.dynamic-button{display:none;margin-top:9px;padding:8px 10px;border-radius:8px;background:#c59a52;color:#fff;text-decoration:none;font-size:8px;font-weight:900}.dynamic-button.show{display:inline-flex}.hidden{display:none!important;}
+@media(min-width:700px){.lc-public{margin:20px auto;min-height:calc(100vh - 40px);border:1px solid #222;border-radius:28px;box-shadow:0 30px 100px #000;}.lc-topbar{margin-bottom:14px;}}
+
 </style>
 
 <style id="leo-profile-20">
@@ -1271,27 +1312,69 @@ html,body{background:var(--p20-bg)!important;color:var(--p20-text)!important}bod
 
 
 <body>
-<div class="page">
-<div class="top-brand"><div class="brand-lion">🦁</div><div class="brand-name">LEO <span>CONNECT</span></div></div>
-<section class="hero">
-<div id="dynamicCover" class="dynamic-cover"><img id="dynamicCoverImage" alt="Profil kapak görseli"></div>
-<div class="logo"><span id="logoPlaceholder" class="logo-placeholder">🦁</span><img id="logo" style="display:none" alt="İşletme logosu"></div>
-<h1 id="name" class="business-name">İşletme</h1><div id="category" class="category">İşletme</div><p id="description" class="description">Dijital işletme profili</p>
-<div class="status"><span class="status-dot"></span><span>Açık</span><span>•</span><span id="heroHours">Dijital profil</span></div>
-<div class="actions"><a id="phoneButton" class="action gold" href="#">📞 Ara</a><a id="whatsappButton" class="action" href="#" target="_blank" rel="noopener">💬 WhatsApp</a></div>
-</section>
-<div id="dynamicAnnouncement" class="dynamic-announcement"><strong>📢 Duyuru</strong><span id="dynamicAnnouncementText"></span></div>
-<div id="smartCampaignsPublic" class="smart-campaigns"></div>
-<div id="dynamicCampaign" class="dynamic-campaign"><strong id="dynamicCampaignTitle"></strong><span id="dynamicCampaignText"></span><img id="dynamicCampaignImage" class="dynamic-media" alt="Kampanya görseli"><a id="dynamicCampaignButton" class="dynamic-button" target="_blank" rel="noopener"></a></div>
-<div id="dynamicFeatured" class="dynamic-featured"><strong id="dynamicFeaturedTitle"></strong><span id="dynamicFeaturedText"></span><img id="dynamicFeaturedImage" class="dynamic-media" alt="Öne çıkan içerik görseli"><a id="dynamicFeaturedButton" class="dynamic-button" target="_blank" rel="noopener"></a></div>
-<div id="dynamicGallery" class="dynamic-gallery"></div><div id="dynamicVideo" class="dynamic-video"><div class="dynamic-video-label">VİDEO</div><div id="dynamicVideoFrame"></div></div>
-<section id="contactSection" class="section hidden"><div class="section-title"><div class="section-icon">📍</div><div><strong>İletişim</strong><span>Bize kolayca ulaşın</span></div></div><div class="info-list"><div id="locationRow" class="info-row hidden"><div class="info-icon">📍</div><div class="info-content"><span class="info-label">KONUM</span><span id="address" class="info-value"></span></div><a id="locationLink" class="info-action" target="_blank" rel="noopener">AÇ</a></div><div id="phoneRow" class="info-row hidden"><div class="info-icon">📞</div><div class="info-content"><span class="info-label">TELEFON</span><span id="phone" class="info-value"></span></div><a id="phoneLink" class="info-action">ARA</a></div></div></section>
-<section id="socialSection" class="section hidden"><div class="section-title"><div class="section-icon">✦</div><div><strong>Bizi Takip Edin</strong><span>Diğer kanallarımız</span></div></div><div class="link-grid"><a id="instagramLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">📸</div><div class="link-text"><strong>Instagram</strong><span>Profili aç</span></div></a><a id="tiktokLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">🎵</div><div class="link-text"><strong>TikTok</strong><span>Profili aç</span></div></a><a id="googleLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">⭐</div><div class="link-text"><strong>Google'da Değerlendir</strong><span>Deneyimini paylaş</span></div></a><a id="websiteLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">🌐</div><div class="link-text"><strong>Web Sitesi</strong><span>Siteyi aç</span></div></a><a id="menuLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">📋</div><div class="link-text"><strong>Menü</strong><span>Menüyü görüntüle</span></div></a></div></section>
-<section id="hoursSection" class="section hidden"><div class="section-title"><div class="section-icon">🕐</div><div><strong>Çalışma Saatleri</strong><span>Ne zaman açığız?</span></div></div><div class="hours-card"><div class="hours-icon">🕐</div><div class="hours-content"><strong>AÇIKLIK DURUMU</strong><span id="hours">-</span></div></div></section>
-<section id="ibanSection" class="section hidden"><div class="section-title"><div class="section-icon">💳</div><div><strong>Ödeme Bilgileri</strong><span>Güvenli ve kolay ödeme</span></div></div><div class="iban-card"><div class="iban-label">IBAN</div><div id="iban" class="iban-number">-</div><div class="iban-buttons"><button class="iban-button gold" onclick="copyIBAN()">IBAN'I KOPYALA</button></div><div id="ibanMessage" class="iban-message"></div><div class="iban-label" style="margin-top:16px">HESAP SAHİBİ</div><div id="ibanHolder" class="iban-holder">-</div><div class="iban-buttons"><button class="iban-button" onclick="copyIBANHolder()">ADI KOPYALA</button></div><div id="ibanHolderMessage" class="iban-message"></div></div></section>
-<section id="reviewBooster" class="review-booster hidden"><div class="review-booster-icon">★</div><div id="reviewBoosterTitle" class="review-booster-title">Deneyimini bizimle paylaş</div><div id="reviewBoosterText" class="review-booster-text">Memnun kaldıysan Google’da bizi değerlendir.</div><div id="reviewBoosterStars" class="review-booster-stars"></div><div id="reviewBoosterMessage" class="review-booster-message"></div><div id="reviewBoosterActions"></div></section>
-<div class="footer">LEO CONNECT • DIGITAL BUSINESS PROFILE<div class="powered">DOKUN • BAĞLAN • KEŞFET • BÜYÜT</div></div>
-</div>
+<main class="lc-public">
+  <header class="lc-topbar">
+    <div class="lc-brand"><span class="lc-brand-mark">🦁</span><span>LEO <b>CONNECT</b></span></div>
+    <button class="lc-lang" type="button" aria-label="Dil">TR</button>
+  </header>
+
+  <section class="lc-hero">
+    <div id="dynamicCover" class="lc-cover"><img id="dynamicCoverImage" alt="Profil kapak görseli"></div>
+    <div class="lc-hero-inner">
+      <div class="lc-logo-wrap"><span id="logoPlaceholder" class="lc-logo-placeholder">🦁</span><img id="logo" class="lc-logo" style="display:none" alt="İşletme logosu"></div>
+      <h1 id="name" class="lc-name">İşletme</h1>
+      <div id="category" class="lc-category">İşletme</div>
+      <p id="description" class="lc-description">Dijital işletme profili</p>
+      <div class="lc-status"><span></span><b>Açık</b><i>•</i><em id="heroHours">Dijital profil</em></div>
+
+      <div class="lc-social-actions">
+        <a id="phoneButton" class="lc-circle-action" href="#" aria-label="Ara"><span>☎</span><small>Ara</small></a>
+        <a id="whatsappButton" class="lc-circle-action" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><span>◉</span><small>WhatsApp</small></a>
+        <a id="previewInstagram" class="lc-circle-action hidden" href="#" target="_blank" rel="noopener" aria-label="Instagram"><span>◎</span><small>Instagram</small></a>
+        <a id="previewLocation" class="lc-circle-action hidden" href="#" target="_blank" rel="noopener" aria-label="Konum"><span>⌖</span><small>Konum</small></a>
+      </div>
+
+      <div class="lc-primary-actions">
+        <a id="previewMenu" class="lc-primary gold hidden" href="#" target="_blank" rel="noopener">☰ &nbsp; Menü</a>
+        <a id="previewWebsite" class="lc-primary hidden" href="#" target="_blank" rel="noopener">↗ &nbsp; Web Sitesi</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="dynamicAnnouncement" class="lc-announcement"><div class="lc-kicker">📢 DUYURU</div><div id="dynamicAnnouncementText"></div></div>
+  <div id="smartCampaignsPublic" class="smart-campaigns"></div>
+  <div id="dynamicCampaign" class="lc-content-card dynamic-campaign"><strong id="dynamicCampaignTitle"></strong><span id="dynamicCampaignText"></span><img id="dynamicCampaignImage" class="dynamic-media" alt="Kampanya görseli"><a id="dynamicCampaignButton" class="dynamic-button" target="_blank" rel="noopener"></a></div>
+  <div id="dynamicFeatured" class="lc-content-card dynamic-featured"><strong id="dynamicFeaturedTitle"></strong><span id="dynamicFeaturedText"></span><img id="dynamicFeaturedImage" class="dynamic-media" alt="Öne çıkan içerik görseli"><a id="dynamicFeaturedButton" class="dynamic-button" target="_blank" rel="noopener"></a></div>
+  <div id="dynamicGallery" class="dynamic-gallery"></div>
+  <div id="dynamicVideo" class="dynamic-video"><div class="dynamic-video-label">VİDEO</div><div id="dynamicVideoFrame"></div></div>
+
+  <section id="contactSection" class="lc-content-card hidden">
+    <div class="lc-section-head"><span>⌖</span><div><strong>İletişim &amp; Konum</strong><small>Bize kolayca ulaşın</small></div></div>
+    <div class="lc-info-list">
+      <div id="locationRow" class="lc-info-row hidden"><div class="lc-info-icon">⌖</div><div><small>KONUM</small><p id="address"></p></div><a id="locationLink" target="_blank" rel="noopener">AÇ</a></div>
+      <div id="phoneRow" class="lc-info-row hidden"><div class="lc-info-icon">☎</div><div><small>TELEFON</small><p id="phone"></p></div><a id="phoneLink">ARA</a></div>
+    </div>
+  </section>
+
+  <section id="socialSection" class="lc-content-card hidden">
+    <div class="lc-section-head"><span>✦</span><div><strong>Dijital Kanallar</strong><small>Tüm bağlantılarınız tek profilde</small></div></div>
+    <div class="link-grid">
+      <a id="instagramLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">◎</div><div class="link-text"><strong>Instagram</strong><span>Profili aç</span></div></a>
+      <a id="tiktokLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">♪</div><div class="link-text"><strong>TikTok</strong><span>Profili aç</span></div></a>
+      <a id="googleLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">★</div><div class="link-text"><strong>Google'da Değerlendir</strong><span>Deneyimini paylaş</span></div></a>
+      <a id="websiteLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">↗</div><div class="link-text"><strong>Web Sitesi</strong><span>Siteyi aç</span></div></a>
+      <a id="menuLink" class="link hidden" target="_blank" rel="noopener"><div class="link-icon">☰</div><div class="link-text"><strong>Menü</strong><span>Menüyü görüntüle</span></div></a>
+    </div>
+  </section>
+
+  <section id="hoursSection" class="lc-content-card hidden"><div class="lc-section-head"><span>◷</span><div><strong>Çalışma Saatleri</strong><small>Ne zaman açığız?</small></div></div><div class="hours-card"><div class="hours-icon">◷</div><div class="hours-content"><strong>AÇIKLIK DURUMU</strong><span id="hours">-</span></div></div></section>
+
+  <section id="ibanSection" class="lc-content-card hidden"><div class="lc-section-head"><span>₺</span><div><strong>Ödeme Bilgileri</strong><small>Güvenli ve kolay ödeme</small></div></div><div class="iban-card"><div class="iban-label">IBAN</div><div id="iban" class="iban-number">-</div><div class="iban-buttons"><button class="iban-button gold" onclick="copyIBAN()">IBAN'I KOPYALA</button></div><div id="ibanMessage" class="iban-message"></div><div class="iban-label" style="margin-top:16px">HESAP SAHİBİ</div><div id="ibanHolder" class="iban-holder">-</div><div class="iban-buttons"><button class="iban-button" onclick="copyIBANHolder()">ADI KOPYALA</button></div><div id="ibanHolderMessage" class="iban-message"></div></div></section>
+
+  <section id="reviewBooster" class="review-booster hidden"><div class="review-booster-icon">★</div><div id="reviewBoosterTitle" class="review-booster-title">Deneyimini bizimle paylaş</div><div id="reviewBoosterText" class="review-booster-text">Memnun kaldıysan Google’da bizi değerlendir.</div><div id="reviewBoosterStars" class="review-booster-stars"></div><div id="reviewBoosterMessage" class="review-booster-message"></div><div id="reviewBoosterActions"></div></section>
+
+  <footer class="lc-footer"><b>LEO</b> CONNECT <span>•</span> POWERED BY LEO CONNECT</footer>
+</main>
 <script>
 
 
@@ -2314,6 +2397,38 @@ function render(){
 
   }
 
+
+  /* PUBLIC PROFILE 2.0 QUICK ACTIONS */
+  const instaPreview = document.getElementById("previewInstagram");
+  const instagramUrl = safeUrl(business.instagram);
+  if(instaPreview && instagramUrl){
+    instaPreview.href = instagramUrl;
+    instaPreview.classList.remove("hidden");
+    instaPreview.addEventListener("click",()=>track("instagram"));
+  }
+
+  const locationPreview = document.getElementById("previewLocation");
+  if(locationPreview && business.address){
+    locationPreview.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(String(business.address));
+    locationPreview.classList.remove("hidden");
+    locationPreview.addEventListener("click",()=>track("location"));
+  }
+
+  const menuPreview = document.getElementById("previewMenu");
+  const menuUrl = safeUrl(business.menu);
+  if(menuPreview && menuUrl){
+    menuPreview.href = menuUrl;
+    menuPreview.classList.remove("hidden");
+    menuPreview.addEventListener("click",()=>track("menu"));
+  }
+
+  const websitePreview = document.getElementById("previewWebsite");
+  const websiteUrl = safeUrl(business.website);
+  if(websitePreview && websiteUrl){
+    websitePreview.href = websiteUrl;
+    websitePreview.classList.remove("hidden");
+    websitePreview.addEventListener("click",()=>track("website"));
+  }
 
   /* SOURCE TRACKING
      QR ve NFC girişleri server tarafında kaydedilir.
