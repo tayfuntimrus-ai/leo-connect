@@ -572,7 +572,7 @@ function renderDynamicProfile(){
     const btn=document.getElementById('dynamicCampaignButton');
     const btnUrl=dynamicSafeUrl(d.campaign_button_url);
     if(btnUrl && d.campaign_button_text){btn.href=btnUrl;btn.textContent=d.campaign_button_text;btn.classList.add('show');}else btn.classList.remove('show');
-    btn.onclick=()=>{ if(btnUrl) track('campaign'); };
+    btn.onclick=()=>{ if(btnUrl) track('campaign_click'); };
   }
 
   /* V2 SMART CAMPAIGNS — scheduled campaigns take priority over legacy single campaign */
@@ -614,7 +614,7 @@ function renderDynamicProfile(){
     if(btn){
       if(btnUrl && d.featured_button_text){btn.href=btnUrl;btn.textContent=d.featured_button_text;btn.classList.add('show');}
       else btn.classList.remove('show');
-      btn.onclick=()=>{ if(btnUrl) track('featured'); };
+      btn.onclick=()=>{ if(btnUrl) track('featured_click'); };
     }
   }
 
@@ -681,7 +681,7 @@ function wirePreviewUtilities(){
   const order=findCustom(["sipariş","siparis","yemeksepeti","getir","trendyol","migros"]);
   const reserveLink=document.getElementById("utilityReserve");
   const orderLink=document.getElementById("utilityOrder");
-  if(reserve){ reserveLink.href=reserve.url; reserveLink.target="_blank"; reserveLink.rel="noopener"; reserveLink.classList.remove("hidden"); reserveLink.querySelector("span").textContent="▣"; reserveLink.lastChild.textContent=reserve.title||"Rezervasyon"; reserveLink.onclick=()=>track("reservation"); }
+  if(reserve){ reserveLink.href=reserve.url; reserveLink.target="_blank"; reserveLink.rel="noopener"; reserveLink.classList.remove("hidden"); reserveLink.querySelector("span").textContent="▣"; reserveLink.lastChild.textContent=reserve.title||"Rezervasyon"; reserveLink.onclick=()=>track("rezervasyon"); }
   else if(reserveLink){ reserveLink.classList.add("hidden"); }
   if(order){ orderLink.href=order.url; orderLink.target="_blank"; orderLink.rel="noopener"; orderLink.classList.remove("hidden"); orderLink.lastChild.textContent=order.title||"Sipariş Ver"; orderLink.onclick=()=>track("order"); }
   else if(orderLink){ orderLink.classList.add("hidden"); }

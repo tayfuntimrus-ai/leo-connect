@@ -172,6 +172,45 @@ function createNfcCode() {
 const PROFILE_OPEN_TYPES = `('profile_view','qr_scan','qr','nfc')`;
 
 
+/*
+  GECERLI EVENT TIPLERI — TEK KAYNAK
+
+  Bu liste daha once kodda UC ayri yerde tekrarlaniyordu ve birbirinden
+  ayrismisti:
+
+    1) /api/event/:slug icindeki allowedTypes
+    2) /api/business-live-activity akis sorgusu
+    3) ayni endpoint'in istatistik sorgusu
+
+  Sonuc: whatsapp canli akista gorunuyor ama phone gorunmuyordu; iban,
+  share, review_* ve campaign_* tipleri de akistan disariydi. Oysa
+  dashboard.html icindeki formatEventType() bu tiplerin HEPSI icin hazir
+  etiket tutuyor, yani arayuz onlari gostermeye hazirdi ama sorgu hicbir
+  zaman getirmiyordu.
+
+  Artik tek yerden yonetiliyor.
+*/
+const EVENT_TYPES = [
+  /* profil acilislari */
+  'profile_view', 'qr_scan', 'qr', 'nfc',
+  /* iletisim */
+  'whatsapp', 'phone', 'email', 'telegram',
+  /* sosyal */
+  'instagram', 'facebook', 'tiktok', 'youtube', 'linkedin', 'x',
+  /* isletme baglantilari */
+  'google_review', 'website', 'menu', 'location', 'iban', 'share',
+  'tripadvisor', 'booking', 'bilet', 'rezervasyon',
+  /* siparis platformlari */
+  'yemeksepeti', 'getir', 'trendyol-yemek', 'migros-yemek', 'order',
+  /* yorum yonlendirme */
+  'review_open', 'review_positive', 'review_feedback',
+  /* icerik bloklari */
+  'campaign_view', 'campaign_click', 'featured_click'
+];
+
+const EVENT_TYPES_SQL = `(${EVENT_TYPES.map(t => `'${t}'`).join(',')})`;
+
+
 function publicBusiness(row) {
   if (!row) return null;
   const allowed = normalizeAllowedPlatforms(row.social_platform_permissions);
@@ -3102,11 +3141,7 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
       FROM events e
       LEFT JOIN nfc_tags t ON t.id=e.nfc_tag_id
       WHERE e.business_id=$1
-        AND e.type IN ('qr_scan','qr','nfc',
-          'instagram','facebook','tiktok','youtube','linkedin','x',
-          'whatsapp','google_review','website',
-          'yemeksepeti','getir','trendyol-yemek','migros-yemek',
-          'rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email')
+        AND e.type IN ${EVENT_TYPES_SQL}
       ORDER BY e.created_at DESC
       LIMIT $2
     `, [req.user.id, limit]);
@@ -3117,11 +3152,7 @@ app.get('/api/business-live-activity', auth, requireBusinessPermission('live'), 
         COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE)::int AS today
       FROM events
       WHERE business_id=$1
-        AND type IN ('qr_scan','qr','nfc',
-          'instagram','facebook','tiktok','youtube','linkedin','x',
-          'whatsapp','google_review','website',
-          'yemeksepeti','getir','trendyol-yemek','migros-yemek',
-          'rezervasyon','bilet','menu','location','tripadvisor','booking','telegram','email')
+        AND type IN ${EVENT_TYPES_SQL}
     `, [req.user.id]);
     res.json({activities: result.rows, stats: stats.rows[0] || {last_15m:0,last_60m:0,today:0}});
   } catch(error) {
@@ -3305,45 +3336,9 @@ app.post('/api/event/:slug', async (req, res) => {
     const nfcCode =
       String(req.body.nfc_code || '').trim();
 
-    const allowedTypes = [
-      'profile_view',
-      'qr_scan',
-      'qr',
-      'nfc',
-      'whatsapp',
-      'phone',
-      'instagram',
-      'facebook',
-      'tiktok',
-      'youtube',
-      'linkedin',
-      'x',
-      'google_review',
-      'website',
-      'yemeksepeti',
-      'getir',
-      'trendyol-yemek',
-      'migros-yemek',
-      'rezervasyon',
-      'bilet',
-      'menu',
-      'location',
-      'tripadvisor',
-      'booking',
-      'telegram',
-      'email',
-      'iban',
-      'share',
-      'review_open',
-      'review_positive',
-      'review_feedback',
-      'campaign_view',
-      'campaign_click'
-    ];
-
     const allowedSources = ['', 'direct', 'qr', 'nfc'];
 
-    if (!allowedTypes.includes(type)) {
+    if (!EVENT_TYPES.includes(type)) {
 
       return res.status(400).json({
         error: 'Geçersiz event tipi'
