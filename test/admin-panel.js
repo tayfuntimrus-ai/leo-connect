@@ -141,6 +141,34 @@ setTimeout(async () => {
   win.fetch = okFetch;
   await win.loadAll();
 
+  /* ---- 0c. ISLETME DETAYI PATLARSA HATA KALICI GORUNMELI ----
+     Kullanicinin yasadigi durum: "Detay" butonuna basiyorum hicbir sey
+     olmuyor. Aslinda hata vardi ama 2,8 saniyelik bildirimde kaybolup
+     gidiyordu. Artik ekranda KALMALI. */
+  const goodFetch2 = win.fetch;
+  win.fetch = async (url) => {
+    const u = String(url);
+    if(/\/api\/admin\/business\/\d+$/.test(u)){
+      return {ok:false,status:500,
+              headers:{get:()=>'application/json'},
+              json:async()=>({error:'İşletme bilgileri alınamadı'}),
+              text:async()=>JSON.stringify({error:'İşletme bilgileri alınamadı'})};
+    }
+    return goodFetch2(url);
+  };
+  await win.openBusiness(7);
+  await new Promise(r=>setTimeout(r,30));
+  const errBar = doc.getElementById('errorBar');
+  check('Detay açılamayınca hata KALICI görünüyor',
+    errBar?.style.display === 'block' && /İşletme bilgileri alınamadı/.test(errBar.innerHTML),
+    errBar?.style.display);
+  check('Hata hangi adımda olduğunu söylüyor',
+    /İşletme detayı açılamadı/.test(errBar?.innerHTML || ''), '');
+  check('Hata kutusu kapatılabiliyor',
+    /err-x/.test(errBar?.innerHTML || ''), '');
+  win.fetch = goodFetch2;
+  if(errBar) errBar.style.display = 'none';
+
   /* ---- 1. isletme acilisi hatasiz mi ---- */
   toasts.length=0;
   await win.openBusiness(42);
