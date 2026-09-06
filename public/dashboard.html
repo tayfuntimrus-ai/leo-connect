@@ -6137,7 +6137,9 @@ function formatEventType(type){
     campaign_view:{icon:"🚀",label:"Kampanya görüntülendi"},
     campaign_click:{icon:"🚀",label:"Kampanyaya tıklandı"},
     featured_click:{icon:"✨",label:"Öne çıkana tıklandı"},
-    order:{icon:"🧾",label:"Sipariş bağlantısına tıklandı"}
+    order:{icon:"🧾",label:"Sipariş bağlantısına tıklandı"},
+    order_start:{icon:"🛒",label:"Sipariş ekranı açıldı"},
+    order_submit:{icon:"✅",label:"Sipariş verildi"}
   };
   const e=events[type];
   return e ? `${e.icon} ${e.label}` : `🔔 ${type||"Yeni etkileşim"}`;

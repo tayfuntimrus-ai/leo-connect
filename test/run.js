@@ -11,6 +11,7 @@ const SUITES = [
   ['contract',  'frontend <-> backend sozlesmesi'],
   ['theme',     'marka temasi butunlugu'],
   ['accent',    'isletmeye ozel vurgu rengi'],
+  ['orders',    'menu ve siparis altyapisi'],
   ['smoke',     'QR gorselleri ve NFC sayaclari'],
   ['jwtguard',  'JWT_SECRET korumasi'],
   ['ratelimit', 'rate limit ve IP ayrimi'],
