@@ -21,6 +21,46 @@
 <footer class="footer"><span class="leo-signature">Leo Connect ile çalışıyor</span></footer>
 </main>
 
+<!-- ==================================================
+     SİPARİŞ EKRANI
+     İşletmede sipariş modülü açıksa görünür.
+================================================== -->
+<div id="orderSheet" class="osheet" hidden>
+  <div class="osheet-back" onclick="closeOrderSheet()"></div>
+  <div class="osheet-panel" role="dialog" aria-modal="true" aria-labelledby="osheetTitle">
+
+    <div class="osheet-head">
+      <div>
+        <div class="osheet-kicker">SİPARİŞ</div>
+        <strong id="osheetTitle">Menü</strong>
+        <span id="osheetWhere"></span>
+      </div>
+      <button type="button" class="osheet-x" onclick="closeOrderSheet()" aria-label="Kapat">✕</button>
+    </div>
+
+    <div id="osheetBody" class="osheet-body">
+      <div class="osheet-info">Menü yükleniyor…</div>
+    </div>
+
+    <div id="osheetFoot" class="osheet-foot" hidden>
+      <div class="osheet-note-wrap">
+        <input id="orderNote" maxlength="200" placeholder="Not eklemek ister misin? (opsiyonel)">
+      </div>
+      <div class="osheet-total-row">
+        <div>
+          <small>TOPLAM</small>
+          <strong id="orderTotal">₺0,00</strong>
+        </div>
+        <button type="button" id="orderSubmit" class="osheet-submit" onclick="submitOrder()" disabled>
+          Siparişi Gönder
+        </button>
+      </div>
+      <div id="orderStatus" class="osheet-status"></div>
+    </div>
+
+  </div>
+</div>
+
 <style id="leo-accent-layer">
 /* ============================================================
    ISLETMEYE OZEL VURGU + SABIT LEO CONNECT IMZASI
@@ -82,6 +122,76 @@
   color:var(--lc-on-accent) !important;
 }
 .smart-campaign-kicker{ color:var(--lc-gold) !important; }
+
+/* ============================================================
+   SIPARIS EKRANI
+
+   Vurgu rengi isletmeye ozeldir (--lc-gold). Uzerindeki yazi rengi
+   --lc-on-accent ile hesaplanir, cunku isletme acik bir renk secebilir.
+   ============================================================ */
+.osheet{position:fixed;inset:0;z-index:9000;display:flex;align-items:flex-end;justify-content:center}
+.osheet[hidden]{display:none}
+.osheet-back{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(3px)}
+.osheet-panel{position:relative;width:min(560px,100%);max-height:92vh;display:flex;flex-direction:column;
+  background:#111;border:1px solid #2b2b2b;border-bottom:0;
+  border-radius:22px 22px 0 0;box-shadow:0 -20px 60px rgba(0,0,0,.6)}
+@media(min-width:620px){
+  .osheet{align-items:center}
+  .osheet-panel{border-radius:22px;border-bottom:1px solid #2b2b2b;max-height:86vh}
+}
+
+.osheet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  padding:18px 18px 14px;border-bottom:1px solid #2b2b2b}
+.osheet-kicker{font-size:9px;letter-spacing:.2em;font-weight:800;color:var(--lc-gold)}
+.osheet-head strong{display:block;font-size:20px;margin-top:5px}
+.osheet-head span{display:block;font-size:11px;color:#9b9b9b;margin-top:3px}
+.osheet-x{border:1px solid #2b2b2b;background:#171717;color:#ddd;width:34px;height:34px;
+  border-radius:11px;font-size:14px;cursor:pointer;flex:0 0 auto}
+
+.osheet-body{flex:1;overflow-y:auto;padding:14px 18px;-webkit-overflow-scrolling:touch}
+.osheet-info{padding:34px 12px;text-align:center;color:#9b9b9b;font-size:13px}
+
+.ocat{font-size:10px;letter-spacing:.16em;font-weight:800;color:var(--lc-gold);
+  text-transform:uppercase;margin:18px 0 9px}
+.ocat:first-child{margin-top:2px}
+
+.oitem{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #1e1e1e}
+.oitem:last-child{border-bottom:0}
+.oitem-m{flex:1;min-width:0}
+.oitem-m strong{display:block;font-size:14px;font-weight:700}
+.oitem-m span{display:block;font-size:11.5px;color:#8f8f8f;margin-top:2px;line-height:1.45}
+.oitem-p{font-size:14px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.oqty{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.oqty button{width:30px;height:30px;border-radius:9px;border:1px solid #333;background:#181818;
+  color:#fff;font-size:16px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.oqty button.add{background:var(--lc-gold);border-color:var(--lc-gold);color:var(--lc-on-accent);font-weight:900}
+.oqty button:disabled{opacity:.35;cursor:not-allowed}
+.oqty b{min-width:18px;text-align:center;font-size:14px;font-variant-numeric:tabular-nums}
+
+.osheet-foot{border-top:1px solid #2b2b2b;padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px))}
+.osheet-note-wrap{margin-bottom:12px}
+.osheet-note-wrap input{width:100%;padding:11px 13px;border-radius:12px;border:1px solid #2b2b2b;
+  background:#171717;color:#fff;font:inherit;font-size:13px;outline:none}
+.osheet-note-wrap input:focus{border-color:var(--lc-gold)}
+.osheet-total-row{display:flex;align-items:center;gap:12px}
+.osheet-total-row small{display:block;font-size:9px;letter-spacing:.16em;color:#8f8f8f;font-weight:800}
+.osheet-total-row strong{display:block;font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;margin-top:2px}
+.osheet-submit{flex:1;min-height:50px;border-radius:14px;border:1px solid var(--lc-gold);
+  background:var(--lc-gold);color:var(--lc-on-accent);font-weight:900;font-size:15px;cursor:pointer}
+.osheet-submit:disabled{opacity:.4;cursor:not-allowed}
+.osheet-status{font-size:12px;margin-top:10px;text-align:center;min-height:16px;color:#9b9b9b}
+.osheet-status.err{color:#ff8a7a}
+.osheet-status.ok{color:#5fd08a}
+
+/* siparis alindi ekrani */
+.odone{text-align:center;padding:36px 16px}
+.odone .tick{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;
+  background:var(--lc-gold);color:var(--lc-on-accent);font-size:30px;font-weight:900}
+.odone strong{display:block;font-size:20px;margin-bottom:6px}
+.odone span{display:block;font-size:13px;color:#9b9b9b;line-height:1.6}
+.odone .ono{display:inline-block;margin-top:14px;padding:7px 14px;border-radius:999px;
+  border:1px solid var(--lc-gold);color:var(--lc-gold);font-size:12px;font-weight:800}
 
 /* --- Leo Connect imzasi: HER ZAMAN sabit marka rengi --- */
 .footer{
@@ -354,6 +464,8 @@ async function getBusiness(){
 
     business = await response.json();
     render();
+    /* Siparis modulu ayri sorulur; kapaliysa profil normal calisir. */
+    loadOrderMenu();
 
   }catch(error){
 
@@ -622,6 +734,266 @@ function renderPreviewProducts(){
   items.forEach(item=>{const card=document.createElement('article');card.className='product-card';card.innerHTML=`<img src="${item.url}" alt="${item.name}"><div class="product-body"><strong>${item.name}</strong><span>İşletmenin öne çıkan ürünü</span><div class="product-more">Detayları Gör →</div></div>`;grid.appendChild(card);});
   box.classList.remove('hidden');
 }
+
+/* ==================================================
+   SİPARİŞ EKRANI
+
+   Akis:
+     1) profil yuklendikten sonra /api/public-menu/:slug sorulur
+     2) modul acikssa "Sipariş Ver" butonu ic siparis ekranini acar
+     3) musteri sepeti olusturur
+     4) gonderirken gerekiyorsa konum izni istenir
+     5) POST /api/orders/:slug
+
+   Fiyatlar burada YALNIZCA GOSTERIM icindir. Sunucu toplami menuden
+   kendisi hesaplar; buradan gonderilen fiyat yok sayilir.
+================================================== */
+
+let orderMenu = null;      /* /api/public-menu yaniti */
+const orderCart = new Map(); /* menu_item_id -> adet */
+
+const oMoney = n => '₺' + Number(n||0).toLocaleString('tr-TR',
+  {minimumFractionDigits:2, maximumFractionDigits:2});
+const oEsc = v => String(v??'').replace(/[&<>"']/g,
+  m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
+function apiBases(){
+  return [window.location.origin, "https://leo-connect.onrender.com"]
+    .filter((v,i,a) => v && a.indexOf(v) === i);
+}
+
+async function loadOrderMenu(){
+  const slug = business?.slug;
+  if(!slug) return;
+  for(const base of apiBases()){
+    try{
+      const r = await fetch(base + "/api/public-menu/" + encodeURIComponent(slug));
+      const d = await r.json();
+      /* 403 = modul kapali; hata degil, sadece siparis yok */
+      if(r.ok && d?.orders_enabled){ orderMenu = d; break; }
+      if(r.status === 403){ orderMenu = null; break; }
+    }catch(_){}
+  }
+  applyOrderAvailability();
+}
+
+/*
+  Siparis modulu acikssa "Sipariş Ver" butonu harici linke degil
+  ic siparis ekranina gider. Modul kapaliysa mevcut davranis korunur
+  (isletmenin tanimladigi Yemeksepeti/Getir gibi harici link).
+*/
+function applyOrderAvailability(){
+  const link = document.getElementById('utilityOrder');
+  if(!link) return;
+  if(!orderMenu){ return; }
+  link.classList.remove('hidden');
+  link.removeAttribute('target');
+  link.href = '#';
+  if(link.lastChild) link.lastChild.textContent = 'Sipariş Ver';
+  link.onclick = e => { e.preventDefault(); openOrderSheet(); };
+  const utility = document.querySelector('.utility');
+  if(utility) utility.classList.remove('hidden');
+}
+
+/*
+  Masa bilgisi ayrica gonderilmez: NFC ile gelindiginde sunucu
+  nfc_code'dan etiketi bulur ve panelde etiketin adi ile yerlesimi
+  ("Masa 4 · Bahçe") gorunur. Etiketsiz erisimde masa bilinmez.
+*/
+function orderTableLabel(){ return ''; }
+
+window.openOrderSheet = function(){
+  const sheet = document.getElementById('orderSheet');
+  if(!sheet || !orderMenu) return;
+  sheet.hidden = false;
+  document.body.style.overflow = 'hidden';
+  try{ track('order_start'); }catch(_){}
+  renderOrderMenu();
+};
+
+window.closeOrderSheet = function(){
+  const sheet = document.getElementById('orderSheet');
+  if(sheet) sheet.hidden = true;
+  document.body.style.overflow = '';
+};
+
+function renderOrderMenu(){
+  const body = document.getElementById('osheetBody');
+  const foot = document.getElementById('osheetFoot');
+  const where = document.getElementById('osheetWhere');
+  if(!body || !orderMenu) return;
+
+  if(where){
+    where.textContent = orderMenu.location_required
+      ? 'Sipariş için işletmenin yakınında olman gerekir'
+      : (business?.name || '');
+  }
+
+  const items = orderMenu.items || [];
+  if(!items.length){
+    body.innerHTML = '<div class="osheet-info">Bu işletme henüz menü eklememiş.</div>';
+    if(foot) foot.hidden = true;
+    return;
+  }
+  if(foot) foot.hidden = false;
+
+  const cats = orderMenu.categories || [];
+  const groups = [];
+  for(const c of cats){
+    const list = items.filter(i => i.category_id === c.id);
+    if(list.length) groups.push([c.name, list]);
+  }
+  const loose = items.filter(i => !cats.some(c => c.id === i.category_id));
+  if(loose.length) groups.push(['Diğer', loose]);
+
+  body.innerHTML = groups.map(([name, list]) => `
+    <div class="ocat">${oEsc(name)}</div>
+    ${list.map(i => {
+      const q = orderCart.get(i.id) || 0;
+      return `<div class="oitem">
+        <div class="oitem-m">
+          <strong>${oEsc(i.name)}</strong>
+          ${i.description ? `<span>${oEsc(i.description)}</span>` : ''}
+        </div>
+        <div class="oitem-p">${oMoney(i.price)}</div>
+        <div class="oqty">
+          <button type="button" onclick="changeQty(${i.id},-1)" ${q ? '' : 'disabled'} aria-label="Azalt">−</button>
+          <b id="q_${i.id}">${q}</b>
+          <button type="button" class="add" onclick="changeQty(${i.id},1)" aria-label="Ekle">+</button>
+        </div>
+      </div>`;
+    }).join('')}
+  `).join('');
+
+  updateOrderTotal();
+}
+
+window.changeQty = function(id, delta){
+  const cur = orderCart.get(id) || 0;
+  let next = cur + delta;
+  if(next < 0) next = 0;
+  if(next > 99) next = 99;
+  if(next === 0) orderCart.delete(id); else orderCart.set(id, next);
+
+  const el = document.getElementById('q_' + id);
+  if(el) el.textContent = next;
+  const minus = el?.previousElementSibling;
+  if(minus) minus.disabled = next === 0;
+  updateOrderTotal();
+};
+
+function updateOrderTotal(){
+  const items = orderMenu?.items || [];
+  let total = 0;
+  for(const [id, q] of orderCart){
+    const item = items.find(i => i.id === id);
+    if(item) total += Number(item.price || 0) * q;
+  }
+  const el = document.getElementById('orderTotal');
+  if(el) el.textContent = oMoney(total);
+  const btn = document.getElementById('orderSubmit');
+  if(btn) btn.disabled = orderCart.size === 0;
+}
+
+/*
+  Konum izni. HTTPS zorunlu (Render'da var) ve kullanici reddedebilir;
+  o durumda net bir mesaj gosterilir, sessizce basarisiz olunmaz.
+*/
+function askLocation(){
+  return new Promise(resolve => {
+    if(!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      p => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      () => resolve(null),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  });
+}
+
+window.submitOrder = async function(){
+  const btn = document.getElementById('orderSubmit');
+  const status = document.getElementById('orderStatus');
+  const slug = business?.slug;
+  if(!slug || !orderCart.size) return;
+
+  const setStatus = (msg, cls) => {
+    if(!status) return;
+    status.textContent = msg || '';
+    status.className = 'osheet-status' + (cls ? ' ' + cls : '');
+  };
+
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Gönderiliyor…';
+  setStatus('');
+
+  try{
+    let coords = null;
+    if(orderMenu?.location_required){
+      setStatus('Konum alınıyor…');
+      coords = await askLocation();
+      if(!coords){
+        setStatus('Sipariş verebilmek için konum izni gerekiyor. Tarayıcı ayarlarından izin verip tekrar dene.', 'err');
+        btn.disabled = false; btn.textContent = original;
+        return;
+      }
+    }
+
+    const payload = {
+      items: [...orderCart].map(([menu_item_id, quantity]) => ({ menu_item_id, quantity })),
+      customer_note: document.getElementById('orderNote')?.value || '',
+      table_label: orderTableLabel(),
+      nfc_code: nfcCode || '',
+      ...(coords || {})
+    };
+
+    let data = null, ok = false;
+    for(const base of apiBases()){
+      try{
+        const r = await fetch(base + "/api/orders/" + encodeURIComponent(slug), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        data = await r.json();
+        ok = r.ok;
+        break;
+      }catch(_){}
+    }
+
+    if(!ok){
+      /* Sunucu mesafeyi de dondurur; kullaniciya somut bilgi verilir */
+      let msg = data?.error || 'Sipariş gönderilemedi.';
+      if(data?.distance_meters != null && data?.radius_meters != null){
+        msg += ` (${data.distance_meters} m uzaktasın, sınır ${data.radius_meters} m)`;
+      }
+      setStatus(msg, 'err');
+      btn.disabled = false; btn.textContent = original;
+      return;
+    }
+
+    showOrderDone(data?.order);
+  }catch(e){
+    setStatus('Bağlantı hatası. Lütfen tekrar dene.', 'err');
+    btn.disabled = false; btn.textContent = original;
+  }
+};
+
+function showOrderDone(order){
+  const body = document.getElementById('osheetBody');
+  const foot = document.getElementById('osheetFoot');
+  if(foot) foot.hidden = true;
+  if(body){
+    body.innerHTML = `<div class="odone">
+      <div class="tick">✓</div>
+      <strong>Siparişin alındı</strong>
+      <span>İşletmeye iletildi. Hazırlanmaya başlandığında masana getirilecek.</span>
+      ${order?.id ? `<div class="ono">Sipariş No: #${order.id}</div>` : ''}
+    </div>`;
+  }
+  orderCart.clear();
+}
+
 
 /* ==================================================
    ISLETMEYE OZEL VURGU RENGI
