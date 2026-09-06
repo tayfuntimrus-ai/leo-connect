@@ -554,9 +554,37 @@ async function openBusiness(id){
     const d=await api("/api/admin/business/"+id);
     if(!d || !d.business) throw new Error('Sunucu işletme bilgisi döndürmedi (yanıtta "business" alanı yok)');
     currentBusiness={...d.business,permissions:d.permissions||{profile:true,digital:true,qr:false,nfc:false,analytics:false,live:false,ai:false},nfc_tags:d.nfc_tags||[]};
+    /*
+      UC EKRAN AYNI ANDA ACIK OLABILIYORDU
+
+      hideAllMainPages() globalPage'e "show" ekliyor. Isletmeler
+      sekmesindeyken globalPage ACIK oluyor; openBusiness ise yalnizca
+      businessPage'e "show" ekleyip globalPage'i KAPATMIYORDU.
+
+      Sonuc: detay sayfasi Isletmeler sayfasinin ALTINDA aciliyor,
+      kullanici hicbir degisiklik gormuyor ve buton "tepki vermiyor"
+      saniyordu. Genel Bakis'tan girildiginde globalPage zaten kapali
+      oldugu icin orada calisiyor gibi gorunuyordu.
+
+      Artik ucu de acikca yonetiliyor: hangi ekran acilacaksa
+      digerleri kapatilir.
+    */
     document.querySelector(".content").style.display="none";
+    document.getElementById("globalPage").classList.remove("show");
     document.getElementById("businessPage").classList.add("show");
     renderBusinessPage();
+
+    /*
+      SEKME BASA ALINIYOR
+
+      Panellerden yalnizca birinde "active" var. Kullanici daha once
+      baska bir sekmeye (orn. Erisim Izinleri) tiklamissa o panel acik
+      kaliyordu. renderBusinessPage yalnizca GENEL BAKIS panelini
+      dolduruyor; acik panel baskasi oldugu icin ekran BOS gorunuyordu.
+
+      Isletme her acilisinda genel bakisa donuluyor.
+    */
+    switchBizTab("overview", document.querySelector('[data-tab="overview"]'));
     /* "b" burada TANIMLI DEGILDI. Optional chaining tanimsiz DEGISKENI
        korumaz, sadece null/undefined DEGERI korur; bu yuzden her isletme
        acilisinda "b is not defined" firliyor, hata bildirimi cikiyor ve

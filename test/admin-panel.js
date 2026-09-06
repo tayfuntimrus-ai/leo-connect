@@ -169,6 +169,50 @@ setTimeout(async () => {
   win.fetch = goodFetch2;
   if(errBar) errBar.style.display = 'none';
 
+  /* ---- 0d. KULLANICININ BILDIRDIGI IKI AKIS ----
+
+     a) Genel Bakis -> Detay  : sayfa aciliyordu ama EKRAN BOSTU
+        (onceki sekme acik kaliyor, genel bakis paneli gizli kaliyordu)
+     b) Isletmeler   -> Detay : buton TEPKI VERMIYORDU
+        (globalPage acik kaliyor, detay onun altinda aciliyordu)
+  */
+  const bizPage = doc.getElementById('businessPage');
+  const globalPage = doc.getElementById('globalPage');
+  const content = doc.querySelector('.content');
+
+  /* (a) once baska bir sekmeye gecip durumu "kirli" birak */
+  await win.openBusiness(42);
+  win.switchBizTab('permissions', doc.querySelector('[data-tab="permissions"]'));
+  await new Promise(r=>setTimeout(r,25));
+  win.showHome(doc.querySelectorAll('.nav button')[0]);
+
+  await win.openBusiness(42);
+  await new Promise(r=>setTimeout(r,25));
+  check('Genel Bakış → Detay: sayfa açılıyor',
+    bizPage.classList.contains('show'), '');
+  check('Genel Bakış → Detay: ekran BOŞ DEĞİL',
+    doc.getElementById('bizOverview')?.classList.contains('active') &&
+    doc.getElementById('bizOverview').innerHTML.length > 100,
+    'bizOverview ' + (doc.getElementById('bizOverview')?.classList.contains('active')?'aktif':'PASİF') +
+    ', ' + (doc.getElementById('bizOverview')?.innerHTML.length||0) + ' karakter');
+
+  /* (b) Isletmeler sekmesinden ac */
+  win.showBusinessesPage(doc.querySelectorAll('.nav button')[1]);
+  await new Promise(r=>setTimeout(r,25));
+  check('İşletmeler sekmesi açık (globalPage görünür)',
+    globalPage.classList.contains('show'), '');
+
+  await win.openBusiness(42);
+  await new Promise(r=>setTimeout(r,25));
+  check('İşletmeler → Detay: globalPage KAPANIYOR',
+    !globalPage.classList.contains('show'),
+    globalPage.classList.contains('show') ? 'hâlâ açık — detay altında kalır' : 'kapandı');
+  check('İşletmeler → Detay: detay sayfası görünür',
+    bizPage.classList.contains('show') && content.style.display === 'none', '');
+  check('İşletmeler → Detay: içerik dolu',
+    doc.getElementById('bizOverview')?.innerHTML.length > 100,
+    (doc.getElementById('bizOverview')?.innerHTML.length||0) + ' karakter');
+
   /* ---- 1. isletme acilisi hatasiz mi ---- */
   toasts.length=0;
   await win.openBusiness(42);
