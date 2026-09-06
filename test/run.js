@@ -13,6 +13,7 @@ const SUITES = [
   ['accent',    'isletmeye ozel vurgu rengi'],
   ['orders',    'menu ve siparis altyapisi'],
   ['dashboard', 'isletme paneli yapisi'],
+  ['admin-panel', 'admin paneli calisma-ani'],
   ['customer-order', 'musteri siparis ekrani'],
   ['smoke',     'QR gorselleri ve NFC sayaclari'],
   ['jwtguard',  'JWT_SECRET korumasi'],
