@@ -257,12 +257,62 @@ let allBusinesses=[];
 let overview={};
 let currentBusiness=null;
 
+/*
+  GORUNMEYEN HATA KALMASIN
+
+  Panelin cogu butonu async fonksiyon cagiriyor. Bir fonksiyon try/catch
+  kullanmazsa hata "unhandled rejection" olarak sessizce kayboluyor ve
+  buton "hicbir sey yapmiyor" gibi gorunuyordu. Artik her hata hem
+  konsola hem ekrana dusuyor.
+*/
+window.addEventListener('unhandledrejection', e => {
+  const msg = e?.reason?.message || String(e?.reason || 'Bilinmeyen hata');
+  console.error('YAKALANMAMIŞ HATA:', e?.reason);
+  if(typeof showToast === 'function') showToast('Hata: ' + msg);
+});
+window.addEventListener('error', e => {
+  if(!e?.message) return;
+  console.error('SAYFA HATASI:', e.message, e.filename + ':' + e.lineno);
+  if(typeof showToast === 'function') showToast('Hata: ' + e.message);
+});
+
 function authHeaders(){return adminToken?{"Authorization":"Bearer "+adminToken}:{}}
 async function api(path,options={}){
   const res=await fetch(API+path,{...options,headers:{"Content-Type":"application/json",...authHeaders(),...(options.headers||{})}});
   if(res.status===401||res.status===403){logout();throw new Error("Yetkisiz erişim");}
-  const data=await res.json().catch(()=>({}));
-  if(!res.ok)throw new Error(data.error||data.message||"İstek başarısız");
+
+  /*
+    SESSIZ HATA TUZAGI
+
+    Express fallback'i BILINMEYEN her yola index.html donduruyor —
+    ustelik 200 OK ile. Onceden burada su vardi:
+
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok) throw ...
+
+    Yani olmayan bir uca istek atildiginda res.json() patliyor, catch
+    bos nesne veriyor, res.ok TRUE oldugu icin hata firlatilmiyor ve
+    cagiran bos {} aliyordu. Buton hicbir sey yapmiyor, hata da
+    gorunmuyordu.
+
+    Artik yanit gercekten JSON mu diye bakiliyor; degilse acik hata.
+  */
+  const ctype=(res.headers.get('content-type')||'').toLowerCase();
+  const raw=await res.text();
+
+  if(!ctype.includes('application/json')){
+    console.error('API JSON DONDURMEDI:', path, res.status, ctype, raw.slice(0,120));
+    throw new Error(`Sunucu bu adres için JSON döndürmedi (${res.status}). Uç bulunamamış olabilir: ${path}`);
+  }
+
+  let data;
+  try{ data=JSON.parse(raw); }
+  catch(e){
+    console.error('API YANITI COZULEMEDI:', path, raw.slice(0,120));
+    throw new Error('Sunucu yanıtı okunamadı: '+path);
+  }
+
+  if(!res.ok)throw new Error(data.error||data.message||`İstek başarısız (${res.status})`);
   return data;
 }
 function adminLogin(){
@@ -818,7 +868,11 @@ async function showQRManager(btn){
   if(btn)setActive(btn);
   showGlobalPage("QR Merkezi","Tüm işletmelerin mevcut QR kodlarını tek merkezden yönet.",'<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
   try{
-    const biz=allBusinesses.length?allBusinesses:(await api("/api/admin/businesses")).businesses||[];
+    /* /api/admin/businesses DUZ DIZI donduruyor, {businesses:[...]} degil.
+       Onceden yalnizca .businesses okunuyordu; allBusinesses bossa
+       liste bos kaliyordu. Iki sekil de destekleniyor. */
+    const fresh=allBusinesses.length?allBusinesses:await api("/api/admin/businesses");
+    const biz=Array.isArray(fresh)?fresh:(fresh?.businesses||[]);
     document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div><h3>Merkezi QR Yönetimi</h3><div class="sub">Mevcut slug ve QR adresleri korunur.</div></div><div class="global-grid" style="margin-top:15px">${biz.length?biz.map(b=>`<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">▣</div><div><div class="global-name">${esc(b.name||"İsimsiz")}</div><div class="global-sub">${esc(b.category||"—")} • /p/${esc(b.slug||"")} • ${n(b.qr_scans)} tarama</div></div></div><div class="modal-actions"><button class="btn primary" onclick="showQR(${Number(b.id)})">QR'ı Gör</button><button class="btn" onclick="openBusiness(${Number(b.id)})">İşletmeye Git</button></div></div>`).join(""):'<div class="empty">İşletme bulunamadı.</div>'}</div></section>`;
   }catch(e){document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
 }
