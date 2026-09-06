@@ -213,6 +213,75 @@ setTimeout(async () => {
     doc.getElementById('bizOverview')?.innerHTML.length > 100,
     (doc.getElementById('bizOverview')?.innerHTML.length||0) + ' karakter');
 
+  /* ---- 0e. GERCEK SUNUCU YANIT SEKLI ----
+     publicBusiness() profile_views / qr_scans / nfc_scans /
+     phone_clicks / whatsapp_clicks ICERMEZ. Test verisi bunlari
+     iceriyordu; gercekte eksikler. Panel yine dolmali. */
+  const REAL_SHAPE = {
+    id:42, name:'Test Cafe', slug:'test-cafe', email:'a@b.c', category:'Kafe',
+    description:'', phone:'0555', whatsapp:'', address:'', instagram:'', tiktok:'',
+    google_review:'', website:'', menu:'', iban:'', iban_holder:'', hours:'',
+    logo_url:'', social_links:{}, custom_links:[], social_platform_permissions:{},
+    created_at:new Date()
+  };
+  const prevFetch = win.fetch;
+  win.fetch = async (url) => {
+    const u=String(url);
+    if(/\/api\/admin\/business\/\d+$/.test(u)){
+      const body={business:REAL_SHAPE,permissions:PERMS,nfc_tags:[]};
+      return {ok:true,status:200,headers:{get:()=>'application/json'},
+              json:async()=>body,text:async()=>JSON.stringify(body)};
+    }
+    return prevFetch(url);
+  };
+  await win.openBusiness(42);
+  await new Promise(r=>setTimeout(r,30));
+  const ovReal = doc.getElementById('bizOverview');
+  const heroReal = doc.getElementById('businessHero');
+  check('Gerçek yanıt şekliyle başlık doluyor',
+    heroReal?.innerHTML.length > 100, (heroReal?.innerHTML.length||0)+' karakter');
+  check('Gerçek yanıt şekliyle panel DOLUYOR',
+    ovReal?.innerHTML.length > 100 && !/çizilemedi/.test(ovReal.innerHTML),
+    (ovReal?.innerHTML.length||0)+' karakter');
+  check('Panel boş kalırsa ekranda uyarı çıkar (güvenlik ağı)',
+    /Bu ekran çizilemedi/.test(fs.readFileSync(path.join(REPO,'public','admin.html'),'utf8')), '');
+  win.fetch = prevFetch;
+
+  /* ---- 0e2. GERCEKTEN GORUNUYOR MU ----
+
+     Onceki testler yalnizca classList.contains('show') kontrol
+     ediyordu. Ama CSS'te .business-page.show{display:block} kurali
+     YOKTU: sinif ekleniyor, sayfa yine display:none kaliyordu.
+     Sinif eklenmesi gorunurluk DEMEK DEGIL; hesaplanan stile bakilir. */
+  await win.openBusiness(42);
+  await new Promise(r=>setTimeout(r,30));
+  const bpEl = doc.getElementById('businessPage');
+  const bpDisplay = win.getComputedStyle(bpEl).display;
+  check('İşletme sayfası GERÇEKTEN görünür (display)',
+    bpDisplay !== 'none', `display: ${bpDisplay}`);
+
+  const gpDisplay = win.getComputedStyle(doc.getElementById('globalPage')).display;
+  check('İşletmeler sayfası kapalı (üstte kalmıyor)',
+    gpDisplay === 'none', `display: ${gpDisplay}`);
+
+  const ovDisplay = win.getComputedStyle(doc.getElementById('bizOverview')).display;
+  check('Genel bakış paneli GERÇEKTEN görünür',
+    ovDisplay !== 'none', `display: ${ovDisplay}`);
+
+  /* CSS kurali kaynakta gercekten var mi */
+  const cssSrc = fs.readFileSync(path.join(REPO,'public','admin.html'),'utf8');
+  check('.business-page.show kuralı CSS\'te tanımlı',
+    /\.business-page\.show\s*\{[^}]*display\s*:\s*block/.test(cssSrc), '');
+
+  /* ---- 0f. hata kutusu .content DISINDA mi ---- */
+  const srcNow = fs.readFileSync(path.join(REPO,'public','admin.html'),'utf8');
+  const ci = srcNow.indexOf('<section class="content">');
+  const ei = srcNow.indexOf('id="errorBar"');
+  const bp = srcNow.indexOf('id="businessPage"');
+  check('Hata kutusu .content DIŞINDA (gizlenmiyor)',
+    ei > bp || ei < ci,
+    (ei > ci && ei < bp) ? 'HÂLÂ .content içinde — display:none olunca görünmez' : 'dışarıda');
+
   /* ---- 1. isletme acilisi hatasiz mi ---- */
   toasts.length=0;
   await win.openBusiness(42);
