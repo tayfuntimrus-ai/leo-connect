@@ -587,6 +587,9 @@ function renderBizPermissions(){
         <div class="permission-card"><div><strong>Analytics</strong><span>İstatistikler ve performans</span></div><label class="switch"><input id="perm_analytics" type="checkbox" ${p.analytics?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>Live Tracking</strong><span>QR, NFC ve kanal hareketleri</span></div><label class="switch"><input id="perm_live" type="checkbox" ${p.live?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>LEO AI</strong><span>İçgörü ve öneriler</span></div><label class="switch"><input id="perm_ai" type="checkbox" ${p.ai?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>Yorum Yönlendirme</strong><span>Puana göre Google'a veya geri bildirime yönlendirme</span></div><label class="switch"><input id="perm_review" type="checkbox" ${p.review?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>Kampanyalar</strong><span>Zamanlı kampanya yönetimi</span></div><label class="switch"><input id="perm_campaign" type="checkbox" ${p.campaign?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>Sipariş &amp; Menü</strong><span>Menü yönetimi ve müşteriden sipariş alma</span></div><label class="switch"><input id="perm_orders" type="checkbox" ${p.orders?'checked':''}><span class="slider"></span></label></div>
       </div>
     </section>
     <section class="card biz-section" style="margin-top:15px">
@@ -611,7 +614,7 @@ function renderBizPermissions(){
     </section>`;
 }
 function setAllBusinessPermissions(value){
-  ['profile','digital','qr','nfc','analytics','live','ai'].forEach(k=>{const el=document.getElementById('perm_'+k);if(el)el.checked=value});
+  ['profile','digital','qr','nfc','analytics','live','ai','review','campaign','orders'].forEach(k=>{const el=document.getElementById('perm_'+k);if(el)el.checked=value});
   document.querySelectorAll('[id^="field_"]').forEach(el=>el.checked=value);
   document.querySelectorAll('[id^="channel_"]').forEach(el=>el.checked=value);
 }
@@ -625,6 +628,12 @@ async function saveBusinessPermissions(){
     analytics:document.getElementById("perm_analytics").checked,
     live:document.getElementById("perm_live").checked,
     ai:document.getElementById("perm_ai").checked,
+    /* Bu ucu ONCEDEN gonderilmiyordu. Sunucu eksik anahtari false
+       saydigi icin her izin kaydinda Yorum Yonlendirme ve Kampanyalar
+       sessizce kapaniyordu. */
+    review:document.getElementById("perm_review")?.checked===true,
+    campaign:document.getElementById("perm_campaign")?.checked===true,
+    orders:document.getElementById("perm_orders")?.checked===true,
     profile_fields:{}
   };
   document.querySelectorAll('[id^="field_"]').forEach(el=>{permissions.profile_fields[el.id.replace('field_','')]=el.checked});

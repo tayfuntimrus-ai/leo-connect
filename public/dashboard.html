@@ -2569,6 +2569,94 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
 .accent-reset{flex:0 0 auto;border:1px solid var(--bc-line);background:transparent;
   color:var(--bc-muted);border-radius:9px;padding:8px 12px;font-size:11px;font-weight:700;cursor:pointer}
 .accent-reset:hover{color:var(--leo-accent);border-color:var(--leo-accent)}
+
+/* ===== SIPARIS / MENU / GENEL BAKIS ===== */
+.hidden{display:none!important}
+
+.bc-nav-badge{margin-left:auto;background:var(--leo-accent);color:var(--leo-on-accent);
+  font-size:10px;font-weight:900;padding:1px 7px;border-radius:999px;line-height:1.6}
+
+.bc-order-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.bc-sum-card{display:block;text-decoration:none;color:inherit;border:1px solid var(--bc-line);
+  background:var(--leo-surface);border-radius:16px;padding:16px 18px;position:relative;overflow:hidden;transition:.18s}
+.bc-sum-card:hover{transform:translateY(-2px);border-color:var(--leo-accent)}
+.bc-sum-card small{display:block;font-size:9.5px;letter-spacing:.14em;color:var(--bc-muted);font-weight:800}
+.bc-sum-card strong{display:block;font-size:28px;font-weight:900;letter-spacing:-.02em;margin-top:9px;
+  font-variant-numeric:tabular-nums}
+.bc-sum-card span{display:block;font-size:11px;color:var(--bc-muted);margin-top:3px}
+.bc-sum-accent strong{color:var(--leo-accent)}
+
+.bc-quick-title{font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--bc-muted);
+  text-transform:uppercase;margin:26px 0 12px}
+.bc-quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.bc-quick{text-align:left;border:1px solid var(--bc-line);background:var(--leo-surface);
+  border-radius:16px;padding:18px;cursor:pointer;color:inherit;transition:.18s}
+.bc-quick:hover{transform:translateY(-2px);border-color:var(--leo-accent);background:var(--leo-surface-2)}
+.bc-quick-ico{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;
+  background:var(--leo-accent-wash);color:var(--leo-accent);font-size:19px;margin-bottom:12px}
+.bc-quick strong{display:block;font-size:14px;font-weight:800}
+.bc-quick span:last-child{display:block;font-size:11.5px;color:var(--bc-muted);margin-top:3px}
+
+.bc-recent{margin-top:26px}
+.bc-recent-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.bc-recent-head h2{font-size:17px;margin:0}
+.bc-recent-list{display:flex;flex-direction:column;gap:8px}
+
+.order-card{border:1px solid var(--bc-line);background:var(--leo-surface);border-radius:14px;
+  padding:14px 16px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.order-card.compact{padding:12px 15px}
+.order-main{flex:1 1 220px;min-width:0}
+.order-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.order-no{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--bc-muted)}
+.order-where{font-size:13px;font-weight:800}
+.order-lines{font-size:12px;color:var(--bc-muted);margin-top:6px;line-height:1.6}
+.order-note{font-size:11.5px;color:var(--leo-accent);margin-top:5px}
+.order-total{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
+.order-when{font-size:11px;color:var(--bc-muted);margin-top:3px;text-align:right}
+.order-actions{display:flex;gap:6px;flex-wrap:wrap;width:100%;margin-top:4px}
+.order-actions button{border:1px solid var(--bc-line);background:var(--leo-surface-2);color:var(--bc-text);
+  border-radius:9px;padding:7px 12px;font-size:11.5px;font-weight:700;cursor:pointer}
+.order-actions button.go{background:var(--leo-accent);border-color:var(--leo-accent);color:var(--leo-on-accent)}
+.order-actions button.stop{color:var(--leo-red);border-color:rgba(232,112,95,.4)}
+
+.ostat{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;
+  padding:3px 9px;border-radius:999px;border:1px solid}
+.ostat-new{color:var(--leo-accent);background:var(--leo-accent-wash);border-color:var(--leo-accent)}
+.ostat-preparing{color:#5ea7ff;background:rgba(94,167,255,.12);border-color:rgba(94,167,255,.4)}
+.ostat-ready{color:var(--leo-green);background:rgba(69,194,122,.12);border-color:rgba(69,194,122,.4)}
+.ostat-delivered{color:var(--bc-muted);background:var(--leo-surface-2);border-color:var(--bc-line)}
+.ostat-cancelled{color:var(--leo-red);background:rgba(232,112,95,.12);border-color:rgba(232,112,95,.4)}
+
+.order-filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.order-filter{border:1px solid var(--bc-line);background:transparent;color:var(--bc-muted);
+  border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer}
+.order-filter.active{background:var(--leo-accent-wash);color:var(--leo-accent);border-color:var(--leo-accent)}
+.orders-list{display:flex;flex-direction:column;gap:9px}
+.order-empty{padding:44px 20px;text-align:center;color:var(--bc-muted);font-size:13px;
+  border:1px dashed var(--bc-line);border-radius:16px}
+
+.bc-locked{border:1px dashed var(--bc-line);border-radius:16px;padding:38px 24px;text-align:center}
+.bc-locked strong{display:block;font-size:15px;margin-bottom:6px}
+.bc-locked span{font-size:12.5px;color:var(--bc-muted)}
+
+.menu-cat-list,.menu-item-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.menu-row{border:1px solid var(--bc-line);background:var(--leo-surface-2);border-radius:12px;
+  padding:12px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.menu-row-main{flex:1 1 200px;min-width:0}
+.menu-row-main strong{display:block;font-size:13.5px}
+.menu-row-main span{display:block;font-size:11.5px;color:var(--bc-muted);margin-top:2px}
+.menu-price{font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
+.menu-row button{border:1px solid var(--bc-line);background:transparent;color:var(--bc-muted);
+  border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer}
+.menu-row button:hover{color:var(--leo-accent);border-color:var(--leo-accent)}
+.menu-off{opacity:.5}
+
+@media(max-width:1000px){
+  .bc-order-summary,.bc-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){
+  .bc-order-summary,.bc-quick-grid{grid-template-columns:1fr}
+}
 .profile-content-box .design-save-row{margin-top:14px}
 body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
 .bc-sidebar{width:252px;padding:22px 14px 16px;background:linear-gradient(180deg,#0a0c10,#0a0c10);border-right:1px solid var(--bc-line);gap:13px;box-shadow:18px 0 50px rgba(0,0,0,.14)}
@@ -2609,11 +2697,13 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
   <div class="bc-nav-label">YÖNETİM</div>
   <nav class="bc-nav">
     <button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="ico bc-icon">⌂</span><span>Genel Bakış</span></button>
-    <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="ico bc-icon">⌘</span><span>Profil</span></button>
+    <button data-bc="orders" onclick="showBusinessSection('orders')"><span class="ico bc-icon">🧾</span><span>Siparişler</span><span id="bcOrdersBadge" class="bc-nav-badge hidden">0</span></button>
+    <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="ico bc-icon">▦</span><span>QR ve NFC</span></button>
+    <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="ico bc-icon">▥</span><span>Raporlar</span></button>
+    <button data-bc="menu" onclick="showBusinessSection('menu')"><span class="ico bc-icon">🍽</span><span>Menü</span></button>
     <button data-bc="connections" onclick="showBusinessSection('connections')"><span class="ico bc-icon">↗</span><span>Dijital Kanallar</span></button>
-    <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="ico bc-icon">▦</span><span>QR & NFC</span></button>
     <button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="ico bc-icon">✦</span><span>Kampanyalar</span></button>
-    <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="ico bc-icon">▥</span><span>İstatistikler</span></button>
+    <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="ico bc-icon">⚙</span><span>Ayarlar</span></button>
   </nav>
 
   <div class="bc-side-footer">
@@ -2651,6 +2741,50 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
         <div class="bc-kpi"><small>WHATSAPP</small><strong id="bcKpiWA">0</strong><span>iletişim tıklaması</span></div>
         <div class="bc-kpi"><small>TELEFON</small><strong id="bcKpiPhone">0</strong><span>arama tıklaması</span></div>
         <div class="bc-kpi"><small>TOPLAM</small><strong id="bcKpiTotal">0</strong><span>toplam aksiyon</span></div>
+      </div>
+
+      <!-- Siparis ozeti: modul acik degilse tamamen gizlenir.
+           Bos veri yerine hic gostermemek daha dogru; "0 TL ciro"
+           sistemin calistigi izlenimi verirdi. -->
+      <div id="bcOrderSummary" class="bc-order-summary hidden">
+        <a class="bc-sum-card" href="#" onclick="showBusinessSection('orders');return false">
+          <small>BUGÜNKÜ SİPARİŞ</small><strong id="sumTodayCount">0</strong><span>adet</span>
+        </a>
+        <a class="bc-sum-card" href="#" onclick="showBusinessSection('orders');return false">
+          <small>BUGÜNKÜ CİRO</small><strong id="sumTodayRevenue">₺0</strong><span>iptaller hariç</span>
+        </a>
+        <a class="bc-sum-card bc-sum-accent" href="#" onclick="showBusinessSection('orders');return false">
+          <small>AÇIK SİPARİŞ</small><strong id="sumOpenCount">0</strong><span>işlem bekliyor</span>
+        </a>
+        <a class="bc-sum-card" href="#" onclick="showBusinessSection('digital');return false">
+          <small>AKTİF QR / NFC</small><strong id="sumActiveTags">0</strong><span>masa / nokta</span>
+        </a>
+      </div>
+
+      <!-- Hizli erisim -->
+      <div class="bc-quick-title">Hızlı erişim</div>
+      <div class="bc-quick-grid">
+        <button type="button" class="bc-quick" onclick="showBusinessSection('orders')">
+          <span class="bc-quick-ico">🧾</span><strong>Siparişler</strong><span>Gelen siparişleri yönet</span>
+        </button>
+        <button type="button" class="bc-quick" onclick="showBusinessSection('digital')">
+          <span class="bc-quick-ico">▦</span><strong>QR ve NFC Kodları</strong><span>Masa ve nokta etiketleri</span>
+        </button>
+        <button type="button" class="bc-quick" onclick="showBusinessSection('stats')">
+          <span class="bc-quick-ico">▥</span><strong>Raporlar</strong><span>Performans ve analiz</span>
+        </button>
+        <button type="button" class="bc-quick" onclick="showBusinessSection('menu')">
+          <span class="bc-quick-ico">🍽</span><strong>Menü Yönetimi</strong><span>Kategori ve ürünler</span>
+        </button>
+      </div>
+
+      <!-- Son siparisler -->
+      <div id="bcRecentOrders" class="bc-recent hidden">
+        <div class="bc-recent-head">
+          <h2>Son siparişler</h2>
+          <button type="button" class="feature-btn" onclick="showBusinessSection('orders')">Tümünü gör →</button>
+        </div>
+        <div id="bcRecentList" class="bc-recent-list"></div>
       </div>
 
       <div id="bcOverviewModules" class="bc-overview-modules">
@@ -2729,16 +2863,67 @@ body{background:var(--bc-bg)!important;color:var(--bc-text)!important}
       <div class="bc-stats-notice"><strong>Rapor mantığı</strong><span>QR ve NFC tek bir masa kaydına bağlıdır. Böylece hangi masanın ne kadar kullanıldığını aynı raporda görebilirsin.</span></div>
       <div id="bcStatsMount"></div>
     </div>
+
+    <!-- ============ SİPARİŞLER ============ -->
+    <div class="bc-view" data-view="orders">
+      <div class="bc-section-title bc-section-title-large">
+        <div><div class="bc-kicker">SİPARİŞ MERKEZİ</div><h1>Siparişler</h1><p>Müşteriden gelen siparişleri takip et ve durumlarını güncelle.</p></div>
+        <button class="bc-primary" type="button" onclick="loadOrders()">↻ Yenile</button>
+      </div>
+      <div id="ordersLocked" class="bc-locked hidden">
+        <strong>Sipariş modülü kapalı</strong>
+        <span>Bu modül işletmeye özel olarak açılır. Açtırmak için Leo Connect ile iletişime geçin.</span>
+      </div>
+      <div id="ordersPanel" class="hidden">
+        <div class="order-filters">
+          <button class="order-filter active" data-status="" onclick="setOrderFilter('')">Tümü</button>
+          <button class="order-filter" data-status="new" onclick="setOrderFilter('new')">Yeni</button>
+          <button class="order-filter" data-status="preparing" onclick="setOrderFilter('preparing')">Hazırlanıyor</button>
+          <button class="order-filter" data-status="ready" onclick="setOrderFilter('ready')">Hazır</button>
+          <button class="order-filter" data-status="delivered" onclick="setOrderFilter('delivered')">Teslim</button>
+        </div>
+        <div id="ordersList" class="orders-list"><div class="order-empty">Yükleniyor…</div></div>
+      </div>
+    </div>
+
+    <!-- ============ MENÜ ============ -->
+    <div class="bc-view" data-view="menu">
+      <div class="bc-section-title bc-section-title-large">
+        <div><div class="bc-kicker">MENÜ YÖNETİMİ</div><h1>Menü</h1><p>Kategorileri ve ürünleri düzenle. Müşteri sipariş ekranında bunları görür.</p></div>
+      </div>
+      <div id="menuLocked" class="bc-locked hidden">
+        <strong>Menü modülü kapalı</strong>
+        <span>Sipariş modülüyle birlikte açılır. Açtırmak için Leo Connect ile iletişime geçin.</span>
+      </div>
+      <div id="menuPanel" class="hidden">
+        <section class="box">
+          <div class="box-head">
+            <div><div class="eyebrow">KATEGORİLER</div><h2>Kategoriler</h2><p>Ürünleri gruplamak için kullanılır.</p></div>
+            <button class="feature-btn" type="button" onclick="createMenuCategory()">＋ Kategori Ekle</button>
+          </div>
+          <div id="menuCategoryList" class="menu-cat-list"><div class="order-empty">Yükleniyor…</div></div>
+        </section>
+
+        <section class="box" style="margin-top:16px">
+          <div class="box-head">
+            <div><div class="eyebrow">ÜRÜNLER</div><h2>Ürünler</h2><p>Fiyat, açıklama ve satışta olup olmadığını buradan yönet.</p></div>
+            <button class="feature-btn" type="button" onclick="createMenuItem()">＋ Ürün Ekle</button>
+          </div>
+          <div id="menuItemList" class="menu-item-list"><div class="order-empty">Yükleniyor…</div></div>
+        </section>
+      </div>
+    </div>
   </div>
 </div>
 
 <div class="bc-mobile-nav">
   <button data-bc="overview" class="active" onclick="showBusinessSection('overview')"><span class="mi">⌂</span>Genel</button>
-  <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="mi">⌘</span>Profil</button>
-  <button data-bc="connections" onclick="showBusinessSection('connections')"><span class="mi">↗</span>Dijital</button>
+  <button data-bc="orders" onclick="showBusinessSection('orders')"><span class="mi">🧾</span>Sipariş</button>
   <button data-bc="digital" onclick="showBusinessSection('digital')"><span class="mi">▦</span>QR/NFC</button>
-  <button data-bc="campaigns" onclick="showBusinessSection('campaigns')"><span class="mi">✦</span>Kampanya</button>
-  <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="mi">▥</span>İstatistik</button>
+  <button data-bc="stats" onclick="showBusinessSection('stats')"><span class="mi">▥</span>Rapor</button>
+  <button data-bc="menu" onclick="showBusinessSection('menu')"><span class="mi">🍽</span>Menü</button>
+  <button data-bc="connections" onclick="showBusinessSection('connections')"><span class="mi">↗</span>Dijital</button>
+  <button data-bc="profile" onclick="showBusinessSection('profile')"><span class="mi">⚙</span>Ayarlar</button>
 </div>
 
 <!-- ==================================================
@@ -6137,7 +6322,9 @@ function formatEventType(type){
     campaign_view:{icon:"🚀",label:"Kampanya görüntülendi"},
     campaign_click:{icon:"🚀",label:"Kampanyaya tıklandı"},
     featured_click:{icon:"✨",label:"Öne çıkana tıklandı"},
-    order:{icon:"🧾",label:"Sipariş bağlantısına tıklandı"}
+    order:{icon:"🧾",label:"Sipariş bağlantısına tıklandı"},
+    order_start:{icon:"🛒",label:"Sipariş ekranı açıldı"},
+    order_submit:{icon:"✅",label:"Sipariş verildi"}
   };
   const e=events[type];
   return e ? `${e.icon} ${e.label}` : `🔔 ${type||"Yeni etkileşim"}`;
@@ -6380,7 +6567,7 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
 
 <script id="leo-business-final-js">
 (function(){
-  const map={overview:{title:'Genel Bakış',ids:[]},profile:{title:'Profil',ids:['profile']},connections:{title:'Dijital Kanallar',ids:[]},digital:{title:'QR & NFC',ids:['digital']},campaigns:{title:'Kampanyalar',ids:['campaignSection']},stats:{title:'İstatistikler',ids:['businessAnalyticsV3','performanceSection','reviewSection']}};
+  const map={overview:{title:'Genel Bakış',ids:[]},profile:{title:'Ayarlar',ids:['profile']},connections:{title:'Dijital Kanallar',ids:[]},digital:{title:'QR ve NFC',ids:['digital']},campaigns:{title:'Kampanyalar',ids:['campaignSection']},stats:{title:'Raporlar',ids:['businessAnalyticsV3','performanceSection','reviewSection']},orders:{title:'Siparişler',ids:[]},menu:{title:'Menü',ids:[]}};
   window.showBusinessSection=function(name){
     const cfg=map[name]||map.overview;
     document.querySelectorAll('.bc-view').forEach(v=>v.classList.toggle('active',v.dataset.view===name));
@@ -6394,12 +6581,259 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
     cfg.ids.forEach(id=>{const el=document.getElementById(id); if(el){el.style.display=el.dataset.bcOriginalDisplay||''; const mount=document.getElementById(name==='profile'?(id==='profile'?'bcProfileMount':'bcDesignMount'):name==='digital'?'bcDigitalMount':name==='campaigns'?'bcCampaignMount':'bcStatsMount'); if(mount && el.parentElement!==mount) mount.appendChild(el);}});
     document.getElementById('bcTopTitle').textContent=cfg.title;
     window.scrollTo({top:0,behavior:'smooth'});
+    if(name==='orders'){try{loadOrders()}catch(e){console.error('Siparis yuklenemedi',e)}}
+    if(name==='menu'){try{loadMenu()}catch(e){console.error('Menu yuklenemedi',e)}}
     if(name==='digital' && typeof loadQR==='function'){try{loadQR()}catch(e){}}
     if(name==='digital' && typeof loadBusinessTableCodes==='function'){try{setTimeout(()=>loadBusinessTableCodes(),50)}catch(e){}}
     if(name==='campaigns' && typeof loadBusinessCampaigns==='function'){try{loadBusinessCampaigns()}catch(e){}}
     if(name==='connections' && typeof loadBusinessConnections==='function'){try{loadBusinessConnections()}catch(e){}}
     if(name==='overview'){try{if(typeof loadBusinessLive==='function')loadBusinessLive();if(typeof loadAIInsights==='function')loadAIInsights('7d');if(typeof startLiveRefresh==='function')startLiveRefresh()}catch(e){console.error('Business overview live/AI load error',e)}} else if(name==='stats'){try{if(typeof loadBusinessAnalytics==='function')loadBusinessAnalytics('7d');if(typeof loadReviewBooster==='function')loadReviewBooster();if(typeof stopLiveRefresh==='function')stopLiveRefresh()}catch(e){console.error('Business stats load error',e)}} else if(typeof stopLiveRefresh==='function')stopLiveRefresh();
   };
+  /* ==================================================
+     SİPARİŞ VE MENÜ
+
+     Modül izne bağlı (dashboard_orders). İzin yoksa ekranlar
+     kilitli görünür; boş liste yerine neden kapalı olduğu yazılır.
+  ================================================== */
+  let ordersEnabled=false;
+  let orderFilter='';
+
+  const ORDER_LABEL={new:'Yeni',preparing:'Hazırlanıyor',ready:'Hazır',
+                     delivered:'Teslim edildi',cancelled:'İptal'};
+  /* Sunucudaki ORDER_TRANSITIONS ile ayni olmali */
+  const ORDER_NEXT={new:['preparing','cancelled'],preparing:['ready','cancelled'],
+                    ready:['delivered','cancelled'],delivered:[],cancelled:[]};
+
+  const money=n=>'₺'+Number(n||0).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
+  function timeAgo(iso){
+    const d=new Date(iso); if(isNaN(d)) return '';
+    const s=Math.floor((Date.now()-d.getTime())/1000);
+    if(s<60) return 'az önce';
+    if(s<3600) return Math.floor(s/60)+' dk önce';
+    if(s<86400) return Math.floor(s/3600)+' sa önce';
+    return d.toLocaleDateString('tr-TR');
+  }
+
+  function setModuleLock(enabled){
+    ordersEnabled=enabled===true;
+    [['ordersPanel','ordersLocked'],['menuPanel','menuLocked']].forEach(([panel,lock])=>{
+      const p=document.getElementById(panel), l=document.getElementById(lock);
+      if(p) p.classList.toggle('hidden',!ordersEnabled);
+      if(l) l.classList.toggle('hidden',ordersEnabled);
+    });
+    ['bcOrderSummary','bcRecentOrders'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.classList.toggle('hidden',!ordersEnabled);
+    });
+  }
+
+  async function initOrdersModule(){
+    try{
+      const me=await api('/api/me');
+      setModuleLock(me?.permissions?.orders===true);
+      if(ordersEnabled){ loadOrderSummary(); loadRecentOrders(); }
+    }catch(e){ setModuleLock(false); }
+  }
+
+  async function loadOrderSummary(){
+    if(!ordersEnabled) return;
+    try{
+      const s=await api('/api/orders-summary');
+      if(s?.error) return;
+      const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+      set('sumTodayCount',s.today_count??0);
+      set('sumTodayRevenue',money(s.today_revenue));
+      set('sumOpenCount',s.open_count??0);
+      set('sumActiveTags',s.active_tags??0);
+      const badge=document.getElementById('bcOrdersBadge');
+      if(badge){
+        badge.textContent=s.open_count??0;
+        badge.classList.toggle('hidden',!(s.open_count>0));
+      }
+    }catch(e){}
+  }
+
+  function orderLines(o){
+    if(!o.items||!o.items.length) return '';
+    return o.items.map(i=>`${i.quantity}× ${esc(i.name)}`).join(' · ');
+  }
+
+  function orderCard(o,compact){
+    const where=o.nfc_name?esc(o.nfc_name)+(o.nfc_placement?' · '+esc(o.nfc_placement):'')
+                          :(o.table_label?esc(o.table_label):'Konum belirtilmemiş');
+    const next=(ORDER_NEXT[o.status]||[]).map(s=>
+      `<button class="${s==='cancelled'?'stop':'go'}" onclick="updateOrderStatus(${o.id},'${s}')">${ORDER_LABEL[s]}</button>`
+    ).join('');
+    return `<article class="order-card${compact?' compact':''}">
+      <div class="order-main">
+        <div class="order-top">
+          <span class="ostat ostat-${o.status}">${ORDER_LABEL[o.status]||o.status}</span>
+          <span class="order-where">${where}</span>
+          <span class="order-no">#${o.id}</span>
+        </div>
+        <div class="order-lines">${orderLines(o)||'—'}</div>
+        ${o.customer_note?`<div class="order-note">Not: ${esc(o.customer_note)}</div>`:''}
+      </div>
+      <div>
+        <div class="order-total">${money(o.total)}</div>
+        <div class="order-when">${timeAgo(o.created_at)}</div>
+      </div>
+      ${compact?'':`<div class="order-actions">${next}</div>`}
+    </article>`;
+  }
+
+  window.setOrderFilter=function(status){
+    orderFilter=status||'';
+    document.querySelectorAll('.order-filter').forEach(b=>
+      b.classList.toggle('active',(b.dataset.status||'')===orderFilter));
+    loadOrders();
+  };
+
+  window.loadOrders=async function(){
+    if(!ordersEnabled) return;
+    const list=document.getElementById('ordersList');
+    if(list) list.innerHTML='<div class="order-empty">Yükleniyor…</div>';
+    try{
+      const rows=await api('/api/orders'+(orderFilter?'?status='+orderFilter:''));
+      if(!Array.isArray(rows)) throw new Error(rows?.error||'Siparişler alınamadı');
+      if(list) list.innerHTML = rows.length
+        ? rows.map(o=>orderCard(o,false)).join('')
+        : '<div class="order-empty">Bu filtrede sipariş yok.</div>';
+      loadOrderSummary();
+    }catch(e){
+      if(list) list.innerHTML=`<div class="order-empty">${esc(e.message||'Siparişler alınamadı')}</div>`;
+    }
+  };
+
+  async function loadRecentOrders(){
+    if(!ordersEnabled) return;
+    const box=document.getElementById('bcRecentList');
+    try{
+      const rows=await api('/api/orders?limit=3');
+      if(!Array.isArray(rows)) return;
+      if(box) box.innerHTML = rows.length
+        ? rows.slice(0,3).map(o=>orderCard(o,true)).join('')
+        : '<div class="order-empty">Henüz sipariş yok.</div>';
+    }catch(e){}
+  }
+
+  window.updateOrderStatus=async function(id,status){
+    try{
+      const r=await api('/api/orders/'+id+'/status',{method:'PUT',body:JSON.stringify({status})});
+      if(r?.error) throw new Error(r.error);
+      showToast('Sipariş durumu güncellendi.');
+      loadOrders(); loadRecentOrders();
+    }catch(e){ showToast(e.message||'Durum güncellenemedi.'); }
+  };
+
+  /* ---------- MENÜ ---------- */
+  let menuCats=[], menuItems=[];
+
+  window.loadMenu=async function(){
+    if(!ordersEnabled) return;
+    try{
+      const [c,i]=await Promise.all([api('/api/menu-categories'),api('/api/menu-items')]);
+      menuCats=Array.isArray(c)?c:[];
+      menuItems=Array.isArray(i)?i:[];
+      renderMenu();
+    }catch(e){
+      const el=document.getElementById('menuCategoryList');
+      if(el) el.innerHTML=`<div class="order-empty">${esc(e.message||'Menü alınamadı')}</div>`;
+    }
+  };
+
+  function renderMenu(){
+    const catBox=document.getElementById('menuCategoryList');
+    const itemBox=document.getElementById('menuItemList');
+    if(catBox) catBox.innerHTML = menuCats.length ? menuCats.map(c=>`
+      <div class="menu-row${c.enabled?'':' menu-off'}">
+        <div class="menu-row-main"><strong>${esc(c.name)}</strong>
+          <span>${c.enabled?'Yayında':'Gizli'} · sıra ${c.sort_order}</span></div>
+        <button onclick="renameMenuCategory(${c.id})">Yeniden adlandır</button>
+        <button onclick="toggleMenuCategory(${c.id})">${c.enabled?'Gizle':'Yayınla'}</button>
+        <button onclick="deleteMenuCategory(${c.id})">Sil</button>
+      </div>`).join('') : '<div class="order-empty">Henüz kategori yok.</div>';
+
+    const catName=id=>menuCats.find(c=>c.id===id)?.name||'Kategorisiz';
+    if(itemBox) itemBox.innerHTML = menuItems.length ? menuItems.map(i=>`
+      <div class="menu-row${i.is_available?'':' menu-off'}">
+        <div class="menu-row-main"><strong>${esc(i.name)}</strong>
+          <span>${esc(catName(i.category_id))}${i.is_available?'':' · satışta değil'}</span></div>
+        <span class="menu-price">${money(i.price)}</span>
+        <button onclick="editMenuItem(${i.id})">Düzenle</button>
+        <button onclick="toggleMenuItem(${i.id})">${i.is_available?'Kapat':'Aç'}</button>
+        <button onclick="deleteMenuItem(${i.id})">Sil</button>
+      </div>`).join('') : '<div class="order-empty">Henüz ürün yok.</div>';
+  }
+
+  /*
+    api() hata FIRLATMIYOR; hata durumunda {error} iceren nesne ya da
+    ag hatasinda null donuyor. Kontrol tek yerde yapiliyor ki her CRUD
+    cagrisi sessizce basarili gorunmesin.
+  */
+  async function menuApi(url,method,body){
+    const r=await api(url,{method,body:body?JSON.stringify(body):undefined});
+    if(r===null) throw new Error('Sunucuya ulaşılamadı');
+    if(r&&r.error) throw new Error(r.error);
+    return r;
+  }
+
+  window.createMenuCategory=async function(){
+    const name=prompt('Kategori adı:'); if(!name) return;
+    try{ await menuApi('/api/menu-categories','POST',{name,sort_order:menuCats.length}); loadMenu(); showToast('Kategori eklendi.'); }
+    catch(e){ showToast(e.message||'Eklenemedi.'); }
+  };
+  window.renameMenuCategory=async function(id){
+    const c=menuCats.find(x=>x.id===id); if(!c) return;
+    const name=prompt('Yeni ad:',c.name); if(!name) return;
+    try{ await menuApi('/api/menu-categories/'+id,'PUT',{...c,name}); loadMenu(); }
+    catch(e){ showToast(e.message||'Güncellenemedi.'); }
+  };
+  window.toggleMenuCategory=async function(id){
+    const c=menuCats.find(x=>x.id===id); if(!c) return;
+    try{ await menuApi('/api/menu-categories/'+id,'PUT',{...c,enabled:!c.enabled}); loadMenu(); }
+    catch(e){ showToast(e.message||'Güncellenemedi.'); }
+  };
+  window.deleteMenuCategory=async function(id){
+    if(!confirm('Kategori silinsin mi? Ürünler silinmez, kategorisiz kalır.')) return;
+    try{ await menuApi('/api/menu-categories/'+id,'DELETE'); loadMenu(); showToast('Kategori silindi.'); }
+    catch(e){ showToast(e.message||'Silinemedi.'); }
+  };
+
+  window.createMenuItem=async function(){
+    const name=prompt('Ürün adı:'); if(!name) return;
+    const price=prompt('Fiyat (₺):','0'); if(price===null) return;
+    let category_id=null;
+    if(menuCats.length){
+      const list=menuCats.map((c,n)=>`${n+1}) ${c.name}`).join('\n');
+      const pick=prompt('Kategori seç:\n'+list+'\n\n(boş bırakırsan kategorisiz)');
+      const idx=Number(pick)-1;
+      if(menuCats[idx]) category_id=menuCats[idx].id;
+    }
+    try{ await menuApi('/api/menu-items','POST',{name,price:Number(String(price).replace(',','.'))||0,category_id,sort_order:menuItems.length});
+      loadMenu(); showToast('Ürün eklendi.'); }
+    catch(e){ showToast(e.message||'Eklenemedi.'); }
+  };
+  window.editMenuItem=async function(id){
+    const i=menuItems.find(x=>x.id===id); if(!i) return;
+    const name=prompt('Ürün adı:',i.name); if(!name) return;
+    const price=prompt('Fiyat (₺):',String(i.price)); if(price===null) return;
+    try{ await menuApi('/api/menu-items/'+id,'PUT',{...i,name,price:Number(String(price).replace(',','.'))||0}); loadMenu(); }
+    catch(e){ showToast(e.message||'Güncellenemedi.'); }
+  };
+  window.toggleMenuItem=async function(id){
+    const i=menuItems.find(x=>x.id===id); if(!i) return;
+    try{ await menuApi('/api/menu-items/'+id,'PUT',{...i,is_available:!i.is_available}); loadMenu(); }
+    catch(e){ showToast(e.message||'Güncellenemedi.'); }
+  };
+  window.deleteMenuItem=async function(id){
+    if(!confirm('Ürün silinsin mi?')) return;
+    try{ await menuApi('/api/menu-items/'+id,'DELETE'); loadMenu(); showToast('Ürün silindi.'); }
+    catch(e){ showToast(e.message||'Silinemedi.'); }
+  };
+
   function syncKpis(){
     const pairs=[['profileViews','bcKpiProfile'],['qrViews','bcKpiQR'],['nfcViews','bcKpiNFC'],['whatsappViews','bcKpiWA'],['phoneViews','bcKpiPhone'],['totalViews','bcKpiTotal']];
     pairs.forEach(([a,b])=>{const x=document.getElementById(a),y=document.getElementById(b);if(x&&y)y.textContent=x.textContent||'0';});
@@ -6418,6 +6852,7 @@ async function loadExtraModules(){if(!currentBusiness)return;if(currentBusiness.
     };
     if(profileLink){const obs=new MutationObserver(syncProfileLinks);obs.observe(profileLink,{attributes:true,attributeFilter:['href']});}
     setInterval(()=>{syncKpis();syncLive();syncProfileLinks();},700);
+    initOrdersModule();
     showBusinessSection('overview');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();

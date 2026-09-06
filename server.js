@@ -98,6 +98,21 @@ const eventLimiter = rateLimit({
   message: { error: 'Çok fazla istek. Lütfen biraz bekleyin.' }
 });
 
+/*
+  Siparis olusturma.
+
+  Kimlik dogrulamasi yok (musteri giris yapmiyor), bu yuzden sahte
+  siparis yagmurunu engellemek icin siniri dar tutuldu. Ayni masadaki
+  birkac kisinin arka arkaya siparis vermesine yetecek kadar genis.
+*/
+const orderLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Çok fazla sipariş denemesi. Lütfen biraz bekleyin.' }
+});
+
 app.use('/api/login', loginLimiter);
 app.use('/api/admin/login', loginLimiter);
 app.use('/api/card-login', loginLimiter);
@@ -205,7 +220,9 @@ const EVENT_TYPES = [
   /* yorum yonlendirme */
   'review_open', 'review_positive', 'review_feedback',
   /* icerik bloklari */
-  'campaign_view', 'campaign_click', 'featured_click'
+  'campaign_view', 'campaign_click', 'featured_click',
+  /* siparis akisi */
+  'order_start', 'order_submit'
 ];
 
 const EVENT_TYPES_SQL = `(${EVENT_TYPES.map(t => `'${t}'`).join(',')})`;
@@ -485,6 +502,7 @@ function businessPermissions(row) {
     ai: row?.dashboard_ai === true,
     review: row?.dashboard_review === true,
     campaign: row?.dashboard_campaign === true,
+    orders: row?.dashboard_orders === true,
     profile_theme: row?.profile_theme_permission !== false,
     profile_fields: businessProfileFieldPermissions(row)
   };
@@ -495,7 +513,7 @@ function requireBusinessPermission(permission) {
     try {
       if (req.user?.role === 'admin') return next();
       const result = await pool.query(
-        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign
+        `SELECT dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, dashboard_orders
          FROM businesses WHERE id=$1 LIMIT 1`,
         [req.user.id]
       );
@@ -876,6 +894,94 @@ async function initDatabase() {
   } catch (error) {
     console.error('Vurgu rengi varsayılanı taşınamadı, sunucu yine de başlatılıyor:', error.message);
   }
+
+  /* =========================================================
+     MENÜ VE SİPARİŞ
+
+     Sipariş modülü TÜM işletmelere açık değildir; isteyen işletmeye
+     admin tarafından açılır. Mevcut izin desenine uyar:
+     dashboard_orders varsayılan olarak FALSE.
+  ========================================================= */
+
+  await pool.query(`
+    ALTER TABLE businesses
+      ADD COLUMN IF NOT EXISTS dashboard_orders BOOLEAN NOT NULL DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS lat DOUBLE PRECISION,
+      ADD COLUMN IF NOT EXISTS lng DOUBLE PRECISION,
+      ADD COLUMN IF NOT EXISTS order_radius_meters INTEGER NOT NULL DEFAULT 150,
+      ADD COLUMN IF NOT EXISTS currency TEXT NOT NULL DEFAULT 'TRY'
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS menu_categories (
+      id SERIAL PRIMARY KEY,
+      business_id INTEGER NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      enabled BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_menu_categories_business ON menu_categories(business_id,sort_order)`);
+
+  /*
+    category_id ON DELETE SET NULL: kategori silinince urunler silinmez,
+    kategorisiz kalir. Isletme onlari yeniden siniflandirabilir.
+  */
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS menu_items (
+      id SERIAL PRIMARY KEY,
+      business_id INTEGER NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+      category_id INTEGER REFERENCES menu_categories(id) ON DELETE SET NULL,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      price NUMERIC(10,2) NOT NULL DEFAULT 0,
+      image_url TEXT NOT NULL DEFAULT '',
+      is_available BOOLEAN NOT NULL DEFAULT TRUE,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_menu_items_business ON menu_items(business_id,sort_order)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_menu_items_category ON menu_items(category_id)`);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id SERIAL PRIMARY KEY,
+      business_id INTEGER NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+      nfc_tag_id INTEGER REFERENCES nfc_tags(id) ON DELETE SET NULL,
+      status TEXT NOT NULL DEFAULT 'new',
+      table_label TEXT NOT NULL DEFAULT '',
+      customer_note TEXT NOT NULL DEFAULT '',
+      total NUMERIC(10,2) NOT NULL DEFAULT 0,
+      customer_lat DOUBLE PRECISION,
+      customer_lng DOUBLE PRECISION,
+      distance_meters INTEGER,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_orders_business_created ON orders(business_id,created_at DESC)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_orders_business_status ON orders(business_id,status)`);
+
+  /*
+    name_snapshot ve unit_price BILEREK kopyalanir. Urun adi degisse ya
+    da zam yapilsa bile gecmis siparis oldugu gibi kalmali.
+  */
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS order_items (
+      id SERIAL PRIMARY KEY,
+      order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+      menu_item_id INTEGER REFERENCES menu_items(id) ON DELETE SET NULL,
+      name_snapshot TEXT NOT NULL,
+      unit_price NUMERIC(10,2) NOT NULL DEFAULT 0,
+      quantity INTEGER NOT NULL DEFAULT 1,
+      note TEXT NOT NULL DEFAULT ''
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id)`);
 
   console.log('PostgreSQL + NFC Tag Management hazır.');
 }
@@ -1450,7 +1556,7 @@ app.get(
 app.get('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_theme_permission, profile_field_permissions
+      SELECT id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, dashboard_orders, profile_theme_permission, profile_field_permissions
       FROM businesses WHERE id=$1 LIMIT 1
     `, [Number(req.params.id)]);
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
@@ -1473,6 +1579,8 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
     const ai = body.ai === true;
     const review = body.review === true;
     const campaign = body.campaign === true;
+    /* Siparis modulu isteyen isletmeye acilir; varsayilani kapali. */
+    const orders = body.orders === true;
 
     const current = await pool.query(
       `SELECT profile_field_permissions FROM businesses WHERE id=$1 LIMIT 1`,
@@ -1495,10 +1603,10 @@ app.put('/api/admin/business/:id/permissions', adminAuth, async (req, res) => {
 
     const result = await pool.query(`
       UPDATE businesses
-      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7, dashboard_campaign=$8, profile_theme_permission=$9, profile_field_permissions=$10::jsonb
-      WHERE id=$11
-      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, profile_theme_permission, profile_field_permissions
-    `, [profile, qr, nfc, analytics, live, ai, review, campaign, profile_theme, JSON.stringify(profile_fields), id]);
+      SET dashboard_profile=$1, dashboard_qr=$2, dashboard_nfc=$3, dashboard_analytics=$4, dashboard_live=$5, dashboard_ai=$6, dashboard_review=$7, dashboard_campaign=$8, dashboard_orders=$9, profile_theme_permission=$10, profile_field_permissions=$11::jsonb
+      WHERE id=$12
+      RETURNING id, name, dashboard_profile, dashboard_qr, dashboard_nfc, dashboard_analytics, dashboard_live, dashboard_ai, dashboard_review, dashboard_campaign, dashboard_orders, profile_theme_permission, profile_field_permissions
+    `, [profile, qr, nfc, analytics, live, ai, review, campaign, orders, profile_theme, JSON.stringify(profile_fields), id]);
 
     if (!result.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
     res.json({ success: true, permissions: businessPermissions(result.rows[0]) });
@@ -3373,6 +3481,534 @@ app.get('/api/stats', auth, async (req, res) => {
 
   }
 
+});
+
+
+/* =========================================================
+   MENÜ VE SİPARİŞ
+========================================================= */
+
+const ORDER_STATUSES = ['new', 'preparing', 'ready', 'delivered', 'cancelled'];
+
+/* Bir siparisin gecebilecegi durumlar. Teslim edilen ya da iptal edilen
+   siparis son durumdadir, geri alinamaz. */
+const ORDER_TRANSITIONS = {
+  new:        ['preparing', 'cancelled'],
+  preparing:  ['ready', 'cancelled'],
+  ready:      ['delivered', 'cancelled'],
+  delivered:  [],
+  cancelled:  []
+};
+
+function money(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.round(n * 100) / 100;
+}
+
+function textField(value, max) {
+  return String(value == null ? '' : value).trim().slice(0, max);
+}
+
+/*
+  Iki koordinat arasindaki mesafe (metre) — haversine.
+  Konum dogrulamasi SUNUCUDA yapilir; tarayicidan gelen konum
+  kolayca sahtelenebilir, istemci tarafi kontrol tek basina yetmez.
+*/
+function distanceMeters(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return Math.round(2 * R * Math.asin(Math.sqrt(a)));
+}
+
+function menuCategoryPublic(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    sort_order: Number(row.sort_order || 0),
+    enabled: row.enabled === true
+  };
+}
+
+function menuItemPublic(row) {
+  return {
+    id: row.id,
+    category_id: row.category_id,
+    name: row.name,
+    description: row.description || '',
+    price: Number(row.price || 0),
+    image_url: row.image_url || '',
+    is_available: row.is_available === true,
+    sort_order: Number(row.sort_order || 0)
+  };
+}
+
+function orderPublic(row, items) {
+  return {
+    id: row.id,
+    status: row.status,
+    table_label: row.table_label || '',
+    customer_note: row.customer_note || '',
+    total: Number(row.total || 0),
+    nfc_tag_id: row.nfc_tag_id,
+    nfc_name: row.nfc_name || null,
+    nfc_placement: row.nfc_placement || null,
+    distance_meters: row.distance_meters == null ? null : Number(row.distance_meters),
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    items: (items || []).map(i => ({
+      id: i.id,
+      menu_item_id: i.menu_item_id,
+      name: i.name_snapshot,
+      unit_price: Number(i.unit_price || 0),
+      quantity: Number(i.quantity || 0),
+      note: i.note || ''
+    }))
+  };
+}
+
+
+/* ---------- MENÜ KATEGORİLERİ (işletme) ---------- */
+
+app.get('/api/menu-categories', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const r = await pool.query(
+      `SELECT * FROM menu_categories WHERE business_id=$1 ORDER BY sort_order, id`,
+      [req.user.id]
+    );
+    res.json(r.rows.map(menuCategoryPublic));
+  } catch (e) {
+    console.error('MENU CATEGORY LIST ERROR:', e);
+    res.status(500).json({ error: 'Kategoriler alınamadı' });
+  }
+});
+
+app.post('/api/menu-categories', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const name = textField(req.body?.name, 80);
+    if (!name) return res.status(400).json({ error: 'Kategori adı gerekli' });
+    const sort = Number.isFinite(Number(req.body?.sort_order)) ? Number(req.body.sort_order) : 0;
+    const r = await pool.query(
+      `INSERT INTO menu_categories(business_id,name,sort_order,enabled)
+       VALUES($1,$2,$3,$4) RETURNING *`,
+      [req.user.id, name, sort, req.body?.enabled !== false]
+    );
+    res.json(menuCategoryPublic(r.rows[0]));
+  } catch (e) {
+    console.error('MENU CATEGORY CREATE ERROR:', e);
+    res.status(500).json({ error: 'Kategori oluşturulamadı' });
+  }
+});
+
+app.put('/api/menu-categories/:id', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Geçersiz kategori' });
+    const name = textField(req.body?.name, 80);
+    if (!name) return res.status(400).json({ error: 'Kategori adı gerekli' });
+    const r = await pool.query(
+      `UPDATE menu_categories
+          SET name=$1, sort_order=$2, enabled=$3, updated_at=CURRENT_TIMESTAMP
+        WHERE id=$4 AND business_id=$5
+        RETURNING *`,
+      [name,
+       Number.isFinite(Number(req.body?.sort_order)) ? Number(req.body.sort_order) : 0,
+       req.body?.enabled !== false, id, req.user.id]
+    );
+    if (!r.rows.length) return res.status(404).json({ error: 'Kategori bulunamadı' });
+    res.json(menuCategoryPublic(r.rows[0]));
+  } catch (e) {
+    console.error('MENU CATEGORY UPDATE ERROR:', e);
+    res.status(500).json({ error: 'Kategori güncellenemedi' });
+  }
+});
+
+app.delete('/api/menu-categories/:id', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Geçersiz kategori' });
+    const r = await pool.query(
+      `DELETE FROM menu_categories WHERE id=$1 AND business_id=$2 RETURNING id`,
+      [id, req.user.id]
+    );
+    if (!r.rows.length) return res.status(404).json({ error: 'Kategori bulunamadı' });
+    res.json({ success: true, id: r.rows[0].id });
+  } catch (e) {
+    console.error('MENU CATEGORY DELETE ERROR:', e);
+    res.status(500).json({ error: 'Kategori silinemedi' });
+  }
+});
+
+
+/* ---------- MENÜ ÜRÜNLERİ (işletme) ---------- */
+
+app.get('/api/menu-items', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const r = await pool.query(
+      `SELECT * FROM menu_items WHERE business_id=$1 ORDER BY sort_order, id`,
+      [req.user.id]
+    );
+    res.json(r.rows.map(menuItemPublic));
+  } catch (e) {
+    console.error('MENU ITEM LIST ERROR:', e);
+    res.status(500).json({ error: 'Ürünler alınamadı' });
+  }
+});
+
+app.post('/api/menu-items', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const name = textField(req.body?.name, 120);
+    if (!name) return res.status(400).json({ error: 'Ürün adı gerekli' });
+
+    /* Kategori baska bir isletmeye ait olamaz */
+    let categoryId = Number(req.body?.category_id);
+    if (!Number.isInteger(categoryId) || categoryId <= 0) categoryId = null;
+    if (categoryId) {
+      const c = await pool.query(
+        `SELECT id FROM menu_categories WHERE id=$1 AND business_id=$2 LIMIT 1`,
+        [categoryId, req.user.id]
+      );
+      if (!c.rows.length) return res.status(400).json({ error: 'Kategori bulunamadı' });
+    }
+
+    const r = await pool.query(
+      `INSERT INTO menu_items(business_id,category_id,name,description,price,image_url,is_available,sort_order)
+       VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
+      [req.user.id, categoryId, name,
+       textField(req.body?.description, 400),
+       money(req.body?.price),
+       textField(req.body?.image_url, 2000),
+       req.body?.is_available !== false,
+       Number.isFinite(Number(req.body?.sort_order)) ? Number(req.body.sort_order) : 0]
+    );
+    res.json(menuItemPublic(r.rows[0]));
+  } catch (e) {
+    console.error('MENU ITEM CREATE ERROR:', e);
+    res.status(500).json({ error: 'Ürün oluşturulamadı' });
+  }
+});
+
+app.put('/api/menu-items/:id', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Geçersiz ürün' });
+    const name = textField(req.body?.name, 120);
+    if (!name) return res.status(400).json({ error: 'Ürün adı gerekli' });
+
+    let categoryId = Number(req.body?.category_id);
+    if (!Number.isInteger(categoryId) || categoryId <= 0) categoryId = null;
+    if (categoryId) {
+      const c = await pool.query(
+        `SELECT id FROM menu_categories WHERE id=$1 AND business_id=$2 LIMIT 1`,
+        [categoryId, req.user.id]
+      );
+      if (!c.rows.length) return res.status(400).json({ error: 'Kategori bulunamadı' });
+    }
+
+    const r = await pool.query(
+      `UPDATE menu_items
+          SET category_id=$1,name=$2,description=$3,price=$4,image_url=$5,
+              is_available=$6,sort_order=$7,updated_at=CURRENT_TIMESTAMP
+        WHERE id=$8 AND business_id=$9
+        RETURNING *`,
+      [categoryId, name,
+       textField(req.body?.description, 400),
+       money(req.body?.price),
+       textField(req.body?.image_url, 2000),
+       req.body?.is_available !== false,
+       Number.isFinite(Number(req.body?.sort_order)) ? Number(req.body.sort_order) : 0,
+       id, req.user.id]
+    );
+    if (!r.rows.length) return res.status(404).json({ error: 'Ürün bulunamadı' });
+    res.json(menuItemPublic(r.rows[0]));
+  } catch (e) {
+    console.error('MENU ITEM UPDATE ERROR:', e);
+    res.status(500).json({ error: 'Ürün güncellenemedi' });
+  }
+});
+
+app.delete('/api/menu-items/:id', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Geçersiz ürün' });
+    const r = await pool.query(
+      `DELETE FROM menu_items WHERE id=$1 AND business_id=$2 RETURNING id`,
+      [id, req.user.id]
+    );
+    if (!r.rows.length) return res.status(404).json({ error: 'Ürün bulunamadı' });
+    res.json({ success: true, id: r.rows[0].id });
+  } catch (e) {
+    console.error('MENU ITEM DELETE ERROR:', e);
+    res.status(500).json({ error: 'Ürün silinemedi' });
+  }
+});
+
+
+/* ---------- PUBLIC MENÜ (müşteri) ---------- */
+
+app.get('/api/public-menu/:slug', async (req, res) => {
+  try {
+    const slug = textField(req.params.slug, 90);
+    const b = await pool.query(
+      `SELECT id,name,dashboard_orders,lat,lng,order_radius_meters,currency
+         FROM businesses WHERE slug=$1 LIMIT 1`,
+      [slug]
+    );
+    if (!b.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
+
+    const biz = b.rows[0];
+    if (biz.dashboard_orders !== true) {
+      return res.status(403).json({ error: 'Bu işletmede sipariş özelliği kapalı', orders_enabled: false });
+    }
+
+    const cats = await pool.query(
+      `SELECT * FROM menu_categories WHERE business_id=$1 AND enabled=TRUE ORDER BY sort_order, id`,
+      [biz.id]
+    );
+    const items = await pool.query(
+      `SELECT * FROM menu_items WHERE business_id=$1 AND is_available=TRUE ORDER BY sort_order, id`,
+      [biz.id]
+    );
+
+    res.json({
+      orders_enabled: true,
+      business: { id: biz.id, name: biz.name, currency: biz.currency || 'TRY' },
+      /* Konum dogrulamasi ancak isletme koordinat girdiyse devrede olur */
+      location_required: biz.lat != null && biz.lng != null,
+      radius_meters: Number(biz.order_radius_meters || 150),
+      categories: cats.rows.map(menuCategoryPublic),
+      items: items.rows.map(menuItemPublic)
+    });
+  } catch (e) {
+    console.error('PUBLIC MENU ERROR:', e);
+    res.status(500).json({ error: 'Menü alınamadı' });
+  }
+});
+
+
+/* ---------- SİPARİŞ OLUŞTUR (müşteri) ---------- */
+
+app.post('/api/orders/:slug', orderLimiter, async (req, res) => {
+  try {
+    const slug = textField(req.params.slug, 90);
+    const b = await pool.query(
+      `SELECT id,dashboard_orders,lat,lng,order_radius_meters FROM businesses WHERE slug=$1 LIMIT 1`,
+      [slug]
+    );
+    if (!b.rows.length) return res.status(404).json({ error: 'İşletme bulunamadı' });
+
+    const biz = b.rows[0];
+    if (biz.dashboard_orders !== true) {
+      return res.status(403).json({ error: 'Bu işletmede sipariş özelliği kapalı' });
+    }
+
+    const lines = Array.isArray(req.body?.items) ? req.body.items.slice(0, 50) : [];
+    if (!lines.length) return res.status(400).json({ error: 'Sipariş boş olamaz' });
+
+    /*
+      KONUM DOGRULAMASI
+
+      Isletme koordinat girmediyse kontrol yapilmaz — aksi halde
+      koordinat girmemis her isletmede siparis tamamen calismaz olurdu.
+      Girdiyse mesafe SUNUCUDA hesaplanir.
+    */
+    let distance = null;
+    const cLat = Number(req.body?.lat);
+    const cLng = Number(req.body?.lng);
+    if (biz.lat != null && biz.lng != null) {
+      if (!Number.isFinite(cLat) || !Number.isFinite(cLng)) {
+        return res.status(400).json({
+          error: 'Sipariş verebilmek için konum izni gerekli',
+          location_required: true
+        });
+      }
+      distance = distanceMeters(Number(biz.lat), Number(biz.lng), cLat, cLng);
+      const radius = Number(biz.order_radius_meters || 150);
+      if (distance > radius) {
+        return res.status(403).json({
+          error: 'Sipariş verebilmek için işletmenin yakınında olmalısınız',
+          distance_meters: distance,
+          radius_meters: radius
+        });
+      }
+    }
+
+    /*
+      FIYAT SUNUCUDAN OKUNUR.
+
+      Istemciden gelen fiyat ve toplam BILEREK yok sayilir; aksi halde
+      musteri fiyati kendisi belirleyebilirdi.
+    */
+    const ids = [...new Set(lines.map(l => Number(l.menu_item_id)).filter(Number.isInteger))];
+    if (!ids.length) return res.status(400).json({ error: 'Geçerli ürün yok' });
+
+    const menu = await pool.query(
+      `SELECT id,name,price FROM menu_items
+        WHERE business_id=$1 AND is_available=TRUE AND id = ANY($2::int[])`,
+      [biz.id, ids]
+    );
+    const byId = new Map(menu.rows.map(m => [m.id, m]));
+
+    const resolved = [];
+    for (const line of lines) {
+      const item = byId.get(Number(line.menu_item_id));
+      if (!item) continue;
+      let qty = Number(line.quantity);
+      if (!Number.isInteger(qty) || qty < 1) qty = 1;
+      if (qty > 99) qty = 99;
+      resolved.push({
+        menu_item_id: item.id,
+        name_snapshot: item.name,
+        unit_price: money(item.price),
+        quantity: qty,
+        note: textField(line.note, 200)
+      });
+    }
+    if (!resolved.length) return res.status(400).json({ error: 'Seçilen ürünler artık mevcut değil' });
+
+    const total = money(resolved.reduce((s, l) => s + l.unit_price * l.quantity, 0));
+
+    /* NFC etiketi verildiyse bu isletmeye ait mi dogrula */
+    let nfcTagId = null;
+    const nfcCode = textField(req.body?.nfc_code, 60);
+    if (nfcCode) {
+      const t = await pool.query(
+        `SELECT id FROM nfc_tags WHERE code=$1 AND business_id=$2 LIMIT 1`,
+        [nfcCode, biz.id]
+      );
+      if (t.rows.length) nfcTagId = t.rows[0].id;
+    }
+
+    const created = await pool.query(
+      `INSERT INTO orders(business_id,nfc_tag_id,status,table_label,customer_note,total,customer_lat,customer_lng,distance_meters)
+       VALUES($1,$2,'new',$3,$4,$5,$6,$7,$8) RETURNING *`,
+      [biz.id, nfcTagId,
+       textField(req.body?.table_label, 60),
+       textField(req.body?.customer_note, 400),
+       total,
+       Number.isFinite(cLat) ? cLat : null,
+       Number.isFinite(cLng) ? cLng : null,
+       distance]
+    );
+    const order = created.rows[0];
+
+    for (const l of resolved) {
+      await pool.query(
+        `INSERT INTO order_items(order_id,menu_item_id,name_snapshot,unit_price,quantity,note)
+         VALUES($1,$2,$3,$4,$5,$6)`,
+        [order.id, l.menu_item_id, l.name_snapshot, l.unit_price, l.quantity, l.note]
+      );
+    }
+
+    await pool.query(
+      `INSERT INTO events(business_id,type,source,nfc_tag_id) VALUES($1,'order_submit',$2,$3)`,
+      [biz.id, nfcTagId ? 'nfc' : 'direct', nfcTagId]
+    );
+
+    res.json({ success: true, order: orderPublic(order, resolved.map((l, i) => ({ ...l, id: i + 1 }))) });
+  } catch (e) {
+    console.error('ORDER CREATE ERROR:', e);
+    res.status(500).json({ error: 'Sipariş oluşturulamadı' });
+  }
+});
+
+
+/* ---------- SİPARİŞLER (işletme) ---------- */
+
+app.get('/api/orders', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const limit = Math.min(Math.max(Number(req.query.limit) || 30, 1), 100);
+    const status = ORDER_STATUSES.includes(String(req.query.status)) ? String(req.query.status) : null;
+
+    const r = await pool.query(
+      `SELECT o.*, t.name AS nfc_name, t.placement AS nfc_placement
+         FROM orders o
+         LEFT JOIN nfc_tags t ON t.id=o.nfc_tag_id
+        WHERE o.business_id=$1 ${status ? 'AND o.status=$3' : ''}
+        ORDER BY o.created_at DESC
+        LIMIT $2`,
+      status ? [req.user.id, limit, status] : [req.user.id, limit]
+    );
+
+    const orderIds = r.rows.map(o => o.id);
+    let itemsByOrder = new Map();
+    if (orderIds.length) {
+      const it = await pool.query(
+        `SELECT * FROM order_items WHERE order_id = ANY($1::int[]) ORDER BY id`,
+        [orderIds]
+      );
+      for (const row of it.rows) {
+        if (!itemsByOrder.has(row.order_id)) itemsByOrder.set(row.order_id, []);
+        itemsByOrder.get(row.order_id).push(row);
+      }
+    }
+
+    res.json(r.rows.map(o => orderPublic(o, itemsByOrder.get(o.id) || [])));
+  } catch (e) {
+    console.error('ORDER LIST ERROR:', e);
+    res.status(500).json({ error: 'Siparişler alınamadı' });
+  }
+});
+
+app.put('/api/orders/:id/status', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Geçersiz sipariş' });
+
+    const next = String(req.body?.status || '');
+    if (!ORDER_STATUSES.includes(next)) return res.status(400).json({ error: 'Geçersiz durum' });
+
+    const cur = await pool.query(
+      `SELECT status FROM orders WHERE id=$1 AND business_id=$2 LIMIT 1`,
+      [id, req.user.id]
+    );
+    if (!cur.rows.length) return res.status(404).json({ error: 'Sipariş bulunamadı' });
+
+    const from = cur.rows[0].status;
+    if (from === next) return res.json({ success: true, status: next, unchanged: true });
+    if (!(ORDER_TRANSITIONS[from] || []).includes(next)) {
+      return res.status(409).json({
+        error: `"${from}" durumundaki sipariş "${next}" yapılamaz`,
+        from, allowed: ORDER_TRANSITIONS[from] || []
+      });
+    }
+
+    const r = await pool.query(
+      `UPDATE orders SET status=$1, updated_at=CURRENT_TIMESTAMP
+        WHERE id=$2 AND business_id=$3 RETURNING *`,
+      [next, id, req.user.id]
+    );
+    res.json({ success: true, order: orderPublic(r.rows[0], []) });
+  } catch (e) {
+    console.error('ORDER STATUS ERROR:', e);
+    res.status(500).json({ error: 'Sipariş durumu güncellenemedi' });
+  }
+});
+
+/* Genel Bakis ozet kartlari icin */
+app.get('/api/orders-summary', auth, requireBusinessPermission('orders'), async (req, res) => {
+  try {
+    const r = await pool.query(
+      `SELECT
+         COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE)::int AS today_count,
+         COALESCE(SUM(total) FILTER (WHERE created_at >= CURRENT_DATE AND status <> 'cancelled'),0)::float AS today_revenue,
+         COUNT(*) FILTER (WHERE status IN ('new','preparing','ready'))::int AS open_count
+       FROM orders WHERE business_id=$1`,
+      [req.user.id]
+    );
+    const tags = await pool.query(
+      `SELECT COUNT(*) FILTER (WHERE is_active=TRUE)::int AS active_tags FROM nfc_tags WHERE business_id=$1`,
+      [req.user.id]
+    );
+    res.json({ ...r.rows[0], active_tags: tags.rows[0]?.active_tags || 0 });
+  } catch (e) {
+    console.error('ORDER SUMMARY ERROR:', e);
+    res.status(500).json({ error: 'Sipariş özeti alınamadı' });
+  }
 });
 
 
