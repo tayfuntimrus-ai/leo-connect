@@ -22,6 +22,21 @@ body.light{
 }
 /* Vurgu secenekleri. Varsayilan artik marka amberi.
    "gold" secenegi imza rengidir; digerleri geriye donuk uyumluluk icin duruyor. */
+/* Kalici hata cubugu.
+   position:fixed cunku .content isletme sayfasi acilinca gizleniyor;
+   hata her durumda gorunur kalmali. */
+.error-bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  width:min(620px,calc(100% - 28px));z-index:9999;
+  border:1px solid var(--danger);background:#2a1512;
+  border-radius:14px;padding:16px 18px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.err-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.err-head strong{font-size:15px;color:var(--danger)}
+.err-x{border:1px solid var(--line);background:transparent;color:var(--muted);
+  width:30px;height:30px;border-radius:9px;cursor:pointer;flex:0 0 auto;font-size:13px}
+.err-msg{font-size:13.5px;color:var(--text);margin-top:8px;line-height:1.6;word-break:break-word}
+.err-hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6}
+.err-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
 /* Tanilama uyari kutusu */
 .boot-banner{border:1px solid var(--gold);background:rgba(239,159,39,.08);
   border-radius:14px;padding:16px 18px;margin-bottom:18px}
@@ -207,6 +222,8 @@ a{color:inherit;text-decoration:none}
       <!-- Acilista bir adim basarisiz olursa ya da hic isletme yoksa
            burada Turkce aciklama gorunur; Console'a bakmak gerekmez. -->
       <div id="bootBanner" class="boot-banner" style="display:none"></div>
+      <!-- Kalici hata alani: kullanici kapatana kadar durur -->
+      <div id="errorBar" class="error-bar" style="display:none"></div>
 
       <div class="cards">
         <div class="card stat clickable" role="button" tabindex="0" onclick="showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))" onkeydown="if(event.key==='Enter')showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))"><div class="stat-top"><div class="stat-icon">▦</div><span class="stat-arrow">›</span></div><div class="stat-label">İŞLETMELER</div><div id="sBusinesses" class="stat-value">—</div><div class="stat-note">toplam işletme</div></div>
@@ -383,6 +400,38 @@ function renderBootBanner(){
        <button class="btn" onclick="showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))">İşletmeler sayfasına git</button>
        <button class="btn" onclick="showDiagnostics()">Ayrıntılı tanılama</button>`;
 }
+/*
+  KALICI HATA GOSTERIMI
+
+  Hatalar showToast ile gosteriliyordu; bildirim 2,8 saniyede kayboluyor
+  ve kullanici okuyamadan gidiyor. "Butona basiyorum hicbir sey olmuyor"
+  sikayetinin sebebi buydu: aslinda hata VARDI ama gorunmuyordu.
+
+  Artik hata ekranda KALIR, kullanici kapatana kadar durur.
+*/
+function showError(baslik, hata, ipucu){
+  const mesaj = hata?.message || String(hata||'Bilinmeyen hata');
+  bootStep(baslik,'hata',mesaj);
+  console.error(baslik, hata);
+  const host=document.getElementById('errorBar');
+  if(!host){ showToast(baslik+': '+mesaj); return; }
+  host.style.display='block';
+  host.innerHTML=`
+    <div class="err-head">
+      <strong>${esc(baslik)}</strong>
+      <button class="err-x" onclick="document.getElementById('errorBar').style.display='none'" aria-label="Kapat">✕</button>
+    </div>
+    <div class="err-msg">${esc(mesaj)}</div>
+    ${ipucu?`<div class="err-hint">${esc(ipucu)}</div>`:''}
+    <div class="err-actions">
+      <button class="btn" onclick="showDiagnostics()">Ayrıntılı tanılama</button>
+      <button class="btn" onclick="copyDiagnostics()">Raporu Kopyala</button>
+    </div>`;
+  /* scrollIntoView her ortamda yok; hata gosterimi bunun yuzunden
+     patlamamali. */
+  try{ host.scrollIntoView?.({behavior:'smooth',block:'nearest'}); }catch(_){}
+}
+
 function showDiagnostics(){
   const rows=bootLog.map(s=>{
     const renk = s.durum==='hata' ? 'var(--danger)' : (s.durum==='bos' ? 'var(--gold)' : 'var(--accent)');
@@ -501,7 +550,9 @@ async function copyText(text){try{await navigator.clipboard.writeText(text);show
 
 async function openBusiness(id){
   try{
+    bootStep('İşletme açılıyor','tamam','id='+id);
     const d=await api("/api/admin/business/"+id);
+    if(!d || !d.business) throw new Error('Sunucu işletme bilgisi döndürmedi (yanıtta "business" alanı yok)');
     currentBusiness={...d.business,permissions:d.permissions||{profile:true,digital:true,qr:false,nfc:false,analytics:false,live:false,ai:false},nfc_tags:d.nfc_tags||[]};
     document.querySelector(".content").style.display="none";
     document.getElementById("businessPage").classList.add("show");
@@ -512,7 +563,12 @@ async function openBusiness(id){
        asagidaki kaydirma satirlari hic calismiyordu. */
     document.getElementById("topContextTitle").textContent=currentBusiness?.name||"İşletme";
     window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
-  }catch(e){showToast(e.message)}
+  }catch(e){
+    /* Onceden yalnizca showToast vardi: hata 2,8 saniyede kayboluyor,
+       kullanici "hicbir sey olmuyor" diye goruyordu. Artik KALICI. */
+    showError('İşletme detayı açılamadı', e,
+      'Bu adım /api/admin/business/'+id+' adresini çağırır. Yukarıdaki mesaj sunucudan gelen sebeptir.');
+  }
 }
 function closeBusinessPage(){
   currentBusiness=null;
