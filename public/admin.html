@@ -345,25 +345,49 @@ async function loadAll(){
     const [ov,biz]=await Promise.all([api("/api/admin/overview"),api("/api/admin/businesses")]);
     overview=ov||{};
     allBusinesses=biz.businesses||biz||[];
-    renderOverview();renderBusinesses();
-    document.getElementById("adminMail").textContent=localStorage.getItem("admin_email")||"Admin erişimi";
+    /* Her adim AYRI korunuyor: biri patlarsa digerleri yine calissin.
+       Onceden tek try icindeydiler ve renderOverview patlayinca
+       renderBusinesses hic calismiyordu. */
+    try{ renderOverview(); }catch(e){ console.error('renderOverview:',e); }
+    try{ renderBusinesses(); }catch(e){ console.error('renderBusinesses:',e); showToast('İşletme listesi çizilemedi: '+e.message); }
+    setText("adminMail", localStorage.getItem("admin_email")||"Admin erişimi");
   }catch(e){showToast(e.message)}
 }
 function n(v){return Number(v||0).toLocaleString("tr-TR")}
+
+/*
+  Eleman yoksa PATLAMADAN atla.
+
+  renderOverview() sumViews / sumQR / sumNFC / sumPhone / sumWA
+  elemanlarina yaziyordu; bu besi markup'ta HIC YOKTU. Ilk atamada
+  "Cannot set properties of null" firliyordu.
+
+  Sonucu buyuktu: loadAll() icinde
+
+      renderOverview(); renderBusinesses();
+
+  yaziyor. renderOverview patlayinca renderBusinesses HIC CALISMIYOR,
+  yani ISLETME LISTESI HIC DOLMUYORDU. Admin hicbir isletmeyi acamiyor,
+  dolayisiyla Erisim Izinleri ekranina da ulasamiyordu.
+
+  Eksik eleman artik konsola uyari yazar ama akisi durdurmaz.
+*/
+function setText(id,value){
+  const el=document.getElementById(id);
+  if(!el){ console.warn('Eleman bulunamadı, atlandı:', id); return false; }
+  el.textContent=value;
+  return true;
+}
+
 function renderOverview(){
   const businesses=overview.businesses??overview.total_businesses??allBusinesses.length;
   const views=overview.profile_views??overview.total_profile_views??0;
   const qr=overview.qr_scans??overview.total_qr_scans??0;
   const nfc=overview.nfc_scans??overview.total_nfc_scans??0;
-  document.getElementById("sBusinesses").textContent=n(businesses);
-  document.getElementById("sViews").textContent=n(views);
-  document.getElementById("sQR").textContent=n(qr);
-  document.getElementById("sNFC").textContent=n(nfc);
-  document.getElementById("sumViews").textContent=n(views);
-  document.getElementById("sumQR").textContent=n(qr);
-  document.getElementById("sumNFC").textContent=n(nfc);
-  document.getElementById("sumPhone").textContent=n(overview.phone_clicks);
-  document.getElementById("sumWA").textContent=n(overview.whatsapp_clicks);
+  setText("sBusinesses",n(businesses));
+  setText("sViews",n(views));
+  setText("sQR",n(qr));
+  setText("sNFC",n(nfc));
 }
 function renderBusinesses(list=allBusinesses){
   const tbody=document.getElementById("businessRows");

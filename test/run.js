@@ -9,6 +9,7 @@ const path = require('path');
 
 const SUITES = [
   ['contract',  'frontend <-> backend sozlesmesi'],
+  ['dom-ids',   'eksik eleman taramasi'],
   ['theme',     'marka temasi butunlugu'],
   ['accent',    'isletmeye ozel vurgu rengi'],
   ['orders',    'menu ve siparis altyapisi'],
