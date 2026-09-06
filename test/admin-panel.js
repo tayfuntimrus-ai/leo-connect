@@ -99,6 +99,48 @@ setTimeout(async () => {
   check('Admin e-postası yazıldı',
     !!doc.getElementById('adminMail')?.textContent, '');
 
+  /* ---- 0b. TANILAMA ----
+     Kullanici Console'a bakamiyor. Bir sey ters giderse ekranda
+     Turkce aciklama gorunmeli. */
+  check('Açılış adımları kaydediliyor',
+    Array.isArray(win.bootLog) && win.bootLog.length >= 4,
+    win.bootLog ? win.bootLog.map(s=>s.ad+':'+s.durum).join(', ') : 'bootLog yok');
+  check('Her şey yolundayken uyarı kutusu GİZLİ',
+    doc.getElementById('bootBanner')?.style.display === 'none', '');
+
+  /* isletme yokken uyari cikmali */
+  const okFetch = win.fetch;
+  win.fetch = async (url) => {
+    const u = String(url);
+    const body = /businesses/.test(u) ? [] : {total_businesses:0};
+    return {ok:true,status:200,
+            headers:{get:()=>'application/json'},
+            json:async()=>body,text:async()=>JSON.stringify(body)};
+  };
+  await win.loadAll();
+  const emptyBanner = doc.getElementById('bootBanner');
+  check('İşletme yokken uyarı GÖRÜNÜYOR',
+    emptyBanner?.style.display === 'block' && /Henüz işletme yok/.test(emptyBanner.innerHTML),
+    emptyBanner?.style.display);
+  check('Uyarı ne yapılacağını söylüyor',
+    /işletme oluşturman gerekiyor/.test(emptyBanner?.innerHTML || ''), '');
+
+  /* API patlarsa sebebi yazilmali */
+  win.fetch = async () => ({
+    ok:false,status:500,
+    headers:{get:()=>'application/json'},
+    json:async()=>({error:'Veritabanına ulaşılamadı'}),
+    text:async()=>JSON.stringify({error:'Veritabanına ulaşılamadı'})
+  });
+  await win.loadAll();
+  const errBanner = doc.getElementById('bootBanner');
+  check('API hatası ekranda SEBEBİYLE görünüyor',
+    errBanner?.style.display === 'block' && /Veritabanına ulaşılamadı/.test(errBanner.innerHTML),
+    errBanner?.innerHTML?.slice(0,60));
+  check('Tanılama raporu açılabiliyor', typeof win.showDiagnostics === 'function', '');
+  win.fetch = okFetch;
+  await win.loadAll();
+
   /* ---- 1. isletme acilisi hatasiz mi ---- */
   toasts.length=0;
   await win.openBusiness(42);

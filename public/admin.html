@@ -22,6 +22,14 @@ body.light{
 }
 /* Vurgu secenekleri. Varsayilan artik marka amberi.
    "gold" secenegi imza rengidir; digerleri geriye donuk uyumluluk icin duruyor. */
+/* Tanilama uyari kutusu */
+.boot-banner{border:1px solid var(--gold);background:rgba(239,159,39,.08);
+  border-radius:14px;padding:16px 18px;margin-bottom:18px}
+.boot-banner strong{display:block;font-size:15px;margin-bottom:6px;color:var(--gold)}
+.boot-list{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px}
+.boot-list b{color:var(--text)}
+.boot-banner .btn{margin-right:8px}
+
 body[data-accent="gold"]{--accent:var(--leo-accent);--accent-rgb:239,159,39}
 body[data-accent="green"]{--accent:var(--leo-green);--accent-rgb:69,194,122}
 body[data-accent="blue"]{--accent:var(--leo-blue);--accent-rgb:94,167,255}
@@ -196,6 +204,10 @@ a{color:inherit;text-decoration:none}
         <div class="status"><i></i>Sistem aktif</div>
       </div>
 
+      <!-- Acilista bir adim basarisiz olursa ya da hic isletme yoksa
+           burada Turkce aciklama gorunur; Console'a bakmak gerekmez. -->
+      <div id="bootBanner" class="boot-banner" style="display:none"></div>
+
       <div class="cards">
         <div class="card stat clickable" role="button" tabindex="0" onclick="showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))" onkeydown="if(event.key==='Enter')showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))"><div class="stat-top"><div class="stat-icon">▦</div><span class="stat-arrow">›</span></div><div class="stat-label">İŞLETMELER</div><div id="sBusinesses" class="stat-value">—</div><div class="stat-note">toplam işletme</div></div>
         <div class="card stat clickable" role="button" tabindex="0" onclick="showAdminAnalytics(document.querySelector('.nav button:nth-child(5)'))" onkeydown="if(event.key==='Enter')showAdminAnalytics(document.querySelector('.nav button:nth-child(5)'))"><div class="stat-top"><div class="stat-icon">◉</div><span class="stat-arrow">›</span></div><div class="stat-label">PROFİL GÖRÜNTÜLEME</div><div id="sViews" class="stat-value">—</div><div class="stat-note">toplam görüntüleme</div></div>
@@ -339,19 +351,93 @@ function logout(){
   document.getElementById("app").style.display="none";
   document.getElementById("loginScreen").style.display="grid";
 }
+/* ==================================================
+   TANILAMA
+
+   Panel acilirken her adimi kaydeder. Bir sey ters giderse
+   kullanici Console'a bakmak zorunda kalmadan ekranda ne oldugunu
+   gorur. "Buton calismiyor" demek yerine "su adim su sebeple
+   basarisiz" diyebilmek icin.
+================================================== */
+/* window'a da asiliyor: destek sirasinda Console'a "bootLog" yazip
+   son acilisin ne yaptigini gorebilmek icin. */
+let bootLog=[];
+window.bootLog=bootLog;
+function bootStep(ad,durum,detay){
+  bootLog.push({ad,durum,detay:detay==null?'':String(detay)});
+  window.bootLog=bootLog;
+}
+function renderBootBanner(){
+  const fail=bootLog.filter(s=>s.durum==='hata');
+  const empty=bootLog.find(s=>s.ad==='İşletme listesi' && s.durum==='bos');
+  const host=document.getElementById('bootBanner');
+  if(!host) return;
+  if(!fail.length && !empty){ host.style.display='none'; return; }
+  host.style.display='block';
+  host.innerHTML = fail.length
+    ? `<strong>Panel tam yüklenemedi</strong>
+       <div class="boot-list">${fail.map(f=>`<div>• <b>${esc(f.ad)}</b>: ${esc(f.detay)}</div>`).join('')}</div>
+       <button class="btn" onclick="showDiagnostics()">Ayrıntılı tanılama</button>`
+    : `<strong>Henüz işletme yok</strong>
+       <div class="boot-list"><div>Sistemde kayıtlı işletme bulunamadı. İşletme detayına, izinlere ve NFC yönetimine ulaşmak için önce bir işletme oluşturman gerekiyor.</div></div>
+       <button class="btn" onclick="showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))">İşletmeler sayfasına git</button>
+       <button class="btn" onclick="showDiagnostics()">Ayrıntılı tanılama</button>`;
+}
+function showDiagnostics(){
+  const rows=bootLog.map(s=>{
+    const renk = s.durum==='hata' ? 'var(--danger)' : (s.durum==='bos' ? 'var(--gold)' : 'var(--accent)');
+    return `<tr><td>${esc(s.ad)}</td><td style="color:${renk};font-weight:700">${esc(s.durum)}</td><td style="word-break:break-all">${esc(s.detay)}</td></tr>`;
+  }).join('');
+  document.getElementById("modalTitle").textContent="Tanılama";
+  document.getElementById("modalBody").innerHTML=`
+    <div class="sub">Panel açılırken çalışan adımlar ve sonuçları.</div>
+    <div style="overflow-x:auto;margin-top:12px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr><th style="text-align:left;padding:8px">ADIM</th><th style="text-align:left;padding:8px">DURUM</th><th style="text-align:left;padding:8px">AYRINTI</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="3">Kayıt yok</td></tr>'}</tbody>
+      </table>
+    </div>
+    <div class="sub" style="margin-top:14px">Tarayıcı: ${esc(navigator.userAgent.slice(0,90))}</div>
+    <div class="modal-actions"><button class="btn primary" onclick="copyDiagnostics()">Raporu Kopyala</button><button class="btn" onclick="closeModal()">Kapat</button></div>`;
+  /* Modal kabinin id'si "modalBg"; "modal" diye bir eleman yok. */
+  openModal();
+}
+function copyDiagnostics(){
+  const txt = bootLog.map(s=>`${s.ad} | ${s.durum} | ${s.detay}`).join('\n')
+            + `\n---\nURL: ${location.href}\nTarayıcı: ${navigator.userAgent}`;
+  copyText(txt);
+}
+
 async function loadAll(){
   if(!adminToken)return;
+  bootLog=[]; window.bootLog=bootLog;
   try{
-    const [ov,biz]=await Promise.all([api("/api/admin/overview"),api("/api/admin/businesses")]);
+    let ov=null, biz=null;
+    try{ ov=await api("/api/admin/overview"); bootStep('Genel bakış verisi','tamam'); }
+    catch(e){ bootStep('Genel bakış verisi','hata',e.message); }
+    try{ biz=await api("/api/admin/businesses"); bootStep('İşletme verisi','tamam'); }
+    catch(e){ bootStep('İşletme verisi','hata',e.message); }
+
     overview=ov||{};
-    allBusinesses=biz.businesses||biz||[];
+    /* /api/admin/businesses DUZ DIZI donduruyor; iki sekil de desteklenir */
+    allBusinesses=Array.isArray(biz)?biz:(biz?.businesses||[]);
+    bootStep('İşletme listesi', allBusinesses.length?'tamam':'bos', allBusinesses.length+' kayıt');
     /* Her adim AYRI korunuyor: biri patlarsa digerleri yine calissin.
        Onceden tek try icindeydiler ve renderOverview patlayinca
        renderBusinesses hic calismiyordu. */
-    try{ renderOverview(); }catch(e){ console.error('renderOverview:',e); }
-    try{ renderBusinesses(); }catch(e){ console.error('renderBusinesses:',e); showToast('İşletme listesi çizilemedi: '+e.message); }
+    try{ renderOverview(); bootStep('Özet kartları','tamam'); }
+    catch(e){ bootStep('Özet kartları','hata',e.message); console.error('renderOverview:',e); }
+
+    try{ renderBusinesses(); bootStep('Liste çizimi','tamam'); }
+    catch(e){ bootStep('Liste çizimi','hata',e.message); console.error('renderBusinesses:',e); }
+
     setText("adminMail", localStorage.getItem("admin_email")||"Admin erişimi");
-  }catch(e){showToast(e.message)}
+    renderBootBanner();
+  }catch(e){
+    bootStep('Açılış','hata',e.message);
+    renderBootBanner();
+    showToast(e.message);
+  }
 }
 function n(v){return Number(v||0).toLocaleString("tr-TR")}
 

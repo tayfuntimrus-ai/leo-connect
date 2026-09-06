@@ -63,9 +63,12 @@ for (const dead of ['sumViews', 'sumQR', 'sumNFC', 'sumPhone', 'sumWA']) {
 }
 
 /* loadAll adımları ayrı ayrı korunuyor mu */
+/* Her ikisi de KENDI try blogunda olmali; ortak try'da biri
+   patlayinca digeri hic calismiyordu. Metnin birebir esitligine
+   degil, ayri sarmalanmis olmalarina bakiliyor. */
 check('loadAll adımları birbirini engellemiyor',
-  /try\{ renderOverview\(\); \}catch/.test(admin) &&
-  /try\{ renderBusinesses\(\); \}catch/.test(admin), '');
+  /try\s*\{\s*renderOverview\(\)[\s\S]{0,80}?\}\s*catch/.test(admin) &&
+  /try\s*\{\s*renderBusinesses\(\)[\s\S]{0,80}?\}\s*catch/.test(admin), '');
 check('Güvenli setText yardımcısı var',
   /function setText\(id,value\)/.test(admin), '');
 
