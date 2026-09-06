@@ -79,6 +79,26 @@ setTimeout(async () => {
   const toasts=[];
   win.showToast=m=>toasts.push(String(m));
 
+  /* ---- 0. GERCEK ACILIS AKISI ----
+     Onceki surumde bu test openBusiness()'i DOGRUDAN cagiriyordu ve
+     gercek acilis yolunu (loadAll) hic gecmiyordu. Bu yuzden
+     renderOverview'in patlayip renderBusinesses'i engellemesini
+     kaciriyordu: isletme listesi hic dolmuyordu. */
+  toasts.length=0;
+  await win.loadAll();
+  const rows=doc.getElementById('businessRows');
+  check('loadAll() hatasız tamamlanıyor',
+    !toasts.some(t=>/Cannot set|Cannot read|not defined/i.test(t)),
+    toasts.length ? toasts.join(' | ') : 'toast yok');
+  check('İşletme listesi DOLDU',
+    !!rows && /Test Cafe/.test(rows.innerHTML),
+    rows ? `${rows.innerHTML.length} karakter` : 'businessRows yok');
+  check('Genel bakış sayaçları yazıldı',
+    doc.getElementById('sBusinesses')?.textContent !== '',
+    doc.getElementById('sBusinesses')?.textContent);
+  check('Admin e-postası yazıldı',
+    !!doc.getElementById('adminMail')?.textContent, '');
+
   /* ---- 1. isletme acilisi hatasiz mi ---- */
   toasts.length=0;
   await win.openBusiness(42);
