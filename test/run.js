@@ -12,6 +12,7 @@ const SUITES = [
   ['theme',     'marka temasi butunlugu'],
   ['accent',    'isletmeye ozel vurgu rengi'],
   ['orders',    'menu ve siparis altyapisi'],
+  ['dashboard', 'isletme paneli yapisi'],
   ['smoke',     'QR gorselleri ve NFC sayaclari'],
   ['jwtguard',  'JWT_SECRET korumasi'],
   ['ratelimit', 'rate limit ve IP ayrimi'],
