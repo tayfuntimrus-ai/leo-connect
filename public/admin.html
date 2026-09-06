@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LEO CONNECT â€¢ Command Center</title>
+<title>LEO CONNECT • Command Center</title>
 <link rel="stylesheet" href="/brand.css">
 <style>
 /* Renkler /brand.css icindeki marka token'larindan gelir.
@@ -152,10 +152,10 @@ a{color:inherit;text-decoration:none}
   kural YOKTU; .global-page.show vardi, bunun karsiligi unutulmus.
 
   Sonuc: sinif ekleniyor, sayfa yine de gizli kaliyordu.
-    Genel Bakis'tan girince .content gizleniyor, detay da gorunmuyor
-      -> BOMBOS EKRAN
-    Isletmeler'den girince globalPage gorunur kaliyordu
-      -> "buton tepki vermiyor"
+    Genel Bakis'tan  -> .content gizleniyor, detay da gorunmuyor
+                        yani BOMBOS EKRAN
+    Isletmeler'den   -> globalPage gorunur kaliyordu
+                        yani "buton tepki vermiyor"
 
   Iki belirtinin de tek sebebi buydu.
 */
@@ -171,12 +171,12 @@ a{color:inherit;text-decoration:none}
 
 <div id="loginScreen" class="login">
   <div class="login-card">
-    <div class="login-logo">ğŸ¦</div>
+    <div class="login-logo">🦁</div>
     <h2>LEO CONNECT</h2>
-    <p>COMMAND CENTER â€¢ ADMIN ACCESS</p>
+    <p>COMMAND CENTER • ADMIN ACCESS</p>
     <div class="field"><label>ADMIN E-POSTA</label><input id="loginEmail" type="email" autocomplete="username" placeholder="admin@leoconnect.com.tr"></div>
-    <div class="field"><label>ÅÄ°FRE</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"></div>
-    <button class="btn primary" onclick="adminLogin()">COMMAND CENTER'A GÄ°R</button>
+    <div class="field"><label>ŞİFRE</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="btn primary" onclick="adminLogin()">COMMAND CENTER'A GİR</button>
     <div id="loginError" class="error"></div>
   </div>
 </div>
@@ -193,28 +193,28 @@ a{color:inherit;text-decoration:none}
   </div>
   <div><strong>LEO CONNECT</strong><small>COMMAND CENTER</small></div>
 </button>
-    <div class="nav-title">ANA MENÃœ</div>
+    <div class="nav-title">ANA MENÜ</div>
     <nav class="nav">
-      <button type="button" class="active" onclick="showHome(this)"><span class="nav-icon">âŒ‚</span><span>Genel BakÄ±ÅŸ</span></button>
-      <button type="button" onclick="showBusinessesPage(this)"><span class="nav-icon">â–¦</span><span>Ä°ÅŸletmeler</span></button>
-      <button type="button" onclick="showNFCManager(this)"><span class="nav-icon">â—‰</span><span>NFC Etiketleri</span></button>
-      <button type="button" onclick="showQRManager(this)"><span class="nav-icon">â–£</span><span>QR Merkezi</span></button>
-      <button type="button" onclick="showAdminAnalytics(this)"><span class="nav-icon">âŒ</span><span>Analytics</span></button>
+      <button type="button" class="active" onclick="showHome(this)"><span class="nav-icon">⌂</span><span>Genel Bakış</span></button>
+      <button type="button" onclick="showBusinessesPage(this)"><span class="nav-icon">▦</span><span>İşletmeler</span></button>
+      <button type="button" onclick="showNFCManager(this)"><span class="nav-icon">◉</span><span>NFC Etiketleri</span></button>
+      <button type="button" onclick="showQRManager(this)"><span class="nav-icon">▣</span><span>QR Merkezi</span></button>
+      <button type="button" onclick="showAdminAnalytics(this)"><span class="nav-icon">⌁</span><span>Analytics</span></button>
     </nav>
-    <div class="nav-title">SÄ°STEM</div>
+    <div class="nav-title">SİSTEM</div>
     <nav class="nav">
-      <button type="button" onclick="showAccountsPage(this)"><span class="nav-icon">â™™</span><span>Hesaplar</span></button>
-      <button type="button" onclick="showSettingsPage(this)"><span class="nav-icon">âš™</span><span>Ayarlar</span></button>
+      <button type="button" onclick="showAccountsPage(this)"><span class="nav-icon">♙</span><span>Hesaplar</span></button>
+      <button type="button" onclick="showSettingsPage(this)"><span class="nav-icon">⚙</span><span>Ayarlar</span></button>
       <button type="button" onclick="showSupportPage(this)"><span class="nav-icon">?</span><span>Destek</span></button>
     </nav>
-    <div class="admin-card"><div class="admin-row"><div class="avatar">A</div><div><div class="admin-name">Admin</div><div id="adminMail" class="admin-mail">admin</div></div></div><div class="online"><i></i>Ã‡evrimiÃ§i</div></div>
+    <div class="admin-card"><div class="admin-row"><div class="avatar">A</div><div><div class="admin-name">Admin</div><div id="adminMail" class="admin-mail">admin</div></div></div><div class="online"><i></i>Çevrimiçi</div></div>
   </aside>
 
   <main class="main">
     <header class="topbar">
       <div class="top-context"><i></i><b id="topContextTitle">Command Center</b></div>
       <div class="top-actions">
-        <div class="mode"><span id="modeText">Koyu</span><button class="toggle" onclick="toggleTheme()" aria-label="Tema deÄŸiÅŸtir"><b></b></button></div>
+        <div class="mode"><span id="modeText">Koyu</span><button class="toggle" onclick="toggleTheme()" aria-label="Tema değiştir"><b></b></button></div>
         <div class="colors">
           <label>Renk</label>
           <button class="swatch s-gold selected" onclick="setAccent('gold',this)"></button>
@@ -223,15 +223,15 @@ a{color:inherit;text-decoration:none}
           <button class="swatch s-purple" onclick="setAccent('purple',this)"></button>
           <button class="swatch s-red" onclick="setAccent('red',this)"></button>
         </div>
-        <button class="tool" onclick="loadAll()">â†» Yenile</button>
+        <button class="tool" onclick="loadAll()">↻ Yenile</button>
         <button class="tool" onclick="location.href='/'">Site</button>
-        <button class="tool" onclick="logout()">Ã‡Ä±kÄ±ÅŸ</button>
+        <button class="tool" onclick="logout()">Çıkış</button>
       </div>
     </header>
 
     <section class="content">
       <div class="hero">
-        <div><div class="eyebrow">LEO CONNECT â€¢ ADMIN</div><h1>Command Center</h1><p>TÃ¼m iÅŸletmeleri, QR ve NFC altyapÄ±sÄ±nÄ± tek merkezden yÃ¶net.</p></div>
+        <div><div class="eyebrow">LEO CONNECT • ADMIN</div><h1>Command Center</h1><p>Tüm işletmeleri, QR ve NFC altyapısını tek merkezden yönet.</p></div>
         <div class="status"><i></i>Sistem aktif</div>
       </div>
 
@@ -240,19 +240,19 @@ a{color:inherit;text-decoration:none}
       <div id="bootBanner" class="boot-banner" style="display:none"></div>
 
       <div class="cards">
-        <div class="card stat clickable" role="button" tabindex="0" onclick="showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))" onkeydown="if(event.key==='Enter')showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))"><div class="stat-top"><div class="stat-icon">â–¦</div><span class="stat-arrow">â€º</span></div><div class="stat-label">Ä°ÅLETMELER</div><div id="sBusinesses" class="stat-value">â€”</div><div class="stat-note">toplam iÅŸletme</div></div>
-        <div class="card stat clickable" role="button" tabindex="0" onclick="showAdminAnalytics(document.querySelector('.nav button:nth-child(5)'))" onkeydown="if(event.key==='Enter')showAdminAnalytics(document.querySelector('.nav button:nth-child(5)'))"><div class="stat-top"><div class="stat-icon">â—‰</div><span class="stat-arrow">â€º</span></div><div class="stat-label">PROFÄ°L GÃ–RÃœNTÃœLEME</div><div id="sViews" class="stat-value">â€”</div><div class="stat-note">toplam gÃ¶rÃ¼ntÃ¼leme</div></div>
-        <div class="card stat clickable" role="button" tabindex="0" onclick="showQRManager(document.querySelector('.nav button:nth-child(4)'))" onkeydown="if(event.key==='Enter')showQRManager(document.querySelector('.nav button:nth-child(4)'))"><div class="stat-top"><div class="stat-icon">â–£</div><span class="stat-arrow">â€º</span></div><div class="stat-label">QR TARAMA</div><div id="sQR" class="stat-value">â€”</div><div class="stat-note">toplam tarama</div></div>
-        <div class="card stat clickable" role="button" tabindex="0" onclick="showNFCManager(document.querySelector('.nav button:nth-child(3)'))" onkeydown="if(event.key==='Enter')showNFCManager(document.querySelector('.nav button:nth-child(3)'))"><div class="stat-top"><div class="stat-icon">â—‰</div><span class="stat-arrow">â€º</span></div><div class="stat-label">NFC DOKUNUÅ</div><div id="sNFC" class="stat-value">â€”</div><div class="stat-note">toplam dokunuÅŸ</div></div>
+        <div class="card stat clickable" role="button" tabindex="0" onclick="showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))" onkeydown="if(event.key==='Enter')showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))"><div class="stat-top"><div class="stat-icon">▦</div><span class="stat-arrow">›</span></div><div class="stat-label">İŞLETMELER</div><div id="sBusinesses" class="stat-value">—</div><div class="stat-note">toplam işletme</div></div>
+        <div class="card stat clickable" role="button" tabindex="0" onclick="showAdminAnalytics(document.querySelector('.nav button:nth-child(5)'))" onkeydown="if(event.key==='Enter')showAdminAnalytics(document.querySelector('.nav button:nth-child(5)'))"><div class="stat-top"><div class="stat-icon">◉</div><span class="stat-arrow">›</span></div><div class="stat-label">PROFİL GÖRÜNTÜLEME</div><div id="sViews" class="stat-value">—</div><div class="stat-note">toplam görüntüleme</div></div>
+        <div class="card stat clickable" role="button" tabindex="0" onclick="showQRManager(document.querySelector('.nav button:nth-child(4)'))" onkeydown="if(event.key==='Enter')showQRManager(document.querySelector('.nav button:nth-child(4)'))"><div class="stat-top"><div class="stat-icon">▣</div><span class="stat-arrow">›</span></div><div class="stat-label">QR TARAMA</div><div id="sQR" class="stat-value">—</div><div class="stat-note">toplam tarama</div></div>
+        <div class="card stat clickable" role="button" tabindex="0" onclick="showNFCManager(document.querySelector('.nav button:nth-child(3)'))" onkeydown="if(event.key==='Enter')showNFCManager(document.querySelector('.nav button:nth-child(3)'))"><div class="stat-top"><div class="stat-icon">◉</div><span class="stat-arrow">›</span></div><div class="stat-label">NFC DOKUNUŞ</div><div id="sNFC" class="stat-value">—</div><div class="stat-note">toplam dokunuş</div></div>
       </div>
 
       <div class="grid-main">
         <section id="businessSection" class="card section">
           <div class="section-head">
-            <div><div class="section-title">Ä°ÅŸletmeler</div><div class="section-sub">Ä°ÅŸletme detaylarÄ±na ve performansÄ±na buradan ulaÅŸ.</div></div>
-            <div class="search"><input id="businessSearch" placeholder="Ä°ÅŸletme ara..." oninput="filterBusinesses()"><button class="btn primary" onclick="newGlobalBusiness()">ï¼‹ Ä°ÅŸletme Ekle</button></div>
+            <div><div class="section-title">İşletmeler</div><div class="section-sub">İşletme detaylarına ve performansına buradan ulaş.</div></div>
+            <div class="search"><input id="businessSearch" placeholder="İşletme ara..." oninput="filterBusinesses()"><button class="btn primary" onclick="newGlobalBusiness()">＋ İşletme Ekle</button></div>
           </div>
-          <div class="table-wrap"><table class="table"><thead><tr><th>Ä°ÅLETME</th><th>KATEGORÄ°</th><th>PROFÄ°L</th><th>QR</th><th>NFC</th><th>ETÄ°KET</th><th>Ä°ÅLEM</th></tr></thead><tbody id="businessRows"><tr><td colspan="7"><div class="empty">YÃ¼kleniyorâ€¦</div></td></tr></tbody></table></div>
+          <div class="table-wrap"><table class="table"><thead><tr><th>İŞLETME</th><th>KATEGORİ</th><th>PROFİL</th><th>QR</th><th>NFC</th><th>ETİKET</th><th>İŞLEM</th></tr></thead><tbody id="businessRows"><tr><td colspan="7"><div class="empty">Yükleniyor…</div></td></tr></tbody></table></div>
         </section>
 
         <div>
@@ -265,13 +265,13 @@ a{color:inherit;text-decoration:none}
 
 
 <div id="businessPage" class="business-page">
-  <div class="backbar"><button class="back-btn" onclick="closeBusinessPage()">â† Command Center</button><span style="color:var(--muted);font-size:11px">/ Ä°ÅŸletme YÃ¶netimi</span></div>
+  <div class="backbar"><button class="back-btn" onclick="closeBusinessPage()">← Command Center</button><span style="color:var(--muted);font-size:11px">/ İşletme Yönetimi</span></div>
   <div id="businessHero"></div>
   <div class="business-tabs">
-    <button class="active" data-tab="overview" onclick="switchBizTab('overview',this)">Genel BakÄ±ÅŸ</button>
-    <button data-tab="profile" onclick="switchBizTab('profile',this)">Profil YÃ¶netimi</button>
+    <button class="active" data-tab="overview" onclick="switchBizTab('overview',this)">Genel Bakış</button>
+    <button data-tab="profile" onclick="switchBizTab('profile',this)">Profil Yönetimi</button>
     <button data-tab="nfc" onclick="switchBizTab('nfc',this)">NFC Etiketleri</button>
-    <button data-tab="analytics" onclick="switchBizTab('analytics',this)">Analytics</button><button data-tab="permissions" onclick="switchBizTab('permissions',this)">EriÅŸim Ä°zinleri</button>
+    <button data-tab="analytics" onclick="switchBizTab('analytics',this)">Analytics</button><button data-tab="permissions" onclick="switchBizTab('permissions',this)">Erişim İzinleri</button>
     <button data-tab="qr" onclick="switchBizTab('qr',this)">QR Merkezi</button>
   </div>
   <div id="bizOverview" class="biz-panel active"></div>
@@ -284,23 +284,22 @@ a{color:inherit;text-decoration:none}
 
 <div id="globalPage" class="global-page">
   <div class="global-head">
-    <div><div class="eyebrow" id="globalEyebrow">LEO CONNECT â€¢ ADMIN</div><h2 id="globalTitle">Merkez</h2><p id="globalSubtitle">TÃ¼m iÅŸletmeler iÃ§in merkezi yÃ¶netim.</p></div>
-    <button class="btn" onclick="closeGlobalPage()">â† Command Center</button>
+    <div><div class="eyebrow" id="globalEyebrow">LEO CONNECT • ADMIN</div><h2 id="globalTitle">Merkez</h2><p id="globalSubtitle">Tüm işletmeler için merkezi yönetim.</p></div>
+    <button class="btn" onclick="closeGlobalPage()">← Command Center</button>
   </div>
   <div id="globalContent"></div>
 </div>
 
-<div id="modalBg" class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-head"><strong id="modalTitle">Detay</strong><button class="close" onclick="closeModal()">Ã—</button></div><div id="modalBody" class="modal-body"></div></div></div>
+<div id="modalBg" class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-head"><strong id="modalTitle">Detay</strong><button class="close" onclick="closeModal()">×</button></div><div id="modalBody" class="modal-body"></div></div></div>
 <!--
   Kalici hata alani.
 
   ONCEDEN .content ICINDEYDI. openBusiness isletme sayfasini acarken
   .content'i display:none yapiyor; display:none olan bir kabin
   icindeki eleman position:fixed olsa bile GORUNMEZ. Yani hata
-  olusuyordu ama hata kutusu da onunla birlikte gizleniyordu:
-  kullanici bos ekran goruyor, sebebini goremiyordu.
+  olusuyordu ama hata kutusu da onunla birlikte gizleniyordu.
 
-  Artik #toast ile ayni seviyede, hicbir ekran onu gizleyemez.
+  Artik #toast ile ayni seviyede; hicbir ekran onu gizleyemez.
 -->
 <div id="errorBar" class="error-bar" style="display:none"></div>
 
@@ -323,7 +322,7 @@ let currentBusiness=null;
 */
 window.addEventListener('unhandledrejection', e => {
   const msg = e?.reason?.message || String(e?.reason || 'Bilinmeyen hata');
-  console.error('YAKALANMAMIÅ HATA:', e?.reason);
+  console.error('YAKALANMAMIŞ HATA:', e?.reason);
   if(typeof showToast === 'function') showToast('Hata: ' + msg);
 });
 window.addEventListener('error', e => {
@@ -335,12 +334,12 @@ window.addEventListener('error', e => {
 function authHeaders(){return adminToken?{"Authorization":"Bearer "+adminToken}:{}}
 async function api(path,options={}){
   const res=await fetch(API+path,{...options,headers:{"Content-Type":"application/json",...authHeaders(),...(options.headers||{})}});
-  if(res.status===401||res.status===403){logout();throw new Error("Yetkisiz eriÅŸim");}
+  if(res.status===401||res.status===403){logout();throw new Error("Yetkisiz erişim");}
 
   /*
     SESSIZ HATA TUZAGI
 
-    Express fallback'i BILINMEYEN her yola index.html donduruyor â€”
+    Express fallback'i BILINMEYEN her yola index.html donduruyor —
     ustelik 200 OK ile. Onceden burada su vardi:
 
       const data = await res.json().catch(()=>({}));
@@ -358,26 +357,26 @@ async function api(path,options={}){
 
   if(!ctype.includes('application/json')){
     console.error('API JSON DONDURMEDI:', path, res.status, ctype, raw.slice(0,120));
-    throw new Error(`Sunucu bu adres iÃ§in JSON dÃ¶ndÃ¼rmedi (${res.status}). UÃ§ bulunamamÄ±ÅŸ olabilir: ${path}`);
+    throw new Error(`Sunucu bu adres için JSON döndürmedi (${res.status}). Uç bulunamamış olabilir: ${path}`);
   }
 
   let data;
   try{ data=JSON.parse(raw); }
   catch(e){
     console.error('API YANITI COZULEMEDI:', path, raw.slice(0,120));
-    throw new Error('Sunucu yanÄ±tÄ± okunamadÄ±: '+path);
+    throw new Error('Sunucu yanıtı okunamadı: '+path);
   }
 
-  if(!res.ok)throw new Error(data.error||data.message||`Ä°stek baÅŸarÄ±sÄ±z (${res.status})`);
+  if(!res.ok)throw new Error(data.error||data.message||`İstek başarısız (${res.status})`);
   return data;
 }
 function adminLogin(){
   const email=document.getElementById("loginEmail").value.trim();
   const password=document.getElementById("loginPassword").value;
   document.getElementById("loginError").textContent="";
-  if(!email||!password){document.getElementById("loginError").textContent="E-posta ve ÅŸifre gerekli.";return;}
+  if(!email||!password){document.getElementById("loginError").textContent="E-posta ve şifre gerekli.";return;}
   fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password})})
-    .then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"GiriÅŸ baÅŸarÄ±sÄ±z");return d})
+    .then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"Giriş başarısız");return d})
     .then(d=>{
       adminToken=d.token;
       localStorage.setItem("admin_token",adminToken);
@@ -413,19 +412,19 @@ function bootStep(ad,durum,detay){
 }
 function renderBootBanner(){
   const fail=bootLog.filter(s=>s.durum==='hata');
-  const empty=bootLog.find(s=>s.ad==='Ä°ÅŸletme listesi' && s.durum==='bos');
+  const empty=bootLog.find(s=>s.ad==='İşletme listesi' && s.durum==='bos');
   const host=document.getElementById('bootBanner');
   if(!host) return;
   if(!fail.length && !empty){ host.style.display='none'; return; }
   host.style.display='block';
   host.innerHTML = fail.length
-    ? `<strong>Panel tam yÃ¼klenemedi</strong>
-       <div class="boot-list">${fail.map(f=>`<div>â€¢ <b>${esc(f.ad)}</b>: ${esc(f.detay)}</div>`).join('')}</div>
-       <button class="btn" onclick="showDiagnostics()">AyrÄ±ntÄ±lÄ± tanÄ±lama</button>`
-    : `<strong>HenÃ¼z iÅŸletme yok</strong>
-       <div class="boot-list"><div>Sistemde kayÄ±tlÄ± iÅŸletme bulunamadÄ±. Ä°ÅŸletme detayÄ±na, izinlere ve NFC yÃ¶netimine ulaÅŸmak iÃ§in Ã¶nce bir iÅŸletme oluÅŸturman gerekiyor.</div></div>
-       <button class="btn" onclick="showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))">Ä°ÅŸletmeler sayfasÄ±na git</button>
-       <button class="btn" onclick="showDiagnostics()">AyrÄ±ntÄ±lÄ± tanÄ±lama</button>`;
+    ? `<strong>Panel tam yüklenemedi</strong>
+       <div class="boot-list">${fail.map(f=>`<div>• <b>${esc(f.ad)}</b>: ${esc(f.detay)}</div>`).join('')}</div>
+       <button class="btn" onclick="showDiagnostics()">Ayrıntılı tanılama</button>`
+    : `<strong>Henüz işletme yok</strong>
+       <div class="boot-list"><div>Sistemde kayıtlı işletme bulunamadı. İşletme detayına, izinlere ve NFC yönetimine ulaşmak için önce bir işletme oluşturman gerekiyor.</div></div>
+       <button class="btn" onclick="showBusinessesPage(document.querySelector('.nav button:nth-child(2)'))">İşletmeler sayfasına git</button>
+       <button class="btn" onclick="showDiagnostics()">Ayrıntılı tanılama</button>`;
 }
 /*
   KALICI HATA GOSTERIMI
@@ -446,12 +445,12 @@ function showError(baslik, hata, ipucu){
   host.innerHTML=`
     <div class="err-head">
       <strong>${esc(baslik)}</strong>
-      <button class="err-x" onclick="document.getElementById('errorBar').style.display='none'" aria-label="Kapat">âœ•</button>
+      <button class="err-x" onclick="document.getElementById('errorBar').style.display='none'" aria-label="Kapat">✕</button>
     </div>
     <div class="err-msg">${esc(mesaj)}</div>
     ${ipucu?`<div class="err-hint">${esc(ipucu)}</div>`:''}
     <div class="err-actions">
-      <button class="btn" onclick="showDiagnostics()">AyrÄ±ntÄ±lÄ± tanÄ±lama</button>
+      <button class="btn" onclick="showDiagnostics()">Ayrıntılı tanılama</button>
       <button class="btn" onclick="copyDiagnostics()">Raporu Kopyala</button>
     </div>`;
   /* scrollIntoView her ortamda yok; hata gosterimi bunun yuzunden
@@ -464,23 +463,23 @@ function showDiagnostics(){
     const renk = s.durum==='hata' ? 'var(--danger)' : (s.durum==='bos' ? 'var(--gold)' : 'var(--accent)');
     return `<tr><td>${esc(s.ad)}</td><td style="color:${renk};font-weight:700">${esc(s.durum)}</td><td style="word-break:break-all">${esc(s.detay)}</td></tr>`;
   }).join('');
-  document.getElementById("modalTitle").textContent="TanÄ±lama";
+  document.getElementById("modalTitle").textContent="Tanılama";
   document.getElementById("modalBody").innerHTML=`
-    <div class="sub">Panel aÃ§Ä±lÄ±rken Ã§alÄ±ÅŸan adÄ±mlar ve sonuÃ§larÄ±.</div>
+    <div class="sub">Panel açılırken çalışan adımlar ve sonuçları.</div>
     <div style="overflow-x:auto;margin-top:12px">
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead><tr><th style="text-align:left;padding:8px">ADIM</th><th style="text-align:left;padding:8px">DURUM</th><th style="text-align:left;padding:8px">AYRINTI</th></tr></thead>
-        <tbody>${rows||'<tr><td colspan="3">KayÄ±t yok</td></tr>'}</tbody>
+        <tbody>${rows||'<tr><td colspan="3">Kayıt yok</td></tr>'}</tbody>
       </table>
     </div>
-    <div class="sub" style="margin-top:14px">TarayÄ±cÄ±: ${esc(navigator.userAgent.slice(0,90))}</div>
+    <div class="sub" style="margin-top:14px">Tarayıcı: ${esc(navigator.userAgent.slice(0,90))}</div>
     <div class="modal-actions"><button class="btn primary" onclick="copyDiagnostics()">Raporu Kopyala</button><button class="btn" onclick="closeModal()">Kapat</button></div>`;
   /* Modal kabinin id'si "modalBg"; "modal" diye bir eleman yok. */
   openModal();
 }
 function copyDiagnostics(){
   const txt = bootLog.map(s=>`${s.ad} | ${s.durum} | ${s.detay}`).join('\n')
-            + `\n---\nURL: ${location.href}\nTarayÄ±cÄ±: ${navigator.userAgent}`;
+            + `\n---\nURL: ${location.href}\nTarayıcı: ${navigator.userAgent}`;
   copyText(txt);
 }
 
@@ -489,28 +488,28 @@ async function loadAll(){
   bootLog=[]; window.bootLog=bootLog;
   try{
     let ov=null, biz=null;
-    try{ ov=await api("/api/admin/overview"); bootStep('Genel bakÄ±ÅŸ verisi','tamam'); }
-    catch(e){ bootStep('Genel bakÄ±ÅŸ verisi','hata',e.message); }
-    try{ biz=await api("/api/admin/businesses"); bootStep('Ä°ÅŸletme verisi','tamam'); }
-    catch(e){ bootStep('Ä°ÅŸletme verisi','hata',e.message); }
+    try{ ov=await api("/api/admin/overview"); bootStep('Genel bakış verisi','tamam'); }
+    catch(e){ bootStep('Genel bakış verisi','hata',e.message); }
+    try{ biz=await api("/api/admin/businesses"); bootStep('İşletme verisi','tamam'); }
+    catch(e){ bootStep('İşletme verisi','hata',e.message); }
 
     overview=ov||{};
     /* /api/admin/businesses DUZ DIZI donduruyor; iki sekil de desteklenir */
     allBusinesses=Array.isArray(biz)?biz:(biz?.businesses||[]);
-    bootStep('Ä°ÅŸletme listesi', allBusinesses.length?'tamam':'bos', allBusinesses.length+' kayÄ±t');
+    bootStep('İşletme listesi', allBusinesses.length?'tamam':'bos', allBusinesses.length+' kayıt');
     /* Her adim AYRI korunuyor: biri patlarsa digerleri yine calissin.
        Onceden tek try icindeydiler ve renderOverview patlayinca
        renderBusinesses hic calismiyordu. */
-    try{ renderOverview(); bootStep('Ã–zet kartlarÄ±','tamam'); }
-    catch(e){ bootStep('Ã–zet kartlarÄ±','hata',e.message); console.error('renderOverview:',e); }
+    try{ renderOverview(); bootStep('Özet kartları','tamam'); }
+    catch(e){ bootStep('Özet kartları','hata',e.message); console.error('renderOverview:',e); }
 
-    try{ renderBusinesses(); bootStep('Liste Ã§izimi','tamam'); }
-    catch(e){ bootStep('Liste Ã§izimi','hata',e.message); console.error('renderBusinesses:',e); }
+    try{ renderBusinesses(); bootStep('Liste çizimi','tamam'); }
+    catch(e){ bootStep('Liste çizimi','hata',e.message); console.error('renderBusinesses:',e); }
 
-    setText("adminMail", localStorage.getItem("admin_email")||"Admin eriÅŸimi");
+    setText("adminMail", localStorage.getItem("admin_email")||"Admin erişimi");
     renderBootBanner();
   }catch(e){
-    bootStep('AÃ§Ä±lÄ±ÅŸ','hata',e.message);
+    bootStep('Açılış','hata',e.message);
     renderBootBanner();
     showToast(e.message);
   }
@@ -536,7 +535,7 @@ function n(v){return Number(v||0).toLocaleString("tr-TR")}
 */
 function setText(id,value){
   const el=document.getElementById(id);
-  if(!el){ console.warn('Eleman bulunamadÄ±, atlandÄ±:', id); return false; }
+  if(!el){ console.warn('Eleman bulunamadı, atlandı:', id); return false; }
   el.textContent=value;
   return true;
 }
@@ -553,14 +552,14 @@ function renderOverview(){
 }
 function renderBusinesses(list=allBusinesses){
   const tbody=document.getElementById("businessRows");
-  if(!list.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty">Ä°ÅŸletme bulunamadÄ±.</div></td></tr>';return}
+  if(!list.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty">İşletme bulunamadı.</div></td></tr>';return}
   tbody.innerHTML=list.map(b=>`
     <tr>
-      <td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'"><div><div class="biz-name">${esc(b.name||"Ä°simsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td>
-      <td class="accent">${esc(b.category||"â€”")}</td>
+      <td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td>
+      <td class="accent">${esc(b.category||"—")}</td>
       <td>${n(b.profile_views)}</td><td>${n(b.qr_scans)}</td><td>${n(b.nfc_scans)}</td>
       <td><span class="badge">${n(b.nfc_tags)} NFC</span></td>
-      <td><button class="btn primary" onclick="openBusiness(${Number(b.id)})">Detay â€º</button></td>
+      <td><button class="btn primary" onclick="openBusiness(${Number(b.id)})">Detay ›</button></td>
     </tr>`).join("");
 }
 function filterBusinesses(){
@@ -573,13 +572,13 @@ function openModal(){document.getElementById("modalBg").classList.add("show")}
 function closeModal(){document.getElementById("modalBg").classList.remove("show")}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2800)}
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-async function copyText(text){try{await navigator.clipboard.writeText(text);showToast("KopyalandÄ±.")}catch(e){showToast("Kopyalama baÅŸarÄ±sÄ±z.")}}
+async function copyText(text){try{await navigator.clipboard.writeText(text);showToast("Kopyalandı.")}catch(e){showToast("Kopyalama başarısız.")}}
 
 async function openBusiness(id){
   try{
-    bootStep('Ä°ÅŸletme aÃ§Ä±lÄ±yor','tamam','id='+id);
+    bootStep('İşletme açılıyor','tamam','id='+id);
     const d=await api("/api/admin/business/"+id);
-    if(!d || !d.business) throw new Error('Sunucu iÅŸletme bilgisi dÃ¶ndÃ¼rmedi (yanÄ±tta "business" alanÄ± yok)');
+    if(!d || !d.business) throw new Error('Sunucu işletme bilgisi döndürmedi (yanıtta "business" alanı yok)');
     currentBusiness={...d.business,permissions:d.permissions||{profile:true,digital:true,qr:false,nfc:false,analytics:false,live:false,ai:false},nfc_tags:d.nfc_tags||[]};
     /*
       UC EKRAN AYNI ANDA ACIK OLABILIYORDU
@@ -618,37 +617,37 @@ async function openBusiness(id){
 
       Sayfa acildi ama gorunur panel bossa kullanici bombos bir ekran
       goruyor ve nedenini bilmiyor. Bu durumda ekranin KENDI ICINE
-      durum yaziliyor â€” errorBar gizli kalsa bile bu gorunur.
+      durum yaziliyor — errorBar gizli kalsa bile bu gorunur.
     */
     const ov=document.getElementById("bizOverview");
     const hero=document.getElementById("businessHero");
     if(ov && ov.innerHTML.trim().length<40){
-      bootStep('Genel bakÄ±ÅŸ paneli','hata','panel boÅŸ kaldÄ±');
+      bootStep('Genel bakış paneli','hata','panel boş kaldı');
       ov.innerHTML=`<section class="card biz-section">
-        <h3>Bu ekran Ã§izilemedi</h3>
-        <div class="sub">Ä°ÅŸletme bilgisi alÄ±ndÄ± ancak genel bakÄ±ÅŸ iÃ§eriÄŸi oluÅŸturulamadÄ±.</div>
+        <h3>Bu ekran çizilemedi</h3>
+        <div class="sub">İşletme bilgisi alındı ancak genel bakış içeriği oluşturulamadı.</div>
         <div class="info-grid" style="margin-top:14px">
-          <div class="info-box"><small>Ä°ÅLETME</small><strong>${esc(currentBusiness?.name||"â€”")}</strong></div>
-          <div class="info-box"><small>KAYIT NO</small><strong>${esc(String(currentBusiness?.id??"â€”"))}</strong></div>
-          <div class="info-box"><small>BAÅLIK ALANI</small><strong>${hero&&hero.innerHTML.trim().length>40?"doldu":"BOÅ"}</strong></div>
-          <div class="info-box"><small>NFC ETÄ°KETÄ°</small><strong>${(currentBusiness?.nfc_tags||[]).length}</strong></div>
+          <div class="info-box"><small>İŞLETME</small><strong>${esc(currentBusiness?.name||"—")}</strong></div>
+          <div class="info-box"><small>KAYIT NO</small><strong>${esc(String(currentBusiness?.id??"—"))}</strong></div>
+          <div class="info-box"><small>BAŞLIK ALANI</small><strong>${hero&&hero.innerHTML.trim().length>40?"doldu":"BOŞ"}</strong></div>
+          <div class="info-box"><small>NFC ETİKETİ</small><strong>${(currentBusiness?.nfc_tags||[]).length}</strong></div>
         </div>
-        <div class="modal-actions"><button class="btn primary" onclick="showDiagnostics()">AyrÄ±ntÄ±lÄ± tanÄ±lama</button><button class="btn" onclick="copyDiagnostics()">Raporu Kopyala</button></div>
+        <div class="modal-actions"><button class="btn primary" onclick="showDiagnostics()">Ayrıntılı tanılama</button><button class="btn" onclick="copyDiagnostics()">Raporu Kopyala</button></div>
       </section>`;
     } else {
-      bootStep('Genel bakÄ±ÅŸ paneli','tamam',ov.innerHTML.length+' karakter');
+      bootStep('Genel bakış paneli','tamam',(ov?ov.innerHTML.length:0)+' karakter');
     }
     /* "b" burada TANIMLI DEGILDI. Optional chaining tanimsiz DEGISKENI
        korumaz, sadece null/undefined DEGERI korur; bu yuzden her isletme
        acilisinda "b is not defined" firliyor, hata bildirimi cikiyor ve
        asagidaki kaydirma satirlari hic calismiyordu. */
-    document.getElementById("topContextTitle").textContent=currentBusiness?.name||"Ä°ÅŸletme";
+    document.getElementById("topContextTitle").textContent=currentBusiness?.name||"İşletme";
     window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
   }catch(e){
     /* Onceden yalnizca showToast vardi: hata 2,8 saniyede kayboluyor,
        kullanici "hicbir sey olmuyor" diye goruyordu. Artik KALICI. */
-    showError('Ä°ÅŸletme detayÄ± aÃ§Ä±lamadÄ±', e,
-      'Bu adÄ±m /api/admin/business/'+id+' adresini Ã§aÄŸÄ±rÄ±r. YukarÄ±daki mesaj sunucudan gelen sebeptir.');
+    showError('İşletme detayı açılamadı', e,
+      'Bu adım /api/admin/business/'+id+' adresini çağırır. Yukarıdaki mesaj sunucudan gelen sebeptir.');
   }
 }
 function closeBusinessPage(){
@@ -666,12 +665,12 @@ function renderBusinessPage(){
     <div class="business-hero">
       <div class="business-hero-left">
         <img class="business-hero-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'">
-        <div><div class="eyebrow">Ä°ÅLETME YÃ–NETÄ°MÄ°</div><h2>${esc(b.name||"Ä°simsiz")}</h2><p>${esc(b.category||"â€”")} â€¢ /p/${esc(b.slug||"")}</p></div>
+        <div><div class="eyebrow">İŞLETME YÖNETİMİ</div><h2>${esc(b.name||"İsimsiz")}</h2><p>${esc(b.category||"—")} • /p/${esc(b.slug||"")}</p></div>
       </div>
       <div class="hero-actions">
-        <button class="btn primary" onclick="editBusinessPage()">âœ DÃ¼zenle</button>
-        <button class="btn" onclick="showQR(${Number(b.id)})">â–£ QR</button>
-        <button class="btn" onclick="window.open('/p/${encodeURIComponent(b.slug||"")}','_blank')">Profili AÃ§ â†—</button>
+        <button class="btn primary" onclick="editBusinessPage()">✎ Düzenle</button>
+        <button class="btn" onclick="showQR(${Number(b.id)})">▣ QR</button>
+        <button class="btn" onclick="window.open('/p/${encodeURIComponent(b.slug||"")}','_blank')">Profili Aç ↗</button>
       </div>
     </div>`;
   renderBizOverview();
@@ -700,8 +699,8 @@ function renderBusinessPage(){
   bir mesajla cikiyorlar.
 */
 function bizNotLoaded(){
-  console.warn('Ä°ÅŸletme yÃ¼klÃ¼ deÄŸil; ekran Ã§izilmedi.');
-  if(typeof showToast==='function') showToast('Ä°ÅŸletme bilgisi yÃ¼klenmedi.');
+  console.warn('İşletme yüklü değil; ekran çizilmedi.');
+  if(typeof showToast==='function') showToast('İşletme bilgisi yüklenmedi.');
   return undefined;
 }
 
@@ -719,7 +718,7 @@ function switchBizTab(name,btn){
   const panel = panelId ? document.getElementById(panelId) : null;
   if(!panel){
     console.error('Bilinmeyen sekme veya eksik panel:', name, panelId);
-    showToast('Bu ekran aÃ§Ä±lamadÄ±.');
+    showToast('Bu ekran açılamadı.');
     return;   /* mevcut ekrani BOSALTMADAN cik */
   }
   document.querySelectorAll(".business-tabs button").forEach(x=>x.classList.remove("active"));
@@ -737,28 +736,28 @@ function renderBizOverview(){
   const tags=b.nfc_tags||[];
   document.getElementById("bizOverview").innerHTML=`
     <div class="biz-stat-grid">
-      <div class="biz-stat"><small>PROFÄ°L GÃ–RÃœNTÃœLEME</small><strong>${n(b.profile_views)}</strong></div>
+      <div class="biz-stat"><small>PROFİL GÖRÜNTÜLEME</small><strong>${n(b.profile_views)}</strong></div>
       <div class="biz-stat"><small>QR TARAMA</small><strong>${n(b.qr_scans)}</strong></div>
-      <div class="biz-stat"><small>NFC DOKUNUÅ</small><strong>${n(b.nfc_scans)}</strong></div>
+      <div class="biz-stat"><small>NFC DOKUNUŞ</small><strong>${n(b.nfc_scans)}</strong></div>
       <div class="biz-stat"><small>TELEFON TIKLAMA</small><strong>${n(b.phone_clicks)}</strong></div>
       <div class="biz-stat"><small>WHATSAPP TIKLAMA</small><strong>${n(b.whatsapp_clicks)}</strong></div>
     </div>
     <div class="biz-columns">
-      <section class="card biz-section"><h3>Ä°ÅŸletme Bilgileri</h3><div class="sub">Profilde yayÄ±nlanan temel bilgiler.</div>
+      <section class="card biz-section"><h3>İşletme Bilgileri</h3><div class="sub">Profilde yayınlanan temel bilgiler.</div>
         <div class="info-grid">
-          <div class="info-box"><small>KATEGORÄ°</small><strong>${esc(b.category||"â€”")}</strong></div>
-          <div class="info-box"><small>TELEFON</small><strong>${esc(b.phone||"â€”")}</strong></div>
-          <div class="info-box"><small>WHATSAPP</small><strong>${esc(b.whatsapp||"â€”")}</strong></div>
-          <div class="info-box"><small>Ã‡ALIÅMA SAATLERÄ°</small><strong>${esc(b.hours||"â€”")}</strong></div>
-          <div class="info-box"><small>ADRES</small><strong>${esc(b.address||"â€”")}</strong></div>
-          <div class="info-box"><small>IBAN SAHÄ°BÄ°</small><strong>${esc(b.iban_holder||"â€”")}</strong></div>
+          <div class="info-box"><small>KATEGORİ</small><strong>${esc(b.category||"—")}</strong></div>
+          <div class="info-box"><small>TELEFON</small><strong>${esc(b.phone||"—")}</strong></div>
+          <div class="info-box"><small>WHATSAPP</small><strong>${esc(b.whatsapp||"—")}</strong></div>
+          <div class="info-box"><small>ÇALIŞMA SAATLERİ</small><strong>${esc(b.hours||"—")}</strong></div>
+          <div class="info-box"><small>ADRES</small><strong>${esc(b.address||"—")}</strong></div>
+          <div class="info-box"><small>IBAN SAHİBİ</small><strong>${esc(b.iban_holder||"—")}</strong></div>
         </div>
       </section>
-      <section class="card biz-section"><h3>NFC Ã–zeti</h3><div class="sub">${n(tags.length)} adet etiket</div>
+      <section class="card biz-section"><h3>NFC Özeti</h3><div class="sub">${n(tags.length)} adet etiket</div>
         <div class="info-grid" style="grid-template-columns:1fr">
-          ${tags.slice(0,5).map(t=>`<div class="info-box"><small>${esc(t.name||"NFC")}</small><strong>${t.is_active?"Aktif":"Pasif"} â€¢ ${n(t.tap_count)} dokunuÅŸ</strong></div>`).join("")||'<div class="empty">NFC etiketi bulunmuyor.</div>'}
+          ${tags.slice(0,5).map(t=>`<div class="info-box"><small>${esc(t.name||"NFC")}</small><strong>${t.is_active?"Aktif":"Pasif"} • ${n(t.tap_count)} dokunuş</strong></div>`).join("")||'<div class="empty">NFC etiketi bulunmuyor.</div>'}
         </div>
-        <div class="modal-actions"><button class="btn accent" onclick="switchBizTab('nfc',document.querySelector('[data-tab=nfc]'))">NFC YÃ¶netimine Git â†’</button></div>
+        <div class="modal-actions"><button class="btn accent" onclick="switchBizTab('nfc',document.querySelector('[data-tab=nfc]'))">NFC Yönetimine Git →</button></div>
       </section>
     </div>`;
 }
@@ -770,9 +769,9 @@ function renderBizProfile(){
   if(!b) return bizNotLoaded();
   document.getElementById("bizProfile").innerHTML=`
     <section class="card biz-section">
-      <h3>Profil YÃ¶netimi</h3><div class="sub">Ä°ÅŸletmenin mÃ¼ÅŸterilere gÃ¶sterilen bilgilerini buradan yÃ¶net.</div>
+      <h3>Profil Yönetimi</h3><div class="sub">İşletmenin müşterilere gösterilen bilgilerini buradan yönet.</div>
       <div class="profile-editor">
-        ${profileField("name","Ä°ÅŸletme AdÄ±",b.name)}
+        ${profileField("name","İşletme Adı",b.name)}
         ${profileField("category","Kategori",b.category)}
         ${profileField("phone","Telefon",b.phone)}
         ${profileField("whatsapp","WhatsApp",b.whatsapp)}
@@ -781,15 +780,15 @@ function renderBizProfile(){
         ${profileField("tiktok","TikTok",b.tiktok)}
         ${profileField("google_review","Google Yorum",b.google_review)}
         ${profileField("website","Website",b.website)}
-        ${profileField("menu","MenÃ¼",b.menu)}
+        ${profileField("menu","Menü",b.menu)}
         ${profileField("iban","IBAN",b.iban)}
         ${profileField("iban_holder","IBAN Sahibi",b.iban_holder)}
-        ${profileField("hours","Ã‡alÄ±ÅŸma Saatleri",b.hours)}
+        ${profileField("hours","Çalışma Saatleri",b.hours)}
         ${profileField("logo_url","Logo URL",b.logo_url)}
-        <div class="form-field full"><label>AÃ‡IKLAMA</label><textarea id="bp_description">${esc(b.description||"")}</textarea></div>
+        <div class="form-field full"><label>AÇIKLAMA</label><textarea id="bp_description">${esc(b.description||"")}</textarea></div>
       </div>
-      <div class="modal-actions"><button class="btn primary" onclick="saveBusinessPage()">DeÄŸiÅŸiklikleri Kaydet</button><button class="btn" onclick="renderBizProfile()">DeÄŸiÅŸiklikleri SÄ±fÄ±rla</button></div>
-      <div class="section-sub" style="margin-top:10px">ğŸ”’ Mevcut slug korunur. Ä°ÅŸletmenin mevcut QR adresi deÄŸiÅŸtirilmez.</div>
+      <div class="modal-actions"><button class="btn primary" onclick="saveBusinessPage()">Değişiklikleri Kaydet</button><button class="btn" onclick="renderBizProfile()">Değişiklikleri Sıfırla</button></div>
+      <div class="section-sub" style="margin-top:10px">🔒 Mevcut slug korunur. İşletmenin mevcut QR adresi değiştirilmez.</div>
     </section>`;
 }
 function editBusinessPage(){switchBizTab("profile",document.querySelector('[data-tab=profile]'));window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0}
@@ -800,7 +799,7 @@ async function saveBusinessPage(){
   keys.forEach(k=>{const el=document.getElementById("bp_"+k);if(el)body[k]=el.value.trim()});
   try{
     await api("/api/admin/business/"+id,{method:"PUT",body:JSON.stringify(body)});
-    showToast("Ä°ÅŸletme profili gÃ¼ncellendi.");
+    showToast("İşletme profili güncellendi.");
     await loadAll();
     const d=await api("/api/admin/business/"+id);
     currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,digital:true,qr:false,nfc:false,analytics:false,live:false,ai:false},nfc_tags:d.nfc_tags||[]};
@@ -814,38 +813,38 @@ function renderBizNFC(){
   document.getElementById("bizNFC").innerHTML=`
     <section class="card biz-section">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <div><h3>NFC Etiketleri</h3><div class="sub">Bu iÅŸletmeye baÄŸlÄ± tÃ¼m NFC etiketlerini yÃ¶net.</div></div>
-        <button class="btn primary" onclick="newNFC(${Number(b.id)})">ï¼‹ NFC Etiketi OluÅŸtur</button>
+        <div><h3>NFC Etiketleri</h3><div class="sub">Bu işletmeye bağlı tüm NFC etiketlerini yönet.</div></div>
+        <button class="btn primary" onclick="newNFC(${Number(b.id)})">＋ NFC Etiketi Oluştur</button>
       </div>
       <div class="nfc-admin-list">
         ${tags.length?tags.map(t=>{
           const url=t.url||("/p/nfc/"+t.code);
           return `<div class="nfc-admin-card">
             <div class="nfc-admin-top"><div class="nfc-admin-name">${esc(t.name||"NFC Etiketi")}</div><span class="badge">${t.is_active?"Aktif":"Pasif"}</span></div>
-            <div class="nfc-meta">${esc(t.placement||"Konum belirtilmemiÅŸ")} â€¢ ${n(t.tap_count)} dokunuÅŸ${t.last_tap?" â€¢ Son: "+esc(new Date(t.last_tap).toLocaleString("tr-TR")):""}</div>
+            <div class="nfc-meta">${esc(t.placement||"Konum belirtilmemiş")} • ${n(t.tap_count)} dokunuş${t.last_tap?" • Son: "+esc(new Date(t.last_tap).toLocaleString("tr-TR")):""}</div>
             <div class="nfc-meta" style="word-break:break-all">${esc(url)}</div>
             <div class="modal-actions">
               <button class="btn" onclick="copyText(${esc(JSON.stringify(url))})">URL Kopyala</button>
-              <button class="btn" onclick="window.open(${esc(JSON.stringify(url))},'_blank')">Test â†—</button>
-              <button class="btn" onclick="editNFCPage(${Number(t.id)})">DÃ¼zenle</button>
+              <button class="btn" onclick="window.open(${esc(JSON.stringify(url))},'_blank')">Test ↗</button>
+              <button class="btn" onclick="editNFCPage(${Number(t.id)})">Düzenle</button>
               <button class="btn" onclick="deleteNFCPage(${Number(t.id)})">Sil</button>
             </div>
           </div>`;
-        }).join(""):'<div class="empty">Bu iÅŸletmede NFC etiketi yok.</div>'}
+        }).join(""):'<div class="empty">Bu işletmede NFC etiketi yok.</div>'}
       </div>
     </section>`;
 }
 function newNFC(businessId){
   document.getElementById("modalTitle").textContent="Yeni NFC Etiketi";
-  document.getElementById("modalBody").innerHTML=`<div class="form-grid"><div class="form-field full"><label>ETÄ°KET ADI</label><input id="n_name" placeholder="Ã–rn. Masa 1"></div><div class="form-field full"><label>KONUM / YERLEÅÄ°M</label><input id="n_placement" placeholder="Ã–rn. Masa 1, Kasa, MenÃ¼"></div></div><div class="modal-actions"><button class="btn primary" onclick="createNFC(${Number(businessId)})">NFC Etiketi OluÅŸtur</button><button class="btn" onclick="closeModal()">VazgeÃ§</button></div>`;
+  document.getElementById("modalBody").innerHTML=`<div class="form-grid"><div class="form-field full"><label>ETİKET ADI</label><input id="n_name" placeholder="Örn. Masa 1"></div><div class="form-field full"><label>KONUM / YERLEŞİM</label><input id="n_placement" placeholder="Örn. Masa 1, Kasa, Menü"></div></div><div class="modal-actions"><button class="btn primary" onclick="createNFC(${Number(businessId)})">NFC Etiketi Oluştur</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;
   openModal();
 }
 async function createNFC(businessId){
   const name=document.getElementById("n_name").value.trim(),placement=document.getElementById("n_placement").value.trim();
-  if(!name||!placement){showToast("Etiket adÄ± ve konum gerekli.");return}
+  if(!name||!placement){showToast("Etiket adı ve konum gerekli.");return}
   try{
     const d=await api("/api/admin/nfc-tags",{method:"POST",body:JSON.stringify({business_id:businessId,name,placement})});
-    closeModal();showToast("NFC etiketi oluÅŸturuldu.");
+    closeModal();showToast("NFC etiketi oluşturuldu.");
     const fresh=await api("/api/admin/business/"+businessId);
     currentBusiness={...fresh.business,permissions:fresh.permissions||currentBusiness?.permissions||{profile:true,digital:true,qr:false,nfc:false,analytics:false,live:false,ai:false},nfc_tags:fresh.nfc_tags||[]};
     renderBusinessPage();
@@ -857,29 +856,29 @@ async function createNFC(businessId){
 async function editNFCPage(id){
   try{
     const d=await api("/api/admin/nfc-tags/"+id);const t=d.nfc_tag||d;
-    document.getElementById("modalTitle").textContent="NFC Etiketini DÃ¼zenle";
+    document.getElementById("modalTitle").textContent="NFC Etiketini Düzenle";
     document.getElementById("modalBody").innerHTML=`
       <div class="form-grid">
-        <div class="form-field full"><label>ETÄ°KET ADI</label><input id="e_name" value="${esc(t.name||"")}"></div>
-        <div class="form-field full"><label>KONUM / YERLEÅÄ°M</label><input id="e_placement" value="${esc(t.placement||"")}"></div>
+        <div class="form-field full"><label>ETİKET ADI</label><input id="e_name" value="${esc(t.name||"")}"></div>
+        <div class="form-field full"><label>KONUM / YERLEŞİM</label><input id="e_placement" value="${esc(t.placement||"")}"></div>
         <div class="form-field full"><label>DURUM</label><select id="e_active"><option value="true" ${t.is_active?"selected":""}>Aktif</option><option value="false" ${!t.is_active?"selected":""}>Pasif</option></select></div>
       </div>
       <div class="detail-box" style="margin-top:13px"><small>NFC URL</small><strong style="display:block;word-break:break-all;margin-top:5px">${esc(t.url||("/p/nfc/"+t.code))}</strong></div>
-      <div class="modal-actions"><button class="btn primary" onclick="saveNFCPage(${Number(id)},${Number(t.business_id||currentBusiness.id)})">Kaydet</button><button class="btn" onclick="closeModal()">VazgeÃ§</button></div>`;
+      <div class="modal-actions"><button class="btn primary" onclick="saveNFCPage(${Number(id)},${Number(t.business_id||currentBusiness.id)})">Kaydet</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;
     openModal();
   }catch(e){showToast(e.message)}
 }
 async function saveNFCPage(id,businessId){
   const body={name:document.getElementById("e_name").value.trim(),placement:document.getElementById("e_placement").value.trim(),is_active:document.getElementById("e_active").value==="true"};
-  if(!body.name||!body.placement){showToast("Etiket adÄ± ve konum gerekli.");return}
+  if(!body.name||!body.placement){showToast("Etiket adı ve konum gerekli.");return}
   try{
     await api("/api/admin/nfc-tags/"+id,{method:"PUT",body:JSON.stringify(body)});
-    closeModal();showToast("NFC etiketi gÃ¼ncellendi.");
+    closeModal();showToast("NFC etiketi güncellendi.");
     const d=await api("/api/admin/business/"+businessId);currentBusiness={...d.business,permissions:d.permissions||currentBusiness?.permissions||{profile:true,digital:true,qr:false,nfc:false,analytics:false,live:false,ai:false},nfc_tags:d.nfc_tags||[]};renderBusinessPage();
   }catch(e){showToast(e.message)}
 }
 async function deleteNFCPage(id){
-  if(!confirm("Bu NFC etiketini silmek istediÄŸine emin misin?"))return;
+  if(!confirm("Bu NFC etiketini silmek istediğine emin misin?"))return;
   try{
     await api("/api/admin/nfc-tags/"+id,{method:"DELETE"});
     showToast("NFC etiketi silindi.");
@@ -893,10 +892,10 @@ function renderBizAnalytics(){
   document.getElementById("bizAnalytics").innerHTML=`
     <section class="card biz-section">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <div><h3>Analytics</h3><div class="sub">Ä°ÅŸletmenin tÃ¼m zamanlardaki event daÄŸÄ±lÄ±mÄ±.</div></div>
-        <button class="btn" onclick="loadBizAnalytics()">â†» Yenile</button>
+        <div><h3>Analytics</h3><div class="sub">İşletmenin tüm zamanlardaki event dağılımı.</div></div>
+        <button class="btn" onclick="loadBizAnalytics()">↻ Yenile</button>
       </div>
-      <div id="bizAnalyticsData" class="analytics-cards"><div class="empty">YÃ¼kleniyorâ€¦</div></div>
+      <div id="bizAnalyticsData" class="analytics-cards"><div class="empty">Yükleniyor…</div></div>
     </section>`;
   loadBizAnalytics();
 }
@@ -906,7 +905,7 @@ async function loadBizAnalytics(){
     const d=await api("/api/admin/business/"+currentBusiness.id+"/analytics?period=all");
     const a=d.analytics||d.events||d||{};
     const rows=Array.isArray(a)?a:Object.entries(a).map(([type,count])=>({type,count}));
-    box.innerHTML=rows.length?rows.slice(0,20).map(x=>`<div class="analytics-card"><small>${esc(String(x.type||x.event_type||"EVENT").replaceAll("_"," ").toUpperCase())}</small><strong>${n(x.count??x.total??0)}</strong></div>`).join(""):'<div class="empty">Analytics verisi bulunamadÄ±.</div>';
+    box.innerHTML=rows.length?rows.slice(0,20).map(x=>`<div class="analytics-card"><small>${esc(String(x.type||x.event_type||"EVENT").replaceAll("_"," ").toUpperCase())}</small><strong>${n(x.count??x.total??0)}</strong></div>`).join(""):'<div class="empty">Analytics verisi bulunamadı.</div>';
   }catch(e){box.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
 }
 /*
@@ -917,7 +916,7 @@ async function loadBizAnalytics(){
   Onceden channels = p.allowed_platforms || {} yaziyordu; alan hic
   gelmedigi icin channels her zaman bos kaliyor, 21 anahtarin hepsi
   ACIK gorunuyordu. Kaydet'e basildiginda da hepsi acik olarak
-  yaziliyordu â€” yani izin ekranini acip kaydeden admin, kapali
+  yaziliyordu — yani izin ekranini acip kaydeden admin, kapali
   kanallarin hepsini farkinda olmadan aciyordu.
 
   Simdi gercek durum yukleniyor, sonra ekran yeniden ciziliyor.
@@ -941,7 +940,7 @@ function renderBizPermissions(){
   if(!b){
     console.error('renderBizPermissions: isletme yuklu degil');
     const box=document.getElementById("bizPermissions");
-    if(box) box.innerHTML='<section class="card biz-section"><h3>Ä°zinler yÃ¼klenemedi</h3><div class="sub">Ä°ÅŸletme bilgisi alÄ±namadÄ±. Listeye dÃ¶nÃ¼p tekrar deneyin.</div></section>';
+    if(box) box.innerHTML='<section class="card biz-section"><h3>İzinler yüklenemedi</h3><div class="sub">İşletme bilgisi alınamadı. Listeye dönüp tekrar deneyin.</div></section>';
     return;
   }
   const p=b.permissions||{profile:true,digital:true,qr:false,nfc:false,analytics:false,live:false,ai:false};
@@ -950,52 +949,52 @@ function renderBizPermissions(){
   const channelsLoaded=!!p.allowed_platforms;
   if(!channelsLoaded) loadBizChannels();
   const fieldDefs=[
-    ['name','Ä°ÅŸletme AdÄ±'],['category','Kategori'],['description','AÃ§Ä±klama'],['phone','Telefon'],['whatsapp','WhatsApp'],
-    ['address','Konum / Google Maps'],['hours','Ã‡alÄ±ÅŸma Saatleri'],['iban','IBAN'],['iban_holder','IBAN Sahibi'],['logo_url','Logo']
+    ['name','İşletme Adı'],['category','Kategori'],['description','Açıklama'],['phone','Telefon'],['whatsapp','WhatsApp'],
+    ['address','Konum / Google Maps'],['hours','Çalışma Saatleri'],['iban','IBAN'],['iban_holder','IBAN Sahibi'],['logo_url','Logo']
   ];
   const channelDefs=[
     ['instagram','Instagram'],['facebook','Facebook'],['tiktok','TikTok'],['youtube','YouTube'],['linkedin','LinkedIn'],['x','X'],
     ['whatsapp','WhatsApp'],['google','Google'],['website','Website'],['yemeksepeti','Yemeksepeti'],['getir','Getir'],
     ['trendyol-yemek','Trendyol Yemek'],['migros-yemek','Migros Yemek'],['rezervasyon','Rezervasyon'],['bilet','Bilet / Etkinlik'],
-    ['menu','Online MenÃ¼'],['location','Konum'],['tripadvisor','Tripadvisor'],['booking','Booking'],['telegram','Telegram'],['email','E-posta']
+    ['menu','Online Menü'],['location','Konum'],['tripadvisor','Tripadvisor'],['booking','Booking'],['telegram','Telegram'],['email','E-posta']
   ];
   document.getElementById("bizPermissions").innerHTML=`
     <section class="card biz-section">
-      <h3>Ä°ÅŸletme ModÃ¼l Ä°zinleri</h3>
-      <div class="sub">GÃ¼ncel Business Center'da hangi ana alanlarÄ±n iÅŸletmeye aÃ§Ä±k olacaÄŸÄ±nÄ± buradan kontrol et. Profil Ä°Ã§eriÄŸi, Profil YÃ¶netimi'nin iÃ§inde kalÄ±r.</div>
+      <h3>İşletme Modül İzinleri</h3>
+      <div class="sub">Güncel Business Center'da hangi ana alanların işletmeye açık olacağını buradan kontrol et. Profil İçeriği, Profil Yönetimi'nin içinde kalır.</div>
       <div class="permission-grid">
-        <div class="permission-card"><div><strong>Profil</strong><span>Ä°ÅŸletme bilgileri + Profil Ä°Ã§eriÄŸi</span></div><label class="switch"><input id="perm_profile" type="checkbox" ${p.profile?'checked':''}><span class="slider"></span></label></div>
-        <div class="permission-card"><div><strong>Dijital Kanallar</strong><span>21 kanalÄ±n iÅŸletme panelinde gÃ¶rÃ¼nmesi</span></div><label class="switch"><input id="perm_digital" type="checkbox" ${p.digital!==false?'checked':''}><span class="slider"></span></label></div>
-        <div class="permission-card"><div><strong>QR</strong><span>Ana QR ve QR yÃ¶netimi</span></div><label class="switch"><input id="perm_qr" type="checkbox" ${p.qr?'checked':''}><span class="slider"></span></label></div>
-        <div class="permission-card"><div><strong>NFC / Masalar</strong><span>Masa QR/NFC etiket yÃ¶netimi</span></div><label class="switch"><input id="perm_nfc" type="checkbox" ${p.nfc?'checked':''}><span class="slider"></span></label></div>
-        <div class="permission-card"><div><strong>Analytics</strong><span>Ä°statistikler ve performans</span></div><label class="switch"><input id="perm_analytics" type="checkbox" ${p.analytics?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>Profil</strong><span>İşletme bilgileri + Profil İçeriği</span></div><label class="switch"><input id="perm_profile" type="checkbox" ${p.profile?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>Dijital Kanallar</strong><span>21 kanalın işletme panelinde görünmesi</span></div><label class="switch"><input id="perm_digital" type="checkbox" ${p.digital!==false?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>QR</strong><span>Ana QR ve QR yönetimi</span></div><label class="switch"><input id="perm_qr" type="checkbox" ${p.qr?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>NFC / Masalar</strong><span>Masa QR/NFC etiket yönetimi</span></div><label class="switch"><input id="perm_nfc" type="checkbox" ${p.nfc?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>Analytics</strong><span>İstatistikler ve performans</span></div><label class="switch"><input id="perm_analytics" type="checkbox" ${p.analytics?'checked':''}><span class="slider"></span></label></div>
         <div class="permission-card"><div><strong>Live Tracking</strong><span>QR, NFC ve kanal hareketleri</span></div><label class="switch"><input id="perm_live" type="checkbox" ${p.live?'checked':''}><span class="slider"></span></label></div>
-        <div class="permission-card"><div><strong>LEO AI</strong><span>Ä°Ã§gÃ¶rÃ¼ ve Ã¶neriler</span></div><label class="switch"><input id="perm_ai" type="checkbox" ${p.ai?'checked':''}><span class="slider"></span></label></div>
-        <div class="permission-card"><div><strong>Yorum YÃ¶nlendirme</strong><span>Puana gÃ¶re Google'a veya geri bildirime yÃ¶nlendirme</span></div><label class="switch"><input id="perm_review" type="checkbox" ${p.review?'checked':''}><span class="slider"></span></label></div>
-        <div class="permission-card"><div><strong>Kampanyalar</strong><span>ZamanlÄ± kampanya yÃ¶netimi</span></div><label class="switch"><input id="perm_campaign" type="checkbox" ${p.campaign?'checked':''}><span class="slider"></span></label></div>
-        <div class="permission-card"><div><strong>SipariÅŸ &amp; MenÃ¼</strong><span>MenÃ¼ yÃ¶netimi ve mÃ¼ÅŸteriden sipariÅŸ alma</span></div><label class="switch"><input id="perm_orders" type="checkbox" ${p.orders?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>LEO AI</strong><span>İçgörü ve öneriler</span></div><label class="switch"><input id="perm_ai" type="checkbox" ${p.ai?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>Yorum Yönlendirme</strong><span>Puana göre Google'a veya geri bildirime yönlendirme</span></div><label class="switch"><input id="perm_review" type="checkbox" ${p.review?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>Kampanyalar</strong><span>Zamanlı kampanya yönetimi</span></div><label class="switch"><input id="perm_campaign" type="checkbox" ${p.campaign?'checked':''}><span class="slider"></span></label></div>
+        <div class="permission-card"><div><strong>Sipariş &amp; Menü</strong><span>Menü yönetimi ve müşteriden sipariş alma</span></div><label class="switch"><input id="perm_orders" type="checkbox" ${p.orders?'checked':''}><span class="slider"></span></label></div>
       </div>
     </section>
     <section class="card biz-section" style="margin-top:15px">
-      <h3>Profil AlanlarÄ±</h3>
-      <div class="sub">Bunlar iÅŸletmenin kendi profil bilgileri. Dijital Kanallar'dan baÄŸÄ±msÄ±zdÄ±r.</div>
+      <h3>Profil Alanları</h3>
+      <div class="sub">Bunlar işletmenin kendi profil bilgileri. Dijital Kanallar'dan bağımsızdır.</div>
       <div class="permission-grid" style="margin-top:16px">
         ${fieldDefs.map(([key,label])=>`<div class="permission-card"><div><strong>${label}</strong><span>Profil bilgisi</span></div><label class="switch"><input id="field_${key}" type="checkbox" ${fields[key]!==false?'checked':''}><span class="slider"></span></label></div>`).join('')}
       </div>
     </section>
     <section class="card biz-section" style="margin-top:15px">
-      <h3>Dijital Kanal Ä°zinleri</h3>
-      <div class="sub">Bu liste gÃ¼ncel Business Center'daki 21 dijital kanaldÄ±r. Admin burada aÃ§ar; iÅŸletme sadece aÃ§Ä±k kanallara kendi baÄŸlantÄ±sÄ±nÄ± ekler.</div>
-      ${channelsLoaded?'':'<div class="sub" style="color:var(--gold)">Kanal izinleri yÃ¼kleniyorâ€¦ YÃ¼klenmeden kaydetme.</div>'}
+      <h3>Dijital Kanal İzinleri</h3>
+      <div class="sub">Bu liste güncel Business Center'daki 21 dijital kanaldır. Admin burada açar; işletme sadece açık kanallara kendi bağlantısını ekler.</div>
+      ${channelsLoaded?'':'<div class="sub" style="color:var(--gold)">Kanal izinleri yükleniyor… Yüklenmeden kaydetme.</div>'}
       <div class="permission-grid" style="margin-top:16px">
-        ${channelDefs.map(([key,label])=>`<div class="permission-card"><div><strong>${label}</strong><span>Dijital baÄŸlantÄ±</span></div><label class="switch"><input id="channel_${key}" type="checkbox" ${channels[key]!==false?'checked':''} ${channelsLoaded?'':'disabled'}><span class="slider"></span></label></div>`).join('')}
+        ${channelDefs.map(([key,label])=>`<div class="permission-card"><div><strong>${label}</strong><span>Dijital bağlantı</span></div><label class="switch"><input id="channel_${key}" type="checkbox" ${channels[key]!==false?'checked':''} ${channelsLoaded?'':'disabled'}><span class="slider"></span></label></div>`).join('')}
       </div>
       <div class="modal-actions">
-        <button class="btn primary" onclick="saveBusinessPermissions()" ${channelsLoaded?'':'disabled'}>TÃ¼m Ä°zinleri Kaydet</button>
-        <button class="btn" onclick="setAllBusinessPermissions(true)">TÃ¼mÃ¼nÃ¼ AÃ§</button>
-        <button class="btn" onclick="setAllBusinessPermissions(false)">TÃ¼mÃ¼nÃ¼ Kapat</button>
+        <button class="btn primary" onclick="saveBusinessPermissions()" ${channelsLoaded?'':'disabled'}>Tüm İzinleri Kaydet</button>
+        <button class="btn" onclick="setAllBusinessPermissions(true)">Tümünü Aç</button>
+        <button class="btn" onclick="setAllBusinessPermissions(false)">Tümünü Kapat</button>
       </div>
-      <div class="section-sub" style="margin-top:10px">KapalÄ± kanal iÅŸletmede gÃ¶rÃ¼nmez ve mÃ¼ÅŸterinin profilinde de yayÄ±nlanmaz.</div>
+      <div class="section-sub" style="margin-top:10px">Kapalı kanal işletmede görünmez ve müşterinin profilinde de yayınlanmaz.</div>
     </section>`;
 }
 function setAllBusinessPermissions(value){
@@ -1004,11 +1003,11 @@ function setAllBusinessPermissions(value){
   document.querySelectorAll('[id^="channel_"]').forEach(el=>el.checked=value);
 }
 async function saveBusinessPermissions(){
-  if(!currentBusiness?.id){ showToast("Ä°ÅŸletme yÃ¼klenmedi."); return; }
+  if(!currentBusiness?.id){ showToast("İşletme yüklenmedi."); return; }
   /* Kanal izinleri henuz gelmediyse kaydetmek, kapali kanallarin
      hepsini acardi. Yuklenene kadar engelle. */
   if(!currentBusiness.permissions?.allowed_platforms){
-    showToast("Kanal izinleri henÃ¼z yÃ¼klenmedi, birkaÃ§ saniye sonra tekrar dene.");
+    showToast("Kanal izinleri henüz yüklenmedi, birkaç saniye sonra tekrar dene.");
     return;
   }
   const id=currentBusiness.id;
@@ -1036,7 +1035,7 @@ async function saveBusinessPermissions(){
     if(d?.permissions) currentBusiness.permissions=d.permissions;
     const ch=await api("/api/admin/business/"+id+"/social-platform-permissions",{method:"PUT",body:JSON.stringify({allowed_platforms})});
     currentBusiness.permissions={...(currentBusiness.permissions||{}),allowed_platforms:ch?.allowed_platforms||allowed_platforms};
-    showToast("Ä°ÅŸletme eriÅŸim izinleri gÃ¼ncellendi.");
+    showToast("İşletme erişim izinleri güncellendi.");
     renderBusinessPage();
     switchBizTab("permissions",document.querySelector('[data-tab=permissions]'));
   }catch(e){showToast(e.message)}
@@ -1044,19 +1043,19 @@ async function saveBusinessPermissions(){
 
 async function renderBizQR(){
   const b=currentBusiness;
-  document.getElementById("bizQR").innerHTML=`<section class="card biz-section"><h3>QR Merkezi</h3><div class="sub">Ä°ÅŸletmenin mevcut QR adresini gÃ¶rÃ¼ntÃ¼le ve test et.</div><div id="bizQRContent" style="margin-top:15px;text-align:center">YÃ¼kleniyorâ€¦</div></section>`;
+  document.getElementById("bizQR").innerHTML=`<section class="card biz-section"><h3>QR Merkezi</h3><div class="sub">İşletmenin mevcut QR adresini görüntüle ve test et.</div><div id="bizQRContent" style="margin-top:15px;text-align:center">Yükleniyor…</div></section>`;
   try{
     const d=await api("/api/admin/business/"+b.id+"/qr");
     document.getElementById("bizQRContent").innerHTML=`
       <img src="${esc(d.qr||d.dataUrl||"")}" style="width:min(310px,80vw);background:white;padding:14px;border-radius:16px">
       <div style="font-size:11px;color:var(--muted);margin:14px auto;max-width:650px;word-break:break-all">${esc(d.url||"")}</div>
-      <div class="modal-actions" style="justify-content:center"><button class="btn primary" onclick="copyText(${esc(JSON.stringify(d.url||""))})">URL Kopyala</button><button class="btn" onclick="window.open(${esc(JSON.stringify(d.url||""))},'_blank')">Profili AÃ§ â†—</button></div>
-      <div class="section-sub" style="margin-top:10px">ğŸ”’ Bu QR URL'si mevcut iÅŸletme slug'Ä±nÄ± kullanÄ±r ve deÄŸiÅŸtirilmez.</div>`;
+      <div class="modal-actions" style="justify-content:center"><button class="btn primary" onclick="copyText(${esc(JSON.stringify(d.url||""))})">URL Kopyala</button><button class="btn" onclick="window.open(${esc(JSON.stringify(d.url||""))},'_blank')">Profili Aç ↗</button></div>
+      <div class="section-sub" style="margin-top:10px">🔒 Bu QR URL'si mevcut işletme slug'ını kullanır ve değiştirilmez.</div>`;
   }catch(e){document.getElementById("bizQRContent").innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
 }
 async function showCreatedNFC(url,d){
-  document.getElementById("modalTitle").textContent="NFC Etiketi HazÄ±r";
-  document.getElementById("modalBody").innerHTML=`<div class="detail-box"><small>NFC URL</small><strong style="display:block;word-break:break-all;margin-top:5px">${esc(url)}</strong></div><div class="modal-actions"><button class="btn primary" onclick="copyText(${esc(JSON.stringify(url))})">URL Kopyala</button><button class="btn" onclick="window.open(${esc(JSON.stringify(url))},'_blank')">Test Et â†—</button><button class="btn" onclick="closeModal()">Kapat</button></div>`;
+  document.getElementById("modalTitle").textContent="NFC Etiketi Hazır";
+  document.getElementById("modalBody").innerHTML=`<div class="detail-box"><small>NFC URL</small><strong style="display:block;word-break:break-all;margin-top:5px">${esc(url)}</strong></div><div class="modal-actions"><button class="btn primary" onclick="copyText(${esc(JSON.stringify(url))})">URL Kopyala</button><button class="btn" onclick="window.open(${esc(JSON.stringify(url))},'_blank')">Test Et ↗</button><button class="btn" onclick="closeModal()">Kapat</button></div>`;
   openModal();
 }
 async function editNFC(id){return editNFCPage(id)}
@@ -1064,8 +1063,8 @@ async function deleteNFC(id,businessId){return deleteNFCPage(id)}
 async function showQR(id){
   try{
     const d=await api("/api/admin/business/"+id+"/qr");
-    document.getElementById("modalTitle").textContent="Ä°ÅŸletme QR";
-    document.getElementById("modalBody").innerHTML=`<div style="text-align:center"><img src="${esc(d.qr||d.dataUrl||"")}" style="width:min(300px,80vw);background:white;padding:14px;border-radius:16px"><div style="font-size:11px;color:var(--muted);margin:15px 0;word-break:break-all">${esc(d.url||"")}</div><div class="modal-actions" style="justify-content:center"><button class="btn primary" onclick="copyText(${esc(JSON.stringify(d.url||""))})">URL Kopyala</button><button class="btn" onclick="window.open(${esc(JSON.stringify(d.url||""))},'_blank')">Profili AÃ§</button><button class="btn" onclick="openBusiness(${Number(id)})">â† Detaya DÃ¶n</button></div></div>`;
+    document.getElementById("modalTitle").textContent="İşletme QR";
+    document.getElementById("modalBody").innerHTML=`<div style="text-align:center"><img src="${esc(d.qr||d.dataUrl||"")}" style="width:min(300px,80vw);background:white;padding:14px;border-radius:16px"><div style="font-size:11px;color:var(--muted);margin:15px 0;word-break:break-all">${esc(d.url||"")}</div><div class="modal-actions" style="justify-content:center"><button class="btn primary" onclick="copyText(${esc(JSON.stringify(d.url||""))})">URL Kopyala</button><button class="btn" onclick="window.open(${esc(JSON.stringify(d.url||""))},'_blank')">Profili Aç</button><button class="btn" onclick="openBusiness(${Number(id)})">← Detaya Dön</button></div></div>`;
     openModal();
   }catch(e){showToast(e.message)}
 }
@@ -1079,7 +1078,7 @@ function closeGlobalPage(){
 function showGlobalPage(title,subtitle,html){
   document.querySelector(".content").style.display="none";
   document.getElementById("businessPage").classList.remove("show");
-  document.getElementById("globalEyebrow").textContent="LEO CONNECT â€¢ ADMIN";
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • ADMIN";
   document.getElementById("globalTitle").textContent=title;
   document.getElementById("globalSubtitle").textContent=subtitle;
   document.getElementById("globalContent").innerHTML=html;
@@ -1089,38 +1088,38 @@ function showGlobalPage(title,subtitle,html){
 }
 async function showNFCManager(btn){
   if(btn)setActive(btn);
-  showGlobalPage("NFC Etiketleri","TÃ¼m iÅŸletmelerin NFC etiketlerini tek merkezden yÃ¶net.",'<div class="global-card"><div class="section-title">YÃ¼kleniyorâ€¦</div></div>');
+  showGlobalPage("NFC Etiketleri","Tüm işletmelerin NFC etiketlerini tek merkezden yönet.",'<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
   try{
     const tags=await api("/api/admin/nfc-tags");
     const rows=Array.isArray(tags)?tags:tags.nfc_tags||[];
     const bizOptions=allBusinesses.map(b=>`<option value="${Number(b.id)}">${esc(b.name)}</option>`).join("");
-    document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div class="global-row"><div><h3>Merkezi NFC YÃ¶netimi</h3><div class="sub">${n(rows.length)} etiket â€¢ tÃ¼m iÅŸletmeler</div></div><button class="btn primary" onclick="newGlobalNFC()">ï¼‹ NFC Etiketi OluÅŸtur</button></div><div class="global-grid" style="margin-top:15px">${rows.length?rows.map(t=>`<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">â—‰</div><div><div class="global-name">${esc(t.name||"NFC Etiketi")}</div><div class="global-sub">${esc(t.business_name||"Ä°ÅŸletme")} â€¢ ${esc(t.placement||"Konum yok")} â€¢ ${n(t.tap_count)} dokunuÅŸ</div><div class="global-sub">${esc(t.url||("/p/nfc/"+t.code))}</div></div></div><div class="modal-actions"><span class="badge">${t.is_active?"AKTÄ°F":"PASÄ°F"}</span><button class="btn" onclick="copyText(${esc(JSON.stringify(t.url||("/p/nfc/"+t.code)))})">Kopyala</button><button class="btn" onclick="editNFCPage(${Number(t.id)})">DÃ¼zenle</button><button class="btn" onclick="deleteGlobalNFC(${Number(t.id)})">Sil</button></div></div></div>`).join(""):'<div class="empty">HenÃ¼z NFC etiketi bulunmuyor.</div>'}</div></section>`;
+    document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div class="global-row"><div><h3>Merkezi NFC Yönetimi</h3><div class="sub">${n(rows.length)} etiket • tüm işletmeler</div></div><button class="btn primary" onclick="newGlobalNFC()">＋ NFC Etiketi Oluştur</button></div><div class="global-grid" style="margin-top:15px">${rows.length?rows.map(t=>`<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">◉</div><div><div class="global-name">${esc(t.name||"NFC Etiketi")}</div><div class="global-sub">${esc(t.business_name||"İşletme")} • ${esc(t.placement||"Konum yok")} • ${n(t.tap_count)} dokunuş</div><div class="global-sub">${esc(t.url||("/p/nfc/"+t.code))}</div></div></div><div class="modal-actions"><span class="badge">${t.is_active?"AKTİF":"PASİF"}</span><button class="btn" onclick="copyText(${esc(JSON.stringify(t.url||("/p/nfc/"+t.code)))})">Kopyala</button><button class="btn" onclick="editNFCPage(${Number(t.id)})">Düzenle</button><button class="btn" onclick="deleteGlobalNFC(${Number(t.id)})">Sil</button></div></div></div>`).join(""):'<div class="empty">Henüz NFC etiketi bulunmuyor.</div>'}</div></section>`;
   }catch(e){document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
 }
 function newGlobalNFC(){
   document.getElementById("modalTitle").textContent="Yeni NFC Etiketi";
-  document.getElementById("modalBody").innerHTML=`<div class="form-grid"><div class="form-field full"><label>Ä°ÅLETME</label><select id="gn_business">${allBusinesses.map(b=>`<option value="${Number(b.id)}">${esc(b.name)}</option>`).join("")}</select></div><div class="form-field full"><label>ETÄ°KET ADI</label><input id="gn_name" placeholder="Ã–rn. Masa 1"></div><div class="form-field full"><label>KONUM / YERLEÅÄ°M</label><input id="gn_placement" placeholder="Ã–rn. Masa 1, Kasa, MenÃ¼"></div></div><div class="modal-actions"><button class="btn primary" onclick="createGlobalNFC()">NFC Etiketi OluÅŸtur</button><button class="btn" onclick="closeModal()">VazgeÃ§</button></div>`;
+  document.getElementById("modalBody").innerHTML=`<div class="form-grid"><div class="form-field full"><label>İŞLETME</label><select id="gn_business">${allBusinesses.map(b=>`<option value="${Number(b.id)}">${esc(b.name)}</option>`).join("")}</select></div><div class="form-field full"><label>ETİKET ADI</label><input id="gn_name" placeholder="Örn. Masa 1"></div><div class="form-field full"><label>KONUM / YERLEŞİM</label><input id="gn_placement" placeholder="Örn. Masa 1, Kasa, Menü"></div></div><div class="modal-actions"><button class="btn primary" onclick="createGlobalNFC()">NFC Etiketi Oluştur</button><button class="btn" onclick="closeModal()">Vazgeç</button></div>`;
   openModal();
 }
 async function createGlobalNFC(){
   const business_id=Number(document.getElementById("gn_business").value),name=document.getElementById("gn_name").value.trim(),placement=document.getElementById("gn_placement").value.trim();
-  if(!business_id||!name||!placement){showToast("Ä°ÅŸletme, etiket adÄ± ve konum gerekli.");return}
-  try{const d=await api("/api/admin/nfc-tags",{method:"POST",body:JSON.stringify({business_id,name,placement})});closeModal();showToast("NFC etiketi oluÅŸturuldu.");await showNFCManager();if(d.url)showCreatedNFC(d.url,d);}catch(e){showToast(e.message)}
+  if(!business_id||!name||!placement){showToast("İşletme, etiket adı ve konum gerekli.");return}
+  try{const d=await api("/api/admin/nfc-tags",{method:"POST",body:JSON.stringify({business_id,name,placement})});closeModal();showToast("NFC etiketi oluşturuldu.");await showNFCManager();if(d.url)showCreatedNFC(d.url,d);}catch(e){showToast(e.message)}
 }
 async function deleteGlobalNFC(id){
-  if(!confirm("Bu NFC etiketini silmek istediÄŸine emin misin?"))return;
+  if(!confirm("Bu NFC etiketini silmek istediğine emin misin?"))return;
   try{await api("/api/admin/nfc-tags/"+id,{method:"DELETE"});showToast("NFC etiketi silindi.");await showNFCManager();}catch(e){showToast(e.message)}
 }
 async function showQRManager(btn){
   if(btn)setActive(btn);
-  showGlobalPage("QR Merkezi","TÃ¼m iÅŸletmelerin mevcut QR kodlarÄ±nÄ± tek merkezden yÃ¶net.",'<div class="global-card"><div class="section-title">YÃ¼kleniyorâ€¦</div></div>');
+  showGlobalPage("QR Merkezi","Tüm işletmelerin mevcut QR kodlarını tek merkezden yönet.",'<div class="global-card"><div class="section-title">Yükleniyor…</div></div>');
   try{
     /* /api/admin/businesses DUZ DIZI donduruyor, {businesses:[...]} degil.
        Onceden yalnizca .businesses okunuyordu; allBusinesses bossa
        liste bos kaliyordu. Iki sekil de destekleniyor. */
     const fresh=allBusinesses.length?allBusinesses:await api("/api/admin/businesses");
     const biz=Array.isArray(fresh)?fresh:(fresh?.businesses||[]);
-    document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div><h3>Merkezi QR YÃ¶netimi</h3><div class="sub">Mevcut slug ve QR adresleri korunur.</div></div><div class="global-grid" style="margin-top:15px">${biz.length?biz.map(b=>`<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">â–£</div><div><div class="global-name">${esc(b.name||"Ä°simsiz")}</div><div class="global-sub">${esc(b.category||"â€”")} â€¢ /p/${esc(b.slug||"")} â€¢ ${n(b.qr_scans)} tarama</div></div></div><div class="modal-actions"><button class="btn primary" onclick="showQR(${Number(b.id)})">QR'Ä± GÃ¶r</button><button class="btn" onclick="openBusiness(${Number(b.id)})">Ä°ÅŸletmeye Git</button></div></div>`).join(""):'<div class="empty">Ä°ÅŸletme bulunamadÄ±.</div>'}</div></section>`;
+    document.getElementById("globalContent").innerHTML=`<section class="card biz-section"><div><h3>Merkezi QR Yönetimi</h3><div class="sub">Mevcut slug ve QR adresleri korunur.</div></div><div class="global-grid" style="margin-top:15px">${biz.length?biz.map(b=>`<div class="global-card"><div class="global-row"><div class="global-main"><div class="global-icon">▣</div><div><div class="global-name">${esc(b.name||"İsimsiz")}</div><div class="global-sub">${esc(b.category||"—")} • /p/${esc(b.slug||"")} • ${n(b.qr_scans)} tarama</div></div></div><div class="modal-actions"><button class="btn primary" onclick="showQR(${Number(b.id)})">QR'ı Gör</button><button class="btn" onclick="openBusiness(${Number(b.id)})">İşletmeye Git</button></div></div>`).join(""):'<div class="empty">İşletme bulunamadı.</div>'}</div></section>`;
   }catch(e){document.getElementById("globalContent").innerHTML='<div class="global-card"><div class="empty">'+esc(e.message)+'</div></div>'}
 }
 
@@ -1144,17 +1143,17 @@ function showHome(btn){
 
 
 function newGlobalBusiness(){
-  document.getElementById("modalTitle").textContent="Yeni Ä°ÅŸletme";
+  document.getElementById("modalTitle").textContent="Yeni İşletme";
   document.getElementById("modalBody").innerHTML=`
     <div class="form-grid">
-      <label><span>Ä°ÅŸletme AdÄ±</span><input id="cb_name" placeholder="Ã–rn. Hicran SofrasÄ±"></label>
+      <label><span>İşletme Adı</span><input id="cb_name" placeholder="Örn. Hicran Sofrası"></label>
       <label><span>Kategori</span><input id="cb_category" placeholder="Restoran, kafe..."></label>
       <label><span>E-posta</span><input id="cb_email" type="email" placeholder="isletme@example.com"></label>
-      <label><span>Åifre</span><input id="cb_password" type="password" placeholder="En az 8 karakter"></label>
+      <label><span>Şifre</span><input id="cb_password" type="password" placeholder="En az 8 karakter"></label>
     </div>
     <div class="modal-actions">
-      <button class="btn primary" onclick="createGlobalBusiness()">Ä°ÅŸletmeyi OluÅŸtur</button>
-      <button class="btn" onclick="closeModal()">VazgeÃ§</button>
+      <button class="btn primary" onclick="createGlobalBusiness()">İşletmeyi Oluştur</button>
+      <button class="btn" onclick="closeModal()">Vazgeç</button>
     </div>`;
   openModal();
 }
@@ -1164,11 +1163,11 @@ async function createGlobalBusiness(){
   const category=document.getElementById("cb_category").value.trim();
   const email=document.getElementById("cb_email").value.trim();
   const password=document.getElementById("cb_password").value;
-  if(!name||!email||password.length<8){showToast("Ä°ÅŸletme adÄ±, e-posta ve en az 8 karakter ÅŸifre gerekli.");return}
+  if(!name||!email||password.length<8){showToast("İşletme adı, e-posta ve en az 8 karakter şifre gerekli.");return}
   try{
     const d=await api("/api/admin/businesses",{method:"POST",body:JSON.stringify({name,category,email,password})});
     closeModal();
-    showToast("Ä°ÅŸletme oluÅŸturuldu.");
+    showToast("İşletme oluşturuldu.");
     await loadAll();
     if(d.business?.id) setTimeout(()=>openBusiness(Number(d.business.id)),150);
   }catch(e){showToast(e.message)}
@@ -1178,9 +1177,9 @@ async function createGlobalBusiness(){
 function showBusinessesPage(btn){
   setActive(btn);
   hideAllMainPages();
-  document.getElementById("globalEyebrow").textContent="LEO CONNECT â€¢ ADMIN";
-  document.getElementById("globalTitle").textContent="Ä°ÅŸletmeler";
-  document.getElementById("globalSubtitle").textContent="TÃ¼m iÅŸletmeleri tek ekrandan gÃ¶rÃ¼ntÃ¼le ve yÃ¶net.";
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • ADMIN";
+  document.getElementById("globalTitle").textContent="İşletmeler";
+  document.getElementById("globalSubtitle").textContent="Tüm işletmeleri tek ekrandan görüntüle ve yönet.";
   renderBusinessesGlobal();
 }
 
@@ -1190,12 +1189,12 @@ function renderBusinessesGlobal(){
   document.getElementById("globalContent").innerHTML = `
     <section class="card biz-section">
       <div class="section-head">
-        <div><div class="section-title">Ä°ÅŸletme Listesi</div><div class="section-sub">${n(rows.length)} iÅŸletme</div></div>
-        <div class="search"><input id="globalBusinessSearch" placeholder="Ä°ÅŸletme ara..." oninput="filterGlobalBusinesses()"><button class="btn" onclick="loadAll()">â†» Yenile</button></div>
+        <div><div class="section-title">İşletme Listesi</div><div class="section-sub">${n(rows.length)} işletme</div></div>
+        <div class="search"><input id="globalBusinessSearch" placeholder="İşletme ara..." oninput="filterGlobalBusinesses()"><button class="btn" onclick="loadAll()">↻ Yenile</button></div>
       </div>
       <div class="table-wrap">
         <table class="table" id="globalBizTable">
-          <thead><tr><th>Ä°ÅLETME</th><th>KATEGORÄ°</th><th>PROFÄ°L</th><th>QR</th><th>NFC</th><th>ETÄ°KET</th><th>Ä°ÅLEM</th></tr></thead>
+          <thead><tr><th>İŞLETME</th><th>KATEGORİ</th><th>PROFİL</th><th>QR</th><th>NFC</th><th>ETİKET</th><th>İŞLEM</th></tr></thead>
           <tbody id="globalBusinessRows"></tbody>
         </table>
       </div>
@@ -1207,16 +1206,16 @@ function renderGlobalBusinessRows(list){
   const tbody=document.getElementById("globalBusinessRows");
   if(!tbody)return;
   if(!list.length){
-    tbody.innerHTML='<tr><td colspan="7"><div class="empty">Ä°ÅŸletme bulunamadÄ±.</div></td></tr>';
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty">İşletme bulunamadı.</div></td></tr>';
     return;
   }
   tbody.innerHTML=list.map(b=>`
     <tr>
-      <td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'"><div><div class="biz-name">${esc(b.name||"Ä°simsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td>
-      <td class="accent">${esc(b.category||"â€”")}</td>
+      <td><div class="biz"><img class="biz-logo" src="${esc(b.logo_url||"")}" onerror="this.style.display='none'"><div><div class="biz-name">${esc(b.name||"İsimsiz")}</div><div class="biz-mail">${esc(b.email||"")}</div></div></div></td>
+      <td class="accent">${esc(b.category||"—")}</td>
       <td>${n(b.profile_views)}</td><td>${n(b.qr_scans)}</td><td>${n(b.nfc_scans)}</td>
       <td><span class="badge">${n(b.nfc_tags)} NFC</span></td>
-      <td><button class="btn primary" onclick="openBusiness(${Number(b.id)})">Detay â€º</button></td>
+      <td><button class="btn primary" onclick="openBusiness(${Number(b.id)})">Detay ›</button></td>
     </tr>`).join("");
 }
 
@@ -1228,26 +1227,26 @@ function filterGlobalBusinesses(){
 function showAdminAnalytics(btn){
   setActive(btn);
   hideAllMainPages();
-  document.getElementById("globalEyebrow").textContent="LEO CONNECT â€¢ ANALYTICS";
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • ANALYTICS";
   document.getElementById("globalTitle").textContent="Analytics";
-  document.getElementById("globalSubtitle").textContent="Sistemdeki toplam profil, QR, NFC ve etkileÅŸim verileri.";
+  document.getElementById("globalSubtitle").textContent="Sistemdeki toplam profil, QR, NFC ve etkileşim verileri.";
   const o=overview||{};
   document.getElementById("globalContent").innerHTML=`
     <section class="cards">
-      <div class="card stat"><div class="stat-top"><div class="stat-icon">â–¦</div></div><div class="stat-label">Ä°ÅLETMELER</div><div class="stat-value">${n(o.businesses??o.total_businesses??allBusinesses.length)}</div></div>
-      <div class="card stat"><div class="stat-top"><div class="stat-icon">âŒ‚</div></div><div class="stat-label">PROFÄ°L GÃ–RÃœNTÃœLEME</div><div class="stat-value">${n(o.profile_views??o.total_profile_views)}</div></div>
-      <div class="card stat"><div class="stat-top"><div class="stat-icon">â–£</div></div><div class="stat-label">QR TARAMA</div><div class="stat-value">${n(o.qr_scans??o.total_qr_scans)}</div></div>
-      <div class="card stat"><div class="stat-top"><div class="stat-icon">â—‰</div></div><div class="stat-label">NFC DOKUNUÅ</div><div class="stat-value">${n(o.nfc_scans??o.total_nfc_scans)}</div></div>
+      <div class="card stat"><div class="stat-top"><div class="stat-icon">▦</div></div><div class="stat-label">İŞLETMELER</div><div class="stat-value">${n(o.businesses??o.total_businesses??allBusinesses.length)}</div></div>
+      <div class="card stat"><div class="stat-top"><div class="stat-icon">⌂</div></div><div class="stat-label">PROFİL GÖRÜNTÜLEME</div><div class="stat-value">${n(o.profile_views??o.total_profile_views)}</div></div>
+      <div class="card stat"><div class="stat-top"><div class="stat-icon">▣</div></div><div class="stat-label">QR TARAMA</div><div class="stat-value">${n(o.qr_scans??o.total_qr_scans)}</div></div>
+      <div class="card stat"><div class="stat-top"><div class="stat-icon">◉</div></div><div class="stat-label">NFC DOKUNUŞ</div><div class="stat-value">${n(o.nfc_scans??o.total_nfc_scans)}</div></div>
     </section>
     <section class="card biz-section" style="margin-top:16px">
-      <h3>EtkileÅŸim Ã–zeti</h3>
-      <div class="sub">Mevcut admin overview verilerinden canlÄ± Ã¶zet.</div>
+      <h3>Etkileşim Özeti</h3>
+      <div class="sub">Mevcut admin overview verilerinden canlı özet.</div>
       <div class="summary-grid">
-        <div class="summary-item"><div class="summary-value">${n(o.phone_clicks)}</div><div class="summary-label">Telefon TÄ±klama</div></div>
-        <div class="summary-item"><div class="summary-value">${n(o.whatsapp_clicks)}</div><div class="summary-label">WhatsApp TÄ±klama</div></div>
-        <div class="summary-item"><div class="summary-value">${n(o.profile_views??o.total_profile_views)}</div><div class="summary-label">Profil GÃ¶rÃ¼ntÃ¼leme</div></div>
+        <div class="summary-item"><div class="summary-value">${n(o.phone_clicks)}</div><div class="summary-label">Telefon Tıklama</div></div>
+        <div class="summary-item"><div class="summary-value">${n(o.whatsapp_clicks)}</div><div class="summary-label">WhatsApp Tıklama</div></div>
+        <div class="summary-item"><div class="summary-value">${n(o.profile_views??o.total_profile_views)}</div><div class="summary-label">Profil Görüntüleme</div></div>
         <div class="summary-item"><div class="summary-value">${n(o.qr_scans??o.total_qr_scans)}</div><div class="summary-label">QR Tarama</div></div>
-        <div class="summary-item"><div class="summary-value">${n(o.nfc_scans??o.total_nfc_scans)}</div><div class="summary-label">NFC DokunuÅŸ</div></div>
+        <div class="summary-item"><div class="summary-value">${n(o.nfc_scans??o.total_nfc_scans)}</div><div class="summary-label">NFC Dokunuş</div></div>
       </div>
     </section>`;
 }
@@ -1255,35 +1254,35 @@ function showAdminAnalytics(btn){
 function showAccountsPage(btn){
   setActive(btn);
   hideAllMainPages();
-  document.getElementById("globalEyebrow").textContent="LEO CONNECT â€¢ SÄ°STEM";
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • SİSTEM";
   document.getElementById("globalTitle").textContent="Hesaplar";
-  document.getElementById("globalSubtitle").textContent="Admin eriÅŸim hesabÄ±nÄ±n mevcut oturum bilgileri.";
-  const email=localStorage.getItem("admin_email")||"Admin eriÅŸimi";
+  document.getElementById("globalSubtitle").textContent="Admin erişim hesabının mevcut oturum bilgileri.";
+  const email=localStorage.getItem("admin_email")||"Admin erişimi";
   document.getElementById("globalContent").innerHTML=`
     <section class="card biz-section">
-      <h3>Admin HesabÄ±</h3>
+      <h3>Admin Hesabı</h3>
       <div class="sub">Mevcut oturum bilgisi</div>
       <div class="info-grid" style="margin-top:15px">
         <div class="info-box"><small>E-POSTA</small><strong>${esc(email)}</strong></div>
         <div class="info-box"><small>OTURUM</small><strong>Aktif</strong></div>
       </div>
-      <div class="modal-actions"><button class="btn primary" onclick="logout()">Ã‡Ä±kÄ±ÅŸ Yap</button></div>
+      <div class="modal-actions"><button class="btn primary" onclick="logout()">Çıkış Yap</button></div>
     </section>`;
 }
 
 function showSettingsPage(btn){
   setActive(btn);
   hideAllMainPages();
-  document.getElementById("globalEyebrow").textContent="LEO CONNECT â€¢ SÄ°STEM";
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • SİSTEM";
   document.getElementById("globalTitle").textContent="Ayarlar";
-  document.getElementById("globalSubtitle").textContent="Admin gÃ¶rÃ¼nÃ¼mÃ¼nÃ¼ buradan yÃ¶net.";
+  document.getElementById("globalSubtitle").textContent="Admin görünümünü buradan yönet.";
   document.getElementById("globalContent").innerHTML=`
     <section class="card biz-section">
-      <h3>GÃ¶rÃ¼nÃ¼m</h3>
-      <div class="sub">Tema ve vurgu rengini deÄŸiÅŸtirebilirsin.</div>
+      <h3>Görünüm</h3>
+      <div class="sub">Tema ve vurgu rengini değiştirebilirsin.</div>
       <div class="permission-grid" style="margin-top:15px">
-        <div class="permission-card"><div><strong>Koyu / AÃ§Ä±k Tema</strong><span>Admin paneli gÃ¶rÃ¼nÃ¼mÃ¼</span></div><button class="btn" onclick="toggleTheme();showSettingsPage(document.querySelector('.nav button:nth-child(7)'))">DeÄŸiÅŸtir</button></div>
-        <div class="permission-card"><div><strong>Vurgu Rengi</strong><span>Ãœst menÃ¼deki renk seÃ§enekleri aktif.</span></div><div class="top-actions">
+        <div class="permission-card"><div><strong>Koyu / Açık Tema</strong><span>Admin paneli görünümü</span></div><button class="btn" onclick="toggleTheme();showSettingsPage(document.querySelector('.nav button:nth-child(7)'))">Değiştir</button></div>
+        <div class="permission-card"><div><strong>Vurgu Rengi</strong><span>Üst menüdeki renk seçenekleri aktif.</span></div><div class="top-actions">
           <button class="swatch s-gold" onclick="setAccent('gold',this)"></button>
           <button class="swatch s-green" onclick="setAccent('green',this)"></button>
           <button class="swatch s-blue" onclick="setAccent('blue',this)"></button>
@@ -1297,16 +1296,16 @@ function showSettingsPage(btn){
 function showSupportPage(btn){
   setActive(btn);
   hideAllMainPages();
-  document.getElementById("globalEyebrow").textContent="LEO CONNECT â€¢ DESTEK";
-  document.getElementById("globalTitle").textContent="Destek / Sistem KontrolÃ¼";
-  document.getElementById("globalSubtitle").textContent="BaÄŸlantÄ± ve servis durumunu hÄ±zlÄ±ca kontrol et.";
+  document.getElementById("globalEyebrow").textContent="LEO CONNECT • DESTEK";
+  document.getElementById("globalTitle").textContent="Destek / Sistem Kontrolü";
+  document.getElementById("globalSubtitle").textContent="Bağlantı ve servis durumunu hızlıca kontrol et.";
   document.getElementById("globalContent").innerHTML=`
     <section class="card biz-section">
       <h3>Sistem Durumu</h3>
-      <div class="sub">Admin API baÄŸlantÄ±sÄ±nÄ± test etmek iÃ§in aÅŸaÄŸÄ±daki butonu kullan.</div>
+      <div class="sub">Admin API bağlantısını test etmek için aşağıdaki butonu kullan.</div>
       <div id="supportStatus" class="detail-grid" style="margin-top:15px">
         <div class="detail-box"><small>API</small><strong>Kontrol bekliyor</strong></div>
-        <div class="detail-box"><small>OTURUM</small><strong>${adminToken?"Aktif":"KapalÄ±"}</strong></div>
+        <div class="detail-box"><small>OTURUM</small><strong>${adminToken?"Aktif":"Kapalı"}</strong></div>
       </div>
       <div class="modal-actions"><button class="btn primary" onclick="checkSupportApi()">API'YI TEST ET</button></div>
     </section>`;
@@ -1317,7 +1316,7 @@ async function checkSupportApi(){
   if(!box)return;
   try{
     await api("/api/admin/overview");
-    box.innerHTML='<div class="detail-box"><small>API</small><strong class="accent">Ã‡alÄ±ÅŸÄ±yor âœ“</strong></div><div class="detail-box"><small>OTURUM</small><strong class="accent">Aktif âœ“</strong></div>';
+    box.innerHTML='<div class="detail-box"><small>API</small><strong class="accent">Çalışıyor ✓</strong></div><div class="detail-box"><small>OTURUM</small><strong class="accent">Aktif ✓</strong></div>';
   }catch(e){
     box.innerHTML='<div class="detail-box"><small>API</small><strong style="color:var(--danger)">Hata</strong></div><div class="detail-box"><small>MESAJ</small><strong>'+esc(e.message)+'</strong></div>';
   }
