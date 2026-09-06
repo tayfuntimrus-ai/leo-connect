@@ -65,7 +65,10 @@ const dom = new JSDOM(html, {
       else if(/\/api\/admin\/overview/.test(u)) body={total_businesses:1};
       else if(/live-activity/.test(u)) body={activities:[],stats:{}};
       else body={};
-      return {ok:true,status:200,json:async()=>body,text:async()=>JSON.stringify(body)};
+      /* gercek fetch gibi: headers.get() ve JSON content-type */
+      return {ok:true,status:200,
+              headers:{get:h=>String(h).toLowerCase()==='content-type'?'application/json; charset=utf-8':null},
+              json:async()=>body,text:async()=>JSON.stringify(body)};
     };
   }
 });
@@ -140,6 +143,36 @@ setTimeout(async () => {
     fb ? `facebook checked=${fb.checked} (false olmalı)` : '');
   check('AÇIK kanal açık görünüyor', !!ig && ig.checked === true,
     ig ? `instagram checked=${ig.checked}` : '');
+
+  /* ---- 6. sessiz hata tuzagi ---- */
+  /* Express fallback bilinmeyen yola index.html + 200 OK donuyor.
+     api() bunu SESSIZCE bos {} olarak dondurmemeli. */
+  const realFetch = win.fetch;
+  win.fetch = async () => ({
+    ok: true, status: 200,
+    headers: { get: () => 'text/html; charset=utf-8' },
+    text: async () => '<!doctype html><html><body>index</body></html>',
+    json: async () => { throw new SyntaxError('Unexpected token <'); }
+  });
+  let htmlErr = null;
+  try { await win.api('/api/admin/olmayan-uc'); }
+  catch (e) { htmlErr = e.message; }
+  check('HTML yanıtı sessizce yutulmuyor', !!htmlErr,
+    htmlErr ? htmlErr.slice(0, 70) : 'hata fırlatılmadı — SESSİZ');
+  check('Hata mesajı hangi uç olduğunu söylüyor',
+    !!htmlErr && htmlErr.includes('/api/admin/olmayan-uc'), '');
+  win.fetch = realFetch;
+
+  /* ---- 7. businesses dizi seklini de kabul ediyor ---- */
+  const src = fs.readFileSync(path.join(REPO, 'public', 'admin.html'), 'utf8');
+  check('businesses yanıtı dizi olarak da okunuyor',
+    /Array\.isArray\(fresh\)\?fresh:\(fresh\?\.businesses\|\|\[\]\)/.test(src), '');
+
+  /* ---- 8. yakalanmamis hatalar gorunur ---- */
+  check('unhandledrejection yakalanıyor',
+    /addEventListener\('unhandledrejection'/.test(src), '');
+  check('sayfa hataları yakalanıyor',
+    /addEventListener\('error'/.test(src), '');
 
   process.exit(finish() ? 1 : 0);
 }, 1600);
